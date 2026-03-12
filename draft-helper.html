@@ -96,7 +96,7 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
   </div>
   <div class="sort-row">
     <span class="sort-label">排序:</span>
-    <button class="sort-btn active" data-sort="yahoo">Yahoo排名</button>
+    <button class="sort-btn active" data-sort="yahoo">App排名</button>
     <button class="sort-btn" data-sort="vor">VOR高→低</button>
     <button class="sort-btn" data-sort="score">淨分高→低</button>
   </div>
@@ -147,96 +147,96 @@ const POSITIONS = [
 
 // tag: grab=搶, ok=可選, avoid=避開, wait=可等晚拿
 const PLAYERS = [
-  // R1 range (Yahoo 1-12)
-  { yahoo: 1, name: "Aaron Judge", pos: "OF", vor: 8, score: 10, tag: "ok", note: "極端力量+BB，K% 22% 小扣" },
-  { yahoo: 2, name: "Shohei Ohtani", pos: "UTIL", vor: 0, score: 0, tag: "ok", note: "打者資格 Util，需確認聯賽規則" },
-  { yahoo: 3, name: "Bobby Witt Jr.", pos: "SS", vor: 6, score: 8, tag: "ok", note: "菁英 AVG+速度力量均衡" },
-  { yahoo: 4, name: "Juan Soto", pos: "OF", vor: 9, score: 11, tag: "grab", note: "格式之神，BB% 17%，八項七正" },
-  { yahoo: 5, name: "Elly De La Cruz", pos: "SS", vor: 2, score: 4, tag: "avoid", note: "K% 25%，一招鮮(SB)扛不動八項" },
-  { yahoo: 6, name: "Tarik Skubal", pos: "SP", vor: 12, score: 12, tag: "grab", note: "格式第一名，六項全滿，VOR +12" },
-  { yahoo: 7, name: "Jose Ramirez", pos: "3B", vor: 9, score: 9, tag: "grab", note: "K% 12%+30/30，八項零死角" },
-  { yahoo: 8, name: "Kyle Tucker", pos: "OF", vor: 5, score: 7, tag: "ok", note: "BB/K 比近 1:1" },
-  { yahoo: 9, name: "Paul Skenes", pos: "SP", vor: 8, score: 8, tag: "ok", note: "高 K + 穩定" },
-  { yahoo: 10, name: "Julio Rodriguez", pos: "OF", vor: 3, score: 5, tag: "ok", note: "低 BB 限制天花板" },
-  { yahoo: 11, name: "Garrett Crochet", pos: "SP", vor: 8, score: 8, tag: "ok", note: "與 Skenes 同級" },
-  { yahoo: 12, name: "Ronald Acuna Jr.", pos: "OF", vor: 6, score: 8, tag: "ok", note: "五拍子，傷病折扣" },
-  { yahoo: 13, name: "Gunnar Henderson", pos: "SS", vor: 6, score: 8, tag: "ok", note: "力量+速度+SS，23 歲上升中" },
+  // R1 range (App 1-12)
+  { yahoo: 1, name: "Shohei Ohtani", pos: "UTIL", vor: 0, score: 0, tag: "ok", note: "打者 Util，通常第 1 順選走" },
+  { yahoo: 2, name: "Tarik Skubal", pos: "SP", vor: 12, score: 12, tag: "grab", note: "格式第一名，六項全滿，VOR +12" },
+  { yahoo: 3, name: "Aaron Judge", pos: "OF", vor: 8, score: 10, tag: "ok", note: "極端力量+BB，K% 22% 小扣" },
+  { yahoo: 4, name: "Paul Skenes", pos: "SP", vor: 8, score: 8, tag: "ok", note: "高 K + 穩定" },
+  { yahoo: 5, name: "Bobby Witt Jr.", pos: "SS", vor: 6, score: 8, tag: "ok", note: "菁英 AVG+速度力量均衡" },
+  { yahoo: 6, name: "Juan Soto", pos: "OF", vor: 9, score: 11, tag: "grab", note: "格式之神，BB% 17%，八項七正" },
+  { yahoo: 7, name: "Garrett Crochet", pos: "SP", vor: 8, score: 8, tag: "ok", note: "與 Skenes 同級" },
+  { yahoo: 8, name: "Ronald Acuna Jr.", pos: "OF", vor: 6, score: 8, tag: "ok", note: "五拍子，傷病折扣" },
+  { yahoo: 9, name: "Jose Ramirez", pos: "3B", vor: 9, score: 9, tag: "grab", note: "K% 12%+30/30，八項零死角" },
+  { yahoo: 10, name: "Bryan Woo", pos: "SP", vor: 6, score: 6, tag: "ok", note: "菁英控球 BB% 5.5%，App 高估" },
+  { yahoo: 11, name: "Cristopher Sanchez", pos: "SP", vor: 6, score: 6, tag: "ok", note: "吃局數+控球 SP，App 高估" },
+  { yahoo: 12, name: "Vladimir Guerrero Jr.", pos: "1B", vor: 9, score: 10, tag: "grab", note: "R1 尾段寶藏！K% 13.7% 菁英" },
 
-  // R2 range (Yahoo 14-25)
-  { yahoo: 14, name: "Junior Caminero", pos: "3B", vor: 2, score: 2, tag: "avoid", note: "低 BB 6.9% + 新秀 K 風險" },
-  { yahoo: 15, name: "Fernando Tatis Jr.", pos: "OF", vor: 5, score: 7, tag: "ok", note: "五拍子，傷病風險" },
-  { yahoo: 16, name: "Jackson Chourio", pos: "OF", vor: 2, score: 2, tag: "avoid", note: "BB% 6.7%，格式貢獻平庸" },
-  { yahoo: 17, name: "Vladimir Guerrero Jr.", pos: "1B", vor: 9, score: 10, tag: "grab", note: "K% 13.7% 菁英，八項七正，R2 首選" },
-  { yahoo: 18, name: "Cal Raleigh", pos: "C", vor: 3, score: 3, tag: "avoid", note: "188K + .230 AVG，K+AVG 雙失血" },
+  // R2 range (App 13-24)
+  { yahoo: 13, name: "Julio Rodriguez", pos: "OF", vor: 3, score: 5, tag: "ok", note: "低 BB 限制天花板" },
+  { yahoo: 14, name: "Fernando Tatis Jr.", pos: "OF", vor: 5, score: 7, tag: "ok", note: "五拍子，傷病風險" },
+  { yahoo: 15, name: "Corbin Carroll", pos: "OF", vor: 5, score: 7, tag: "ok", note: "速度+力量均衡" },
+  { yahoo: 16, name: "Jacob deGrom", pos: "SP", vor: 5, score: 5, tag: "ok", note: "菁英控球，局數+健康是問號" },
+  { yahoo: 17, name: "Chris Sale", pos: "SP", vor: 5, score: 5, tag: "ok", note: "比率菁英但局數風險" },
+  { yahoo: 18, name: "Kyle Tucker", pos: "OF", vor: 5, score: 7, tag: "ok", note: "BB/K 比近 1:1" },
   { yahoo: 19, name: "Kyle Schwarber", pos: "OF", vor: 1, score: 3, tag: "avoid", note: "197K 毀滅 K 欄 + .230 AVG" },
-  { yahoo: 20, name: "Corbin Carroll", pos: "OF", vor: 5, score: 7, tag: "ok", note: "速度+力量均衡" },
-  { yahoo: 21, name: "Nick Kurtz", pos: "1B", vor: 5, score: 5, tag: "ok", note: "新秀，高 BB% 14.1% 但不確定性大" },
-  { yahoo: 22, name: "Jazz Chisholm Jr.", pos: "2B", vor: 5, score: 5, tag: "grab", note: "2B 稀缺位 + 2B/3B 雙守位" },
-  { yahoo: 23, name: "Pete Alonso", pos: "1B", vor: 3, score: 3, tag: "wait", note: "HR/RBI 強但 K+SB 雙弱" },
-  { yahoo: 24, name: "Zach Neto", pos: "SS", vor: 1, score: 1, tag: "avoid", note: "K% 24% + BB% 7%，格式雙重不友善" },
-  { yahoo: 25, name: "Trea Turner", pos: "SS", vor: 0, score: 2, tag: "avoid", note: "VOR = 0，R2 最大陷阱" },
+  { yahoo: 20, name: "Logan Gilbert", pos: "SP", vor: 7, score: 7, tag: "grab", note: "R2 最高 VOR SP！菁英控球 BB% 5.7%" },
+  { yahoo: 21, name: "Max Fried", pos: "SP", vor: 4, score: 4, tag: "ok", note: "穩定工作馬" },
+  { yahoo: 22, name: "Yoshinobu Yamamoto", pos: "SP", vor: 3, score: 3, tag: "wait", note: "局數受限 154 IP" },
+  { yahoo: 23, name: "Gunnar Henderson", pos: "SS", vor: 6, score: 8, tag: "ok", note: "力量+速度+SS，從 R1 滑落" },
+  { yahoo: 24, name: "Junior Caminero", pos: "3B", vor: 2, score: 2, tag: "avoid", note: "低 BB 6.9% + 新秀 K 風險" },
 
-  // R3 range (Yahoo 26-36)
-  { yahoo: 26, name: "Francisco Lindor", pos: "SS", vor: 3, score: 3, tag: "wait", note: "堪用但可更晚拿 SS" },
-  { yahoo: 27, name: "Cristopher Sanchez", pos: "SP", vor: 6, score: 6, tag: "ok", note: "吃局數+控球 SP" },
-  { yahoo: 28, name: "Ketel Marte", pos: "2B", vor: 6, score: 6, tag: "grab", note: "2B 最佳格式選項" },
-  { yahoo: 29, name: "Mason Miller", pos: "RP", vor: 7, score: 8, tag: "grab", note: "菁英 CL，唯一值得 R3 的 RP" },
-  { yahoo: 30, name: "Manny Machado", pos: "3B", vor: 5, score: 5, tag: "ok", note: "穩定但無突出類別" },
-  { yahoo: 31, name: "James Wood", pos: "OF", vor: 3, score: 3, tag: "wait", note: "新秀潛力，但不確定性" },
-  { yahoo: 32, name: "Bryce Harper", pos: "1B", vor: 5, score: 6, tag: "grab", note: "全面型 1B，低 K+BB+AVG+SLG" },
-  { yahoo: 33, name: "Matt Olson", pos: "1B", vor: 3, score: 4, tag: "wait", note: "HR/RBI 強但 K+SB 雙弱" },
-  { yahoo: 34, name: "Brent Rooker", pos: "OF", vor: 2, score: 4, tag: "wait", note: "極端力量型，K+SB 雙弱，OF 深度壓低 VOR" },
-  { yahoo: 34, name: "Logan Gilbert", pos: "SP", vor: 7, score: 7, tag: "grab", note: "菁英控球 BB% 5.7%，格式溢價 SP" },
-  { yahoo: 35, name: "Edwin Diaz", pos: "RP", vor: 5, score: 6, tag: "ok", note: "高 K CL" },
+  // R3 range (App 25-36)
+  { yahoo: 25, name: "Logan Webb", pos: "SP", vor: 6, score: 6, tag: "ok", note: "QS 之王+控球好（App 推高，公平價）" },
+  { yahoo: 26, name: "Zack Wheeler", pos: "SP", vor: 5, score: 5, tag: "ok", note: "菁英控球+比率（App 推高，公平價）" },
+  { yahoo: 27, name: "Elly De La Cruz", pos: "SS", vor: 2, score: 4, tag: "avoid", note: "K% 25%，一招鮮(SB)扛不動八項" },
+  { yahoo: 28, name: "Ketel Marte", pos: "2B", vor: 6, score: 6, tag: "grab", note: "2B 最佳格式選項！過了這裡斷層" },
+  { yahoo: 29, name: "Cole Ragans", pos: "SP", vor: 3, score: 3, tag: "wait", note: "BB% 8.8% 偏高" },
+  { yahoo: 30, name: "Mason Miller", pos: "RP", vor: 7, score: 8, tag: "grab", note: "菁英 CL，唯一值得 R3 的 RP" },
+  { yahoo: 31, name: "Pete Alonso", pos: "1B", vor: 3, score: 3, tag: "wait", note: "HR/RBI 強但 K+SB 雙弱" },
+  { yahoo: 32, name: "Trea Turner", pos: "SS", vor: 0, score: 2, tag: "avoid", note: "VOR = 0，格式陷阱" },
+  { yahoo: 33, name: "Nick Kurtz", pos: "1B", vor: 5, score: 5, tag: "ok", note: "新秀，高 BB% 14.1% 但不確定性大" },
+  { yahoo: 34, name: "Brent Rooker", pos: "OF", vor: 2, score: 4, tag: "wait", note: "極端力量型，K+SB 雙弱" },
+  { yahoo: 35, name: "Yordan Alvarez", pos: "OF", vor: 5, score: 7, tag: "grab", note: "菁英 AVG/SLG/BB，R3 可拿" },
+  { yahoo: 36, name: "Francisco Lindor", pos: "SS", vor: 3, score: 3, tag: "wait", note: "堪用但可更晚拿 SS" },
 
-  // R4 range (Yahoo 37-48)
-  { yahoo: 37, name: "Bryan Woo", pos: "SP", vor: 6, score: 6, tag: "grab", note: "菁英控球 BB% 5.5%" },
-  { yahoo: 38, name: "Yoshinobu Yamamoto", pos: "SP", vor: 3, score: 3, tag: "wait", note: "局數受限 154 IP" },
-  { yahoo: 39, name: "Chris Sale", pos: "SP", vor: 5, score: 5, tag: "ok", note: "比率菁英但局數風險" },
-  { yahoo: 41, name: "Cade Smith", pos: "RP", vor: 9, score: 10, tag: "grab", note: "SU 界的 Soto，五項全菁英" },
-  { yahoo: 42, name: "Andres Munoz", pos: "RP", vor: 5, score: 5, tag: "ok", note: "穩定 CL" },
-  { yahoo: 43, name: "Jarren Duran", pos: "OF", vor: 4, score: 4, tag: "ok", note: "速度+AVG 型" },
-  { yahoo: 43, name: "Jhoan Duran", pos: "RP", vor: 5, score: 5, tag: "ok", note: "強隊 CL" },
-  { yahoo: 44, name: "Roman Anthony", pos: "OF", vor: 3, score: 3, tag: "wait", note: "新秀不確定性" },
-  { yahoo: 44, name: "Hunter Greene", pos: "SP", vor: 2, score: 2, tag: "avoid", note: "高 K 但 BB/ERA 平庸" },
-  { yahoo: 45, name: "Rafael Devers", pos: "1B", vor: 3, score: 3, tag: "wait", note: "高 K 拖累" },
-  { yahoo: 45, name: "Cole Ragans", pos: "SP", vor: 3, score: 3, tag: "wait", note: "BB% 8.8% 偏高" },
+  // R4 range (App 37-48) — 黃金地帶
+  { yahoo: 37, name: "Jackson Chourio", pos: "OF", vor: 2, score: 2, tag: "avoid", note: "BB% 6.7%，格式貢獻平庸" },
+  { yahoo: 38, name: "George Kirby", pos: "SP", vor: 5, score: 5, tag: "grab", note: "BB% 4.6% 全聯盟頂級！格式之寶" },
+  { yahoo: 39, name: "Jesus Luzardo", pos: "SP", vor: 3, score: 3, tag: "wait", note: "高天花板但傷病風險" },
+  { yahoo: 40, name: "Bryce Harper", pos: "1B", vor: 5, score: 6, tag: "grab", note: "全面型 1B，低 K+BB+AVG+SLG" },
+  { yahoo: 41, name: "Freddie Freeman", pos: "1B", vor: 6, score: 7, tag: "grab", note: "打者最大套利！低 K+高 AVG+BB" },
+  { yahoo: 42, name: "Cal Raleigh", pos: "C", vor: 3, score: 3, tag: "avoid", note: "188K + .230 AVG，K+AVG 雙失血" },
+  { yahoo: 43, name: "Cade Smith", pos: "RP", vor: 9, score: 10, tag: "grab", note: "SU 界的 Soto，五項全菁英！R4 必搶" },
+  { yahoo: 44, name: "Edwin Diaz", pos: "RP", vor: 5, score: 6, tag: "ok", note: "高 K CL" },
+  { yahoo: 45, name: "Framber Valdez", pos: "SP", vor: 3, score: 3, tag: "wait", note: "吃局數但比率普通" },
+  { yahoo: 46, name: "Shohei Ohtani P", pos: "SP", vor: 0, score: 0, tag: "wait", note: "投手資格，需確認規則" },
+  { yahoo: 47, name: "Freddy Peralta", pos: "SP", vor: 2, score: 2, tag: "wait", note: "" },
+  { yahoo: 48, name: "Zach Neto", pos: "SS", vor: 1, score: 1, tag: "avoid", note: "K% 24% + BB% 7%，格式雙重不友善" },
 
-  // R5 range (Yahoo 49-60)
-  { yahoo: 49, name: "Cody Bellinger", pos: "OF", vor: 4, score: 4, tag: "ok", note: "多守位" },
-  { yahoo: 49, name: "Jacob deGrom", pos: "SP", vor: 5, score: 5, tag: "ok", note: "菁英控球，局數+健康是問號" },
-  { yahoo: 50, name: "Jackson Merrill", pos: "OF", vor: 0, score: 0, tag: "avoid", note: "BB% 6.7% 嚴重限制格式價值" },
-  { yahoo: 51, name: "Yordan Alvarez", pos: "OF", vor: 5, score: 7, tag: "grab", note: "菁英 AVG/SLG/BB，Yahoo 下滑套利更大" },
-  { yahoo: 52, name: "Max Fried", pos: "SP", vor: 4, score: 4, tag: "ok", note: "穩定工作馬" },
-  { yahoo: 53, name: "Riley Greene", pos: "OF", vor: 4, score: 6, tag: "grab", note: "均衡五項貢獻者" },
-  { yahoo: 55, name: "Josh Naylor", pos: "1B", vor: 4, score: 4, tag: "ok", note: "打點機器，零速度" },
+  // R5 range (App 49-60)
+  { yahoo: 49, name: "Nathan Eovaldi", pos: "SP", vor: 3, score: 3, tag: "wait", note: "穩定但缺 K" },
+  { yahoo: 50, name: "Hunter Brown", pos: "SP", vor: 2, score: 2, tag: "wait", note: "" },
+  { yahoo: 51, name: "Manny Machado", pos: "3B", vor: 5, score: 5, tag: "grab", note: "3B 被 App 壓低！R5 超值" },
+  { yahoo: 52, name: "George Springer", pos: "OF", vor: 2, score: 2, tag: "wait", note: "App 推高" },
+  { yahoo: 53, name: "Jazz Chisholm Jr.", pos: "2B", vor: 5, score: 5, tag: "grab", note: "2B 稀缺位！App 壓低到 R5 超值" },
+  { yahoo: 54, name: "Dylan Cease", pos: "SP", vor: 1, score: 1, tag: "avoid", note: "BB% 8.7% 雙重受罰" },
+  { yahoo: 55, name: "Rafael Devers", pos: "1B", vor: 3, score: 3, tag: "wait", note: "高 K 拖累" },
   { yahoo: 56, name: "Geraldo Perdomo", pos: "SS", vor: 2, score: 2, tag: "wait", note: "K% 13.2%+BB% 12.1% 隱藏格式溢價但缺長打" },
   { yahoo: 57, name: "Brice Turang", pos: "2B", vor: 3, score: 3, tag: "wait", note: "2B 稀缺但格式貢獻平庸" },
   { yahoo: 58, name: "Corey Seager", pos: "SS", vor: 3, score: 3, tag: "ok", note: "健康時格式友善" },
-  { yahoo: 59, name: "Freddie Freeman", pos: "1B", vor: 6, score: 7, tag: "grab", note: "全選秀打者最大套利！低 K+高 AVG+BB" },
+  { yahoo: 59, name: "Riley Greene", pos: "OF", vor: 4, score: 6, tag: "grab", note: "均衡五項貢獻者" },
   { yahoo: 60, name: "Austin Riley", pos: "3B", vor: 3, score: 3, tag: "ok", note: "傷癒反彈候選" },
 
-  // R6 range (Yahoo 61-74)
-  { yahoo: 61, name: "Logan Webb", pos: "SP", vor: 6, score: 6, tag: "grab", note: "QS 之王+控球好，超值" },
+  // R6+ range
   { yahoo: 62, name: "William Contreras", pos: "C", vor: 1, score: 1, tag: "ok", note: "捕手中最不傷格式" },
-  { yahoo: 63, name: "Devin Williams", pos: "RP", vor: 5, score: 6, tag: "grab", note: "高 K CL，ADP 超值" },
+  { yahoo: 63, name: "Devin Williams", pos: "RP", vor: 5, score: 6, tag: "grab", note: "高 K CL" },
   { yahoo: 63, name: "David Bednar", pos: "RP", vor: 5, score: 5, tag: "ok", note: "穩定 CL+控球好" },
-  { yahoo: 64, name: "Freddy Peralta", pos: "SP", vor: 2, score: 2, tag: "wait", note: "" },
+  { yahoo: 65, name: "Josh Naylor", pos: "1B", vor: 4, score: 4, tag: "ok", note: "打點機器，零速度" },
   { yahoo: 66, name: "Shea Langeliers", pos: "C", vor: 1, score: 1, tag: "wait", note: "可延後" },
-  { yahoo: 67, name: "George Kirby", pos: "SP", vor: 5, score: 5, tag: "grab", note: "BB% 4.6% 全聯盟頂級！格式之寶" },
   { yahoo: 68, name: "Bo Bichette", pos: "SS", vor: 0, score: 0, tag: "wait", note: "低 BB 限制，反彈候選" },
+  { yahoo: 70, name: "Cody Bellinger", pos: "OF", vor: 4, score: 4, tag: "ok", note: "多守位" },
   { yahoo: 73, name: "Randy Arozarena", pos: "OF", vor: 1, score: 1, tag: "wait", note: "" },
   { yahoo: 74, name: "Jeremy Pena", pos: "SS", vor: 2, score: 2, tag: "wait", note: "" },
 
-  // R7-8 range (Yahoo 75-100)
+  // R7-8 range
   { yahoo: 75, name: "Vinnie Pasquantino", pos: "1B", vor: 2, score: 2, tag: "wait", note: "低 K 安全牌但缺 SLG+SB" },
-  { yahoo: 77, name: "Dylan Cease", pos: "SP", vor: 1, score: 1, tag: "avoid", note: "BB% 8.7% 雙重受罰" },
   { yahoo: 78, name: "Maikel Garcia", pos: "2B", vor: 2, score: 2, tag: "wait", note: "2B/3B/SS 多守位但缺長打" },
   { yahoo: 80, name: "Oneil Cruz", pos: "OF", vor: 2, score: 2, tag: "avoid", note: "K% 30%+ 格式陷阱" },
   { yahoo: 81, name: "CJ Abrams", pos: "SS", vor: 1, score: 1, tag: "wait", note: "K 偏高、長打不足" },
-  { yahoo: 85, name: "Ryan Helsley", pos: "RP", vor: 5, score: 5, tag: "grab", note: "超值 CL！ADP 85" },
+  { yahoo: 85, name: "Ryan Helsley", pos: "RP", vor: 5, score: 5, tag: "grab", note: "超值 CL！" },
   { yahoo: 87, name: "Byron Buxton", pos: "OF", vor: 4, score: 4, tag: "ok", note: "天花板高但健康+K 風險" },
-  { yahoo: 89, name: "George Springer", pos: "OF", vor: 2, score: 2, tag: "wait", note: "" },
+  { yahoo: 89, name: "Jackson Merrill", pos: "OF", vor: 0, score: 0, tag: "avoid", note: "BB% 6.7% 嚴重限制格式價值" },
+  { yahoo: 90, name: "Matt Olson", pos: "1B", vor: 3, score: 4, tag: "wait", note: "HR/RBI 強但 K+SB 雙弱" },
   { yahoo: 93, name: "Seiya Suzuki", pos: "OF", vor: 2, score: 2, tag: "wait", note: "" },
   { yahoo: 95, name: "Christian Yelich", pos: "OF", vor: 3, score: 3, tag: "ok", note: "" },
   { yahoo: 97, name: "Willy Adames", pos: "SS", vor: 1, score: 1, tag: "wait", note: "" },
@@ -244,14 +244,14 @@ const PLAYERS = [
   { yahoo: 99, name: "Alex Bregman", pos: "3B", vor: 2, score: 2, tag: "wait", note: "低 K+BB 好但缺速度+SLG" },
   { yahoo: 100, name: "Yandy Diaz", pos: "1B", vor: 2, score: 2, tag: "wait", note: "菁英接觸但缺長打+速度" },
 
-  // R9-10 range (Yahoo 101-120)
+  // R9-10 range
   { yahoo: 103, name: "Luke Keaschall", pos: "2B", vor: 1, score: 1, tag: "wait", note: "2B 備案" },
   { yahoo: 104, name: "Nico Hoerner", pos: "2B", vor: 4, score: 4, tag: "grab", note: "菁英接觸+2B 稀缺安全網" },
   { yahoo: 108, name: "Salvador Perez", pos: "C", vor: 2, score: 2, tag: "wait", note: "" },
   { yahoo: 110, name: "Eugenio Suarez", pos: "3B", vor: 4, score: 4, tag: "grab", note: "被低估的 3B" },
   { yahoo: 111, name: "Jose Altuve", pos: "2B", vor: 5, score: 5, tag: "grab", note: "巨大套利！格式 +5 的 2B 在 R9-10" },
   { yahoo: 113, name: "Daniel Palencia", pos: "RP", vor: 5, score: 5, tag: "grab", note: "超值 CL" },
-  { yahoo: 116, name: "Zack Wheeler", pos: "SP", vor: 5, score: 5, tag: "grab", note: "全 SP 最大套利！菁英控球+比率" },
+  { yahoo: 116, name: "Hunter Greene", pos: "SP", vor: 2, score: 2, tag: "avoid", note: "高 K 但 BB/ERA 平庸" },
   { yahoo: 118, name: "Ozzie Albies", pos: "2B", vor: 5, score: 5, tag: "grab", note: "2B 套利！健康時均衡貢獻" },
   { yahoo: 119, name: "Andy Pages", pos: "OF", vor: 4, score: 4, tag: "ok", note: "" },
 

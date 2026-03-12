@@ -51,14 +51,15 @@ Layer 3：ADP 套利標記（格式排名 vs 市場 ADP 的落差）
 - **打者**：K% 是最強單一預測指標（每高一級 K%，淨分平均掉 1.2 分）
 - **投手**：BB% 是最強單一預測指標（雙重懲罰：BB 欄 + WHIP 欄）
 
-### 最大套利機會（被市場低估）
-- 打者：Freddie Freeman（ADP 68, 淨分 +7）、Ozzie Albies（ADP 158, +5）
-- SP：Zack Wheeler（ADP 116, +5）、Logan Webb（ADP 61, +6）、George Kirby（ADP 67, +5）
-- RP：菁英 SU 全體（Griffin Jax、Robert Garcia、Garrett Whitlock、Hunter Gaddis）
+### 最大套利機會（以 App 排名計）
+- 打者：Freeman（App 41, VOR+6）、Chisholm（App 53, VOR+5）、Machado（App 51, VOR+5）
+- 2B：Altuve（App 55+, VOR+5）、Albies（App 55+, VOR+5）
+- RP：Cade Smith（App 43, VOR+9）、Whitlock（免費 VOR+7）、Gaddis/Jax/Garcia
+- ⚠️ SP 套利因 App 推高而縮小：Webb(25)、Wheeler(26)、Kirby(38) 已是公平價
 
-### 最大格式陷阱（被市場高估）
-- 打者：Cal Raleigh（ADP 18, +3）、Kyle Schwarber（ADP 24, +3）、Zach Neto（ADP 28, +1）
-- SP：Blake Snell（ADP 134, -1）、Tyler Glasnow（ADP 121, 0）、Dylan Cease（ADP 77, +1）
+### 最大格式陷阱
+- 打者：Schwarber（App 19, VOR+1）、De La Cruz（App 27, VOR+2）、Raleigh（App 42, VOR+3）
+- SP：Snell（VOR -1）、Glasnow（VOR 0）、Cease（App 54, VOR+1）
 
 ## 45 秒速查決策規則
 
@@ -89,8 +90,12 @@ Layer 3：ADP 套利標記（格式排名 vs 市場 ADP 的落差）
 
 ## 數據來源與限制
 
-- **ADP**：FanGraphs 跨平台共識 ADP + Yahoo Pre-Season 排名（2026-03-13 擷取）
-- **Yahoo vs FanGraphs 差異**：已校正至分析 3，兩者有差異時以 Yahoo 為準
+- **三套排名系統**：
+  1. FanGraphs 跨平台共識 ADP
+  2. Yahoo 網頁版 Pre-Season 排名（編輯手動排列）
+  3. **Yahoo App Projected Rank**（預測系統自動生成）← 對手實際看到的排名
+- **最終策略以 App 排名為準**（2026-03-12 擷取，前 55 名完整校正）
+- **App vs 網頁版關鍵差異**：App SP 極端偏高（前 20 名中 8 個 SP），打者被壓低
 - **預測數據**：Steamer 2026 預測（前 30 打者 + 32 SP 有完整數據，其餘推估）
 - **Yahoo 守位資格**：2026 年 Mookie Betts 僅有 SS（無 2B），已反映在分析中
-- **時效性**：選秀前應用 Yahoo App 最新排名做最後校正
+- **原始 App 排名數據**：`yahoo-app-rank.txt`
