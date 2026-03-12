@@ -60,6 +60,12 @@ Layer 3：ADP 套利標記（格式排名 vs 市場 ADP 的落差）
 - 打者：Cal Raleigh（ADP 18, +3）、Kyle Schwarber（ADP 24, +3）、Zach Neto（ADP 28, +1）
 - SP：Blake Snell（ADP 134, -1）、Tyler Glasnow（ADP 121, 0）、Dylan Cease（ADP 77, +1）
 
+## 45 秒速查決策規則
+
+- **打者**：K% < 20% → BB% > 10% → SLG > .450，三項至少兩項通過就選
+- **投手**：BB% < 7% 選，> 9% 不選
+- **不確定時**：選低 K 的打者、低 BB 的投手、有 2B/3B 資格的人
+
 ## 文件結構
 
 | 文件 | 用途 | 狀態 |
@@ -67,15 +73,24 @@ Layer 3：ADP 套利標記（格式排名 vs 市場 ADP 的落差）
 | `plan-8x8-draft-analysis.md` | 分析計畫（4 Task / 16 Step） | ✅ 完成 |
 | `分析1-格式類別貢獻評分.md` | 打者+投手的八項評分 | ✅ Task 1+2 完成 |
 | `分析2-跨守位替代價值VOR.md` | 跨守位統一排名 | ✅ Task 3 完成 |
-| `分析3-實戰選秀排名與行動指南.md` | ADP 套利+價格帶行動指南 | ✅ Task 4 完成 |
+| `分析3-實戰選秀排名與行動指南.md` | ADP 套利+價格帶行動指南+R1-R2 優先名單+Plan B+45 秒速查 | ✅ Task 4 完成 |
+| `draft-helper.html` | 選秀日互動助手（手機可用） | ✅ 完成 |
 | `2026 FanGraphs Fantasy Baseball ADP 資料.md` | 原始 ADP 數據 | ✅ 資料收集完成 |
 | `2026 守位稀缺性分析 - 內野與捕手篇.md` | 守位分析（交叉比對） | ✅ 完成 |
 | `*-claude.md` / `*-gemini.md` | 兩份 AI 策略報告（原始輸入） | ✅ 參考資料 |
 | `2026 Yahoo Fantasy Baseball 8×8 H2H 聯賽選秀策略.md` | Claude 報告中文翻譯 | ✅ 完成 |
 
+## 選秀日工具
+
+- **Draft Helper**：https://huansbox.github.io/mlb-fantasy/draft-helper.html
+- 單一 HTML，手機瀏覽器直接開
+- 色標（綠=搶、黃=可選、紫=可等、紅=避開）+ 點擊劃掉 + VOR/淨分排序
+- localStorage 持久化，關掉再開狀態還在
+
 ## 數據來源與限制
 
-- **ADP**：FanGraphs 跨平台共識 ADP（非 Yahoo 專屬，有差異）
+- **ADP**：FanGraphs 跨平台共識 ADP + Yahoo Pre-Season 排名（2026-03-13 擷取）
+- **Yahoo vs FanGraphs 差異**：已校正至分析 3，兩者有差異時以 Yahoo 為準
 - **預測數據**：Steamer 2026 預測（前 30 打者 + 32 SP 有完整數據，其餘推估）
 - **Yahoo 守位資格**：2026 年 Mookie Betts 僅有 SS（無 2B），已反映在分析中
-- **時效性**：資料擷取於 2026-03-12，選秀前應用 Yahoo App 最新 ADP 做最後校正
+- **時效性**：選秀前應用 Yahoo App 最新排名做最後校正
