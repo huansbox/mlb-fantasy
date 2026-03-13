@@ -79,11 +79,26 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
 
 .copy-btn { position: fixed; bottom: 48px; left: 12px; background: #2563eb; color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; z-index: 98; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; }
 .copy-btn:active { transform: scale(0.95); background: #1d4ed8; }
-.copy-btn.copied { background: #16a34a; }
 
 .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 300; display: none; pointer-events: none; }
 .toast.show { display: block; animation: fadeout 1.5s ease-in-out forwards; }
 @keyframes fadeout { 0%,60% { opacity: 1; } 100% { opacity: 0; } }
+
+.pick-panel { position: fixed; bottom: 96px; left: 12px; right: 12px; max-height: 40vh; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 98; display: none; flex-direction: column; overflow: hidden; }
+.pick-panel.show { display: flex; }
+.pick-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.pick-panel-header h4 { font-size: 13px; color: #0f172a; margin: 0; }
+.pick-panel-close { background: none; border: none; font-size: 18px; color: #94a3b8; cursor: pointer; padding: 0 4px; }
+.pick-panel-body { overflow-y: auto; padding: 6px 0; max-height: calc(40vh - 40px); }
+.pick-panel-empty { padding: 16px; text-align: center; color: #94a3b8; font-size: 13px; }
+.pick-item { display: flex; align-items: center; padding: 6px 14px; gap: 8px; font-size: 13px; }
+.pick-item .pick-num { color: #94a3b8; font-size: 11px; min-width: 20px; }
+.pick-item .pick-name { flex: 1; color: #0f172a; font-weight: 500; }
+.pick-item .pick-label { font-size: 10px; padding: 1px 6px; border-radius: 6px; }
+.pick-label-mine { background: #dcfce7; color: #166534; }
+.pick-label-other { background: #f1f5f9; color: #64748b; }
+.pick-remove { background: none; border: none; color: #dc2626; font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+.pick-remove:active { background: #fee2e2; }
 </style>
 </head>
 <body>
@@ -125,6 +140,13 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
   <span>已劃掉: <strong id="draftedCount">0</strong></span>
 </div>
 
+<div class="pick-panel" id="pickPanel">
+  <div class="pick-panel-header">
+    <h4 id="pickPanelTitle">已選 (0)</h4>
+    <button class="pick-panel-close" onclick="togglePickPanel()">✕</button>
+  </div>
+  <div class="pick-panel-body" id="pickPanelBody"></div>
+</div>
 <button class="copy-btn" id="copyBtn" onclick="copyForAI()">📋 複製給 AI</button>
 <button class="reset-btn" id="resetBtn" onclick="resetAll()">重置全部</button>
 <div class="toast" id="toast">已複製到剪貼簿！</div>
@@ -435,6 +457,9 @@ function handlePointerUp(id, e) {
   saveState();
   renderPlayers();
   updateSummary();
+  // Auto-show pick panel
+  document.getElementById('pickPanel').classList.add('show');
+  renderPickPanel();
 }
 
 function handlePointerCancel() {
@@ -466,6 +491,8 @@ function markMine() {
   renderPositions();
   renderPlayers();
   updateSummary();
+  document.getElementById('pickPanel').classList.add('show');
+  renderPickPanel();
 }
 
 function markDrafted() {
@@ -497,6 +524,55 @@ function updateSummary() {
     return p.tag === 'grab' && (!s || !s.status);
   });
   document.getElementById('grabCount').textContent = remaining.length;
+}
+
+function togglePickPanel() {
+  const panel = document.getElementById('pickPanel');
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) renderPickPanel();
+}
+
+function renderPickPanel() {
+  const body = document.getElementById('pickPanelBody');
+  const picks = [];
+  PLAYERS.forEach(p => {
+    const id = getPlayerId(p);
+    const s = state[id];
+    if (s && (s.status === 'drafted' || s.status === 'mine')) {
+      picks.push({ id, name: p.name, pos: p.pos, status: s.status, yahoo: p.yahoo });
+    }
+  });
+
+  document.getElementById('pickPanelTitle').textContent = `已選 (${picks.length})`;
+
+  if (!picks.length) {
+    body.innerHTML = '<div class="pick-panel-empty">還沒有人被選走</div>';
+    return;
+  }
+
+  body.innerHTML = picks.map((pk, i) => {
+    const label = pk.status === 'mine'
+      ? '<span class="pick-label pick-label-mine">我的</span>'
+      : '<span class="pick-label pick-label-other">被選</span>';
+    return `<div class="pick-item">
+      <span class="pick-num">${i + 1}</span>
+      <span class="pick-name">${pk.name}</span>
+      ${label}
+      <button class="pick-remove" onclick="undoPick('${pk.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function undoPick(id) {
+  delete state[id];
+  saveState();
+  renderPositions();
+  renderPlayers();
+  updateSummary();
+  renderPickPanel();
+  // Close panel if empty
+  const picks = Object.values(state).filter(s => s.status === 'drafted' || s.status === 'mine');
+  if (!picks.length) document.getElementById('pickPanel').classList.remove('show');
 }
 
 function copyForAI() {
