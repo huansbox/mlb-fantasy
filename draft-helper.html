@@ -26,7 +26,7 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
 .player-list { padding: 4px 0; }
 
 .player { display: flex; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; background: #fff; cursor: pointer; transition: all 0.15s; gap: 8px; }
-.player:active { transform: scale(0.98); background: #f1f5f9; }
+.player:active { transform: scale(0.98); background: #f1f5f9; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .player.drafted { opacity: 0.3; text-decoration: line-through; order: 999; background: #f8fafc; }
 .player.mine { background: #f0fdf4; border-left: 3px solid #16a34a; }
 
@@ -374,7 +374,7 @@ function renderPlayers() {
     const cls = isDrafted ? 'player drafted' : isMine ? 'player mine' : 'player';
 
     html += `
-      <div class="${cls}" onclick="openModal('${id}')" data-id="${id}">
+      <div class="${cls}" onpointerdown="handlePointerDown('${id}',event)" onpointerup="handlePointerUp('${id}',event)" onpointercancel="handlePointerCancel()" data-id="${id}">
         <div class="tag ${tagClass}"></div>
         <div class="rank">#${p.yahoo > 250 ? 'FA' : p.yahoo}</div>
         <div class="info">
@@ -409,6 +409,36 @@ function setupFilters() {
       renderPlayers();
     });
   });
+}
+
+let longPressTimer = null;
+let isLongPress = false;
+
+function handlePointerDown(id, e) {
+  isLongPress = false;
+  longPressTimer = setTimeout(() => {
+    isLongPress = true;
+    openModal(id);
+  }, 500);
+}
+
+function handlePointerUp(id, e) {
+  clearTimeout(longPressTimer);
+  if (isLongPress) return;
+  // Quick tap = mark drafted instantly
+  const s = state[id] || {};
+  if (s.status === 'drafted' || s.status === 'mine') {
+    // Already marked — long press to undo
+    return;
+  }
+  state[id] = { status: 'drafted' };
+  saveState();
+  renderPlayers();
+  updateSummary();
+}
+
+function handlePointerCancel() {
+  clearTimeout(longPressTimer);
 }
 
 function openModal(id) {
