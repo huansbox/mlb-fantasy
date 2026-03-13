@@ -76,6 +76,14 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
 
 .reset-btn { position: fixed; bottom: 48px; right: 12px; background: #dc2626; color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; z-index: 98; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .reset-btn.show { display: block; }
+
+.copy-btn { position: fixed; bottom: 48px; left: 12px; background: #2563eb; color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; z-index: 98; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s; }
+.copy-btn:active { transform: scale(0.95); background: #1d4ed8; }
+.copy-btn.copied { background: #16a34a; }
+
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 300; display: none; pointer-events: none; }
+.toast.show { display: block; animation: fadeout 1.5s ease-in-out forwards; }
+@keyframes fadeout { 0%,60% { opacity: 1; } 100% { opacity: 0; } }
 </style>
 </head>
 <body>
@@ -117,7 +125,9 @@ body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; 
   <span>已劃掉: <strong id="draftedCount">0</strong></span>
 </div>
 
+<button class="copy-btn" id="copyBtn" onclick="copyForAI()">📋 複製給 AI</button>
 <button class="reset-btn" id="resetBtn" onclick="resetAll()">重置全部</button>
+<div class="toast" id="toast">已複製到剪貼簿！</div>
 
 <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -457,6 +467,35 @@ function updateSummary() {
     return p.tag === 'grab' && (!s || !s.status);
   });
   document.getElementById('grabCount').textContent = remaining.length;
+}
+
+function copyForAI() {
+  const drafted = [];
+  const mine = [];
+  PLAYERS.forEach(p => {
+    const id = getPlayerId(p);
+    const s = state[id];
+    if (!s) return;
+    if (s.status === 'drafted') drafted.push(p.name);
+    if (s.status === 'mine') mine.push(p.name);
+  });
+
+  const totalPicks = drafted.length + mine.length;
+  const round = Math.floor(totalPicks / 12) + 1;
+
+  let lines = [];
+  if (drafted.length) lines.push('被選走: ' + drafted.join(', '));
+  if (mine.length) lines.push('我已選: ' + mine.join(', '));
+  lines.push(`目前 R${round}，共 ${totalPicks} 人被選，輪到我，推薦？`);
+
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1600);
+  });
 }
 
 function resetAll() {
