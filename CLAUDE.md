@@ -101,6 +101,22 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 - 點擊劃掉 + 長按操作 + 📋複製給 AI + 已選面板（含撤銷）
 - localStorage 持久化
 
+## 選秀日即時協助模式
+
+用戶會在選秀中（每輪 45 秒）用 Draft Helper 的「📋 複製給 AI」貼上當前狀態，格式如下：
+```
+被選走: Ohtani, Skubal, Judge, Witt
+我已選: Soto, Henderson
+目前 R3，共 26 人被選，輪到我，推薦？
+```
+
+**回應要求**：
+1. **15 秒內回覆**，格式：`A: 球員 (守位 VOR+X) B: 球員 C: 球員`
+2. 參考 `作戰策略.md` 的瀑布清單和 `draft-helper.html` 的 PLAYERS 陣列
+3. 考慮用戶已選球員的守位，優先填空缺守位
+4. 核心策略：**Punt SB + Punt SV+H**（不選速度型、RP 最後才拿）
+5. 鐵板球員（幾乎一定選得到）：Henderson(R2) → Greene(R5-6) → Suárez(R6-7) → Nola(R7-8) → Albies(R8+)
+
 ## 數據來源與限制
 
 - **排名以 Yahoo App Projected Rank 為準**（2026-03-12/13 擷取，前 202 名）
