@@ -91,7 +91,8 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `分析1-格式類別貢獻評分.md` | 原 8×8 打者+投手八項評分 | ✅ 參考用 |
 | `分析2-跨守位替代價值VOR.md` | 原 8×8 跨守位統一排名 | ✅ 參考用 |
 | `分析3-實戰選秀排名與行動指南.md` | 原 8×8 ADP 套利+行動指南 | ✅ 參考用 |
-| `yahoo-app-rank.txt` / `yahoo-app-rank - 56.txt` | Yahoo App 排名原始數據 | ✅ 資料 |
+| `yahoo-app-rank.txt` / `yahoo-app-rank - 56.txt` / `yahoo-app-rank - 152.txt` | Yahoo App 排名原始數據 | ✅ 資料 |
+| `draft-sim.js` | 蒙地卡羅選秀模擬器（200 次 × 12 順位） | ✅ 完成 |
 
 ## 選秀日工具
 
@@ -102,7 +103,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 ## 數據來源與限制
 
-- **排名以 Yahoo App Projected Rank 為準**（2026-03-12 擷取，前 151 名）
+- **排名以 Yahoo App Projected Rank 為準**（2026-03-12/13 擷取，前 202 名）
 - **預測數據**：Steamer 2026 預測（前 30 打者 + 32 SP 有完整數據，其餘推估）
 - **數據盲點**：缺乏春訓表現、小聯盟數據，系統性低估突破型新秀
 - **OPS 數據**：基於 Steamer AVG/BB%/SLG 推算 OBP+SLG，非精確值
