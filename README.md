@@ -15,7 +15,7 @@
 
 格式分析 → VOR 排名 → 選秀策略 → Monte Carlo 模擬 → Draft Helper 工具
 
-- `7x7-備案分析.md` — 7×7 格式類別評分 + VOR
+- `7x7-選秀分析.md` — 7×7 格式類別評分 + VOR
 - `作戰策略.md` — 選秀日決策樹（R1-R22）
 - `draft-helper.html` — 手機版選秀日互動助手（[線上版](https://huansbox.github.io/mlb-fantasy/draft-helper.html)）
 - `draft-sim.js` — 蒙地卡羅選秀模擬器（200 次 × 12 順位）
@@ -25,8 +25,8 @@
 開季後的陣容管理、waiver wire 操作、每週對戰分析。
 
 - `waiver-log.md` — 球員觀察追蹤記錄
-- `player-eval.skill` — 球員評估 SOP（Claude Code skill）
-- `waiver-scan.skill` — Waiver wire 掃描 SOP（Claude Code skill）
+- `player-eval` skill — 球員評估 SOP（Claude Code skill）
+- `waiver-scan` skill — Waiver wire 掃描 SOP（Claude Code skill）
 
 ## 核心策略
 
@@ -36,6 +36,6 @@
 
 ## 環境
 
-- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `.skill` 檔案
+- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` skill
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行
