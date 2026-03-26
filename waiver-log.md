@@ -10,13 +10,14 @@
 觸發：前 2-3 場先發穩定投 6+ IP → 取代 Littell
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 
+### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
+重評條件：拿到 HOU 每日先發 + AVG 站穩 .250
+- 03-26：工具型（20HR/20SB 潛力）但 36.3% K rate → AVG 風險高，HOU 角色未定。
+
 ## 已結案
 
 ### Jahmai Jones (DET, LF/CF/RF) — Pass
 - 03-26：platoon 球員（右打 vs LHP only），不符每日先發門檻。
-
-### Joey Loperfido (HOU, LF/CF/RF) — Pass（暫時）
-- 03-26：工具型（20HR/20SB 潛力）但 36.3% K rate → AVG 風險高，HOU 角色未定。如拿到每日先發 + AVG 站穩 .250 再考慮。
 
 ### Trent Grisham (NYY, CF) — Pass
 - 03-26：23 HR power 但 AVG ~.235 會拖比率。陣容已有足夠 power（Stanton 同類型），不需要。
