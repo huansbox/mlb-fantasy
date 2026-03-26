@@ -27,3 +27,6 @@
 
 ### TJ Friedl (CIN, LF/CF) — Pass
 - 03-26：BB% ~10%、OPS .726 過門檻、AVG .246-253 臨界。最終選 Frelick 因三位置彈性更高。
+
+### Alejandro Kirk (TOR, C) — Pass
+- 03-26：[eval] vs Langeliers，結論：不換。AVG/BB% 較優（.281/9.5% vs .277/~7%）但 HR 差距致命（15 vs 31）。Langeliers 是 top-5 C（ADP 55），Kirk 的比率優勢不足以彌補 counting stats 降級。

@@ -191,21 +191,20 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | 文件 | 用途 | 狀態 |
 |------|------|------|
 | `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
-| `player-eval.skill` | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |
-| `waiver-scan.skill` | Waiver wire 主動掃描 SOP（搜尋 FA + 更新 log） | ✅ 完成 |
+| `player-eval` skill | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |
+| `waiver-scan` skill | Waiver wire 主動掃描 SOP（搜尋 FA + 更新 log） | ✅ 完成 |
 
 ### 選秀準備（已完成，留作參考）
 
 | 文件 | 用途 |
 |------|------|
-| `7x7-備案分析.md` | 7×7 確認版分析（類別評分+VOR+策略） |
+| `7x7-選秀分析.md` | 7×7 確認版分析（類別評分+VOR+策略） |
 | `作戰策略.md` | 7×7 選秀日決策樹（R1-R5 + 守位檢查） |
 | `draft-helper.html` | 選秀日互動助手（7×7 確認版分數） |
 | `draft-sim.js` | 蒙地卡羅選秀模擬器（200 次 × 12 順位） |
 | `分析1-格式類別貢獻評分.md` | 原 8×8 打者+投手八項評分 |
 | `分析2-跨守位替代價值VOR.md` | 原 8×8 跨守位統一排名 |
 | `分析3-實戰選秀排名與行動指南.md` | 原 8×8 ADP 套利+行動指南 |
-| `yahoo-app-rank.txt` 系列 | Yahoo App 排名原始數據 |
 
 ## In-Season 管理決策規則
 
