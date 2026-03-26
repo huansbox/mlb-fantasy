@@ -1,31 +1,134 @@
-# MLB Fantasy Baseball 選秀分析專案
+# MLB Fantasy Baseball 2026 賽季管理
 
 ## 專案概述
 
-針對 2026 Yahoo Fantasy Baseball 聯賽，進行格式專屬的選秀分析與策略制定。
+2026 Yahoo Fantasy Baseball 聯賽 — 選秀已完成，目前為 in-season 管理階段。
 
-## 聯賽設定
+## 聯賽設定（開季確認版 2026-03-26）
 
 - **平台**：Yahoo Fantasy Baseball
 - **賽制**：H2H **One Win 勝負制**（14 類別合計，贏 8+ = 1 週勝）
-- **隊伍數**：12 隊，分兩個聯盟
-- **選秀**：蛇形選秀（Snake Draft），22 輪，順位未定
+- **隊伍數**：12 隊，無分區
 - **名單配置**：
-  - 打者：C / 1B / 2B / 3B / SS / OF×3 / UTIL×2（共 10 人）
+  - 打者：C / 1B / 2B / 3B / SS / **LF / CF / RF** / UTIL×2（共 10 人）
   - 投手：SP×4 / RP×2 / P×3（共 9 人）
-  - 板凳 / IL / NA
-- **計分類別（7×7 確認版）**：
+  - BN×3 / IL×2 / NA×1
+- **計分類別（7×7）**：
   - 打者：R, HR, RBI, SB, BB, AVG, OPS
   - 投手：IP, W, K, ERA, WHIP, QS, SV+H
-- **限制**：
-  - 每週最低 65 投球局數（Min IP = 65，未達 → ERA + WHIP 判負）
+- **限制與規則**：
+  - 每週最低 **45** 投球局數（Min IP = 45，未達 → ERA + WHIP 判負）
   - 每週最多 6 次異動（Max Acquisition = 6）
+  - Waiver：**FAB**（Free Agent Budget）+ Continual rolling list tiebreak
+  - Lineup 鎖定：**Daily - Tomorrow**（每天要設隔日先發）
+  - Trade Review：Commissioner，Reject Time 2 天
+- **季後賽**：4 隊，Week 24-25（至 9/20）
 
-## 格式狀態（已確認）
+### vs 選秀前設定的變更
 
-- **確認版 7×7 勝負制**（2026-03-13 確認）
+| 項目 | 選秀前 | 開季版 | 影響 |
+|------|--------|--------|------|
+| 外野位 | OF×3 | **LF/CF/RF** | 需個別對位，CF 最稀缺 |
+| Min IP | 65 | **45** | 壓力大降，4 SP 基本穩過 |
+| Divisions | 兩個聯盟 | **無** | 排名單一化 |
+| Bench | 未指定 | **3 格** | 替補空間緊 |
+
+## 現役陣容（2026-03-26）
+
+### 打者
+
+| 位置 | 球員 | 隊伍 | 資格 | 7×7 VOR | 備註 |
+|------|------|------|------|---------|------|
+| C | Shea Langeliers | ATH | C | — | |
+| 1B | Christian Walker | HOU | 1B | — | |
+| 2B | Jazz Chisholm Jr. | NYY | 2B/3B | +5 | K 受益，2B 稀缺 |
+| 3B | Manny Machado | SD | 3B | +5 | 穩定 |
+| SS | Ezequiel Tovar | COL | SS | — | |
+| LF | Jose Altuve | HOU | 2B/LF | +4 | K 輸家但堪用 |
+| CF | Byron Buxton | MIN | CF | +5 | K 受益，**玻璃體質** |
+| RF | Lawrence Butler | ATH | CF/RF | +5 | K 受益 |
+| Util | Ozzie Albies | ATL | 2B | +5 | |
+| Util | Steven Kwan | CLE | LF | +2 | ⚠️ 全隊最弱，替換候選 |
+
+### 板凳打者
+
+| 球員 | 隊伍 | 資格 | 備註 |
+|------|------|------|------|
+| Sal Frelick | MIL | LF/CF/RF | Buxton 保險，CF backup |
+| Giancarlo Stanton | NYY | LF/RF | 純砲 |
+
+### 投手
+
+| 位置 | 球員 | 隊伍 | 7×7 VOR | 備註 |
+|------|------|------|---------|------|
+| SP | Tarik Skubal | DET | **+12** | 全聯盟 #1 |
+| SP | Chris Sale | ATL | +4 | 局數風險 |
+| SP | Cole Ragans | KC | +4 | |
+| SP | Aaron Nola | PHI | +5 | 工作馬 |
+| RP | Robert Garcia | TEX | — | 比率用 |
+| RP | Garrett Whitlock | BOS | — | 比率用 |
+| P | Brayan Bello | BOS | — | |
+| P | Zack Littell | WSH | — | |
+| P | Brady Singer | CIN | — | |
+
+### 板凳投手
+
+| 球員 | 隊伍 | 備註 |
+|------|------|------|
+| Chris Bassitt | BAL | SP 深度 |
+
+### 傷兵
+
+| 球員 | 隊伍 | 狀態 |
+|------|------|------|
+| Merrill Kelly | AZ | IL15，佔 IL 格 |
+
+## 執行中策略
+
+- **Punt SV+H**：RP（Garcia/Whitlock）純比率用，不追救援
+- **軟 Punt SB**：不刻意追速度，但 Chisholm/Albies/Buxton 偶爾能贏
+- **SP 重裝**：9 SP 深度，45 IP 門檻輕鬆過
+- **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
+
+### 陣容風險
+
+| 風險 | 說明 |
+|------|------|
+| **CF 深度** | 只有 Buxton + Butler + Frelick 有 CF 資格，Buxton 傷退 → 連鎖反應 |
+| **Kwan（VOR +2）** | 全隊最弱環節，K 移除輸家，第一替換候選 |
+| **BN 僅 3 格** | 替補空間緊，串流 SP 彈性有限 |
+
+### Watchlist（2026-03-26）
+
+**打者**
+
+| 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
+|------|------|------|---------|---------|
+| **Carson Benge** | NYM | OF(RF) | 連 2 週 OPS > .800 + AVG > .260 | Kwan |
+
+**投手**
+
+| 球員 | 隊伍 | 類型 | 觸發條件 | 取代目標 |
+|------|------|------|---------|---------|
+| **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Littell |
+
+**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Cavalli、Liberatore、Pepiot
+
+### 行動觸發規則
+
+| 條件 | 動作 |
+|------|------|
+| Benge 連 2 週 OPS > .800 + AVG > .260 | 撿 Benge，drop Kwan |
+| Kwan 連 2 週 OPS < .700 | 不等 Benge，直接找 FA 最佳替代 |
+| Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Littell |
+| Painter 被限 5 IP 或跳先發 | 不動，Littell 穩定局數更有用 |
+| Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
+
+## 格式狀態
+
+- **選秀準備階段**：已完成（2026-03-13 確認 7×7）
+- **開季管理階段**：進行中（2026-03-26 起）
 - 原 8×8 分析保留作參考（`分析1`、`分析2`、`分析3`）
-- 所有策略文件已更新為 7×7 確認版
 
 ## 7×7 格式關鍵特性
 
@@ -94,28 +197,26 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `yahoo-app-rank.txt` / `yahoo-app-rank - 56.txt` / `yahoo-app-rank - 152.txt` | Yahoo App 排名原始數據 | ✅ 資料 |
 | `draft-sim.js` | 蒙地卡羅選秀模擬器（200 次 × 12 順位） | ✅ 完成 |
 
-## 選秀日工具
+## In-Season 管理決策規則
+
+### Waiver Wire 篩選框架
+
+**正選級（先發）**：BB% > 10% → OPS > .830 → AVG > .260，兩項通過
+**替補級（backup）**：BB% > 8% → OPS > .720 → AVG > .240，不傷比率優先
+
+### SP 串流標準
+- IP > 180 → ERA < 3.50，兩項通過
+- 45 IP 門檻低，通常不需刻意串流
+
+### 每週檢查清單
+1. 設定隔日先發陣容（Daily deadline）
+2. 確認 SP 週排程，確保 45 IP
+3. 檢查傷兵，必要時用 IL 格 + 撿替補
+4. FAB 競標（週中評估 waiver 目標）
+
+## 選秀日工具（已完成，留作參考）
 
 - **Draft Helper**：https://huansbox.github.io/mlb-fantasy/draft-helper.html
-- 單一 HTML，手機瀏覽器直接開
-- 點擊劃掉 + 長按操作 + 📋複製給 AI + 已選面板（含撤銷）
-- localStorage 持久化
-
-## 選秀日即時協助模式
-
-用戶會在選秀中（每輪 45 秒）用 Draft Helper 的「📋 複製給 AI」貼上當前狀態，格式如下：
-```
-被選走: Ohtani, Skubal, Judge, Witt
-我已選: Soto, Henderson
-目前 R3，共 26 人被選，輪到我，推薦？
-```
-
-**回應要求**：
-1. **15 秒內回覆**，格式：`A: 球員 (守位 VOR+X) B: 球員 C: 球員`
-2. 參考 `作戰策略.md` 的瀑布清單和 `draft-helper.html` 的 PLAYERS 陣列
-3. 考慮用戶已選球員的守位，優先填空缺守位
-4. 核心策略：**Punt SB + Punt SV+H**（不選速度型、RP 最後才拿）
-5. 鐵板球員（幾乎一定選得到）：Henderson(R2) → Greene(R5-6) → Suárez(R6-7) → Nola(R7-8) → Albies(R8+)
 
 ## 數據來源與限制
 
