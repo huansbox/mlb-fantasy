@@ -2,17 +2,13 @@
 
 ## 觀察中
 
-### Carson Benge (NYM, OF/RF)
-觸發：連 2 週 OPS > .800 + AVG > .260 → 取代 Kwan
-- 03-26：春訓 .366/.435，MiLB .281/15HR/22SB/.857 OPS，BB% ~13%。7×7 高適配（BB 雙重計算）。加入 watchlist。
-
 ### Andrew Painter (PHI, SP)
 觸發：前 2-3 場先發穩定投 6+ IP → 取代 Singer
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 
 ### Ryan O'Hearn (PIT, 1B/LF/RF)
-觸發：Benge 未達標 + Kwan 連 2 週 OPS < .700 → 作為 Kwan 替代 fallback
-- 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，通過正選篩選 2/3。比 Kwan 多 ~12HR/+.050 OPS，AVG 小輸 .009。風險：30 歲生涯年 regression + PIT 打線弱。Benge 仍是首選替代目標，O'Hearn 為備案。
+觸發：Kwan 連 2 週 OPS < .700 → 取代 Kwan
+- 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，通過正選篩選 2/3。比 Kwan 多 ~12HR/+.050 OPS，AVG 小輸 .009。風險：30 歲生涯年 regression + PIT 打線弱。Benge 被撿走後升格為 Kwan 首選替代目標。
 
 ### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
 重評條件：拿到 HOU 每日先發 + AVG 站穩 .250
@@ -38,15 +34,19 @@
 重評條件：被 drop 到 FA
 - 03-26：98.7 mph 均速，11.9 K/9，MIL 開幕戰先發。但 2025 後半段崩（6.06 ERA），穩定性存疑。已被聯賽 rostered。
 
-### Matthew Liberatore (STL, SP) — 條件 Pass
-重評條件：被 drop 到 FA
-- 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
-
 ### Ryan Pepiot (TB, SP) — 條件 Pass
 重評條件：被 drop 到 FA
 - 03-26：2025 生涯最佳，市場未反映實力。已被聯賽 rostered。
 
 ## 已結案
+
+### Carson Benge (NYM, OF/RF) — 已被撿走
+- 03-26：春訓 .366/.435，MiLB .281/15HR/22SB/.857 OPS，BB% ~13%。7×7 高適配。加入 watchlist。
+- 03-27：已被聯賽其他隊 rostered。
+
+### Matthew Liberatore (STL, SP) — Pass
+- 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
+- 03-27：[eval] 被 drop 到 FA，觸發重評。2025: 4.21 ERA/1.31 WHIP/122K/151.2 IP。2026 預測 ~4.44 ERA/152 IP，逐項輸現有後段 4 SP（Singer/Bello/Bassitt/Littell）。春訓新 splitter 有潛力但僅小樣本。不撿。
 
 ### Carlos Correa (HOU, 3B/SS) — Pass
 - 03-27：[eval] .276/.734 OPS/13HR/BB% ~7.5%，正選篩選僅 1/3。不升級 Machado(3B)，贏 Tovar(SS) 幅度太小，31 歲+反覆傷病。不追蹤。

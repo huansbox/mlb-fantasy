@@ -25,8 +25,10 @@
 開季後的陣容管理、waiver wire 操作、每週對戰分析。
 
 - `waiver-log.md` — 球員觀察追蹤記錄
+- `roster-baseline.md` — 陣容基準卡（全員預測/實際數據）
 - `player-eval` skill — 球員評估 SOP（Claude Code skill）
 - `waiver-scan` skill — Waiver wire 掃描 SOP（Claude Code skill）
+- `roster-scan` skill — 陣容基準卡週更 SOP（Claude Code skill）
 
 ## 核心策略
 
@@ -36,6 +38,6 @@
 
 ## 環境
 
-- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` skill
+- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` / `roster-scan` skill
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行

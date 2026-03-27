@@ -87,7 +87,7 @@
 
 - **Punt SV+H**：RP（Garcia/Whitlock）純比率用，不追救援
 - **軟 Punt SB**：不刻意追速度，但 Chisholm/Albies/Buxton 偶爾能贏
-- **SP 重裝**：9 SP 深度，45 IP 門檻輕鬆過
+- **SP 重裝**：9 SP 深度，40 IP 門檻輕鬆過
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
 
 ### 陣容風險
@@ -104,8 +104,7 @@
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Carson Benge** | NYM | OF(RF) | 連 2 週 OPS > .800 + AVG > .260 | Kwan |
-| **Ryan O'Hearn** | PIT | 1B/LF/RF | Benge 未達標 + Kwan 連 2 週 OPS < .700 | Kwan（backup） |
+| **Ryan O'Hearn** | PIT | 1B/LF/RF | Kwan 連 2 週 OPS < .700 | Kwan |
 
 **投手**
 
@@ -113,16 +112,15 @@
 |------|------|------|---------|---------|
 | **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Singer |
 
-**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Liberatore、Pepiot
+**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge
 
-**已評估 Pass**：Correa（3B/SS，.734 OPS 不過正選門檻，不升級現有 3B/SS）
+**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）
 
 ### 行動觸發規則
 
 | 條件 | 動作 |
 |------|------|
-| Benge 連 2 週 OPS > .800 + AVG > .260 | 撿 Benge，drop Kwan |
-| Kwan 連 2 週 OPS < .700 + Benge 未達標 | 撿 O'Hearn，drop Kwan |
+| Kwan 連 2 週 OPS < .700 | 撿 O'Hearn，drop Kwan |
 | Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Singer |
 | Painter 被限 5 IP 或跳先發 | 不動，Singer 穩定局數更有用 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
@@ -194,8 +192,10 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | 文件 | 用途 | 狀態 |
 |------|------|------|
 | `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
+| `roster-baseline.md` | 陣容基準卡（全員預測/實際數據，eval 比較用） | 🔄 進行中 |
 | `player-eval` skill | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |
 | `waiver-scan` skill | Waiver wire 主動掃描 SOP（搜尋 FA + 更新 log） | ✅ 完成 |
+| `roster-scan` skill | 陣容基準卡週更 SOP（更新數據 + 趨勢標記） | ✅ 完成 |
 
 ### 選秀準備（已完成，留作參考）
 
@@ -222,7 +222,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 ### 每週檢查清單
 1. 設定隔日先發陣容（Daily deadline）
-2. 確認 SP 週排程，確保 45 IP
+2. 確認 SP 週排程，確保 40 IP
 3. 檢查傷兵，必要時用 IL 格 + 撿替補
 4. FAB 競標（週中評估 waiver 目標）
 
