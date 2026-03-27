@@ -104,7 +104,7 @@
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Ryan O'Hearn** | PIT | 1B/LF/RF | Kwan 連 2 週 OPS < .700 | Kwan |
+| **Ryan O'Hearn** | PIT | 1B/LF/RF | Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 | Walker 或 Kwan |
 
 **投手**
 
@@ -120,7 +120,10 @@
 
 | 條件 | 動作 |
 |------|------|
-| Kwan 連 2 週 OPS < .700 | 撿 O'Hearn，drop Kwan |
+| Walker 連 2 週 AVG < .200 | 撿 O'Hearn，drop Walker（O'Hearn 有 1B 資格） |
+| Kwan 連 2 週 OPS < .700 且無 power 改善 | 撿 O'Hearn，drop Kwan |
+| Kwan 維持 OPS > .750 + HR pace > 15 | 不動，春訓 bat speed 改善兌現中 |
+| Singer 開季 ERA > 5.00 + 水泡復發 | 撿 O'Hearn，drop Singer（騰打者位） |
 | Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Singer |
 | Painter 被限 5 IP 或跳先發 | 不動，Singer 穩定局數更有用 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |

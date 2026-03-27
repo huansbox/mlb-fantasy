@@ -7,8 +7,10 @@
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 
 ### Ryan O'Hearn (PIT, 1B/LF/RF)
-觸發：Kwan 連 2 週 OPS < .700 → 取代 Kwan
-- 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，通過正選篩選 2/3。比 Kwan 多 ~12HR/+.050 OPS，AVG 小輸 .009。風險：30 歲生涯年 regression + PIT 打線弱。Benge 被撿走後升格為 Kwan 首選替代目標。
+觸發：Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 → 取代 Walker 或 Kwan
+- 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，正選篩選 2/3（BB% ✓ AVG ✓ OPS ✗）。春訓開幕戰三分砲（406 呎），無傷病或角色疑慮。風險：30 歲生涯年 regression + PIT 打線弱（R/RBI 可能灌水不足）。
+- 03-27：基準卡對比 — O'Hearn(.281/.803/17HR/11%) vs Kwan(.277/.749/11HR/8.9%) vs Walker(.229/.734/23HR/8.6%)。O'Hearn 篩選通過率最高（2/3），Kwan 1/3，Walker 0/3。vs Kwan：OPS +.054、HR +6、BB% +2%，SB 輸但 punt SB。vs Walker：AVG +.052、OPS +.069，HR 少 6 但比率優勢大。
+- 03-27：春訓對比後調整 — Kwan 春訓 .292/1.060 OPS/2HR + 休賽季練 bat speed（去年 1st percentile），有 power breakout 跡象，暫不急換。Walker 春訓 6 場 .000/14AB 更令人擔憂，O'Hearn 有 1B 資格可直接替。取代範圍擴大至 Walker，Walker 優先於 Kwan。
 
 ### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
 重評條件：拿到 HOU 每日先發 + AVG 站穩 .250

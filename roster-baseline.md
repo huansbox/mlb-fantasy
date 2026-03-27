@@ -27,8 +27,8 @@
 
 ### 打者弱點摘要
 
-- **Kwan**：HR/RBI 全隊墊底（11 HR / 49 RBI），AVG 高但 power 貢獻極低 → 第一替換目標
-- **Walker**：AVG .229 拖比率，OPS .734 偏低，但 1B 無替代方案
+- **Kwan**：HR/RBI 全隊墊底（11 HR / 49 RBI），但春訓 .292/1.060 OPS/2 HR + 休賽季練揮棒速度，有 power breakout 跡象 → 觀察開季表現再決定
+- **Walker**：AVG .229 拖比率，OPS .734 偏低，春訓 6 場 .000（14 AB）令人擔憂 → O'Hearn（1B/LF/RF）可作替代方案
 - **Tovar**：BB% 5.2% 全隊最低，OPS .745，靠 Coors 加成撐場
 - **Stanton**：PA 僅 ~410（健康風險），SB 0-1，純 HR/RBI 砲台
 
@@ -59,9 +59,9 @@
 
 ### SP 弱點摘要
 
-- **Bello**：ERA 4.40 / WHIP 1.40 全隊最差，K 僅 130，IP 也最少 → 第一替換目標
+- **Bello**：Steamer 最悲觀（4.40 ERA / 1.40 WHIP），但春訓 WBC 後 12 IP / 0 ER / 14 K / 0 BB + 新 curveball + changeup 重生，breakout 訊號明確 → 暫留觀察
+- **Singer**：春訓 1.66 WHIP / 9:7 K:BB / 水泡問題，配合 Painter 替換計畫 → **第一 drop 候選**
 - **Littell**：2025 實績亮眼（186 IP / 1.10 WHIP），但 Steamer 看衰（152 IP / 4.56 ERA），迴歸風險高
-- **Singer**：IP 178 尚可但 ERA 4.36 / WHIP 1.32 平庸 → Painter 的替換目標
 
 ---
 
