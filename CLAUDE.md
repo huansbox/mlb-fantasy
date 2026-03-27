@@ -110,9 +110,9 @@
 
 | 球員 | 隊伍 | 類型 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Littell |
+| **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Singer |
 
-**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Cavalli、Liberatore、Pepiot
+**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Liberatore、Pepiot
 
 ### 行動觸發規則
 
@@ -120,8 +120,8 @@
 |------|------|
 | Benge 連 2 週 OPS > .800 + AVG > .260 | 撿 Benge，drop Kwan |
 | Kwan 連 2 週 OPS < .700 | 不等 Benge，直接找 FA 最佳替代 |
-| Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Littell |
-| Painter 被限 5 IP 或跳先發 | 不動，Littell 穩定局數更有用 |
+| Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Singer |
+| Painter 被限 5 IP 或跳先發 | 不動，Singer 穩定局數更有用 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
 
 ## 格式狀態

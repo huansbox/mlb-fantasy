@@ -7,7 +7,7 @@
 - 03-26：春訓 .366/.435，MiLB .281/15HR/22SB/.857 OPS，BB% ~13%。7×7 高適配（BB 雙重計算）。加入 watchlist。
 
 ### Andrew Painter (PHI, SP)
-觸發：前 2-3 場先發穩定投 6+ IP → 取代 Littell
+觸發：前 2-3 場先發穩定投 6+ IP → 取代 Singer
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 
 ### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
@@ -34,10 +34,6 @@
 重評條件：被 drop 到 FA
 - 03-26：98.7 mph 均速，11.9 K/9，MIL 開幕戰先發。但 2025 後半段崩（6.06 ERA），穩定性存疑。已被聯賽 rostered。
 
-### Cade Cavalli (WSH, SP) — 條件 Pass
-重評條件：被 drop 到 FA
-- 03-26：TJS 復出，WSH 開幕戰先發。春訓 14IP/0.00 ERA/10K，97 mph。預測 ~137 IP/4.20 ERA — IP 堪用但 ERA/WHIP 偏高。注意：與 Littell 同隊。已被聯賽 rostered。
-
 ### Matthew Liberatore (STL, SP) — 條件 Pass
 重評條件：被 drop 到 FA
 - 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
@@ -62,3 +58,7 @@
 
 ### Alejandro Kirk (TOR, C) — Pass
 - 03-26：[eval] vs Langeliers，結論：不換。AVG/BB% 較優（.281/9.5% vs .277/~7%）但 HR 差距致命（15 vs 31）。Langeliers 是 top-5 C（ADP 55），Kirk 的比率優勢不足以彌補 counting stats 降級。
+
+### Cade Cavalli (WSH, SP) — Pass
+- 03-26：TJS 復出，WSH 開幕戰先發。春訓 14IP/0.00 ERA/10K，97 mph。預測 ~137 IP/4.20 ERA。已被聯賽 rostered。
+- 03-27：[eval] 被 drop 到 FA。完整比較後段 4 SP（Littell/Bello/Singer/Bassitt），Cavalli 連最弱的都贏不了 — IP 少 30+、ERA/WHIP 更差。不撿。附帶發現：Littell 其實是後段 SP 中 7×7 價值最高的（IP 王 + WHIP 1.10），Painter 取代目標修正為 Singer。
