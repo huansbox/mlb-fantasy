@@ -14,6 +14,38 @@
 重評條件：拿到 HOU 每日先發 + AVG 站穩 .250
 - 03-26：工具型（20HR/20SB 潛力）但 36.3% K rate → AVG 風險高，HOU 角色未定。
 
+### Kevin McGonigle (DET, SS/3B) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：全棒球 #2 新秀。MiLB .305/.408/.583，BB% 14.9%，K% 11.6%。7×7 完美適配（BB 雙重計算 + 低 K 保護 AVG）。SS/3B 雙資格。已被聯賽 rostered。
+
+### Samuel Basallo (BAL, C) — 條件 Pass
+重評條件：被 drop 到 FA + AVG 站穩 .240
+- 03-26：春訓 .371/.450/.771。MiLB 23HR/.966 OPS。C 資格 + 30HR 潛力，可升級 Langeliers。但 MLB 初登板 .165 AVG，AVG 風險高。已被聯賽 rostered。
+
+### JJ Wetherholt (STL, 2B) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：MiLB .306/.421/.510，17HR/23SB。全能型 2B，但我方已有 Chisholm/Altuve/Albies 三個 2B，位置重疊。已被聯賽 rostered。
+
+### Nolan McLean (NYM, SP) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：2025 MLB 2.06 ERA/1.04 WHIP/57K in 48IP。NL ROY 熱門。2026 預測 ~3.70 ERA/151K/152IP。K 菁英。已被聯賽 rostered。
+
+### Jacob Misiorowski (MIL, SP) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：98.7 mph 均速，11.9 K/9，MIL 開幕戰先發。但 2025 後半段崩（6.06 ERA），穩定性存疑。已被聯賽 rostered。
+
+### Cade Cavalli (WSH, SP) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：TJS 復出，WSH 開幕戰先發。春訓 14IP/0.00 ERA/10K，97 mph。預測 ~137 IP/4.20 ERA — IP 堪用但 ERA/WHIP 偏高。注意：與 Littell 同隊。已被聯賽 rostered。
+
+### Matthew Liberatore (STL, SP) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
+
+### Ryan Pepiot (TB, SP) — 條件 Pass
+重評條件：被 drop 到 FA
+- 03-26：2025 生涯最佳，市場未反映實力。已被聯賽 rostered。
+
 ## 已結案
 
 ### Jahmai Jones (DET, LF/CF/RF) — Pass
