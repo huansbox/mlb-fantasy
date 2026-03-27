@@ -17,7 +17,7 @@
   - 打者：R, HR, RBI, SB, BB, AVG, OPS
   - 投手：IP, W, K, ERA, WHIP, QS, SV+H
 - **限制與規則**：
-  - 每週最低 **45** 投球局數（Min IP = 45，未達 → ERA + WHIP 判負）
+  - 每週最低 **40** 投球局數（Min IP = 40，未達 → ERA + WHIP 判負）
   - 每週最多 6 次異動（Max Acquisition = 6）
   - Waiver：**FAB**（Free Agent Budget）+ Continual rolling list tiebreak
   - Lineup 鎖定：**Daily - Tomorrow**（每天要設隔日先發）
@@ -29,7 +29,7 @@
 | 項目 | 選秀前 | 開季版 | 影響 |
 |------|--------|--------|------|
 | 外野位 | OF×3 | **LF/CF/RF** | 需個別對位，CF 最稀缺 |
-| Min IP | 65 | **45** | 壓力大降，4 SP 基本穩過 |
+| Min IP | 65 | **40** | 壓力大降，4 SP 基本穩過 |
 | Divisions | 兩個聯盟 | **無** | 排名單一化 |
 | Bench | 未指定 | **3 格** | 替補空間緊 |
 
@@ -215,7 +215,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 ### SP 串流標準
 - IP > 180 → ERA < 3.50，兩項通過
-- 45 IP 門檻低，通常不需刻意串流
+- 40 IP 門檻低，通常不需刻意串流
 
 ### 每週檢查清單
 1. 設定隔日先發陣容（Daily deadline）
