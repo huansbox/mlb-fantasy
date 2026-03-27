@@ -98,13 +98,14 @@
 | **Kwan（VOR +2）** | 全隊最弱環節，K 移除輸家，第一替換候選 |
 | **BN 僅 3 格** | 替補空間緊，串流 SP 彈性有限 |
 
-### Watchlist（2026-03-26）
+### Watchlist（2026-03-27）
 
 **打者**
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
 | **Carson Benge** | NYM | OF(RF) | 連 2 週 OPS > .800 + AVG > .260 | Kwan |
+| **Ryan O'Hearn** | PIT | 1B/LF/RF | Benge 未達標 + Kwan 連 2 週 OPS < .700 | Kwan（backup） |
 
 **投手**
 
@@ -114,12 +115,14 @@
 
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Liberatore、Pepiot
 
+**已評估 Pass**：Correa（3B/SS，.734 OPS 不過正選門檻，不升級現有 3B/SS）
+
 ### 行動觸發規則
 
 | 條件 | 動作 |
 |------|------|
 | Benge 連 2 週 OPS > .800 + AVG > .260 | 撿 Benge，drop Kwan |
-| Kwan 連 2 週 OPS < .700 | 不等 Benge，直接找 FA 最佳替代 |
+| Kwan 連 2 週 OPS < .700 + Benge 未達標 | 撿 O'Hearn，drop Kwan |
 | Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Singer |
 | Painter 被限 5 IP 或跳先發 | 不動，Singer 穩定局數更有用 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
