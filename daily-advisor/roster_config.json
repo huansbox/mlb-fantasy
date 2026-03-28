@@ -38,6 +38,7 @@
     "min_ip": 40,
     "max_acquisitions": 6,
     "week_start": "monday",
+    "opening_day": "2026-03-26",
     "season": 2026
   }
 }

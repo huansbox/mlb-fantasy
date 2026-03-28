@@ -137,16 +137,28 @@ def fetch_team_hitting(team_id, season):
 # ── Analysis logic ──
 
 
-def get_week_monday(today):
-    """Return the Monday of the current fantasy week (Mon-Sun)."""
-    days_since_monday = today.weekday()  # 0=Mon
-    return today - timedelta(days=days_since_monday)
+def get_fantasy_week(target_date, config):
+    """Return (week_start, week_end, week_number) for the fantasy week containing target_date.
+
+    Week 1 starts on opening_day and ends on the first Sunday.
+    Week 2+ are Monday-Sunday.
+    """
+    opening_day = datetime.strptime(config["league"]["opening_day"], "%Y-%m-%d").date()
+    # First Sunday after opening day
+    first_sunday = opening_day + timedelta(days=(6 - opening_day.weekday()))
+    if target_date <= first_sunday:
+        return opening_day, first_sunday, 1
+    # Week 2+: Monday-Sunday
+    days_since_monday = target_date.weekday()  # 0=Mon
+    monday = target_date - timedelta(days=days_since_monday)
+    sunday = monday + timedelta(days=6)
+    week_number = 2 + (monday - (first_sunday + timedelta(days=1))).days // 7
+    return monday, sunday, week_number
 
 
 def calc_weekly_ip(config, target_date):
     """Calculate total IP for the fantasy week containing target_date."""
-    monday = get_week_monday(target_date)
-    sunday = monday + timedelta(days=6)
+    week_start, week_end, _ = get_fantasy_week(target_date, config)
     season = config["league"]["season"]
     active_pitchers = [p for p in config["pitchers"] if p["role"] != "IL"]
 
@@ -159,7 +171,7 @@ def calc_weekly_ip(config, target_date):
             continue
         for log in logs:
             log_date = datetime.strptime(log["date"], "%Y-%m-%d").date()
-            if monday <= log_date <= sunday:
+            if week_start <= log_date <= week_end:
                 total_ip += log["ip"]
                 entries.append(
                     f"  {p['name']}: {log['ip']:.1f} IP ({log['date']} vs {team_abbr(log['opponent'])})"
@@ -245,17 +257,21 @@ def analyze(config, target_date):
         lines.append("  (無)")
 
     # ── Section 4: Weekly IP ──
-    lines.append("\n本週 IP 進度：")
-    total_ip, ip_entries = calc_weekly_ip(config, target_date)
+    _, _, week_number = get_fantasy_week(target_date, config)
     min_ip = config["league"]["min_ip"]
+    lines.append(f"\n本週 IP 進度（Week {week_number}）：")
+    total_ip, ip_entries = calc_weekly_ip(config, target_date)
     if ip_entries:
         lines.extend(ip_entries)
-    lines.append(f"  合計: {total_ip:.1f} / {min_ip} IP")
-    remaining = min_ip - total_ip
-    if remaining > 0:
-        lines.append(f"  還需: {remaining:.1f} IP")
+    if week_number == 1:
+        lines.append(f"  合計: {total_ip:.1f} IP（Week 1 無最低局數限制）")
     else:
-        lines.append("  已達標")
+        lines.append(f"  合計: {total_ip:.1f} / {min_ip} IP")
+        remaining = min_ip - total_ip
+        if remaining > 0:
+            lines.append(f"  還需: {remaining:.1f} IP")
+        else:
+            lines.append("  已達標")
 
     # ── Section 5: Upcoming SP schedule (next 3 days) ──
     schedule_cache = {date_str: games}
