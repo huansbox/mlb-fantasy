@@ -42,5 +42,6 @@
 
 - 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` / `roster-scan` skill
 - `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token
+  - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 已安裝，待部署腳本 + cron
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行
