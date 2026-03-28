@@ -1,2 +1,3 @@
 *.skill
 daily-advisor/.env
+daily-advisor/yahoo_token.json
