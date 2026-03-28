@@ -1,0 +1,43 @@
+{
+  "batters": [
+    {"name": "Shea Langeliers",   "mlb_id": 669127, "team": "ATH", "positions": ["C"],        "role": "starter"},
+    {"name": "Christian Walker",   "mlb_id": 572233, "team": "HOU", "positions": ["1B"],       "role": "starter"},
+    {"name": "Jazz Chisholm Jr.",  "mlb_id": 665862, "team": "NYY", "positions": ["2B", "3B"], "role": "starter"},
+    {"name": "Manny Machado",      "mlb_id": 592518, "team": "SD",  "positions": ["3B"],       "role": "starter"},
+    {"name": "Ezequiel Tovar",     "mlb_id": 678662, "team": "COL", "positions": ["SS"],       "role": "starter"},
+    {"name": "Jose Altuve",        "mlb_id": 514888, "team": "HOU", "positions": ["2B", "LF"], "role": "starter"},
+    {"name": "Byron Buxton",       "mlb_id": 621439, "team": "MIN", "positions": ["CF"],       "role": "starter"},
+    {"name": "Lawrence Butler",    "mlb_id": 671732, "team": "ATH", "positions": ["CF", "RF"], "role": "starter"},
+    {"name": "Ozzie Albies",       "mlb_id": 645277, "team": "ATL", "positions": ["2B"],       "role": "starter"},
+    {"name": "Steven Kwan",        "mlb_id": 680757, "team": "CLE", "positions": ["LF"],       "role": "starter"},
+    {"name": "Sal Frelick",        "mlb_id": 686217, "team": "MIL", "positions": ["LF", "CF", "RF"], "role": "bench"},
+    {"name": "Giancarlo Stanton",  "mlb_id": 519317, "team": "NYY", "positions": ["LF", "RF"], "role": "bench"}
+  ],
+  "pitchers": [
+    {"name": "Tarik Skubal",    "mlb_id": 669373, "team": "DET", "type": "SP", "role": "starter"},
+    {"name": "Chris Sale",      "mlb_id": 519242, "team": "ATL", "type": "SP", "role": "starter"},
+    {"name": "Cole Ragans",     "mlb_id": 666142, "team": "KC",  "type": "SP", "role": "starter"},
+    {"name": "Aaron Nola",      "mlb_id": 605400, "team": "PHI", "type": "SP", "role": "starter"},
+    {"name": "Robert Garcia",   "mlb_id": 676395, "team": "TEX", "type": "RP", "role": "starter"},
+    {"name": "Garrett Whitlock","mlb_id": 676477, "team": "BOS", "type": "RP", "role": "starter"},
+    {"name": "Brayan Bello",    "mlb_id": 678394, "team": "BOS", "type": "SP", "role": "starter"},
+    {"name": "Zack Littell",    "mlb_id": 641793, "team": "WSH", "type": "SP", "role": "starter"},
+    {"name": "Brady Singer",    "mlb_id": 663903, "team": "CIN", "type": "SP", "role": "starter"},
+    {"name": "Chris Bassitt",   "mlb_id": 605135, "team": "BAL", "type": "SP", "role": "bench"},
+    {"name": "Merrill Kelly",   "mlb_id": 518876, "team": "AZ",  "type": "SP", "role": "IL"}
+  ],
+  "teams": {
+    "ATH": 133, "ATL": 144, "AZ": 109, "BAL": 110, "BOS": 111,
+    "CHC": 112, "CIN": 113, "CLE": 114, "COL": 115, "CWS": 145,
+    "DET": 116, "HOU": 117, "KC": 118, "LAA": 108, "LAD": 119,
+    "MIA": 146, "MIL": 158, "MIN": 142, "NYM": 121, "NYY": 147,
+    "PHI": 143, "PIT": 134, "SD": 135, "SEA": 136, "SF": 137,
+    "STL": 138, "TB": 139, "TEX": 140, "TOR": 141, "WSH": 120
+  },
+  "league": {
+    "min_ip": 40,
+    "max_acquisitions": 6,
+    "week_start": "monday",
+    "season": 2026
+  }
+}
