@@ -769,6 +769,46 @@ def main():
     else:
         print("Failed to send.", file=sys.stderr)
 
+    # Archive to GitHub Issue
+    _, _, week_number = get_fantasy_week(target_date, config)
+    save_github_issue(target_date, week_number, data_summary, advice)
+
+
+def save_github_issue(target_date, week_number, data_summary, advice):
+    """Save daily report as a GitHub Issue for future review."""
+    repo = "huansbox/mlb-fantasy"
+    title = f"Daily Report — {target_date}"
+    body = f"""## Claude Advice
+
+{advice}
+
+---
+
+<details>
+<summary>Raw Data Summary</summary>
+
+```
+{data_summary}
+```
+
+</details>
+"""
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "create",
+             "--repo", repo,
+             "--title", title,
+             "--body", body,
+             "--label", f"week-{week_number}"],
+            capture_output=True, text=True, encoding="utf-8", timeout=30,
+        )
+        if result.returncode == 0:
+            print(f"Issue created: {result.stdout.strip()}", file=sys.stderr)
+        else:
+            print(f"GitHub Issue error: {result.stderr}", file=sys.stderr)
+    except Exception as e:
+        print(f"GitHub Issue failed (non-blocking): {e}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
