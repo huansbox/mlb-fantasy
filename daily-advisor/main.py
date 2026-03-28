@@ -1,10 +1,12 @@
-"""Daily Advisor Phase 1 — Fantasy Baseball 每日陣容建議產生器"""
+"""Daily Advisor — Fantasy Baseball 每日陣容建議產生器"""
 
 import argparse
 import json
 import os
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -13,24 +15,55 @@ ET = ZoneInfo("America/New_York")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MLB_API = "https://statsapi.mlb.com/api/v1"
+YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
+YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
+YAHOO_TOKEN_FILE = os.path.join(SCRIPT_DIR, "yahoo_token.json")
+
+# Yahoo stat_id (str) → (display_name, lower_is_better)
+YAHOO_STAT_MAP = {
+    "7": ("R", False),
+    "12": ("HR", False),
+    "13": ("RBI", False),
+    "16": ("SB", False),
+    "18": ("BB", False),
+    "3": ("AVG", False),
+    "55": ("OPS", False),
+    "50": ("IP", False),
+    "28": ("W", False),
+    "42": ("K", False),
+    "26": ("ERA", True),
+    "27": ("WHIP", True),
+    "83": ("QS", False),
+    "89": ("SV+H", False),
+}
 
 
 def load_config():
     with open(os.path.join(SCRIPT_DIR, "roster_config.json"), encoding="utf-8") as f:
-        return json.load(f)
+        config = json.load(f)
+    # Build name → mlb_id lookup from config
+    config["mlb_id_map"] = {}
+    for p in config.get("batters", []) + config.get("pitchers", []):
+        if p.get("mlb_id"):
+            config["mlb_id_map"][p["name"]] = p["mlb_id"]
+    return config
 
 
 def load_env():
-    env_path = os.path.join(SCRIPT_DIR, ".env")
-    if not os.path.exists(env_path):
-        return {}
     env = {}
-    with open(env_path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                env[k.strip()] = v.strip()
+    env_path = os.path.join(SCRIPT_DIR, ".env")
+    if os.path.exists(env_path):
+        with open(env_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    env[k.strip()] = v.strip()
+    # os.environ overrides .env (op run injects real values over op:// references)
+    for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
+                "YAHOO_CLIENT_ID", "YAHOO_CLIENT_SECRET"):
+        if key in os.environ:
+            env[key] = os.environ[key]
     return env
 
 
@@ -137,6 +170,277 @@ def fetch_team_hitting(team_id, season):
     }
 
 
+# ── Yahoo Fantasy API ──
+
+
+def yahoo_refresh_token(env):
+    """Refresh Yahoo OAuth token. Returns access_token."""
+    with open(YAHOO_TOKEN_FILE, encoding="utf-8") as f:
+        tokens = json.load(f)
+
+    data = urllib.parse.urlencode({
+        "grant_type": "refresh_token",
+        "refresh_token": tokens["refresh_token"],
+        "client_id": env["YAHOO_CLIENT_ID"],
+        "client_secret": env["YAHOO_CLIENT_SECRET"],
+    }).encode()
+
+    req = urllib.request.Request(
+        YAHOO_TOKEN_URL, data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        result = json.loads(resp.read())
+
+    # Preserve old refresh_token if response doesn't include a new one
+    tokens["access_token"] = result["access_token"]
+    if "refresh_token" in result:
+        tokens["refresh_token"] = result["refresh_token"]
+
+    with open(YAHOO_TOKEN_FILE, "w", encoding="utf-8") as f:
+        json.dump(tokens, f, indent=2)
+
+    return result["access_token"]
+
+
+def yahoo_api_get(path, access_token):
+    """Yahoo Fantasy API GET request."""
+    url = f"{YAHOO_API}{path}"
+    sep = "&" if "?" in path else "?"
+    url += f"{sep}format=json"
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {access_token}"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read())
+
+
+def fetch_yahoo_scoreboard(config, env):
+    """Fetch current week H2H scoreboard. Returns dict or None on failure."""
+    if not os.path.exists(YAHOO_TOKEN_FILE):
+        return None
+
+    league_key = config["league"].get("league_key")
+    team_name = config["league"].get("team_name")
+    if not league_key:
+        return None
+
+    access_token = yahoo_refresh_token(env)
+
+    # Fetch scoreboard
+    sb = yahoo_api_get(f"/league/{league_key}/scoreboard", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+
+        teams = v["matchup"]["0"]["teams"]
+        t0_info = teams["0"]["team"][0]
+        t1_info = teams["1"]["team"][0]
+
+        # Extract team names, keys, and find which is mine
+        n0 = n1 = "?"
+        k0 = k1 = None
+        my_idx = None
+        for item in t0_info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    n0 = item["name"]
+                if "team_key" in item:
+                    k0 = item["team_key"]
+                if "is_owned_by_current_login" in item:
+                    my_idx = 0
+        for item in t1_info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    n1 = item["name"]
+                if "team_key" in item:
+                    k1 = item["team_key"]
+                if "is_owned_by_current_login" in item:
+                    my_idx = 1
+
+        # Fallback: match by team_name from config
+        if my_idx is None:
+            if n0 == team_name:
+                my_idx = 0
+            elif n1 == team_name:
+                my_idx = 1
+            else:
+                continue
+
+        opp_idx = 1 - my_idx
+        my_name = n0 if my_idx == 0 else n1
+        opp_name = n1 if my_idx == 0 else n0
+        opp_key = k1 if my_idx == 0 else k0
+
+        my_stats = teams[str(my_idx)]["team"][1]["team_stats"]["stats"]
+        opp_stats = teams[str(opp_idx)]["team"][1]["team_stats"]["stats"]
+
+        categories = []
+        wins = losses = draws = 0
+
+        for i in range(len(my_stats)):
+            stat_id = my_stats[i]["stat"]["stat_id"]
+            if stat_id not in YAHOO_STAT_MAP:
+                continue  # skip display-only stats like H/AB
+            cat_name, lower_is_better = YAHOO_STAT_MAP[stat_id]
+            my_val = my_stats[i]["stat"]["value"]
+            opp_val = opp_stats[i]["stat"]["value"]
+
+            try:
+                fm, fo = float(my_val), float(opp_val)
+                if lower_is_better:
+                    result = "W" if fm < fo else ("L" if fm > fo else "D")
+                else:
+                    result = "W" if fm > fo else ("L" if fm < fo else "D")
+            except (ValueError, TypeError):
+                result = "D"
+
+            if result == "W":
+                wins += 1
+            elif result == "L":
+                losses += 1
+            else:
+                draws += 1
+
+            categories.append({
+                "name": cat_name,
+                "mine": my_val,
+                "opp": opp_val,
+                "result": result,
+            })
+
+        return {
+            "my_team": my_name,
+            "opponent": opp_name,
+            "opponent_key": opp_key,
+            "categories": categories,
+            "wins": wins,
+            "losses": losses,
+            "draws": draws,
+        }
+
+    return None
+
+
+def fetch_yahoo_roster(team_key, access_token, mlb_id_map):
+    """Fetch roster from Yahoo API, return batters and pitchers lists."""
+    roster_data = yahoo_api_get(f"/team/{team_key}/roster", access_token)
+    players = roster_data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
+
+    batters = []
+    pitchers = []
+    for k, v in players.items():
+        if k == "count":
+            continue
+        player = v["player"]
+        info = player[0]
+        pos_data = player[1]
+
+        name = team_val = display_pos = None
+        for item in info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    name = item["name"].get("full")
+                if "editorial_team_abbr" in item:
+                    team_val = item["editorial_team_abbr"].upper()
+                if "display_position" in item:
+                    display_pos = item["display_position"]
+
+        # Get selected position (where they're slotted)
+        selected_pos = "BN"
+        sel = pos_data.get("selected_position", [{}])
+        for s in sel:
+            if isinstance(s, dict) and "position" in s:
+                selected_pos = s["position"]
+
+        if not name or not display_pos:
+            continue
+
+        # Determine role from selected position
+        if selected_pos == "IL" or selected_pos == "IL+":
+            role = "IL"
+        elif selected_pos == "BN":
+            role = "bench"
+        else:
+            role = "starter"
+
+        positions = [p.strip() for p in display_pos.split(",")]
+        mlb_id = mlb_id_map.get(name)
+
+        if any(p in ("SP", "RP") for p in positions):
+            p_type = "SP" if "SP" in positions else "RP"
+            pitchers.append({
+                "name": name, "mlb_id": mlb_id, "team": team_val,
+                "type": p_type, "role": role, "selected_pos": selected_pos,
+            })
+        else:
+            batters.append({
+                "name": name, "mlb_id": mlb_id, "team": team_val,
+                "positions": positions, "role": role, "selected_pos": selected_pos,
+            })
+
+    return batters, pitchers
+
+
+def fetch_opponent_sp_schedule(opp_key, access_token, target_date, week_end):
+    """Fetch opponent's SP roster and cross-reference with MLB schedule for remaining days."""
+    # Get opponent roster
+    roster_data = yahoo_api_get(f"/team/{opp_key}/roster", access_token)
+    players = roster_data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
+
+    # Extract opponent's SP names and MLB teams
+    opp_sps = []
+    for k, v in players.items():
+        if k == "count":
+            continue
+        player = v["player"]
+        info = player[0]
+        name = None
+        mlb_team = None
+        position = None
+        for item in info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    name = item["name"].get("full")
+                if "editorial_team_abbr" in item:
+                    mlb_team = item["editorial_team_abbr"].upper()
+                if "display_position" in item:
+                    position = item["display_position"]
+        # Only include SPs (not RP)
+        if position and "SP" in position and name:
+            opp_sps.append({"name": name, "team": mlb_team})
+
+    if not opp_sps:
+        return []
+
+    # Check MLB schedule for each remaining day this week
+    opp_sp_names = {sp["name"] for sp in opp_sps}
+    opp_sp_teams = {sp["team"] for sp in opp_sps}
+    schedule_entries = []
+
+    weekday_names = ["一", "二", "三", "四", "五", "六", "日"]
+    current = target_date
+    while current <= week_end:
+        date_str = current.strftime("%Y-%m-%d")
+        wd = weekday_names[current.weekday()]
+        try:
+            games = fetch_schedule(date_str)
+        except Exception:
+            current += timedelta(days=1)
+            continue
+        day_starts = []
+        for g in games:
+            for pk in ("away_pitcher", "home_pitcher"):
+                pitcher = g.get(pk)
+                if pitcher and pitcher in opp_sp_names:
+                    day_starts.append(pitcher)
+        if day_starts:
+            schedule_entries.append(f"  {date_str} (週{wd}): {', '.join(day_starts)}")
+        current += timedelta(days=1)
+
+    return schedule_entries
+
+
 # ── Analysis logic ──
 
 
@@ -159,11 +463,12 @@ def get_fantasy_week(target_date, config):
     return monday, sunday, week_number
 
 
-def calc_weekly_ip(config, target_date):
+def calc_weekly_ip(config, target_date, pitchers_list=None):
     """Calculate total IP for the fantasy week containing target_date."""
     week_start, week_end, _ = get_fantasy_week(target_date, config)
     season = config["league"]["season"]
-    active_pitchers = [p for p in config["pitchers"] if p["role"] != "IL"]
+    src = pitchers_list if pitchers_list else config["pitchers"]
+    active_pitchers = [p for p in src if p["role"] != "IL"]
 
     entries = []
     total_ip = 0.0
@@ -182,16 +487,44 @@ def calc_weekly_ip(config, target_date):
     return total_ip, entries
 
 
-def analyze(config, target_date):
+def analyze(config, target_date, env=None):
     """Build the full data summary for claude -p."""
     season = config["league"]["season"]
     date_str = target_date.strftime("%Y-%m-%d")
     weekday_names = ["一", "二", "三", "四", "五", "六", "日"]
     weekday = weekday_names[target_date.weekday()]
 
+    # Fetch live roster from Yahoo if available, fallback to config
+    batters = config["batters"]
+    pitchers = config["pitchers"]
+    if env and env.get("YAHOO_CLIENT_ID") and os.path.exists(YAHOO_TOKEN_FILE):
+        try:
+            access_token = yahoo_refresh_token(env)
+            league_key = config["league"]["league_key"]
+            # Find my team key
+            teams_data = yahoo_api_get(f"/league/{league_key}/teams", access_token)
+            teams_list = teams_data["fantasy_content"]["league"][1]["teams"]
+            my_key = None
+            for k, v in teams_list.items():
+                if k == "count":
+                    continue
+                for item in v["team"][0]:
+                    if isinstance(item, dict) and "is_owned_by_current_login" in item:
+                        for it in v["team"][0]:
+                            if isinstance(it, dict) and "team_key" in it:
+                                my_key = it["team_key"]
+                        break
+            if my_key:
+                batters, pitchers = fetch_yahoo_roster(
+                    my_key, access_token, config["mlb_id_map"]
+                )
+                print("Using live Yahoo roster.", file=sys.stderr)
+        except Exception as e:
+            print(f"Yahoo roster fetch failed, using config: {e}", file=sys.stderr)
+
     games = fetch_schedule(date_str)
 
-    # Build set of teams playing tomorrow
+    # Build set of teams playing
     teams_playing = set()
     # Map: team_abbr → opponent_team_abbr
     matchup_map = {}
@@ -204,7 +537,7 @@ def analyze(config, target_date):
         matchup_map[h] = a
 
     # Identify my SP starts tomorrow
-    my_sp_names = {p["name"]: p for p in config["pitchers"] if p["type"] == "SP"}
+    my_sp_names = {p["name"]: p for p in pitchers if p["type"] == "SP"}
     sp_starts = []
     for g in games:
         for pitcher_key, side, opp_side in [
@@ -219,9 +552,10 @@ def analyze(config, target_date):
     # ── Section 1: Batters ──
     lines = [f"=== 明日賽程 ({date_str} 週{weekday}) ===\n"]
     lines.append("我的打者：")
-    for b in config["batters"]:
+    for b in batters:
         pos = "/".join(b["positions"])
-        tag = "正選" if b["role"] == "starter" else "板凳"
+        slot = b.get("selected_pos", b["role"])
+        tag = "板凳" if b["role"] == "bench" else slot
         if b["team"] in teams_playing:
             opp = matchup_map.get(b["team"], "?")
             lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp}")
@@ -248,7 +582,7 @@ def analyze(config, target_date):
     lines.append("\n投打衝突：")
     conflicts = []
     for sp in sp_starts:
-        for b in config["batters"]:
+        for b in batters:
             if b["team"] == sp["opponent"]:
                 conflicts.append(
                     f"  {sp['name']} 先發 vs {sp['opponent']}"
@@ -263,7 +597,7 @@ def analyze(config, target_date):
     _, _, week_number = get_fantasy_week(target_date, config)
     min_ip = config["league"]["min_ip"]
     lines.append(f"\n本週 IP 進度（Week {week_number}）：")
-    total_ip, ip_entries = calc_weekly_ip(config, target_date)
+    total_ip, ip_entries = calc_weekly_ip(config, target_date, pitchers)
     if ip_entries:
         lines.extend(ip_entries)
     if week_number == 1:
@@ -276,26 +610,69 @@ def analyze(config, target_date):
         else:
             lines.append("  已達標")
 
-    # ── Section 5: Upcoming SP schedule (next 3 days) ──
-    schedule_cache = {date_str: games}
-    lines.append("\n未來 3 天 SP 排程：")
-    for offset in range(0, 3):
-        future = target_date + timedelta(days=offset)
-        future_str = future.strftime("%Y-%m-%d")
-        future_weekday = weekday_names[future.weekday()]
+    # ── Section 5: H2H Scoreboard ──
+    sb = None
+    if env:
         try:
-            future_games = schedule_cache.get(future_str) or fetch_schedule(future_str)
+            sb = fetch_yahoo_scoreboard(config, env)
+            if sb:
+                lines.append(f"\n=== 本週 H2H 對戰態勢 ===")
+                lines.append(f"對手：{sb['opponent']}")
+                lines.append(f"目前比分：{sb['wins']}W-{sb['losses']}L-{sb['draws']}D（需 8+ 贏）\n")
+                lines.append(f"  {'類別':>6}  {'我方':>8}  {'對手':>8}  狀態")
+                for cat in sb["categories"]:
+                    if cat["result"] == "W":
+                        tag = "✅ 贏"
+                    elif cat["result"] == "L":
+                        tag = "❌ 輸"
+                    else:
+                        tag = "➖ 平"
+                    # Mark punt categories
+                    if cat["name"] in ("SB", "SV+H"):
+                        tag += "（punt）"
+                    lines.append(f"  {cat['name']:>6}  {cat['mine']:>8}  {cat['opp']:>8}  {tag}")
+        except Exception as e:
+            print(f"Yahoo API error (skipping scoreboard): {e}", file=sys.stderr)
+
+    # ── Section 6: My SP schedule (rest of week) ──
+    _, week_end, _ = get_fantasy_week(target_date, config)
+    schedule_cache = {date_str: games}
+    lines.append("\n本週剩餘我方 SP 排程：")
+    current = target_date
+    while current <= week_end:
+        cur_str = current.strftime("%Y-%m-%d")
+        cur_wd = weekday_names[current.weekday()]
+        try:
+            cur_games = schedule_cache.get(cur_str) or fetch_schedule(cur_str)
+            schedule_cache[cur_str] = cur_games
         except Exception:
+            current += timedelta(days=1)
             continue
         day_starts = []
-        for g in future_games:
-            for pk in ["away_pitcher", "home_pitcher"]:
+        for g in cur_games:
+            for pk in ("away_pitcher", "home_pitcher"):
                 if g.get(pk) in my_sp_names:
                     day_starts.append(g[pk])
         if day_starts:
-            lines.append(f"  {future_str} (週{future_weekday}): {', '.join(day_starts)}")
+            lines.append(f"  {cur_str} (週{cur_wd}): {', '.join(day_starts)}")
         else:
-            lines.append(f"  {future_str} (週{future_weekday}): (無)")
+            lines.append(f"  {cur_str} (週{cur_wd}): (無)")
+        current += timedelta(days=1)
+
+    # ── Section 7: Opponent SP schedule (rest of week) ──
+    if env and sb and sb.get("opponent_key"):
+        try:
+            access_token = yahoo_refresh_token(env)
+            opp_entries = fetch_opponent_sp_schedule(
+                sb["opponent_key"], access_token, target_date, week_end
+            )
+            lines.append(f"\n本週剩餘對手 SP 排程（{sb['opponent']}）：")
+            if opp_entries:
+                lines.extend(opp_entries)
+            else:
+                lines.append("  (無已確認先發)")
+        except Exception as e:
+            print(f"Opponent SP schedule error (skipping): {e}", file=sys.stderr)
 
     return "\n".join(lines)
 
@@ -366,7 +743,7 @@ def main():
         target_date = datetime.now(ET).date()
 
     print(f"Fetching data for {target_date}...", file=sys.stderr)
-    data_summary = analyze(config, target_date)
+    data_summary = analyze(config, target_date, env)
 
     if args.dry_run:
         print(data_summary)
