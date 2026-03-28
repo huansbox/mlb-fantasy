@@ -194,6 +194,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 | 文件 | 用途 | 狀態 |
 |------|------|------|
+| `賽季管理入門.md` | H2H One Win 賽季管理入門要點（週例行、決策樹、punt 紀律） | ✅ 開季參考 |
 | `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
 | `roster-baseline.md` | 陣容基準卡（全員預測/實際數據，eval 比較用） | 🔄 進行中 |
 | `player-eval` skill | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |

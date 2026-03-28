@@ -24,6 +24,7 @@
 
 開季後的陣容管理、waiver wire 操作、每週對戰分析。
 
+- `賽季管理入門.md` — H2H One Win 賽季管理入門要點
 - `waiver-log.md` — 球員觀察追蹤記錄
 - `roster-baseline.md` — 陣容基準卡（全員預測/實際數據）
 - `player-eval` skill — 球員評估 SOP（Claude Code skill）
