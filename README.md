@@ -44,6 +44,7 @@
 - `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token + Yahoo OAuth token
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron: 每日 UTC 13:45（台灣 21:45）自動執行，log 在 `/var/log/daily-advisor.log`
+  - 每日報告自動存檔為 GitHub Issue（label: `week-N`），覆盤用 `gh issue list --label week-1`
   - 更新部署：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && git pull'`
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行
