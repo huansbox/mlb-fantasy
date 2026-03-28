@@ -30,6 +30,7 @@
 - `player-eval` skill — 球員評估 SOP（Claude Code skill）
 - `waiver-scan` skill — Waiver wire 掃描 SOP（Claude Code skill）
 - `roster-scan` skill — 陣容基準卡週更 SOP（Claude Code skill）
+- `daily-advisor/` — 每日陣容建議產生器（MLB Stats API + claude -p → Telegram 推送）
 
 ## 核心策略
 
@@ -40,5 +41,6 @@
 ## 環境
 
 - 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` / `roster-scan` skill
+- `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行

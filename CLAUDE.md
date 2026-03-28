@@ -200,6 +200,8 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `player-eval` skill | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |
 | `waiver-scan` skill | Waiver wire 主動掃描 SOP（搜尋 FA + 更新 log） | ✅ 完成 |
 | `roster-scan` skill | 陣容基準卡週更 SOP（更新數據 + 趨勢標記） | ✅ 完成 |
+| `daily-advisor/` | 每日陣容建議產生器（MLB Stats API + claude -p + Telegram） | 🔄 Phase 1 完成 |
+| `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
 
 ### 選秀準備（已完成，留作參考）
 
