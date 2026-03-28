@@ -7,6 +7,9 @@ import subprocess
 import sys
 import urllib.request
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+ET = ZoneInfo("America/New_York")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MLB_API = "https://statsapi.mlb.com/api/v1"
@@ -360,7 +363,7 @@ def main():
     if args.date:
         target_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        target_date = datetime.now().date() + timedelta(days=1)
+        target_date = datetime.now(ET).date()
 
     print(f"Fetching data for {target_date}...", file=sys.stderr)
     data_summary = analyze(config, target_date)
