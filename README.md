@@ -41,7 +41,7 @@
 ## 環境
 
 - 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` / `roster-scan` skill
-- `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token
+- `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token + Yahoo OAuth token
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron: 每日 UTC 13:45（台灣 21:45）自動執行，log 在 `/var/log/daily-advisor.log`
   - 更新部署：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && git pull'`
