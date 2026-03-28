@@ -759,6 +759,10 @@ def main():
 
     print(advice)
 
+    # Archive to GitHub Issue
+    _, _, week_number = get_fantasy_week(target_date, config)
+    save_github_issue(target_date, week_number, data_summary, advice)
+
     if args.no_send:
         return
 
@@ -768,10 +772,6 @@ def main():
         print("Sent.", file=sys.stderr)
     else:
         print("Failed to send.", file=sys.stderr)
-
-    # Archive to GitHub Issue
-    _, _, week_number = get_fantasy_week(target_date, config)
-    save_github_issue(target_date, week_number, data_summary, advice)
 
 
 def save_github_issue(target_date, week_number, data_summary, advice):
