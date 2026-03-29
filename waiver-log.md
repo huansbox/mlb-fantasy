@@ -12,6 +12,10 @@
 - 03-27：基準卡對比 — O'Hearn(.281/.803/17HR/11%) vs Kwan(.277/.749/11HR/8.9%) vs Walker(.229/.734/23HR/8.6%)。O'Hearn 篩選通過率最高（2/3），Kwan 1/3，Walker 0/3。vs Kwan：OPS +.054、HR +6、BB% +2%，SB 輸但 punt SB。vs Walker：AVG +.052、OPS +.069，HR 少 6 但比率優勢大。
 - 03-27：春訓對比後調整 — Kwan 春訓 .292/1.060 OPS/2HR + 休賽季練 bat speed（去年 1st percentile），有 power breakout 跡象，暫不急換。Walker 春訓 6 場 .000/14AB 更令人擔憂，O'Hearn 有 1B 資格可直接替。取代範圍擴大至 Walker，Walker 優先於 Kwan。
 
+### Brandon Marsh (PHI, LF/CF) — 條件 Pass
+重評條件：Buxton 進 IL + Frelick 無法覆蓋 CF
+- 03-29：[waiver-scan] CF FA 中唯一非速度型選項。BB% 菁英級（~12-14%），7×7 BB 雙重計算下被低估。但 AVG .230-.240 拖比率，替補門檻可能僅 1/3（BB% ✓）。定位為 CF 緊急保險，不作正選升級。5% rostered。
+
 ### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
 重評條件：拿到 HOU 每日先發 + AVG 站穩 .250
 - 03-26：工具型（20HR/20SB 潛力）但 36.3% K rate → AVG 風險高，HOU 角色未定。

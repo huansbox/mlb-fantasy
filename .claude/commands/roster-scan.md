@@ -32,23 +32,30 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 > 數據來源優先順序：FanGraphs > Baseball Reference > ESPN > Yahoo
 > ROS（Rest of Season）預測：RotoChamp Steamer 或 FanGraphs Steamer ROS
 
-### 打者 — WebSearch 查詢
+### 2a：WebSearch 查詢（主要數據來源）
 
-每位打者搜尋：
+**打者** — 每位搜尋：
 ```
 {球員名} {今年} stats {今天日期附近}
 ```
-
 **必須取得**：G（場次）、PA、AVG、OPS、HR、RBI、R、SB、BB%
 
-### 投手 — WebSearch 查詢
-
-每位 SP 搜尋：
+**投手** — 每位 SP 搜尋：
 ```
 {球員名} {今年} stats pitching {今天日期附近}
 ```
-
 **必須取得**：GS、IP、ERA、WHIP、K、W、QS（如可取得）
+
+### 2b：Yahoo API 輔助查詢
+
+球員狀態（守位資格、IL、健康）有疑問時，用 `yahoo_query.py` 快速確認：
+
+```bash
+cd {專案根目錄} && op run --env-file=daily-advisor/.env -- python daily-advisor/yahoo_query.py player "{球員名}"
+```
+
+> Yahoo API 目前不提供統計數據（AVG/OPS/ERA 等），實際 stats 以 WebSearch（Step 2a）為準。
+> VPS 上改用 `export $(cat /etc/calorie-bot/op-token.env) &&` 取代 `op run --env-file=...`。
 
 ### 效率技巧
 
