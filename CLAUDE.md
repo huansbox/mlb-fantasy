@@ -202,6 +202,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `roster-scan` skill | 陣容基準卡週更 SOP（更新數據 + 趨勢標記） | ✅ 完成 |
 | `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 21:45）+ 最終報（台灣 05:00，含 Lineup 確認） | ✅ Phase 2 已部署 |
 | `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
+| `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考（已用 + 可用） | ✅ 參考 |
 
 ### 選秀準備（已完成，留作參考）
 
