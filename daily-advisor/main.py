@@ -775,6 +775,15 @@ def analyze(config, target_date, env=None, morning=False):
             lines.append("\n板凳球員 Lineup 狀態：")
             lines.extend(bench_lines)
 
+        # ── Section 9: Evening advice (morning mode only) ──
+        _, _, wk = get_fantasy_week(target_date, config)
+        evening_advice = fetch_evening_advice(target_date, wk)
+        if evening_advice:
+            lines.append("\n=== 速報建議（前一晚） ===")
+            lines.append(evening_advice)
+        else:
+            lines.append("\n（速報未找到，請獨立判斷）")
+
     return "\n".join(lines)
 
 
@@ -880,6 +889,37 @@ def main():
         print("Sent.", file=sys.stderr)
     else:
         print("Failed to send.", file=sys.stderr)
+
+
+def fetch_evening_advice(target_date, week_number):
+    """Fetch the evening report's advice from GitHub Issues for the same date."""
+    repo = "huansbox/mlb-fantasy"
+    title_query = f"[速報] Daily Report — {target_date}"
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "list", "--repo", repo,
+             "--label", f"week-{week_number}",
+             "--search", title_query,
+             "--json", "body", "--limit", "1"],
+            capture_output=True, text=True, encoding="utf-8", timeout=15,
+        )
+        if result.returncode != 0:
+            return None
+        issues = json.loads(result.stdout)
+        if not issues:
+            return None
+        body = issues[0]["body"]
+        # Extract advice between "## Claude Advice" and "---"
+        marker = "## Claude Advice"
+        start = body.find(marker)
+        if start == -1:
+            return None
+        start += len(marker)
+        end = body.find("\n---\n", start)
+        return body[start:end].strip() if end != -1 else body[start:].strip()
+    except Exception as e:
+        print(f"Failed to fetch evening advice: {e}", file=sys.stderr)
+        return None
 
 
 def save_github_issue(target_date, week_number, data_summary, advice, morning=False):
