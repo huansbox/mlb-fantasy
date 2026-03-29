@@ -50,6 +50,12 @@
 - 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
 - 03-27：[eval] 被 drop 到 FA，觸發重評。2025: 4.21 ERA/1.31 WHIP/122K/151.2 IP。2026 預測 ~4.44 ERA/152 IP，逐項輸現有後段 4 SP（Singer/Bello/Bassitt/Littell）。春訓新 splitter 有潛力但僅小樣本。不撿。
 
+### Dominic Canzone (SEA, LF/RF) — Pass
+- 03-29：[eval] vs Kwan(LF)，結論：不換。2025 .300/.840 是 82G 小樣本，預測系統一致回歸至 .245/.741（Composite）。正選篩選 0/3、替補勉強 2/3。vs Kwan：HR +5 / RBI +4，但 AVG -32pt / R -26 / BB -23 / SB -12。BB 雙重計算下 Kwan 格式價值明顯更高。Opening Day 2 HR 不改變結論。
+
+### Francisco Alvarez (NYM, C) — Pass
+- 03-29：[eval] vs Langeliers(C)。2025: .256/.787 OPS/11HR/BB% 9.7%（76G 傷縮）。Steamer 2026: .241/.775 OPS/18HR。替補級篩選 2/3 通過但正選級 0/3。Langeliers 7 類別全勝（HR+9, R+20, RBI+21, OPS+.021）。C 位非弱點，BN 3 格無 drop 目標。不撿不追蹤。
+
 ### Carlos Correa (HOU, 3B/SS) — Pass
 - 03-27：[eval] .276/.734 OPS/13HR/BB% ~7.5%，正選篩選僅 1/3。不升級 Machado(3B)，贏 Tovar(SS) 幅度太小，31 歲+反覆傷病。不追蹤。
 
