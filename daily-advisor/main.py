@@ -153,6 +153,40 @@ def fetch_pitcher_gamelog(player_id, season):
     ]
 
 
+def fetch_lineups(date_str, season):
+    """Fetch actual batting lineups for all games on a date.
+
+    Returns dict: team_abbr → list of {name, id, position, batting_order}
+    """
+    data = api_get(
+        f"/schedule?sportId=1&date={date_str}&hydrate=lineups,probablePitcher"
+    )
+    team_lineups = {}
+    for d in data.get("dates", []):
+        for g in d["games"]:
+            lineups = g.get("lineups", {})
+            for side, team_key in [
+                ("homePlayers", "home"),
+                ("awayPlayers", "away"),
+            ]:
+                players = lineups.get(side, [])
+                if not players:
+                    continue
+                t = team_abbr(g["teams"][team_key]["team"]["name"], season)
+                team_lineups[t] = [
+                    {
+                        "name": p["fullName"],
+                        "id": p["id"],
+                        "position": p.get("primaryPosition", {}).get(
+                            "abbreviation", "?"
+                        ),
+                        "batting_order": i + 1,
+                    }
+                    for i, p in enumerate(players)
+                ]
+    return team_lineups
+
+
 def fetch_team_hitting(team_id, season):
     """Fetch team season hitting stats."""
     data = api_get(
@@ -487,7 +521,7 @@ def calc_weekly_ip(config, target_date, pitchers_list=None):
     return total_ip, entries
 
 
-def analyze(config, target_date, env=None):
+def analyze(config, target_date, env=None, morning=False):
     """Build the full data summary for claude -p."""
     season = config["league"]["season"]
     date_str = target_date.strftime("%Y-%m-%d")
@@ -674,12 +708,84 @@ def analyze(config, target_date, env=None):
         except Exception as e:
             print(f"Opponent SP schedule error (skipping): {e}", file=sys.stderr)
 
+    # ── Section 8: Lineup confirmation (morning mode only) ──
+    if morning:
+        try:
+            team_lineups = fetch_lineups(date_str, season)
+        except Exception as e:
+            print(f"Lineup fetch error: {e}", file=sys.stderr)
+            team_lineups = {}
+
+        lines.append("\n=== 實際 Lineup 確認 ===")
+
+        # Starters
+        confirmed = []
+        not_in_lineup = []
+        lineup_unknown = []
+        for b in batters:
+            if b["role"] != "starter":
+                continue
+            if b["team"] not in teams_playing:
+                continue  # off-day, already covered above
+            lu = team_lineups.get(b["team"])
+            if lu is None:
+                lineup_unknown.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
+                continue
+            match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
+            if match:
+                confirmed.append(
+                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ({match['position']})"
+                )
+            else:
+                not_in_lineup.append(
+                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單 ⚠️"
+                )
+
+        if confirmed:
+            lines.append("\n已確認先發：")
+            lines.extend(confirmed)
+        if not_in_lineup:
+            lines.append("\n未進 Lineup：")
+            lines.extend(not_in_lineup)
+        if lineup_unknown:
+            lines.append("\nLineup 未公布：")
+            lines.extend(lineup_unknown)
+
+        # Bench batters
+        bench_lines = []
+        for b in batters:
+            if b["role"] != "bench":
+                continue
+            if b["team"] not in teams_playing:
+                continue
+            lu = team_lineups.get(b["team"])
+            if lu is None:
+                bench_lines.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
+                continue
+            match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
+            if match:
+                bench_lines.append(
+                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ← 有先發"
+                )
+            else:
+                bench_lines.append(
+                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單"
+                )
+        if bench_lines:
+            lines.append("\n板凳球員 Lineup 狀態：")
+            lines.extend(bench_lines)
+
     return "\n".join(lines)
 
 
-def call_claude(data_summary):
+def call_claude(data_summary, morning=False):
     """Call claude -p with the data summary and prompt template."""
-    prompt = load_prompt_template()
+    if morning:
+        tmpl_path = os.path.join(SCRIPT_DIR, "prompt_template_morning.txt")
+        with open(tmpl_path, encoding="utf-8") as f:
+            prompt = f.read()
+    else:
+        prompt = load_prompt_template()
     full_prompt = f"{prompt}\n\n---\n以下是今日數據：\n\n{data_summary}"
 
     result = subprocess.run(
@@ -731,7 +837,8 @@ def main():
     parser = argparse.ArgumentParser(description="Fantasy Baseball Daily Advisor")
     parser.add_argument("--dry-run", action="store_true", help="Only fetch data and print summary, skip claude and telegram")
     parser.add_argument("--no-send", action="store_true", help="Run claude but don't send to Telegram")
-    parser.add_argument("--date", help="Target date YYYY-MM-DD (default: tomorrow)")
+    parser.add_argument("--morning", action="store_true", help="Morning mode: include lineup data, use morning prompt")
+    parser.add_argument("--date", help="Target date YYYY-MM-DD (default: today in ET)")
     args = parser.parse_args()
 
     config = load_config()
@@ -742,15 +849,16 @@ def main():
     else:
         target_date = datetime.now(ET).date()
 
-    print(f"Fetching data for {target_date}...", file=sys.stderr)
-    data_summary = analyze(config, target_date, env)
+    mode_label = "最終報" if args.morning else "速報"
+    print(f"[{mode_label}] Fetching data for {target_date}...", file=sys.stderr)
+    data_summary = analyze(config, target_date, env, morning=args.morning)
 
     if args.dry_run:
         print(data_summary)
         return
 
     print("Calling claude -p...", file=sys.stderr)
-    advice = call_claude(data_summary)
+    advice = call_claude(data_summary, morning=args.morning)
     if not advice:
         print("Claude returned no output.", file=sys.stderr)
         print("\n--- Raw data summary ---")
@@ -761,7 +869,7 @@ def main():
 
     # Archive to GitHub Issue
     _, _, week_number = get_fantasy_week(target_date, config)
-    save_github_issue(target_date, week_number, data_summary, advice)
+    save_github_issue(target_date, week_number, data_summary, advice, morning=args.morning)
 
     if args.no_send:
         return
@@ -774,10 +882,11 @@ def main():
         print("Failed to send.", file=sys.stderr)
 
 
-def save_github_issue(target_date, week_number, data_summary, advice):
+def save_github_issue(target_date, week_number, data_summary, advice, morning=False):
     """Save daily report as a GitHub Issue for future review."""
     repo = "huansbox/mlb-fantasy"
-    title = f"Daily Report — {target_date}"
+    tag = "最終報" if morning else "速報"
+    title = f"[{tag}] Daily Report — {target_date}"
     body = f"""## Claude Advice
 
 {advice}
