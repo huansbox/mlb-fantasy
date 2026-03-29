@@ -42,7 +42,8 @@ def load_env():
                 if line and not line.startswith("#") and "=" in line:
                     k, v = line.split("=", 1)
                     env[k.strip()] = v.strip()
-    for key in ("YAHOO_CLIENT_ID", "YAHOO_CLIENT_SECRET"):
+    for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
+                "YAHOO_CLIENT_ID", "YAHOO_CLIENT_SECRET"):
         if key in os.environ:
             env[key] = os.environ[key]
     return env
@@ -265,6 +266,31 @@ def cmd_player(args, access_token, config):
             for name, val in stats.items():
                 print(f"  {name}: {val}")
         print()
+
+
+def send_telegram(message, env):
+    """Send message via Telegram Bot API."""
+    token = env.get("TELEGRAM_BOT_TOKEN")
+    chat_id = env.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        print("Telegram credentials missing", file=sys.stderr)
+        return False
+    MAX_LEN = 4096
+    if len(message) > MAX_LEN:
+        message = message[:MAX_LEN - 20] + "\n\n(訊息截斷)"
+    payload = json.dumps({
+        "chat_id": chat_id, "text": message, "parse_mode": "Markdown",
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        data=payload, headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read()).get("ok", False)
+    except Exception as e:
+        print(f"Telegram send error: {e}", file=sys.stderr)
+        return False
 
 
 def main():
