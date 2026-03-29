@@ -452,11 +452,11 @@ def fetch_opponent_sp_schedule(opp_key, access_token, target_date, week_end):
     opp_sp_teams = {sp["team"] for sp in opp_sps}
     schedule_entries = []
 
-    weekday_names = ["一", "二", "三", "四", "五", "六", "日"]
+    weekday_en = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     current = target_date
     while current <= week_end:
         date_str = current.strftime("%Y-%m-%d")
-        wd = weekday_names[current.weekday()]
+        wd = weekday_en[current.weekday()]
         try:
             games = fetch_schedule(date_str)
         except Exception:
@@ -469,7 +469,7 @@ def fetch_opponent_sp_schedule(opp_key, access_token, target_date, week_end):
                 if pitcher and pitcher in opp_sp_names:
                     day_starts.append(pitcher)
         if day_starts:
-            schedule_entries.append(f"  {date_str} (週{wd}): {', '.join(day_starts)}")
+            schedule_entries.append(f"  {date_str} ({wd}): {', '.join(day_starts)}")
         current += timedelta(days=1)
 
     return schedule_entries
@@ -525,8 +525,8 @@ def analyze(config, target_date, env=None, morning=False):
     """Build the full data summary for claude -p."""
     season = config["league"]["season"]
     date_str = target_date.strftime("%Y-%m-%d")
-    weekday_names = ["一", "二", "三", "四", "五", "六", "日"]
-    weekday = weekday_names[target_date.weekday()]
+    weekday_en = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    weekday = weekday_en[target_date.weekday()]
 
     # Fetch live roster from Yahoo if available, fallback to config
     batters = config["batters"]
@@ -584,7 +584,7 @@ def analyze(config, target_date, env=None, morning=False):
                 sp_starts.append({"name": name, "opponent": opp, "info": my_sp_names[name]})
 
     # ── Section 1: Batters ──
-    lines = [f"=== 明日賽程 ({date_str} 週{weekday}) ===\n"]
+    lines = [f"=== {date_str} ({weekday}) ===\n"]
     lines.append("我的打者：")
     for b in batters:
         pos = "/".join(b["positions"])
@@ -675,7 +675,7 @@ def analyze(config, target_date, env=None, morning=False):
     current = target_date
     while current <= week_end:
         cur_str = current.strftime("%Y-%m-%d")
-        cur_wd = weekday_names[current.weekday()]
+        cur_wd = weekday_en[current.weekday()]
         try:
             cur_games = schedule_cache.get(cur_str) or fetch_schedule(cur_str)
             schedule_cache[cur_str] = cur_games
@@ -688,9 +688,9 @@ def analyze(config, target_date, env=None, morning=False):
                 if g.get(pk) in my_sp_names:
                     day_starts.append(g[pk])
         if day_starts:
-            lines.append(f"  {cur_str} (週{cur_wd}): {', '.join(day_starts)}")
+            lines.append(f"  {cur_str} ({cur_wd}): {', '.join(day_starts)}")
         else:
-            lines.append(f"  {cur_str} (週{cur_wd}): (無)")
+            lines.append(f"  {cur_str} ({cur_wd}): (無)")
         current += timedelta(days=1)
 
     # ── Section 7: Opponent SP schedule (rest of week) ──
