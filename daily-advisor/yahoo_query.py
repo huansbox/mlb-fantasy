@@ -12,6 +12,25 @@ YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
 YAHOO_TOKEN_FILE = os.path.join(SCRIPT_DIR, "yahoo_token.json")
 
+# Yahoo stat_id → display name (matches league's 14 scoring categories)
+YAHOO_STAT_MAP = {
+    "60": ("H/AB", None),
+    "7": ("R", False),
+    "12": ("HR", False),
+    "13": ("RBI", False),
+    "16": ("SB", False),
+    "18": ("BB", False),
+    "3": ("AVG", False),
+    "55": ("OPS", False),
+    "50": ("IP", False),
+    "28": ("W", False),
+    "42": ("K", False),
+    "26": ("ERA", True),
+    "27": ("WHIP", True),
+    "83": ("QS", False),
+    "89": ("SV+H", False),
+}
+
 
 def load_env():
     env = {}
@@ -83,9 +102,9 @@ def extract_player_info(player_data):
                 status = item["status"]
             if "player_key" in item:
                 player_key = item["player_key"]
-    # percent_owned is in a sub-resource if requested
-    if len(player_data) > 1:
-        po_data = player_data[1]
+    # percent_owned may be at any index after 0 (depends on sub-resources requested)
+    for idx in range(1, len(player_data)):
+        po_data = player_data[idx]
         if isinstance(po_data, dict) and "percent_owned" in po_data:
             po_list = po_data["percent_owned"]
             if isinstance(po_list, list):
@@ -94,6 +113,7 @@ def extract_player_info(player_data):
                         percent_owned = po["value"]
             elif isinstance(po_list, dict):
                 percent_owned = po_list.get("value")
+            break
     return {
         "name": name or "?",
         "team": team or "?",
@@ -102,6 +122,22 @@ def extract_player_info(player_data):
         "percent_owned": percent_owned,
         "player_key": player_key,
     }
+
+
+def parse_player_stats(player_data):
+    """Extract stats from player data that includes /stats sub-resource."""
+    stats = {}
+    for idx in range(1, len(player_data)):
+        ps = player_data[idx]
+        if isinstance(ps, dict) and "player_stats" in ps:
+            for s in ps["player_stats"].get("stats", []):
+                sid = s["stat"]["stat_id"]
+                val = s["stat"]["value"]
+                if sid in YAHOO_STAT_MAP:
+                    name, _ = YAHOO_STAT_MAP[sid]
+                    stats[name] = val
+            break
+    return stats
 
 
 def cmd_fa(args, access_token, config):
@@ -119,7 +155,7 @@ def cmd_fa(args, access_token, config):
         filters.append(f"start={args.start}")
 
     filter_str = ";".join(filters)
-    path = f"/league/{league_key}/players;{filter_str}/percent_owned"
+    path = f"/league/{league_key}/players;{filter_str};out=stats,percent_owned"
 
     data = api_get(path, access_token)
     players_data = data["fantasy_content"]["league"][1]["players"]
@@ -129,17 +165,23 @@ def cmd_fa(args, access_token, config):
         if k == "count":
             continue
         p = extract_player_info(v["player"])
+        p["stats"] = parse_player_stats(v["player"])
         players.append(p)
 
     # Output
     pos_filter = args.position or "ALL"
     print(f"=== FA 查詢 (position={pos_filter}, sort={args.sort}, count={args.count}) ===\n")
-    print(f"{'#':>3}  {'球員':20}  {'隊伍':5}  {'位置':12}  {'%owned':>7}  {'狀態'}")
-    print("-" * 70)
     for i, p in enumerate(players, 1):
         po = f"{p['percent_owned']}%" if p["percent_owned"] else "—"
         st = p["status"] if p["status"] else ""
-        print(f"{i:3}  {p['name']:20}  {p['team']:5}  {p['position']:12}  {po:>7}  {st}")
+        stats = p.get("stats", {})
+        if "ERA" in stats:
+            stat_str = f"ERA {stats.get('ERA', '—')} | WHIP {stats.get('WHIP', '—')} | K {stats.get('K', '—')} | IP {stats.get('IP', '—')}"
+        elif "AVG" in stats:
+            stat_str = f"AVG {stats.get('AVG', '—')} | OPS {stats.get('OPS', '—')} | HR {stats.get('HR', '—')} | BB {stats.get('BB', '—')}"
+        else:
+            stat_str = ""
+        print(f"{i:3}  {p['name']:20}  {p['team']:5}  {p['position']:12}  {po:>7}  {stat_str}  {st}")
 
 
 def _search_players(search_name, league_key, access_token):
@@ -166,10 +208,9 @@ def _search_players(search_name, league_key, access_token):
 
 
 def cmd_player(args, access_token, config):
-    """Look up a specific player."""
+    """Look up a specific player with stats and percent_owned via two-step query."""
     league_key = config["league"]["league_key"]
     search_name = args.player
-    # search filter doesn't support /percent_owned sub-resource
     players_data = _search_players(search_name, league_key, access_token)
     if players_data is None:
         print(f"找不到球員: {search_name}")
@@ -179,10 +220,43 @@ def cmd_player(args, access_token, config):
         if k == "count":
             continue
         p = extract_player_info(v["player"])
+        player_key = p.get("player_key")
+
+        # Two-step: use player_key to get stats + percent_owned
+        stats = {}
+        percent_owned = None
+        if player_key:
+            try:
+                sd = api_get(
+                    f"/league/{league_key}/players;player_keys={player_key}/stats",
+                    access_token,
+                )
+                sp = sd["fantasy_content"]["league"][1]["players"]["0"]["player"]
+                stats = parse_player_stats(sp)
+            except Exception:
+                pass
+            try:
+                pd = api_get(
+                    f"/league/{league_key}/players;player_keys={player_key}/percent_owned",
+                    access_token,
+                )
+                pp = pd["fantasy_content"]["league"][1]["players"]["0"]["player"]
+                for item in pp[1].get("percent_owned", []):
+                    if isinstance(item, dict) and "value" in item:
+                        percent_owned = item["value"]
+            except Exception:
+                pass
+
+        po_str = f"{percent_owned}%" if percent_owned is not None else "—"
         print(f"=== {p['name']} ===")
         print(f"隊伍: {p['team']}")
         print(f"位置: {p['position']}")
+        print(f"持有率: {po_str}")
         print(f"狀態: {p['status'] or '健康'}")
+        if stats:
+            print("--- 本季數據 ---")
+            for name, val in stats.items():
+                print(f"  {name}: {val}")
         print()
 
 
@@ -197,7 +271,7 @@ def main():
     fa_parser.add_argument("--sort-type", default="season", help="Sort period: season, lastweek, lastmonth (default: season)")
     fa_parser.add_argument("--count", "-n", type=int, default=25, help="Number of results (default: 25)")
     fa_parser.add_argument("--start", type=int, default=0, help="Pagination offset (default: 0)")
-    fa_parser.add_argument("--status", default="A", help="Player status: FA, A (all available), W (waivers) (default: A)")
+    fa_parser.add_argument("--status", default="FA", help="Player status: FA (free agents), A (all available), W (waivers) (default: FA)")
 
     # Player lookup
     player_parser = sub.add_parser("player", help="Look up a specific player")
