@@ -44,8 +44,9 @@ python daily-advisor/yahoo_query.py fa --sort AR --sort-type lastweek --count 15
 python daily-advisor/yahoo_query.py fa --sort AR --count 20
 ```
 
+> `yahoo_query.py fa` 回傳 7×7 scoring stats（打者 AVG/OPS/HR/BB，投手 ERA/WHIP/K/IP）+ %owned，可直接用於初篩，減少 WebSearch 依賴。
 > `--position` 參數根據 CLAUDE.md 陣容風險動態決定，不硬編碼。
-> VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴（VPS 的 .env 仍用 op:// 參照）。
+> VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
 > 若 Yahoo API 失敗（HTTP 999 rate limit 等），fallback 到 Step 2b。
 
 ### 2b：WebSearch 補充

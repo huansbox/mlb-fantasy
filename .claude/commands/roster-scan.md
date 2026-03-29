@@ -54,7 +54,7 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 python daily-advisor/yahoo_query.py player "{球員名}"
 ```
 
-> Yahoo API 目前不提供統計數據（AVG/OPS/ERA 等），實際 stats 以 WebSearch（Step 2a）為準。
+> `yahoo_query.py player` 現在回傳守位資格、持有率、本季 7×7 stats。可作為 WebSearch 的交叉驗證或替代來源。
 > VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
 
 ### 效率技巧

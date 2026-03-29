@@ -24,6 +24,10 @@
 | `GET /league/{league_key}/scoreboard` | H2H 週對戰比分 | `fetch_yahoo_scoreboard()` |
 | `GET /team/{team_key}/roster` | 我方/對手陣容 | `fetch_yahoo_roster()` |
 | `GET /league/{league_key}/teams` | 聯賽隊伍列表，找自己的 team_key | `analyze()` 內 |
+| `GET /league/{key}/players;{filters};out=stats,percent_owned` | FA 查詢 + 7×7 stats + 持有率 | `cmd_fa()` |
+| `GET /league/{key}/players;search={name}` | 球員姓名搜尋 | `cmd_player()` |
+| `GET /league/{key}/players;player_keys={key}/stats` | 指定球員本季數據 | `cmd_player()` 二段查詢 |
+| `GET /league/{key}/players;player_keys={key}/percent_owned` | 指定球員持有率 | `cmd_player()` 二段查詢 |
 
 ## 可用但尚未使用的端點
 
