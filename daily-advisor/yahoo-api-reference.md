@@ -57,6 +57,22 @@ GET /league/{league_key}/players;status=FA;position={pos};sort=AR;count=25;start
 
 寫入端點的 XML payload 格式待實際使用時再補。
 
+## 擴展方向
+
+### 讀取類（現有權限可用）
+
+- [x] H2H 週對戰比分（已實作）
+- [x] 我方 / 對手陣容（已實作）
+- [ ] **FA 球員查詢** — waiver-scan / player-eval 可直接拉 FA 清單 + 數據，取代手動搜尋
+- [ ] 近期交易記錄 — 知道別隊撿了誰放了誰
+- [ ] 聯賽排名 — standings
+
+### 寫入類（需 `fspt-w` scope，重新授權）
+
+- [ ] 自動設 lineup — 最終報建議後直接執行，省手動操作（需確認防護機制）
+- [ ] 自動 add/drop — waiver-scan 發現目標後直接操作（FAB 花錯不可逆，風險高）
+- [ ] 自動交易 — 風險太高，不建議自動化
+
 ## 相關檔案
 
 | 檔案 | 用途 |
