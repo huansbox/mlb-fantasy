@@ -158,7 +158,11 @@ def cmd_fa(args, access_token, config):
     path = f"/league/{league_key}/players;{filter_str};out=stats,percent_owned"
 
     data = api_get(path, access_token)
-    players_data = data["fantasy_content"]["league"][1]["players"]
+    league_data = data["fantasy_content"]["league"]
+    if len(league_data) < 2 or "players" not in league_data[1]:
+        print("查無結果")
+        return
+    players_data = league_data[1]["players"]
 
     players = []
     for k, v in players_data.items():
@@ -186,9 +190,9 @@ def cmd_fa(args, access_token, config):
 
 def _search_players(search_name, league_key, access_token):
     """Search for players, with apostrophe fallback."""
-    queries = [search_name.replace("'", "")]
-    # If name has apostrophe, also try last name only
+    queries = [search_name]
     if "'" in search_name:
+        queries.append(search_name.replace("'", ""))
         parts = search_name.replace("'", " ").split()
         if parts:
             queries.append(parts[-1])
@@ -196,7 +200,10 @@ def _search_players(search_name, league_key, access_token):
     for q in queries:
         encoded = urllib.parse.quote(q)
         path = f"/league/{league_key}/players;search={encoded}"
-        data = api_get(path, access_token)
+        try:
+            data = api_get(path, access_token)
+        except Exception:
+            continue
         league_data = data["fantasy_content"]["league"]
         if len(league_data) < 2 or "players" not in league_data[1]:
             continue
