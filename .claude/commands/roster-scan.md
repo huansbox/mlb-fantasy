@@ -51,11 +51,11 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 球員狀態（守位資格、IL、健康）有疑問時，用 `yahoo_query.py` 快速確認：
 
 ```bash
-cd {專案根目錄} && op run --env-file=daily-advisor/.env -- python daily-advisor/yahoo_query.py player "{球員名}"
+python daily-advisor/yahoo_query.py player "{球員名}"
 ```
 
 > Yahoo API 目前不提供統計數據（AVG/OPS/ERA 等），實際 stats 以 WebSearch（Step 2a）為準。
-> VPS 上改用 `export $(cat /etc/calorie-bot/op-token.env) &&` 取代 `op run --env-file=...`。
+> VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
 
 ### 效率技巧
 
