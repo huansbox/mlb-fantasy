@@ -5,12 +5,18 @@
 ### Andrew Painter (PHI, SP)
 觸發：前 2-3 場先發穩定投 6+ IP → 取代 Singer
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
+- 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
 
 ### Ryan O'Hearn (PIT, 1B/LF/RF)
 觸發：Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 → 取代 Walker 或 Kwan
 - 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，正選篩選 2/3（BB% ✓ AVG ✓ OPS ✗）。春訓開幕戰三分砲（406 呎），無傷病或角色疑慮。風險：30 歲生涯年 regression + PIT 打線弱（R/RBI 可能灌水不足）。
 - 03-27：基準卡對比 — O'Hearn(.281/.803/17HR/11%) vs Kwan(.277/.749/11HR/8.9%) vs Walker(.229/.734/23HR/8.6%)。O'Hearn 篩選通過率最高（2/3），Kwan 1/3，Walker 0/3。vs Kwan：OPS +.054、HR +6、BB% +2%，SB 輸但 punt SB。vs Walker：AVG +.052、OPS +.069，HR 少 6 但比率優勢大。
 - 03-27：春訓對比後調整 — Kwan 春訓 .292/1.060 OPS/2HR + 休賽季練 bat speed（去年 1st percentile），有 power breakout 跡象，暫不急換。Walker 春訓 6 場 .000/14AB 更令人擔憂，O'Hearn 有 1B 資格可直接替。取代範圍擴大至 Walker，Walker 優先於 Kwan。
+- 03-29：[waiver-scan] 仍為 FA（18% owned）。觸發條件需 2 週數據，最早 Week 3 評估。Walker 開季 .300/.917（12 PA）暫時穩住，Kwan .286/.571（14 PA/0BB）偏弱但小樣本。
+
+### Royce Lewis (MIN, 3B) — 條件 Pass
+重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
+- 03-29：[waiver-scan] 42% owned 在 12 隊 FA 極度反常。前 #1 pick，健康時 .290/.850+/20+ HR 天賦。但連 4 年進 IL（膝蓋/大腿/腹斜肌），春訓側腹緊繃（MRI clean）。3B 有 Machado 不需升級，BN 3 格全滿（Frelick/Stanton/Bassitt），無 drop 空間。天賦頂級但健康風險太高，暫不動。
 
 ### Brandon Marsh (PHI, LF/CF) — 條件 Pass
 重評條件：Buxton 進 IL + Frelick 無法覆蓋 CF
@@ -19,6 +25,7 @@
 ### Joey Loperfido (HOU, LF/CF/RF) — 條件 Pass
 重評條件：拿到 HOU 每日先發 + AVG 站穩 .250
 - 03-26：工具型（20HR/20SB 潛力）但 36.3% K rate → AVG 風險高，HOU 角色未定。
+- 03-29：[waiver-scan] 條件未達，維持 Pass。
 
 ### Kevin McGonigle (DET, SS/3B) — 條件 Pass
 重評條件：被 drop 到 FA
