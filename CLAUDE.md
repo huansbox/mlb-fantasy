@@ -202,6 +202,8 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `.claude/commands/roster-scan.md` | 陣容基準卡週更 SOP（`/roster-scan`） | ✅ 完成 |
 | `daily-advisor/yahoo_query.py` | Yahoo FA 查詢 CLI（skill 透過 Bash 呼叫） | ✅ 完成 |
 | `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 21:45）+ 最終報（台灣 05:00，含 Lineup 確認） | ✅ Phase 2 已部署 |
+| `daily-advisor/fa_watch.py` | Daily FA Watch（每日 07:00，%owned 追蹤 + claude -p） | ✅ 完成 |
+| `daily-advisor/weekly_scan.py` | Weekly Deep Scan（每週一 19:30，完整 FA 分析） | ✅ 完成 |
 | `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考（已用 + 可用） | ✅ 參考 |
 
@@ -224,8 +226,9 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 **正選級（先發）**：BB% > 10% → OPS > .830 → AVG > .260，兩項通過
 **替補級（backup）**：BB% > 8% → OPS > .720 → AVG > .240，不傷比率優先
 
-### SP 串流標準
-- IP > 180 → ERA < 3.50，兩項通過
+### SP 篩選標準
+- **選秀/正選級**：IP > 180 → ERA < 3.50，兩項通過
+- **In-Season FA 放寬版**：IP > 150 → ERA < 4.00（FA 池質量低於選秀，門檻放寬）
 - 40 IP 門檻低，通常不需刻意串流
 
 ### 每週檢查清單
@@ -233,6 +236,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 2. 確認 SP 週排程，確保 40 IP
 3. 檢查傷兵，必要時用 IL 格 + 撿替補
 4. FAB 競標（週中評估 waiver 目標）
+5. 週二：跑 `/waiver-scan`（互動 session，補 WebSearch 新聞面）
 
 ## 選秀日工具（已完成，留作參考）
 
