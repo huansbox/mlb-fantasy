@@ -197,9 +197,10 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點（週例行、決策樹、punt 紀律） | ✅ 開季參考 |
 | `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
 | `roster-baseline.md` | 陣容基準卡（全員預測/實際數據，eval 比較用） | 🔄 進行中 |
-| `player-eval` skill | 球員評估 SOP（指名球員的深入評估） | ✅ 完成 |
-| `waiver-scan` skill | Waiver wire 主動掃描 SOP（搜尋 FA + 更新 log） | ✅ 完成 |
-| `roster-scan` skill | 陣容基準卡週更 SOP（更新數據 + 趨勢標記） | ✅ 完成 |
+| `.claude/commands/player-eval.md` | 球員評估 SOP（`/player-eval`） | ✅ 完成 |
+| `.claude/commands/waiver-scan.md` | Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢） | ✅ 完成 |
+| `.claude/commands/roster-scan.md` | 陣容基準卡週更 SOP（`/roster-scan`） | ✅ 完成 |
+| `daily-advisor/yahoo_query.py` | Yahoo FA 查詢 CLI（skill 透過 Bash 呼叫） | ✅ 完成 |
 | `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 21:45）+ 最終報（台灣 05:00，含 Lineup 確認） | ✅ Phase 2 已部署 |
 | `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考（已用 + 可用） | ✅ 參考 |

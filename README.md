@@ -27,9 +27,10 @@
 - `賽季管理入門.md` — H2H One Win 賽季管理入門要點
 - `waiver-log.md` — 球員觀察追蹤記錄
 - `roster-baseline.md` — 陣容基準卡（全員預測/實際數據）
-- `player-eval` skill — 球員評估 SOP（Claude Code skill）
-- `waiver-scan` skill — Waiver wire 掃描 SOP（Claude Code skill）
-- `roster-scan` skill — 陣容基準卡週更 SOP（Claude Code skill）
+- `.claude/commands/player-eval.md` — 球員評估 SOP（`/player-eval`）
+- `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
+- `.claude/commands/roster-scan.md` — 陣容基準卡週更 SOP（`/roster-scan`）
+- `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
 - `daily-advisor/` — 每日陣容建議產生器（MLB Stats API + claude -p → Telegram 推送）
 
 ## 核心策略
