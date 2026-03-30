@@ -140,32 +140,34 @@
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Ryan O'Hearn** | PIT | 1B/LF/RF | Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 | Walker 或 Kwan |
+| **Jordan Walker** | STL | LF/RF | 連 2 週 OPS > .750 + BB% > 8% | Kwan |
+| **Colt Keith** | DET | 1B/2B/3B | 連 2 週 OPS > .720 + BB% > 8% | Walker(1B) |
 
 **投手**
 
 | 球員 | 隊伍 | 類型 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
 | **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Singer |
+| **Emerson Hancock** | SEA | SP | 前 2-3 場 ERA < 3.50 + K/9 > 8 | Singer（與 Painter 競爭） |
 
 **近期行動**：
 - **Painter 3/31 確認先發**（PHI vs WSH，弱打線）— 第一場觀察機會
-- **4/3 Singer 先發後決策點**：Singer 表現 + Painter 3/31 結果 → 決定是否 drop Singer 撿 Painter
+- **4/3 Singer 先發後決策點**：Singer 表現 + Painter 3/31 + Hancock 第二場 → 決定替換目標
 
-**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge
+**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
 
-**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）
+**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）、Canzone（LF/RF，預測回歸 .245/.741）、Hoskins（1B，AVG ~.230 + 傷病史）
 
 ### 行動觸發規則
 
 | 條件 | 動作 |
 |------|------|
-| Walker 連 2 週 AVG < .200 | 撿 O'Hearn，drop Walker（O'Hearn 有 1B 資格） |
-| Kwan 連 2 週 OPS < .700 且無 power 改善 | 撿 O'Hearn，drop Kwan |
+| Walker 連 2 週 AVG < .200 | 撿 Colt Keith（有 1B 資格），drop Walker |
+| Kwan 連 2 週 OPS < .700 且無 power 改善 | 撿 Jordan Walker（LF/RF），drop Kwan |
 | Kwan 維持 OPS > .750 + HR pace > 15 | 不動，春訓 bat speed 改善兌現中 |
-| Singer 開季 ERA > 5.00 + 水泡復發 | 撿 O'Hearn，drop Singer（騰打者位） |
-| Painter 前 2-3 場穩定投 6+ IP | 撿 Painter，drop Singer |
-| Painter 被限 5 IP 或跳先發 | 不動，Singer 穩定局數更有用 |
+| Singer 4/3 表現差 + Painter 3/31 投好 | 撿 Painter，drop Singer |
+| Singer 4/3 表現差 + Hancock 持續壓制 | 撿 Hancock，drop Singer（K 率更高） |
+| Painter/Hancock 都一般 | 不動，Singer 穩定局數更有用 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
 
 ## 格式狀態

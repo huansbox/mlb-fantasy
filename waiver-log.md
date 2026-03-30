@@ -8,16 +8,22 @@
 - 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
 - 03-30：**3/31 確認先發**（PHI vs WSH，弱打線）。第一場觀察機會。搭配 Singer ~4/3 先發結果一起評估 — Singer 表現差 + Painter 投好 → 立即執行替換。
 
-### Ryan O'Hearn (PIT, 1B/LF/RF)
-觸發：Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 → 取代 Walker 或 Kwan
-- 03-27：[eval] 2025 All-Star，.281/.803 OPS/17HR/BB% ~11%，正選篩選 2/3（BB% ✓ AVG ✓ OPS ✗）。春訓開幕戰三分砲（406 呎），無傷病或角色疑慮。風險：30 歲生涯年 regression + PIT 打線弱（R/RBI 可能灌水不足）。
-- 03-27：基準卡對比 — O'Hearn(.281/.803/17HR/11%) vs Kwan(.277/.749/11HR/8.9%) vs Walker(.229/.734/23HR/8.6%)。O'Hearn 篩選通過率最高（2/3），Kwan 1/3，Walker 0/3。vs Kwan：OPS +.054、HR +6、BB% +2%，SB 輸但 punt SB。vs Walker：AVG +.052、OPS +.069，HR 少 6 但比率優勢大。
-- 03-27：春訓對比後調整 — Kwan 春訓 .292/1.060 OPS/2HR + 休賽季練 bat speed（去年 1st percentile），有 power breakout 跡象，暫不急換。Walker 春訓 6 場 .000/14AB 更令人擔憂，O'Hearn 有 1B 資格可直接替。取代範圍擴大至 Walker，Walker 優先於 Kwan。
-- 03-29：[waiver-scan] 仍為 FA（18% owned）。觸發條件需 2 週數據，最早 Week 3 評估。Walker 開季 .300/.917（12 PA）暫時穩住，Kwan .286/.571（14 PA/0BB）偏弱但小樣本。
+### Jordan Walker (STL, LF/RF)
+觸發：連 2 週 OPS > .750 + BB% > 8% → 取代 Kwan
+- 03-30：[waiver-scan] 23 歲前 top prospect，2024-2025 低潮後 make-or-break 年。休季 Driveline 揮棒重建，STL 給每日 RF 先發。84th percentile sprint speed。開季 .400/1.400/1HR/2BB（5 PA，極小樣本）。3% owned。LF/RF 資格 = Kwan 替換方向。風險：過去兩年 AVG ~.220，approach 仍待驗證。
+
+### Colt Keith (DET, 1B/2B/3B)
+觸發：連 2 週 OPS > .720 + BB% > 8% → 取代 Walker(1B)
+- 03-30：[waiver-scan] DET 年輕核心，多位置彈性（1B/2B/3B）。開季 .444/1.101/0HR/2BB。16% owned。**有 1B 資格**可直接替 Walker，O'Hearn 被搶後的替代監控目標。
+
+### Emerson Hancock (SEA, SP/RP)
+觸發：前 2-3 場先發 ERA < 3.50 + K/9 > 8 → 取代 Singer（與 Painter 競爭）
+- 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
 
 ### Royce Lewis (MIN, 3B) — 條件 Pass
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
 - 03-29：[waiver-scan] 42% owned 在 12 隊 FA 極度反常。前 #1 pick，健康時 .290/.850+/20+ HR 天賦。但連 4 年進 IL（膝蓋/大腿/腹斜肌），春訓側腹緊繃（MRI clean）。3B 有 Machado 不需升級，BN 3 格全滿（Frelick/Stanton/Bassitt），無 drop 空間。天賦頂級但健康風險太高，暫不動。
+- 03-30：[waiver-scan] .222/1.253/2HR — 火燙但條件未達（BN 仍無空位），維持 Pass。
 
 ### Brandon Marsh (PHI, LF/CF) — 條件 Pass
 重評條件：Buxton 進 IL + Frelick 無法覆蓋 CF
@@ -60,6 +66,9 @@
 - 策略確立：只在特定情境精準串流 1-2 次，不常態洗。詳見 CLAUDE.md 串流決策規則。
 
 ## 已結案
+
+### Ryan O'Hearn (PIT, 1B/LF/RF) — 被搶
+- 03-30：被聯賽其他隊 rostered。替代監控：Colt Keith(1B 方向)、Jordan Walker(LF 方向)。
 
 ### Carson Benge (NYM, OF/RF) — 已被撿走
 - 03-26：春訓 .366/.435，MiLB .281/15HR/22SB/.857 OPS，BB% ~13%。7×7 高適配。加入 watchlist。
