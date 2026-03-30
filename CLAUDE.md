@@ -154,6 +154,7 @@
 - **Painter 降級為備選**（2026-03-30 eval）：預測 111 IP / 4.62 ERA，全面輸 Singer（168 IP / 4.30 ERA）。局數限制 = IP + QS 雙打折
 - **Hancock 升為首選**：6 IP / 9K 首秀亮眼，K 率 > Painter，若無局數限制 upside 更高
 - **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
+- **NA 格空位**：考慮 stash Dylan Crews（WSH, CF/RF），離 MLB 最近的 CF prospect，填 CF 弱點。待決定
 
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
 
