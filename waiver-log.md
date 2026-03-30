@@ -2,11 +2,16 @@
 
 ## 觀察中
 
+### Emerson Hancock (SEA, SP)
+觸發：前 2-3 場 ERA < 3.50 + K/9 > 8 → 取代 Singer（首選候選）
+- 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
+
 ### Andrew Painter (PHI, SP)
-觸發：前 2-3 場先發穩定投 6+ IP → 取代 Singer
+觸發：前 2-3 場穩定投 6+ IP → 取代 Singer（備選，Hancock 優先）
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 - 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
-- 03-30：**3/31 確認先發**（PHI vs WSH，弱打線）。第一場觀察機會。搭配 Singer ~4/3 先發結果一起評估 — Singer 表現差 + Painter 投好 → 立即執行替換。
+- 03-30：3/31 確認先發（PHI vs WSH）。被 RALLY MONKEY drop 回到 FA pool（30% owned）。
+- 03-30：[eval] vs Singer，結論：**不換**。預測 111 IP / 4.62 ERA / 1.39 WHIP / ~100 K / 7 QS，全面輸 Singer（168 IP / 4.30 ERA / 1.30 WHIP / 136 K / 11 QS）。局數限制 110-130 IP 是硬傷，IP + QS 雙打折。TJS 術後球速/fastball shape 仍未完全恢復。降級為 Hancock 之後的備選。
 
 ### Jordan Walker (STL, LF/RF)
 觸發：連 2 週 OPS > .750 + BB% > 8% → 取代 Kwan
@@ -16,9 +21,7 @@
 觸發：連 2 週 OPS > .720 + BB% > 8% → 取代 Walker(1B)
 - 03-30：[waiver-scan] DET 年輕核心，多位置彈性（1B/2B/3B）。開季 .444/1.101/0HR/2BB。16% owned。**有 1B 資格**可直接替 Walker，O'Hearn 被搶後的替代監控目標。
 
-### Emerson Hancock (SEA, SP/RP)
-觸發：前 2-3 場先發 ERA < 3.50 + K/9 > 8 → 取代 Singer（與 Painter 競爭）
-- 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
+### 串流 SP 評估（2026-03-30）
 
 ### Royce Lewis (MIN, 3B) — 條件 Pass
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽

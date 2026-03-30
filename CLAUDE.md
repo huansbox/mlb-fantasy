@@ -147,12 +147,13 @@
 
 | 球員 | 隊伍 | 類型 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Singer |
-| **Emerson Hancock** | SEA | SP | 前 2-3 場 ERA < 3.50 + K/9 > 8 | Singer（與 Painter 競爭） |
+| **Emerson Hancock** | SEA | SP | 前 2-3 場 ERA < 3.50 + K/9 > 8 | Singer（首選候選） |
+| Andrew Painter | PHI | SP | 前 2-3 場穩定投 6+ IP | Singer（備選，局數限制硬傷） |
 
 **近期行動**：
-- **Painter 3/31 確認先發**（PHI vs WSH，弱打線）— 第一場觀察機會
-- **4/3 Singer 先發後決策點**：Singer 表現 + Painter 3/31 + Hancock 第二場 → 決定替換目標
+- **Painter 降級為備選**（2026-03-30 eval）：預測 111 IP / 4.62 ERA，全面輸 Singer（168 IP / 4.30 ERA）。局數限制 = IP + QS 雙打折
+- **Hancock 升為首選**：6 IP / 9K 首秀亮眼，K 率 > Painter，若無局數限制 upside 更高
+- **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
 
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
 
@@ -165,9 +166,9 @@
 | Walker 連 2 週 AVG < .200 | 撿 Colt Keith（有 1B 資格），drop Walker |
 | Kwan 連 2 週 OPS < .700 且無 power 改善 | 撿 Jordan Walker（LF/RF），drop Kwan |
 | Kwan 維持 OPS > .750 + HR pace > 15 | 不動，春訓 bat speed 改善兌現中 |
-| Singer 4/3 表現差 + Painter 3/31 投好 | 撿 Painter，drop Singer |
-| Singer 4/3 表現差 + Hancock 持續壓制 | 撿 Hancock，drop Singer（K 率更高） |
-| Painter/Hancock 都一般 | 不動，Singer 穩定局數更有用 |
+| Singer 連 2 場 ERA > 5.00 + Hancock 連 2 場好投 | 撿 Hancock，drop Singer |
+| Singer 連 2 場 ERA > 5.00 + Hancock 一般但 Painter 穩定 6+ IP | 撿 Painter，drop Singer（備選） |
+| Singer 回穩（ERA < 4.50） | 不動，Singer 局數優勢（168 IP）仍是核心價值 |
 | Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
 
 ## 格式狀態
