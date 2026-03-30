@@ -35,13 +35,14 @@
 
 **FA / 球員查詢**
 ```
-GET /league/{league_key}/players;status=FA;position={pos};sort=AR;count=25;start=0
+GET /league/{league_key}/players;status=A;position={pos};sort=AR;count=25;start=0;out=stats,percent_owned,ownership
 ```
-- `status`: `FA`（自由球員）/ `W`（waiver）/ `A`（所有可用）/ `T`（已被選）
+- `status`: **`A`（所有可用，推薦預設）**/ `FA`（純自由球員）/ `W`（waiver 中）/ `T`（已被選）
 - `position`: `C`, `1B`, `2B`, `SS`, `LF`, `CF`, `RF`, `SP`, `RP`, `B`（全打者）, `P`（全投手）
 - `sort`: `AR`（actual rank）/ `OR`（overall rank）/ stat_id
 - `sort_type`: `season` / `lastweek` / `lastmonth` / `date`
-- 可附加 sub-resource: `stats`, `percent_owned`, `ownership`
+- `out` sub-resources: `stats`, `percent_owned`, `ownership`
+- `ownership` 回傳 waiver 清除日期：`{"waiver_date": "2026-04-01", "ownership_type": "waivers"}`
 
 **其他可查的資源**
 - `/league/{league_key}/standings` — 聯賽排名
