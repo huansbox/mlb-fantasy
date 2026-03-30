@@ -22,22 +22,22 @@ TPE = ZoneInfo("Asia/Taipei")
 
 # Default queries for daily watch (R3: ALL 50 + lastweek)
 DAILY_QUERIES = [
-    ("ALL", "status=FA;sort=AR;count=50"),
-    ("ALL-lastweek", "status=FA;sort=AR;sort_type=lastweek;count=20"),
-    ("CF", "status=FA;position=CF;sort=AR;count=10"),
-    ("SP", "status=FA;position=SP;sort=AR;count=10"),
-    ("1B", "status=FA;position=1B;sort=AR;count=10"),
+    ("ALL", "status=A;sort=AR;count=50"),
+    ("ALL-lastweek", "status=A;sort=AR;sort_type=lastweek;count=20"),
+    ("CF", "status=A;position=CF;sort=AR;count=10"),
+    ("SP", "status=A;position=SP;sort=AR;count=10"),
+    ("1B", "status=A;position=1B;sort=AR;count=10"),
 ]
 
 # Expanded queries for weekly scan (R4)
 WEEKLY_QUERIES = [
-    ("ALL", "status=FA;sort=AR;count=50"),
-    ("ALL-lastweek", "status=FA;sort=AR;sort_type=lastweek;count=30"),
-    ("CF", "status=FA;position=CF;sort=AR;count=15"),
-    ("SP", "status=FA;position=SP;sort=AR;count=20"),
-    ("1B", "status=FA;position=1B;sort=AR;count=10"),
-    ("LF", "status=FA;position=LF;sort=AR;count=10"),
-    ("2B", "status=FA;position=2B;sort=AR;count=10"),
+    ("ALL", "status=A;sort=AR;count=50"),
+    ("ALL-lastweek", "status=A;sort=AR;sort_type=lastweek;count=30"),
+    ("CF", "status=A;position=CF;sort=AR;count=15"),
+    ("SP", "status=A;position=SP;sort=AR;count=20"),
+    ("1B", "status=A;position=1B;sort=AR;count=10"),
+    ("LF", "status=A;position=LF;sort=AR;count=10"),
+    ("2B", "status=A;position=2B;sort=AR;count=10"),
 ]
 
 

@@ -304,7 +304,7 @@ def main():
     fa_parser.add_argument("--sort-type", default="season", help="Sort period: season, lastweek, lastmonth (default: season)")
     fa_parser.add_argument("--count", "-n", type=int, default=25, help="Number of results (default: 25)")
     fa_parser.add_argument("--start", type=int, default=0, help="Pagination offset (default: 0)")
-    fa_parser.add_argument("--status", default="FA", help="Player status: FA (free agents), A (all available), W (waivers) (default: FA)")
+    fa_parser.add_argument("--status", default="A", help="Player status: A (all available, default), FA (free agents only), W (waivers only)")
 
     # Player lookup
     player_parser = sub.add_parser("player", help="Look up a specific player")
