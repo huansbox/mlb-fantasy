@@ -309,7 +309,182 @@ def fetch_daily_reports_metadata(week_number):
 
 
 # ── Preview Data Fetching ──
-# TODO: Task 3
+
+
+def fetch_next_opponent(league_key, access_token, week, team_name="99 940"):
+    """Get this week's opponent name and team_key."""
+    sb = yahoo_api_get(f"/league/{league_key}/scoreboard;week={week}", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+        teams_node = v["matchup"]["0"]["teams"]
+
+        pair = []
+        for ti in ("0", "1"):
+            info = teams_node[ti]["team"][0]
+            name = key = ""
+            for item in info:
+                if isinstance(item, dict):
+                    if "name" in item:
+                        name = item["name"]
+                    if "team_key" in item:
+                        key = item["team_key"]
+            pair.append({"name": name, "key": key})
+
+        if pair[0]["name"] == team_name:
+            return pair[1]
+        elif pair[1]["name"] == team_name:
+            return pair[0]
+
+    return None
+
+
+def fetch_opponent_roster(team_key, access_token):
+    """Fetch opponent's full roster. Returns {"batters": [...], "pitchers": [...]}."""
+    roster_data = yahoo_api_get(f"/team/{team_key}/roster", access_token)
+    players = roster_data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
+
+    batters = []
+    pitchers = []
+    for k, v in players.items():
+        if k == "count":
+            continue
+        player = v["player"]
+        info = player[0]
+        pos_data = player[1]
+
+        name = team_val = display_pos = ""
+        for item in info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    name = item["name"].get("full", "")
+                if "editorial_team_abbr" in item:
+                    team_val = item["editorial_team_abbr"].upper()
+                if "display_position" in item:
+                    display_pos = item["display_position"]
+
+        selected_pos = "BN"
+        sel = pos_data.get("selected_position", [{}])
+        for s in sel:
+            if isinstance(s, dict) and "position" in s:
+                selected_pos = s["position"]
+
+        if not name or not display_pos:
+            continue
+
+        if selected_pos in ("IL", "IL+"):
+            role = "IL"
+        elif selected_pos == "BN":
+            role = "bench"
+        else:
+            role = "starter"
+
+        positions = [p.strip() for p in display_pos.split(",")]
+
+        if any(p in ("SP", "RP") for p in positions):
+            p_type = "SP" if "SP" in positions else "RP"
+            pitchers.append({"name": name, "team": team_val, "type": p_type, "role": role})
+        else:
+            batters.append({"name": name, "team": team_val, "positions": positions, "role": role})
+
+    return {"batters": batters, "pitchers": pitchers}
+
+
+def fetch_sp_schedules(config, opp_roster, week_start, week_end):
+    """Fetch SP probable pitcher schedules for both teams.
+
+    Returns: (my_sp_schedule, opp_sp_schedule)
+    """
+    my_sps = {p["name"]: p["team"] for p in config.get("pitchers", [])
+              if p.get("type") == "SP" and p.get("role") != "IL"}
+    opp_sps = {p["name"]: p["team"] for p in opp_roster.get("pitchers", [])
+               if p.get("type") == "SP" and p.get("role") != "IL"}
+    all_sp_names = set(my_sps.keys()) | set(opp_sps.keys())
+
+    my_schedule = []
+    opp_schedule = []
+
+    d = week_start
+    while d <= week_end:
+        date_str = d.isoformat()
+        try:
+            data = mlb_api_get(f"/schedule?sportId=1&date={date_str}&hydrate=probablePitcher")
+            for dd in data.get("dates", []):
+                for g in dd["games"]:
+                    for side in ("away", "home"):
+                        sp_name = g["teams"][side].get("probablePitcher", {}).get("fullName", "")
+                        if sp_name in all_sp_names:
+                            opp_side = "home" if side == "away" else "away"
+                            vs_team = g["teams"][opp_side]["team"]["name"]
+                            entry = {
+                                "date": date_str,
+                                "pitcher": sp_name,
+                                "team": my_sps.get(sp_name, opp_sps.get(sp_name, "")),
+                                "vs": vs_team,
+                                "confirmed": True,
+                            }
+                            if sp_name in my_sps:
+                                my_schedule.append(entry)
+                            else:
+                                opp_schedule.append(entry)
+        except Exception as e:
+            print(f"  SP schedule error for {date_str}: {e}", file=sys.stderr)
+        time.sleep(0.3)
+        d += timedelta(days=1)
+
+    my_schedule.sort(key=lambda x: x["date"])
+    opp_schedule.sort(key=lambda x: x["date"])
+    return my_schedule, opp_schedule
+
+
+def compute_positional_coverage(config, week_start, week_end):
+    """Check daily positional coverage, identify dead slots (C/1B/SS)."""
+    batters = config.get("batters", [])
+    team_id_map = config.get("teams", {})
+    # Reverse map: mlb_team_id → config abbreviation
+    id_to_abbr = {v: k for k, v in team_id_map.items()}
+
+    coverage = {}
+    d = week_start
+    while d <= week_end:
+        date_str = d.isoformat()
+        try:
+            data = mlb_api_get(f"/schedule?sportId=1&date={date_str}")
+            teams_playing = set()
+            for dd in data.get("dates", []):
+                for g in dd["games"]:
+                    for side in ("away", "home"):
+                        tid = g["teams"][side]["team"].get("id")
+                        if tid and tid in id_to_abbr:
+                            teams_playing.add(id_to_abbr[tid])
+
+            with_games = [b["name"] for b in batters if b["team"] in teams_playing]
+            no_game = [b["name"] for b in batters if b["team"] not in teams_playing]
+
+            dead_slots = []
+            for pos in RISK_POSITIONS:
+                has_eligible = any(
+                    pos in b.get("positions", []) and b["team"] in teams_playing
+                    for b in batters
+                )
+                if not has_eligible:
+                    dead_slots.append(pos)
+
+            coverage[date_str] = {
+                "players_with_games": with_games,
+                "players_no_game": no_game,
+                "dead_slots": dead_slots,
+            }
+        except Exception as e:
+            print(f"  Coverage error for {date_str}: {e}", file=sys.stderr)
+            coverage[date_str] = {"players_with_games": [], "players_no_game": [], "dead_slots": []}
+
+        time.sleep(0.3)
+        d += timedelta(days=1)
+
+    return coverage
 
 
 # ── JSON Assembly ──
@@ -372,8 +547,35 @@ def main():
     else:
         print("  Week 1 — no previous week to review", file=sys.stderr)
 
-    # TODO: Task 3 — preview data
+    # ── Preview: this week's data ──
+    print(f"  Fetching week {week_number} opponent...", file=sys.stderr)
+    next_opp = fetch_next_opponent(league_key, access_token, week_number, team_name)
+
     preview_data = {}
+    if next_opp:
+        print(f"  Opponent: {next_opp['name']}", file=sys.stderr)
+
+        print(f"  Fetching opponent roster...", file=sys.stderr)
+        opp_roster = fetch_opponent_roster(next_opp["key"], access_token)
+
+        print(f"  Fetching SP schedules ({week_start} ~ {week_end})...", file=sys.stderr)
+        my_sp_sched, opp_sp_sched = fetch_sp_schedules(config, opp_roster, week_start, week_end)
+
+        print(f"  Computing positional coverage...", file=sys.stderr)
+        pos_coverage = compute_positional_coverage(config, week_start, week_end)
+
+        preview_data = {
+            "opponent_name": next_opp["name"],
+            "opponent_key": next_opp["key"],
+            "opponent_roster": opp_roster,
+            "my_sp_schedule": my_sp_sched,
+            "opp_sp_schedule": opp_sp_sched,
+            "probable_as_of": datetime.now(ET).isoformat(),
+            "positional_coverage": pos_coverage,
+            "predicted_outcome": None,
+        }
+    else:
+        print("  Could not determine this week's opponent", file=sys.stderr)
 
     # TODO: Task 4 — assemble + output
     output = {
