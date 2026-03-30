@@ -13,29 +13,23 @@ import os
 import subprocess
 import sys
 import time
-import urllib.error
-import urllib.parse
 import urllib.request
 from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 
-ET = ZoneInfo("America/New_York")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+
+# Shared helpers from yahoo_query.py (same pattern as weekly_scan.py / fa_watch.py)
+from yahoo_query import (
+    refresh_token, load_env, load_config, api_get as yahoo_api_get,
+    YAHOO_STAT_MAP,
+)
+
+ET = ZoneInfo("America/New_York")
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 MLB_API = "https://statsapi.mlb.com/api/v1"
-YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
-YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
-YAHOO_TOKEN_FILE = os.path.join(SCRIPT_DIR, "yahoo_token.json")
 WEEKLY_DATA_DIR = os.path.join(SCRIPT_DIR, "weekly-data")
-
-# Yahoo stat_id → (display_name, lower_is_better)
-YAHOO_STAT_MAP = {
-    "7": ("R", False), "12": ("HR", False), "13": ("RBI", False),
-    "16": ("SB", False), "18": ("BB", False), "3": ("AVG", False),
-    "55": ("OPS", False), "50": ("IP", False), "28": ("W", False),
-    "42": ("K", False), "26": ("ERA", True), "27": ("WHIP", True),
-    "83": ("QS", False), "89": ("SV+H", False),
-}
 
 LOWER_IS_BETTER = {"ERA", "WHIP"}
 
@@ -46,71 +40,7 @@ CATEGORY_ORDER = ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS",
 RISK_POSITIONS = ["C", "1B", "SS"]
 
 
-# ── Config & Env ──
-
-
-def load_config():
-    with open(os.path.join(SCRIPT_DIR, "roster_config.json"), encoding="utf-8") as f:
-        config = json.load(f)
-    config["mlb_id_map"] = {}
-    for p in config.get("batters", []) + config.get("pitchers", []):
-        if p.get("mlb_id"):
-            config["mlb_id_map"][p["name"]] = p["mlb_id"]
-    return config
-
-
-def load_env():
-    env = {}
-    env_path = os.path.join(SCRIPT_DIR, ".env")
-    if os.path.exists(env_path):
-        with open(env_path, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    k, v = line.split("=", 1)
-                    env[k.strip()] = v.strip()
-    for key in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
-                "YAHOO_CLIENT_ID", "YAHOO_CLIENT_SECRET"):
-        if key in os.environ:
-            env[key] = os.environ[key]
-    return env
-
-
-# ── API Helpers (match main.py patterns) ──
-
-
-def yahoo_refresh_token(env):
-    """Refresh Yahoo OAuth token. Returns access_token."""
-    with open(YAHOO_TOKEN_FILE, encoding="utf-8") as f:
-        tokens = json.load(f)
-    data = urllib.parse.urlencode({
-        "grant_type": "refresh_token",
-        "refresh_token": tokens["refresh_token"],
-        "client_id": env["YAHOO_CLIENT_ID"],
-        "client_secret": env["YAHOO_CLIENT_SECRET"],
-    }).encode()
-    req = urllib.request.Request(
-        YAHOO_TOKEN_URL, data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        result = json.loads(resp.read())
-    tokens["access_token"] = result["access_token"]
-    if "refresh_token" in result:
-        tokens["refresh_token"] = result["refresh_token"]
-    with open(YAHOO_TOKEN_FILE, "w", encoding="utf-8") as f:
-        json.dump(tokens, f, indent=2)
-    return result["access_token"]
-
-
-def yahoo_api_get(path, access_token):
-    """Yahoo Fantasy API GET request."""
-    url = f"{YAHOO_API}{path}"
-    sep = "&" if "?" in path else "?"
-    url += f"{sep}format=json"
-    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {access_token}"})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        return json.loads(resp.read())
+# ── API Helpers ──
 
 
 def mlb_api_get(path):
@@ -221,8 +151,6 @@ def fetch_league_scoreboard(league_key, access_token, week, team_name="99 940"):
                 "categories": categories,
                 "final_record": {"wins": wins, "losses": losses, "draws": draws},
             }
-
-        time.sleep(0.5)
 
     return my_matchup, all_teams
 
@@ -505,9 +433,10 @@ def git_push(json_path, week_number):
 
     try:
         subprocess.run(["git", "pull", "--rebase", "origin", "master"],
-                       cwd=REPO_ROOT, timeout=30)
-    except Exception as e:
-        print(f"  Git pull --rebase failed: {e}", file=sys.stderr)
+                       cwd=REPO_ROOT, check=True, timeout=30)
+    except subprocess.CalledProcessError as e:
+        print(f"  Git pull --rebase failed (skip push): {e}", file=sys.stderr)
+        return
 
     try:
         subprocess.run(["git", "push", "origin", "master"],
@@ -545,7 +474,7 @@ def main():
 
     print(f"[Weekly Review] Week {week_number} ({week_start} ~ {week_end})", file=sys.stderr)
 
-    access_token = yahoo_refresh_token(env)
+    access_token = refresh_token(env)
 
     # ── Review: last week's data ──
     prev_week = week_number - 1
