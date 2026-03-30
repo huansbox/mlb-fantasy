@@ -56,7 +56,7 @@ def collect_fa_snapshot(access_token, config, queries=None):
     snapshot = {}
 
     for label, filters in queries:
-        path = f"/league/{league_key}/players;{filters};out=stats,percent_owned"
+        path = f"/league/{league_key}/players;{filters};out=stats,percent_owned,ownership"
         try:
             data = api_get(path, access_token)
             league_data = data["fantasy_content"]["league"]
@@ -75,6 +75,7 @@ def collect_fa_snapshot(access_token, config, queries=None):
                         "position": p["position"],
                         "pct": int(float(p["percent_owned"] or 0)),  # (R13)
                         "stats": stats,
+                        "waiver_date": p.get("waiver_date", ""),
                     }
         except Exception as e:
             print(f"FA query error ({label}): {e}", file=sys.stderr)
@@ -135,6 +136,7 @@ def calc_owned_changes(today_snapshot, history, today_str):
             "position": info["position"], "pct": pct,
             "d1": d1, "d3": d3,
             "stats": info.get("stats", {}),
+            "waiver_date": info.get("waiver_date", ""),
         })
 
     return changes, ref_1d, ref_3d
@@ -166,7 +168,8 @@ def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
         for c in risers:
             d1 = f"+{c['d1']}" if c["d1"] > 0 else str(c["d1"])
             d3 = f"+{c['d3']}" if c["d3"] and c["d3"] > 0 else (str(c["d3"]) if c["d3"] is not None else "—")
-            lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}")
+            wtag = f" [W {c['waiver_date']}]" if c.get("waiver_date") else ""
+            lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}{wtag}")
 
     if fallers and fallers[0]["d1"] < 0:
         lines.append("\n降幅前 5:")
@@ -176,7 +179,8 @@ def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
                 break
             d1 = str(c["d1"])
             d3 = str(c["d3"]) if c["d3"] is not None else "—"
-            lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}")
+            wtag = f" [W {c['waiver_date']}]" if c.get("waiver_date") else ""
+            lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}{wtag}")
 
     return "\n".join(lines)
 

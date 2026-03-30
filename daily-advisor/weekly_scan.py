@@ -56,7 +56,8 @@ def build_weekly_data(today_str, snapshot, changes, ref_1d, ref_3d, config):
                     stat_str = f"AVG {stats.get('AVG', '—')} OPS {stats.get('OPS', '—')} HR {stats.get('HR', '—')} BB {stats.get('BB', '—')}"
                 else:
                     stat_str = ""
-                lines.append(f"  {name:20} {info['team']:5} {info['position']:12} {info['pct']:>3}%  {stat_str}")
+                wtag = f" [W {info['waiver_date']}]" if info.get("waiver_date") else ""
+                lines.append(f"  {name:20} {info['team']:5} {info['position']:12} {info['pct']:>3}%  {stat_str}{wtag}")
 
     # %owned changes
     rankings = format_change_rankings(changes, ref_1d, ref_3d, top_n=10)
