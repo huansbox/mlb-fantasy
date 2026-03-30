@@ -246,6 +246,10 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 22:15，含 Lineup）+ 最終報（台灣 05:00） | ✅ Phase 2 已部署 |
 | `daily-advisor/fa_watch.py` | Daily FA Watch（每日 07:00，%owned 追蹤 + claude -p） | ✅ 完成 |
 | `daily-advisor/weekly_scan.py` | Weekly Deep Scan（每週一 19:30，完整 FA 分析） | ✅ 完成 |
+| `daily-advisor/weekly_review.py` | 週覆盤資料準備（cron 週一 TW 18:00） | ✅ 完成 |
+| `daily-advisor/weekly-data/` | 週覆盤 JSON 資料（week-N.json） | 🔄 自動產生 |
+| `.claude/commands/weekly-review.md` | 週覆盤互動 SOP（`/weekly-review`） | ✅ 完成 |
+| `week-reviews.md` | 累積式週覆盤記錄（預測 + 覆盤 + 學習） | 🔄 進行中 |
 | `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考（已用 + 可用） | ✅ 參考 |
 

@@ -179,6 +179,16 @@ def main():
         save_summary(advice)
         save_github_issue(today_str, data_summary, advice)
 
+        # Append weekly review reminder
+        try:
+            from weekly_review import load_config as wr_load_config, get_fantasy_week
+            wr_config = wr_load_config()
+            today_et = datetime.now(ZoneInfo("America/New_York")).date()
+            _, _, wn = get_fantasy_week(today_et, wr_config)
+            advice += f"\n\n---\n📋 Week {wn} 覆盤資料已備好，開 session 跑 /weekly-review"
+        except Exception as e:
+            print(f"Weekly review reminder failed (skipping): {e}", file=sys.stderr)
+
         if args.no_send:
             return
 

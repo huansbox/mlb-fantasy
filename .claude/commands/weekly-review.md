@@ -1,0 +1,104 @@
+# Weekly Review — 週覆盤 + 週預測
+
+每週一執行。Phase 1 覆盤上週，Phase 2 預測本週。
+
+## Step 1：讀取資料
+
+1. 確認當前 fantasy week：
+   ```bash
+   python -c "
+   import sys; sys.path.insert(0,'daily-advisor')
+   from weekly_review import load_config, get_fantasy_week
+   from datetime import datetime
+   from zoneinfo import ZoneInfo
+   config = load_config()
+   today = datetime.now(ZoneInfo('America/New_York')).date()
+   ws, we, wn = get_fantasy_week(today, config)
+   print(f'Current week: {wn} ({ws} ~ {we})')
+   "
+   ```
+2. 讀 `daily-advisor/weekly-data/week-{N}.json`（N = 當前週數，由 cron 自動準備）
+3. 讀 `week-reviews.md`（上週的 predicted_outcome，用於覆盤對照）
+
+若 JSON 不存在，提示用戶：
+- VPS 上跑：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && python3 daily-advisor/weekly_review.py --prepare'`
+- 或本地即時拉取：`python daily-advisor/weekly_review.py --prepare --dry-run > daily-advisor/weekly-data/week-{N}.json`
+
+## Step 2（Phase 1）：覆盤上週
+
+> 如果是開季第一週（無上週資料），跳過 Phase 1，直接進 Phase 2。
+
+1. 從 JSON `review` 區塊讀取 14 類別 mine/opp/result
+2. 從 `week-reviews.md` 讀取上週的 predicted_outcome（strong/toss_up/weak 分類）
+3. 顯示對照表：
+
+   | 類別 | 預測 | 實際 | ✓/✗ | mine | opp |
+   |------|------|------|------|------|-----|
+
+4. 計算準確率（correct / total）
+5. 顯示聯盟類別排名（league_category_ranks）
+6. 掃描日報品質（用 `gh issue view {number}` 讀取 daily_reports 中的 issues）：
+   - 速報 → 最終報推翻次數及類型
+   - 「Lineup 未公布」出現比例
+7. **詢問用戶**：預測偏差的原因（逐項標記或整體說明）
+8. 寫入 `week-reviews.md` 的覆盤區塊
+
+## Step 3（Phase 2）：預測本週
+
+1. 從 JSON `preview` 區塊讀取：
+   - 對手陣容（batters + pitchers，標注 IL）
+   - 雙方 SP 排程（confirmed / 推估）
+   - 守位覆蓋 + dead_slots
+2. 顯示分析：
+   - 對手打者/投手陣容摘要
+   - SP 排程對比表（我方 vs 對手）
+   - **守位死格警告**（哪天 C/1B/SS 沒人）
+3. 產出 14 類別預測：
+   - 結合覆盤 insight（若有）
+   - 分 strong / toss_up / weak + 信心度 + 一句話理由
+   - 整體預測比分 + 策略建議（攻擊/保守/正常）
+4. **詢問用戶**：確認或修正策略
+5. 將 predicted_outcome 寫回 JSON 的 `preview.predicted_outcome`：
+   ```json
+   {
+     "strong": ["HR", "IP", "K", ...],
+     "toss_up": ["R", "W", ...],
+     "weak": ["SB", "SV+H"],
+     "projected_record": "10-4",
+     "strategy": "正常打，保護比率"
+   }
+   ```
+6. 寫入 `week-reviews.md` 的預測區塊
+7. Commit JSON + week-reviews.md
+
+## `week-reviews.md` 格式
+
+每週追加一段，格式如下：
+
+```markdown
+## Week {N} vs {對手名}
+
+### 預測（{日期} 產出）
+| 類別 | 預測 | 信心 | 理由 |
+|------|------|------|------|
+| R | W | 中 | 我方打線較深 |
+| ...
+
+整體：{projected_record}，{strategy}
+
+### 覆盤（{日期} 回顧）
+| 類別 | 預測 | 實際 | ✓/✗ | 偏差原因 |
+|------|------|------|------|---------|
+| WHIP | W | L | ✗ | Nola@Coors |
+| ...
+
+準確率：{correct}/{total}（{pct}%）
+
+### 日報品質
+- 速報→最終報推翻：{N} 次（{類型}）
+- Lineup 未公布比例：速報 {N}%
+- Prompt 調整建議：{建議或「無」}
+
+### 學到什麼
+- {insight}
+```

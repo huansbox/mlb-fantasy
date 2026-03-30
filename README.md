@@ -45,6 +45,7 @@
 - `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token + Yahoo OAuth token
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron 排程：
+    - **Weekly Review** UTC 10:00 每週一（台灣 18:00）：覆盤資料準備
     - **Weekly Scan** UTC 11:30 每週一（台灣 19:30）：FA 市場深度掃描
     - **速報** UTC 14:15（台灣 22:15）：SP 排程 + 對戰分析 + Lineup 確認
     - **最終報** UTC 21:00（台灣 05:00）：lineup 確認 + 調整建議
