@@ -1,0 +1,580 @@
+{
+  "week": 2,
+  "dates": [
+    "2026-03-30",
+    "2026-04-05"
+  ],
+  "generated": "2026-03-30T06:15:27.725241-04:00",
+  "review": {
+    "opponent_name": "Droptheball",
+    "categories": [
+      {
+        "name": "R",
+        "mine": 18.0,
+        "opp": 15.0,
+        "result": "W"
+      },
+      {
+        "name": "HR",
+        "mine": 7.0,
+        "opp": 5.0,
+        "result": "W"
+      },
+      {
+        "name": "RBI",
+        "mine": 16.0,
+        "opp": 14.0,
+        "result": "W"
+      },
+      {
+        "name": "SB",
+        "mine": 2.0,
+        "opp": 3.0,
+        "result": "L"
+      },
+      {
+        "name": "BB",
+        "mine": 19.0,
+        "opp": 12.0,
+        "result": "W"
+      },
+      {
+        "name": "AVG",
+        "mine": 0.286,
+        "opp": 0.202,
+        "result": "W"
+      },
+      {
+        "name": "OPS",
+        "mine": 0.907,
+        "opp": 0.675,
+        "result": "W"
+      },
+      {
+        "name": "IP",
+        "mine": 28.2,
+        "opp": 30.2,
+        "result": "L"
+      },
+      {
+        "name": "W",
+        "mine": 2.0,
+        "opp": 1.0,
+        "result": "W"
+      },
+      {
+        "name": "K",
+        "mine": 34.0,
+        "opp": 33.0,
+        "result": "W"
+      },
+      {
+        "name": "ERA",
+        "mine": 3.14,
+        "opp": 3.82,
+        "result": "W"
+      },
+      {
+        "name": "WHIP",
+        "mine": 1.29,
+        "opp": 1.24,
+        "result": "L"
+      },
+      {
+        "name": "QS",
+        "mine": 2.0,
+        "opp": 0.0,
+        "result": "W"
+      },
+      {
+        "name": "SV+H",
+        "mine": 2.0,
+        "opp": 4.0,
+        "result": "L"
+      }
+    ],
+    "final_record": {
+      "wins": 10,
+      "losses": 4,
+      "draws": 0
+    },
+    "league_standings": [
+      {
+        "team": "Annbii Studio",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "992330",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "BUMMER",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "SerBowNee",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "99 940",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "SUMMER",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "ZaYu",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "99 APO",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "Droptheball",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "99 TeTe",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "RALLY MONKEY®",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "鍋's Neat Team",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      }
+    ],
+    "league_category_ranks": {
+      "R": 6,
+      "HR": 3,
+      "RBI": 7,
+      "SB": 10,
+      "BB": 5,
+      "AVG": 4,
+      "OPS": 2,
+      "IP": 9,
+      "W": 4,
+      "K": 9,
+      "ERA": 5,
+      "WHIP": 7,
+      "QS": 6,
+      "SV+H": 5
+    },
+    "daily_reports": [
+      {
+        "date": "2026-03-28",
+        "issue_number": 1,
+        "title": "Daily Report — 2026-03-28"
+      },
+      {
+        "date": "2026-03-29",
+        "issue_number": 3,
+        "title": "[最終報] Daily Report — 2026-03-29"
+      },
+      {
+        "date": "2026-03-29",
+        "issue_number": 2,
+        "title": "[速報] Daily Report — 2026-03-29"
+      }
+    ]
+  },
+  "preview": {
+    "opponent_name": "鍋's Neat Team",
+    "opponent_key": "469.l.105457.t.11",
+    "opponent_roster": {
+      "batters": [
+        {
+          "name": "Yainer Diaz",
+          "team": "HOU",
+          "positions": [
+            "C"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Josh Naylor",
+          "team": "SEA",
+          "positions": [
+            "1B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Xavier Edwards",
+          "team": "MIA",
+          "positions": [
+            "2B",
+            "SS"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Alex Bregman",
+          "team": "CHC",
+          "positions": [
+            "3B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Zach Neto",
+          "team": "LAA",
+          "positions": [
+            "SS"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Aaron Judge",
+          "team": "NYY",
+          "positions": [
+            "LF",
+            "CF",
+            "RF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Wyatt Langford",
+          "team": "TEX",
+          "positions": [
+            "LF",
+            "CF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Jo Adell",
+          "team": "LAA",
+          "positions": [
+            "CF",
+            "RF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Pete Alonso",
+          "team": "BAL",
+          "positions": [
+            "1B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Jarren Duran",
+          "team": "BOS",
+          "positions": [
+            "LF",
+            "CF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Otto Lopez",
+          "team": "MIA",
+          "positions": [
+            "2B",
+            "SS"
+          ],
+          "role": "bench"
+        },
+        {
+          "name": "Addison Barger",
+          "team": "TOR",
+          "positions": [
+            "3B",
+            "LF",
+            "RF"
+          ],
+          "role": "bench"
+        },
+        {
+          "name": "Andrew Vaughn",
+          "team": "MIL",
+          "positions": [
+            "1B"
+          ],
+          "role": "bench"
+        }
+      ],
+      "pitchers": [
+        {
+          "name": "Sonny Gray",
+          "team": "BOS",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Jack Flaherty",
+          "team": "DET",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Edward Cabrera",
+          "team": "CHC",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Mike Burrows",
+          "team": "HOU",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Cade Smith",
+          "team": "CLE",
+          "type": "RP",
+          "role": "starter"
+        },
+        {
+          "name": "Raisel Iglesias",
+          "team": "ATL",
+          "type": "RP",
+          "role": "starter"
+        },
+        {
+          "name": "Ryan Helsley",
+          "team": "BAL",
+          "type": "RP",
+          "role": "starter"
+        },
+        {
+          "name": "Ryan Walker",
+          "team": "SF",
+          "type": "RP",
+          "role": "starter"
+        },
+        {
+          "name": "Paul Sewald",
+          "team": "AZ",
+          "type": "RP",
+          "role": "starter"
+        },
+        {
+          "name": "Bryce Miller",
+          "team": "SEA",
+          "type": "SP",
+          "role": "IL"
+        },
+        {
+          "name": "Nick Lodolo",
+          "team": "CIN",
+          "type": "SP",
+          "role": "IL"
+        }
+      ]
+    },
+    "my_sp_schedule": [
+      {
+        "date": "2026-03-30",
+        "pitcher": "Chris Bassitt",
+        "team": "BAL",
+        "vs": "Texas Rangers",
+        "confirmed": true
+      },
+      {
+        "date": "2026-03-31",
+        "pitcher": "Brayan Bello",
+        "team": "BOS",
+        "vs": "Houston Astros",
+        "confirmed": true
+      },
+      {
+        "date": "2026-04-01",
+        "pitcher": "Chris Sale",
+        "team": "ATL",
+        "vs": "Athletics",
+        "confirmed": true
+      },
+      {
+        "date": "2026-04-02",
+        "pitcher": "Cole Ragans",
+        "team": "KC",
+        "vs": "Minnesota Twins",
+        "confirmed": true
+      }
+    ],
+    "opp_sp_schedule": [
+      {
+        "date": "2026-03-30",
+        "pitcher": "Edward Cabrera",
+        "team": "CHC",
+        "vs": "Los Angeles Angels",
+        "confirmed": true
+      },
+      {
+        "date": "2026-04-01",
+        "pitcher": "Mike Burrows",
+        "team": "HOU",
+        "vs": "Boston Red Sox",
+        "confirmed": true
+      }
+    ],
+    "probable_as_of": "2026-03-30T06:15:27.725211-04:00",
+    "positional_coverage": {
+      "2026-03-30": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Byron Buxton",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-03-31": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [
+          "Byron Buxton"
+        ],
+        "dead_slots": []
+      },
+      "2026-04-01": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Byron Buxton",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-04-02": {
+        "players_with_games": [
+          "Byron Buxton",
+          "Ozzie Albies"
+        ],
+        "players_no_game": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Lawrence Butler",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "dead_slots": [
+          "C",
+          "1B",
+          "SS"
+        ]
+      },
+      "2026-04-03": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Byron Buxton",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-04-04": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Byron Buxton",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-04-05": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Christian Walker",
+          "Jazz Chisholm Jr.",
+          "Manny Machado",
+          "Ezequiel Tovar",
+          "Jose Altuve",
+          "Byron Buxton",
+          "Lawrence Butler",
+          "Ozzie Albies",
+          "Steven Kwan",
+          "Sal Frelick",
+          "Giancarlo Stanton"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      }
+    },
+    "predicted_outcome": null
+  }
+}
