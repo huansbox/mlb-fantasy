@@ -139,7 +139,173 @@ def get_fantasy_week(target_date, config):
 
 
 # ── Review Data Fetching ──
-# TODO: Task 2
+
+
+def fetch_league_scoreboard(league_key, access_token, week, team_name="99 940"):
+    """Fetch scoreboard for all matchups in a given week.
+
+    Returns:
+        my_matchup: dict with categories, final_record, opponent_name (or None)
+        all_teams: {team_name: {"R": val, ...}}
+    """
+    sb = yahoo_api_get(f"/league/{league_key}/scoreboard;week={week}", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+
+    all_teams = {}
+    my_matchup = None
+
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+
+        teams_node = v["matchup"]["0"]["teams"]
+
+        # Parse both teams in this matchup
+        pair = []
+        for ti in ("0", "1"):
+            team_info = teams_node[ti]["team"][0]
+            team_stats_raw = teams_node[ti]["team"][1]["team_stats"]["stats"]
+
+            name = "?"
+            for item in team_info:
+                if isinstance(item, dict) and "name" in item:
+                    name = item["name"]
+                    break
+
+            # Parse stats using YAHOO_STAT_MAP
+            stats = {}
+            for s in team_stats_raw:
+                sid = s["stat"]["stat_id"]
+                val = s["stat"]["value"]
+                if sid not in YAHOO_STAT_MAP:
+                    continue
+                cat_name, _ = YAHOO_STAT_MAP[sid]
+                try:
+                    stats[cat_name] = float(val)
+                except (ValueError, TypeError):
+                    stats[cat_name] = 0.0
+
+            pair.append({"name": name, "stats": stats})
+            all_teams[name] = stats
+
+        # Check if my team is in this matchup
+        my_idx = None
+        if pair[0]["name"] == team_name:
+            my_idx = 0
+        elif pair[1]["name"] == team_name:
+            my_idx = 1
+
+        if my_idx is not None:
+            me = pair[my_idx]
+            opp = pair[1 - my_idx]
+
+            categories = []
+            wins = losses = draws = 0
+            for cat in CATEGORY_ORDER:
+                mv = me["stats"].get(cat, 0.0)
+                ov = opp["stats"].get(cat, 0.0)
+                if cat in LOWER_IS_BETTER:
+                    result = "W" if mv < ov else ("L" if mv > ov else "D")
+                else:
+                    result = "W" if mv > ov else ("L" if mv < ov else "D")
+                if result == "W":
+                    wins += 1
+                elif result == "L":
+                    losses += 1
+                else:
+                    draws += 1
+                categories.append({"name": cat, "mine": mv, "opp": ov, "result": result})
+
+            my_matchup = {
+                "opponent_name": opp["name"],
+                "categories": categories,
+                "final_record": {"wins": wins, "losses": losses, "draws": draws},
+            }
+
+        time.sleep(0.5)
+
+    return my_matchup, all_teams
+
+
+def compute_category_ranks(all_teams, team_name="99 940"):
+    """Compute per-category rank for my team among all teams. 1 = best."""
+    ranks = {}
+    for cat in CATEGORY_ORDER:
+        values = [(name, stats.get(cat, 0.0)) for name, stats in all_teams.items()]
+        values.sort(key=lambda x: x[1], reverse=(cat not in LOWER_IS_BETTER))
+        for rank_idx, (name, _) in enumerate(values, 1):
+            if name == team_name:
+                ranks[cat] = rank_idx
+                break
+    return ranks
+
+
+def fetch_league_standings(league_key, access_token):
+    """Fetch league standings (W-L record and rank)."""
+    data = yahoo_api_get(f"/league/{league_key}/standings", access_token)
+    teams_node = data["fantasy_content"]["league"][1]["standings"][0]["teams"]
+
+    standings = []
+    for k, v in teams_node.items():
+        if k == "count":
+            continue
+        team_info = v["team"][0]
+        team_standings = v["team"][1].get("team_standings", {})
+
+        name = "?"
+        for item in team_info:
+            if isinstance(item, dict) and "name" in item:
+                name = item["name"]
+                break
+
+        record = team_standings.get("outcome_totals", {})
+        standings.append({
+            "team": name,
+            "wins": int(record.get("wins", 0)),
+            "losses": int(record.get("losses", 0)),
+            "rank": int(team_standings.get("rank", 0)),
+        })
+
+    standings.sort(key=lambda x: x["rank"])
+    return standings
+
+
+def fetch_daily_reports_metadata(week_number):
+    """Fetch GitHub Issue metadata for daily reports of a given week."""
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "list",
+             "--repo", "huansbox/mlb-fantasy",
+             "--label", f"week-{week_number}",
+             "--state", "all",
+             "--json", "number,title,createdAt",
+             "--limit", "20"],
+            capture_output=True, text=True, encoding="utf-8", timeout=30,
+        )
+        if result.returncode != 0:
+            print(f"  gh issue list failed: {result.stderr}", file=sys.stderr)
+            return []
+
+        issues = json.loads(result.stdout)
+        reports = []
+        for issue in issues:
+            title = issue.get("title", "")
+            # Extract date from title like "[速報] Daily Report 2026-03-30"
+            date_str = ""
+            for part in title.split():
+                if len(part) == 10 and part[4:5] == "-" and part[7:8] == "-":
+                    date_str = part
+                    break
+            reports.append({
+                "date": date_str,
+                "issue_number": issue["number"],
+                "title": title,
+            })
+        reports.sort(key=lambda x: x["date"])
+        return reports
+    except Exception as e:
+        print(f"  fetch_daily_reports error: {e}", file=sys.stderr)
+        return []
 
 
 # ── Preview Data Fetching ──
@@ -180,8 +346,31 @@ def main():
 
     access_token = yahoo_refresh_token(env)
 
-    # TODO: Task 2 — review data
+    # ── Review: last week's data ──
+    prev_week = week_number - 1
     review_data = {}
+    if prev_week >= 1:
+        print(f"  Fetching week {prev_week} scoreboard (all teams)...", file=sys.stderr)
+        my_matchup, all_teams = fetch_league_scoreboard(
+            league_key, access_token, prev_week, team_name)
+
+        print(f"  Computing category ranks...", file=sys.stderr)
+        category_ranks = compute_category_ranks(all_teams, team_name)
+
+        print(f"  Fetching standings...", file=sys.stderr)
+        standings = fetch_league_standings(league_key, access_token)
+
+        print(f"  Fetching daily report metadata...", file=sys.stderr)
+        daily_reports = fetch_daily_reports_metadata(prev_week)
+
+        review_data = {
+            **(my_matchup or {}),
+            "league_standings": standings,
+            "league_category_ranks": category_ranks,
+            "daily_reports": daily_reports,
+        }
+    else:
+        print("  Week 1 — no previous week to review", file=sys.stderr)
 
     # TODO: Task 3 — preview data
     preview_data = {}
