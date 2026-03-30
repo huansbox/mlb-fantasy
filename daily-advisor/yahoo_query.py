@@ -103,18 +103,23 @@ def extract_player_info(player_data):
                 status = item["status"]
             if "player_key" in item:
                 player_key = item["player_key"]
-    # percent_owned may be at any index after 0 (depends on sub-resources requested)
+    # percent_owned and ownership may be at any index after 0
+    ownership_type = waiver_date = None
     for idx in range(1, len(player_data)):
         po_data = player_data[idx]
-        if isinstance(po_data, dict) and "percent_owned" in po_data:
-            po_list = po_data["percent_owned"]
-            if isinstance(po_list, list):
-                for po in po_list:
-                    if isinstance(po, dict) and "value" in po:
-                        percent_owned = po["value"]
-            elif isinstance(po_list, dict):
-                percent_owned = po_list.get("value")
-            break
+        if isinstance(po_data, dict):
+            if "percent_owned" in po_data:
+                po_list = po_data["percent_owned"]
+                if isinstance(po_list, list):
+                    for po in po_list:
+                        if isinstance(po, dict) and "value" in po:
+                            percent_owned = po["value"]
+                elif isinstance(po_list, dict):
+                    percent_owned = po_list.get("value")
+            if "ownership" in po_data:
+                own = po_data["ownership"]
+                ownership_type = own.get("ownership_type", "")
+                waiver_date = own.get("waiver_date", "")
     return {
         "name": name or "?",
         "team": team or "?",
@@ -122,6 +127,8 @@ def extract_player_info(player_data):
         "status": status or "",
         "percent_owned": percent_owned,
         "player_key": player_key,
+        "ownership_type": ownership_type or "",
+        "waiver_date": waiver_date or "",
     }
 
 
@@ -156,7 +163,7 @@ def cmd_fa(args, access_token, config):
         filters.append(f"start={args.start}")
 
     filter_str = ";".join(filters)
-    path = f"/league/{league_key}/players;{filter_str};out=stats,percent_owned"
+    path = f"/league/{league_key}/players;{filter_str};out=stats,percent_owned,ownership"
 
     data = api_get(path, access_token)
     league_data = data["fantasy_content"]["league"]
@@ -179,6 +186,8 @@ def cmd_fa(args, access_token, config):
     for i, p in enumerate(players, 1):
         po = f"{p['percent_owned']}%" if p["percent_owned"] else "—"
         st = p["status"] if p["status"] else ""
+        waiver_tag = f"W {p['waiver_date']}" if p.get("waiver_date") else ""
+        status_tag = f"{st} {waiver_tag}".strip()
         stats = p.get("stats", {})
         if "ERA" in stats:
             stat_str = f"ERA {stats.get('ERA', '—')} | WHIP {stats.get('WHIP', '—')} | K {stats.get('K', '—')} | IP {stats.get('IP', '—')}"
@@ -186,7 +195,7 @@ def cmd_fa(args, access_token, config):
             stat_str = f"AVG {stats.get('AVG', '—')} | OPS {stats.get('OPS', '—')} | HR {stats.get('HR', '—')} | BB {stats.get('BB', '—')}"
         else:
             stat_str = ""
-        print(f"{i:3}  {p['name']:20}  {p['team']:5}  {p['position']:12}  {po:>7}  {stat_str}  {st}")
+        print(f"{i:3}  {p['name']:20}  {p['team']:5}  {p['position']:12}  {po:>7}  {stat_str}  {status_tag}")
 
 
 def _search_players(search_name, league_key, access_token):
