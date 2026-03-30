@@ -89,6 +89,26 @@
 - **軟 Punt SB**：不刻意追速度，但 Chisholm/Albies/Buxton 偶爾能贏
 - **SP 重裝**：9 SP 深度，40 IP 門檻輕鬆過
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
+- **不常態串流 SP**：FA 池 SP 品質太差（12 隊聯賽好 SP 都被持有），串流的 K 增幅低、ERA/WHIP 風險高，只在特定情境精準使用 1-2 次（見下方）
+
+### 串流 SP 決策規則（2026-03-30 確立）
+
+| 情境 | 做法 |
+|------|------|
+| 週四發現 IP 差 40 很遠（< 30 IP 且只剩 1 場先發） | 撿 1 個 matchup 好的串流 SP |
+| 某項 counting stat 接近翻盤（K 差 3-5 個） | 精準撿 1 場高 K 率 SP |
+| ERA/WHIP 已大幅領先（ERA < 2.50） | 比率有餘裕，可冒險加 1 場 |
+| 對手弱到本週穩贏 | 可用 2-3 次異動測試串流效果 |
+| **預設** | **不串流，留異動額度給傷兵替補和 hot bat** |
+
+### Waiver 操作規則（聯賽設定確認 2026-03-30）
+
+- **所有撿人走 FAAB**（waiver_rule: all），無即時 FA
+- **處理時間**：每日 ET 3AM（= TW 15:00）
+- **上場時效**：claim → 隔日 TW 15:00 處理 → Daily-Tomorrow 設 lineup → 再隔天上場（前置 2 天）
+- **被 drop 球員**：1 天 waiver period
+- **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
+- **每週上限**：6 次 add（add/drop 一組算 1 次）
 
 ### 陣容風險
 
@@ -97,8 +117,24 @@
 | **CF 深度** | 只有 Buxton + Butler + Frelick 有 CF 資格，Buxton 傷退 → 連鎖反應 |
 | **Kwan（VOR +2）** | 全隊最弱環節，K 移除輸家，第一替換候選 |
 | **BN 僅 3 格** | 替補空間緊，串流 SP 彈性有限 |
+| **IP/K 聯盟第 9** | Week 1 數據偏低（5 天短週），Week 2 完整週驗證中 |
+| **WHIP 聯盟第 7** | RP 比率貢獻待觀察（Garcia/Whitlock） |
 
-### Watchlist（2026-03-27）
+### Week 1 複盤（2026-03-30）
+
+**戰績**：10W-4L vs Droptheball（本週勝）
+
+**聯盟排名（12 隊）**：
+- 頂尖：HR(T1)、OPS(2)
+- 強：R(T3)、AVG(4)、W(T3)
+- 中上：ERA(5)、BB(T5)
+- 中段：QS(T4)、RBI(T5)
+- **需改善**：IP(9)、K(9)、WHIP(7)
+- Punt 項：SB(T9)、SV+H(5)
+
+**聯盟威脅**：BUMMER（54K/1.93 ERA/0.90 WHIP + .298 AVG，投打均衡最強隊）
+
+### Watchlist（2026-03-30）
 
 **打者**
 
@@ -112,9 +148,13 @@
 |------|------|------|---------|---------|
 | **Andrew Painter** | PHI | SP | 前 2-3 場先發穩定投 6+ IP | Singer |
 
+**近期行動**：
+- **Painter 3/31 確認先發**（PHI vs WSH，弱打線）— 第一場觀察機會
+- **4/3 Singer 先發後決策點**：Singer 表現 + Painter 3/31 結果 → 決定是否 drop Singer 撿 Painter
+
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge
 
-**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）
+**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）
 
 ### 行動觸發規則
 

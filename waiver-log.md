@@ -6,6 +6,7 @@
 觸發：前 2-3 場先發穩定投 6+ IP → 取代 Singer
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 - 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
+- 03-30：**3/31 確認先發**（PHI vs WSH，弱打線）。第一場觀察機會。搭配 Singer ~4/3 先發結果一起評估 — Singer 表現差 + Painter 投好 → 立即執行替換。
 
 ### Ryan O'Hearn (PIT, 1B/LF/RF)
 觸發：Walker 連 2 週 AVG < .200 或 Kwan 連 2 週 OPS < .700 → 取代 Walker 或 Kwan
@@ -50,6 +51,13 @@
 ### Ryan Pepiot (TB, SP) — 條件 Pass
 重評條件：被 drop 到 FA
 - 03-26：2025 生涯最佳，市場未反映實力。已被聯賽 rostered。
+
+### 串流 SP 評估（2026-03-30）
+結論：本週不串流。FA 池 SP 品質不支持常態串流（12 隊好 SP 都被持有）。
+- Severino (ATH)：4/1 先發 @ ATL，17% owned，5IP/3K/3.60ERA/1.20WHIP — K 太低
+- Liberatore (STL)：4/1 vs NYM，WHIP 1.80 — 已 Pass
+- Cavalli (WSH)：4/1 @ PHI，4.91ERA/1.64WHIP — 比率太差
+- 策略確立：只在特定情境精準串流 1-2 次，不常態洗。詳見 CLAUDE.md 串流決策規則。
 
 ## 已結案
 
