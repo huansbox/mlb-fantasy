@@ -241,6 +241,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 |------|------|------|
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點（週例行、決策樹、punt 紀律） | ✅ 開季參考 |
 | `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
+| `league-scouting.md` | 聯盟 12 隊 GM 策略分析（開季基準 snapshot） | ✅ 2026-03-30 |
 | `roster-baseline.md` | 陣容基準卡（全員預測/實際數據，eval 比較用） | 🔄 進行中 |
 | `.claude/commands/player-eval.md` | 球員評估 SOP（`/player-eval`） | ✅ 完成 |
 | `.claude/commands/waiver-scan.md` | Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢） | ✅ 完成 |
