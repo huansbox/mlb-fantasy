@@ -575,6 +575,12 @@
         "dead_slots": []
       }
     },
-    "predicted_outcome": null
+    "predicted_outcome": {
+      "strong": ["AVG", "OPS", "IP", "K", "QS", "BB"],
+      "toss_up": ["HR", "RBI", "R", "W", "ERA", "WHIP"],
+      "weak": ["SB", "SV+H"],
+      "projected_record": "10-4",
+      "strategy": "正常打，保護比率，不串流"
+    }
   }
 }
