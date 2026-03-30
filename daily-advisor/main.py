@@ -187,6 +187,32 @@ def fetch_lineups(date_str, season):
     return team_lineups
 
 
+def fetch_pitcher_season_stats(pitcher_id, season):
+    """Fetch pitcher's season stats (ERA, WHIP, K/9)."""
+    try:
+        data = api_get(
+            f"/people/{pitcher_id}/stats?stats=season&season={season}&group=pitching"
+        )
+        stat_groups = data.get("stats", [])
+        splits = stat_groups[0].get("splits", []) if stat_groups else []
+        if not splits:
+            return None
+        s = splits[0]["stat"]
+        ip = parse_ip(s.get("inningsPitched", 0))
+        k = int(s.get("strikeOuts", 0))
+        k9 = round(k * 9 / ip, 1) if ip > 0 else 0
+        return {
+            "era": s.get("era", "—"),
+            "whip": s.get("whip", "—"),
+            "k9": k9,
+            "ip": f"{s.get('inningsPitched', '0')}",
+            "record": f"{s.get('wins', 0)}-{s.get('losses', 0)}",
+        }
+    except Exception as e:
+        print(f"Pitcher stats fetch failed ({pitcher_id}): {e}", file=sys.stderr)
+        return None
+
+
 def fetch_team_hitting(team_id, season):
     """Fetch team season hitting stats."""
     data = api_get(
@@ -562,6 +588,8 @@ def analyze(config, target_date, env=None, morning=False):
     teams_playing = set()
     # Map: team_abbr → opponent_team_abbr
     matchup_map = {}
+    # Map: team_abbr → opposing probable pitcher info
+    opp_sp_map = {}
     for g in games:
         a = team_abbr(g["away_team"], season)
         h = team_abbr(g["home_team"], season)
@@ -569,6 +597,28 @@ def analyze(config, target_date, env=None, morning=False):
         teams_playing.add(h)
         matchup_map[a] = h
         matchup_map[h] = a
+        # Away team faces home pitcher, and vice versa
+        if g.get("home_pitcher"):
+            opp_sp_map[a] = {
+                "name": g["home_pitcher"],
+                "id": g.get("home_pitcher_id"),
+            }
+        if g.get("away_pitcher"):
+            opp_sp_map[h] = {
+                "name": g["away_pitcher"],
+                "id": g.get("away_pitcher_id"),
+            }
+
+    # Fetch season stats for opposing SPs that my batters will face
+    my_teams = {b["team"] for b in batters}
+    opp_pitcher_ids_seen = set()
+    for team in my_teams:
+        sp_info = opp_sp_map.get(team)
+        if sp_info and sp_info["id"] and sp_info["id"] not in opp_pitcher_ids_seen:
+            opp_pitcher_ids_seen.add(sp_info["id"])
+            stats = fetch_pitcher_season_stats(sp_info["id"], season)
+            if stats:
+                sp_info["stats"] = stats
 
     # Identify my SP starts tomorrow
     my_sp_names = {p["name"]: p for p in pitchers if p["type"] == "SP"}
@@ -592,7 +642,15 @@ def analyze(config, target_date, env=None, morning=False):
         tag = "板凳" if b["role"] == "bench" else slot
         if b["team"] in teams_playing:
             opp = matchup_map.get(b["team"], "?")
-            lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp}")
+            sp_info = opp_sp_map.get(b["team"])
+            if sp_info:
+                sp_label = sp_info["name"]
+                st = sp_info.get("stats")
+                if st:
+                    sp_label += f", {st['era']} ERA / {st['k9']} K9"
+                lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} ({sp_label})")
+            else:
+                lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} (SP TBD)")
         else:
             lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → 休兵")
 
