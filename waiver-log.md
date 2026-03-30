@@ -28,6 +28,10 @@
 - 03-29：[waiver-scan] 42% owned 在 12 隊 FA 極度反常。前 #1 pick，健康時 .290/.850+/20+ HR 天賦。但連 4 年進 IL（膝蓋/大腿/腹斜肌），春訓側腹緊繃（MRI clean）。3B 有 Machado 不需升級，BN 3 格全滿（Frelick/Stanton/Bassitt），無 drop 空間。天賦頂級但健康風險太高，暫不動。
 - 03-30：[waiver-scan] .222/1.253/2HR — 火燙但條件未達（BN 仍無空位），維持 Pass。
 
+### Brenton Doyle (COL, CF) — 條件 Pass
+重評條件：Buxton 進 IL + Frelick 不夠（Doyle 比 Marsh 更有 power）
+- 03-30：[waiver-scan] 74% owned 被 BUMMER drop（W 3/31 清除）。CF 資格填弱點，但 AVG ~.250 拖比率 + 速度型（punt SB 打折）+ Coors 灌水。開季 .000/.083 是 2G 噪音。作為 CF 緊急備案比 Marsh 更有 HR 潛力（20+ HR 2025）。
+
 ### Brandon Marsh (PHI, LF/CF) — 條件 Pass
 重評條件：Buxton 進 IL + Frelick 無法覆蓋 CF
 - 03-29：[waiver-scan] CF FA 中唯一非速度型選項。BB% 菁英級（~12-14%），7×7 BB 雙重計算下被低估。但 AVG .230-.240 拖比率，替補門檻可能僅 1/3（BB% ✓）。定位為 CF 緊急保險，不作正選升級。5% rostered。
