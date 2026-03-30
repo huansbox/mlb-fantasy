@@ -155,6 +155,7 @@
 - **Hancock 升為首選**：6 IP / 9K 首秀亮眼，K 率 > Painter，若無局數限制 upside 更高
 - **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
 - **NA 格空位**：考慮 stash Dylan Crews（WSH, CF/RF），離 MLB 最近的 CF prospect，填 CF 弱點。待決定
+- **TODO**：速報加入「打者 vs 對方先發投手」matchup 資訊（MLB API 有 probable pitcher，但 analyze() 沒組裝給每位打者）
 
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
 
