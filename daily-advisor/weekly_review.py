@@ -487,8 +487,34 @@ def compute_positional_coverage(config, week_start, week_end):
     return coverage
 
 
-# ── JSON Assembly ──
-# TODO: Task 4
+# ── JSON Output & Git ──
+
+
+def git_push(json_path, week_number):
+    """Git add, commit, and push the weekly data file."""
+    rel_path = os.path.relpath(json_path, REPO_ROOT)
+    try:
+        subprocess.run(["git", "add", rel_path], cwd=REPO_ROOT, check=True, timeout=10)
+        subprocess.run(
+            ["git", "commit", "-m", f"data: weekly review data for week {week_number}"],
+            cwd=REPO_ROOT, check=True, timeout=10,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"  Git commit failed: {e}", file=sys.stderr)
+        return
+
+    try:
+        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
+                       cwd=REPO_ROOT, timeout=30)
+    except Exception as e:
+        print(f"  Git pull --rebase failed: {e}", file=sys.stderr)
+
+    try:
+        subprocess.run(["git", "push", "origin", "master"],
+                       cwd=REPO_ROOT, check=True, timeout=30)
+        print("  Git push succeeded", file=sys.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"  Git push failed (resolve manually): {e}", file=sys.stderr)
 
 
 # ── Main ──
@@ -577,7 +603,7 @@ def main():
     else:
         print("  Could not determine this week's opponent", file=sys.stderr)
 
-    # TODO: Task 4 — assemble + output
+    # ── Assemble & output ──
     output = {
         "week": week_number,
         "dates": [week_start.isoformat(), week_end.isoformat()],
@@ -586,9 +612,20 @@ def main():
         "preview": preview_data,
     }
 
-    if args.dry_run:
-        print(json.dumps(output, indent=2, ensure_ascii=False, default=str))
+    json_str = json.dumps(output, indent=2, ensure_ascii=False, default=str)
 
+    if args.dry_run:
+        print(json_str)
+        print("[Weekly Review] Done (dry-run).", file=sys.stderr)
+        return
+
+    os.makedirs(WEEKLY_DATA_DIR, exist_ok=True)
+    json_path = os.path.join(WEEKLY_DATA_DIR, f"week-{week_number}.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        f.write(json_str)
+    print(f"  Written to {json_path}", file=sys.stderr)
+
+    git_push(json_path, week_number)
     print("[Weekly Review] Done.", file=sys.stderr)
 
 
