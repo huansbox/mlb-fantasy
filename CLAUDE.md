@@ -201,7 +201,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | `.claude/commands/waiver-scan.md` | Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢） | ✅ 完成 |
 | `.claude/commands/roster-scan.md` | 陣容基準卡週更 SOP（`/roster-scan`） | ✅ 完成 |
 | `daily-advisor/yahoo_query.py` | Yahoo FA 查詢 CLI（skill 透過 Bash 呼叫） | ✅ 完成 |
-| `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 21:45）+ 最終報（台灣 05:00，含 Lineup 確認） | ✅ Phase 2 已部署 |
+| `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 22:15，含 Lineup）+ 最終報（台灣 05:00） | ✅ Phase 2 已部署 |
 | `daily-advisor/fa_watch.py` | Daily FA Watch（每日 07:00，%owned 追蹤 + claude -p） | ✅ 完成 |
 | `daily-advisor/weekly_scan.py` | Weekly Deep Scan（每週一 19:30，完整 FA 分析） | ✅ 完成 |
 | `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |

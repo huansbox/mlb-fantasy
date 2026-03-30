@@ -46,7 +46,7 @@
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron 排程：
     - **Weekly Scan** UTC 11:30 每週一（台灣 19:30）：FA 市場深度掃描
-    - **速報** UTC 13:45（台灣 21:45）：SP 排程 + 對戰分析
+    - **速報** UTC 14:15（台灣 22:15）：SP 排程 + 對戰分析 + Lineup 確認
     - **最終報** UTC 21:00（台灣 05:00）：lineup 確認 + 調整建議
     - **FA Watch** UTC 23:00（台灣 07:00）：%owned 追蹤 + FA 快報
   - 報告自動存檔為 GitHub Issue（戰報 label: `week-N`，FA 掃描 label: `waiver-scan`）

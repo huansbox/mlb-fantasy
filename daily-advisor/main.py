@@ -708,74 +708,74 @@ def analyze(config, target_date, env=None, morning=False):
         except Exception as e:
             print(f"Opponent SP schedule error (skipping): {e}", file=sys.stderr)
 
-    # ── Section 8: Lineup confirmation (morning mode only) ──
+    # ── Section 8: Lineup confirmation ──
+    try:
+        team_lineups = fetch_lineups(date_str, season)
+    except Exception as e:
+        print(f"Lineup fetch error: {e}", file=sys.stderr)
+        team_lineups = {}
+
+    lines.append("\n=== 實際 Lineup 確認 ===")
+
+    # Starters
+    confirmed = []
+    not_in_lineup = []
+    lineup_unknown = []
+    for b in batters:
+        if b["role"] != "starter":
+            continue
+        if b["team"] not in teams_playing:
+            continue  # off-day, already covered above
+        lu = team_lineups.get(b["team"])
+        if lu is None:
+            lineup_unknown.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
+            continue
+        match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
+        if match:
+            confirmed.append(
+                f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ({match['position']})"
+            )
+        else:
+            not_in_lineup.append(
+                f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單 ⚠️"
+            )
+
+    if confirmed:
+        lines.append("\n已確認先發：")
+        lines.extend(confirmed)
+    if not_in_lineup:
+        lines.append("\n未進 Lineup：")
+        lines.extend(not_in_lineup)
+    if lineup_unknown:
+        lines.append("\nLineup 未公布：")
+        lines.extend(lineup_unknown)
+
+    # Bench batters
+    bench_lines = []
+    for b in batters:
+        if b["role"] != "bench":
+            continue
+        if b["team"] not in teams_playing:
+            continue
+        lu = team_lineups.get(b["team"])
+        if lu is None:
+            bench_lines.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
+            continue
+        match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
+        if match:
+            bench_lines.append(
+                f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ← 有先發"
+            )
+        else:
+            bench_lines.append(
+                f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單"
+            )
+    if bench_lines:
+        lines.append("\n板凳球員 Lineup 狀態：")
+        lines.extend(bench_lines)
+
+    # ── Section 9: Evening advice (morning mode only) ──
     if morning:
-        try:
-            team_lineups = fetch_lineups(date_str, season)
-        except Exception as e:
-            print(f"Lineup fetch error: {e}", file=sys.stderr)
-            team_lineups = {}
-
-        lines.append("\n=== 實際 Lineup 確認 ===")
-
-        # Starters
-        confirmed = []
-        not_in_lineup = []
-        lineup_unknown = []
-        for b in batters:
-            if b["role"] != "starter":
-                continue
-            if b["team"] not in teams_playing:
-                continue  # off-day, already covered above
-            lu = team_lineups.get(b["team"])
-            if lu is None:
-                lineup_unknown.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
-                continue
-            match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
-            if match:
-                confirmed.append(
-                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ({match['position']})"
-                )
-            else:
-                not_in_lineup.append(
-                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單 ⚠️"
-                )
-
-        if confirmed:
-            lines.append("\n已確認先發：")
-            lines.extend(confirmed)
-        if not_in_lineup:
-            lines.append("\n未進 Lineup：")
-            lines.extend(not_in_lineup)
-        if lineup_unknown:
-            lines.append("\nLineup 未公布：")
-            lines.extend(lineup_unknown)
-
-        # Bench batters
-        bench_lines = []
-        for b in batters:
-            if b["role"] != "bench":
-                continue
-            if b["team"] not in teams_playing:
-                continue
-            lu = team_lineups.get(b["team"])
-            if lu is None:
-                bench_lines.append(f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → Lineup 未公布")
-                continue
-            match = next((p for p in lu if p["id"] == b.get("mlb_id")), None)
-            if match:
-                bench_lines.append(
-                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 第 {match['batting_order']} 棒 ← 有先發"
-                )
-            else:
-                bench_lines.append(
-                    f"  {b['name']} ({'/'.join(b['positions'])}, {b['team']}) → 不在先發名單"
-                )
-        if bench_lines:
-            lines.append("\n板凳球員 Lineup 狀態：")
-            lines.extend(bench_lines)
-
-        # ── Section 9: Evening advice (morning mode only) ──
         _, _, wk = get_fantasy_week(target_date, config)
         evening_advice = fetch_evening_advice(target_date, wk)
         if evening_advice:
