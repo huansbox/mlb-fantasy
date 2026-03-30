@@ -277,12 +277,33 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 - **In-Season FA 放寬版**：IP > 150 → ERA < 4.00（FA 池質量低於選秀，門檻放寬）
 - 40 IP 門檻低，通常不需刻意串流
 
-### 每週檢查清單
-1. 設定隔日先發陣容（Daily deadline）
-2. 確認 SP 週排程，確保 40 IP
-3. 檢查傷兵，必要時用 IL 格 + 撿替補
-4. FAB 競標（週中評估 waiver 目標）
-5. 週二：跑 `/waiver-scan`（互動 session，補 WebSearch 新聞面）
+### 每週 SOP
+
+**自動化（VPS cron）**
+
+| 時間 (TW) | 頻率 | Job | 輸出 |
+|-----------|------|-----|------|
+| 每天 22:15 | 每日 | 速報 | Telegram + Issue（SP 排程 + 對戰 + Lineup） |
+| 每天 05:00 | 每日 | 最終報 | Telegram + Issue（Lineup 確認 + 夜場調整） |
+| 每天 07:00 | 每日 | FA Watch | Telegram + Issue（%owned 變動追蹤） |
+| 週一 18:00 | 每週 | Weekly Review Prep | `week-N.json` 存 repo |
+| 週一 19:30 | 每週 | Weekly Scan | Telegram + Issue（FA 深度掃描 + 覆盤提醒） |
+
+**每日動作**
+1. TW 22:15 收到速報 → 設好隔日 lineup → 睡覺
+2. TW 07:00 醒來看最終報 + FA Watch → 夜場球員微調（如需要）
+
+**週一 Session（覆盤 + 預測 + FA 按需）**
+1. 看 Weekly Scan Telegram 報告（FA 池快照）
+2. `/weekly-review`：Phase 1 覆盤上週 → Phase 2 預測本週
+3. 按需：`/player-eval`（深入評估特定球員）或 `/waiver-scan`（補 WebSearch 新聞面）
+
+**週中決策點**
+- 週四：檢查 IP 進度（速報會提醒），不夠才考慮精準串流 1 場
+- 觸發條件達成時：執行 Watchlist 行動（見行動觸發規則）
+
+**低頻任務**
+- `/roster-scan`：2-3 週一次（30+ PA 後才有統計意義）
 
 ## 選秀日工具（已完成，留作參考）
 
