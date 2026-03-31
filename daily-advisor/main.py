@@ -299,6 +299,42 @@ def format_pitcher_stats(stats):
     return " | ".join(parts)
 
 
+def fetch_batter_season_stats(player_id, season):
+    """Fetch batter's season hitting stats (OPS, HR/AB, BB%)."""
+    try:
+        data = api_get(
+            f"/people/{player_id}/stats?stats=season&season={season}&group=hitting"
+        )
+        stat_groups = data.get("stats", [])
+        splits = stat_groups[0].get("splits", []) if stat_groups else []
+        if not splits:
+            return None
+        s = splits[0]["stat"]
+        ab = int(s.get("atBats", 0))
+        pa = int(s.get("plateAppearances", 0))
+        hr = int(s.get("homeRuns", 0))
+        bb = int(s.get("baseOnBalls", 0))
+        ops = s.get("ops", "—")
+        hr_ab = round(hr / ab, 3) if ab > 0 else 0
+        bb_pct = round(bb / pa * 100, 1) if pa > 0 else 0
+        return {"ops": ops, "hr_ab": hr_ab, "bb_pct": bb_pct, "pa": pa}
+    except Exception as e:
+        print(f"Batter stats fetch failed ({player_id}): {e}", file=sys.stderr)
+        return None
+
+
+def format_batter_stats(current, prior, proj):
+    """Format batter stats: prior year + projection + current season."""
+    parts = []
+    if prior:
+        parts.append(f"去年: {prior['ops']} OPS / {prior['hr_ab']:.3f} HR/AB / {prior['bb_pct']}% BB ({prior['pa']} PA)")
+    if proj:
+        parts.append(f"預測: {proj['ops']:.3f} OPS / {proj['hr_ab']:.3f} HR/AB / {proj['bb_pct']}% BB")
+    if current:
+        parts.append(f"本季: {current['ops']} OPS / {current['hr_ab']:.3f} HR/AB / {current['bb_pct']}% BB ({current['pa']} PA)")
+    return " | ".join(parts)
+
+
 def fetch_team_hitting(team_id, season):
     """Fetch team season hitting stats."""
     data = api_get(
@@ -725,6 +761,15 @@ def analyze(config, target_date, env=None, morning=False):
                     "venue_name": g.get("venue_name", ""),
                 })
 
+    # ── Pre-fetch batter stats (current + prior year) ──
+    batter_stats_cache = {}
+    for b in batters:
+        mlb_id = b.get("mlb_id")
+        if mlb_id:
+            current = fetch_batter_season_stats(mlb_id, season)
+            prior = fetch_batter_season_stats(mlb_id, season - 1)
+            batter_stats_cache[mlb_id] = {"current": current, "prior": prior}
+
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
     lines.append("我的打者：")
@@ -746,6 +791,14 @@ def analyze(config, target_date, env=None, morning=False):
                 lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} (SP TBD)")
         else:
             lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → 休兵")
+        # Batter's own stats line
+        mlb_id = b.get("mlb_id")
+        if mlb_id:
+            bs = batter_stats_cache.get(mlb_id, {})
+            proj = b.get("proj")
+            batter_line = format_batter_stats(bs.get("current"), bs.get("prior"), proj)
+            if batter_line:
+                lines.append(f"    {batter_line}")
 
     # ── Section 2: SP starts ──
     lines.append("\n我的 SP 明日先發：")
