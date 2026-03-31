@@ -261,6 +261,43 @@ def build_fa_watch_data(today_str, snapshot, changes, ref_1d, ref_3d, config):
     return "\n".join(lines)
 
 
+# ── GitHub Issue archive ──
+
+
+def save_github_issue(today_str, data_summary, advice):
+    """Archive as GitHub Issue with fa-watch label."""
+    repo = "huansbox/mlb-fantasy"
+    title = f"[FA Watch] {today_str}"
+    body = f"""## Analysis
+
+{advice}
+
+---
+
+<details>
+<summary>Raw Data</summary>
+
+```
+{data_summary}
+```
+
+</details>
+"""
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "create", "--repo", repo,
+             "--title", title, "--body", body,
+             "--label", "fa-watch"],
+            capture_output=True, text=True, encoding="utf-8", timeout=30,
+        )
+        if result.returncode == 0:
+            print(f"Issue created: {result.stdout.strip()}", file=sys.stderr)
+        else:
+            print(f"GitHub Issue error: {result.stderr}", file=sys.stderr)
+    except Exception as e:
+        print(f"GitHub Issue failed: {e}", file=sys.stderr)
+
+
 # ── Claude + Telegram ──
 
 
@@ -322,6 +359,8 @@ def main():
             return
 
         print(advice)
+
+        save_github_issue(today_str, data_summary, advice)
 
         if args.no_send:
             return
