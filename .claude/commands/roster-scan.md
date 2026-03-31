@@ -29,22 +29,17 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 
 ## Step 2：蒐集實際數據
 
-> 數據來源優先順序：FanGraphs > Baseball Reference > ESPN > Yahoo
-> ROS（Rest of Season）預測：RotoChamp Steamer 或 FanGraphs Steamer ROS
+### 2a：自動化腳本（主要資料來源）
 
-### 2a：WebSearch 查詢（主要數據來源）
+一次抓取全陣容的 MLB Stats API + Savant Statcast 數據：
 
-**打者** — 每位搜尋：
+```bash
+python daily-advisor/roster_stats.py
 ```
-{球員名} {今年} stats {今天日期附近}
-```
-**必須取得**：G（場次）、PA、AVG、OPS、HR、RBI、R、SB、BB%
 
-**投手** — 每位 SP 搜尋：
-```
-{球員名} {今年} stats pitching {今天日期附近}
-```
-**必須取得**：GS、IP、ERA、WHIP、K、W、QS（如可取得）
+> 輸出 markdown 表格：打者（G/PA/xwOBA/HH%/Barrel%/OPS/HR/BB%/BBE + 去年基準）+ 投手（GS/IP/ERA/WHIP/K/W/QS）。
+> 直接複製到 roster-baseline.md，不需手動搜尋。
+> VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
 
 ### 2b：Yahoo API 輔助查詢
 
@@ -54,12 +49,16 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 python daily-advisor/yahoo_query.py player "{球員名}"
 ```
 
-> `yahoo_query.py player` 現在回傳守位資格、持有率、本季 7×7 stats。可作為 WebSearch 的交叉驗證或替代來源。
-> VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
+### 2c：WebSearch 補充（fallback）
+
+roster_stats.py 無法取得的資訊才用 WebSearch：
+- 傷病 / IL 更新
+- 角色變動（先發 → 替補、輪值調整）
+- Steamer ROS 更新預測
 
 ### 效率技巧
 
-- **並行搜尋**：用 4 個 Agent 分批搜尋（打者 A-F / 打者 G-L / SP 組 / 後段 SP + RP 組）
+- **不再需要並行 Agent 搜尋** — roster_stats.py 一次跑完全陣容（~30 秒）
 - **單一來源優先**：如果 FanGraphs 或 ESPN 的一個頁面能拉到多人數據，優先用
 - **RP 簡化**：Punt SV+H 策略下，RP 只需更新 ERA / WHIP / IP，不追 SV+H
 

@@ -42,14 +42,23 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 
 > ⚠️ **平行執行注意**：多個 player-eval agent 同時跑時，各 agent 不要自行寫入 waiver-log.md（會衝突）。改為在結論中列出建議的 log 更新內容，由主 session 統一寫入。單獨執行時正常寫入。
 
-### 打者 — WebSearch 查詢清單
+### 打者 — 資料蒐集
+
+**Step 1.1：Savant Statcast（優先，取代 WebSearch）**
+
+```bash
+python daily-advisor/yahoo_query.py savant "{球員名}"
+```
+
+> 回傳 2025 + 2026 的 xwOBA / HH% / Barrel% / BBE，不需 Yahoo auth。
+> 名字支援模糊匹配（Jesús = Jesus）。
+
+**Step 1.2：WebSearch 補充**
 
 1. `{球員名} {去年} stats batting` → 取得 OPS / HR / SB / BB%
-2. `{球員名} {去年} statcast baseball savant xwOBA hard-hit barrel` → 取得 xwOBA、Hard-Hit%、Barrel%、BBE
-3. `{球員名} {今年} projected stats fantasy` → Steamer/ATC 預測
-4. `{球員名} {今年} statcast xwOBA hard-hit%` → 當季 Statcast（開季後）
-5. `{球員名} {今年} news spring training` → 近況、傷病、WBC、角色
-6. `{球員名} position eligibility yahoo fantasy` → Yahoo 守位資格
+2. `{球員名} {今年} projected stats fantasy` → Steamer/ATC 預測
+3. `{球員名} {今年} news spring training` → 近況、傷病、WBC、角色
+4. `{球員名} position eligibility yahoo fantasy` → Yahoo 守位資格
 
 **必須取得（不可用「大概」代替）**：xwOBA、HH%、Barrel%、OPS、HR、BB%、上場場次、守位資格、PA/BBE（樣本量）
 

@@ -1,9 +1,12 @@
-"""Yahoo Fantasy API query tool — FA player search and player lookup."""
+"""Yahoo Fantasy API query tool — FA player search, player lookup, and Savant stats."""
 
 import argparse
+import csv
+import io
 import json
 import os
 import sys
+import unicodedata
 import urllib.parse
 import urllib.request
 
@@ -302,6 +305,110 @@ def send_telegram(message, env):
         return False
 
 
+def _normalize(name):
+    """Strip accents for fuzzy matching (Jesús → Jesus)."""
+    return "".join(
+        c for c in unicodedata.normalize("NFD", name)
+        if unicodedata.category(c) != "Mn"
+    ).lower()
+
+
+def _fetch_savant_csv(url):
+    """Fetch a Baseball Savant CSV leaderboard."""
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    resp = urllib.request.urlopen(req, timeout=20)
+    return resp.read().decode("utf-8-sig")
+
+
+def _match_player(rows, query):
+    """Find a player in Savant CSV rows by fuzzy name match."""
+    q = _normalize(query)
+    q_parts = q.split()
+    matches = []
+    for row in rows:
+        raw_name = row.get("\ufefflast_name, first_name") or row.get("last_name, first_name", "")
+        if not raw_name:
+            continue
+        # CSV format: "LastName, FirstName"
+        parts = [p.strip().strip('"') for p in raw_name.split(",")]
+        if len(parts) < 2:
+            continue
+        last = _normalize(parts[0])
+        first = _normalize(parts[1])
+        full = f"{first} {last}"
+        # Match: exact full name, or last name + first initial
+        if q == full or q == f"{last} {first}":
+            matches.append((row, 0))
+        elif last in q_parts and first.startswith(q_parts[0][:3]):
+            matches.append((row, 1))
+        elif last in q_parts:
+            matches.append((row, 2))
+    matches.sort(key=lambda x: x[1])
+    return matches[0][0] if matches else None
+
+
+def cmd_savant(args):
+    """Look up a player's Statcast data from Baseball Savant CSV."""
+    query = args.player
+    years = [int(args.year)] if args.year else [2026, 2025]
+
+    print(f"=== {query} — Statcast ===\n")
+
+    for year in years:
+        label = "本季" if year == 2026 else str(year)
+
+        # Statcast (HH%, Barrel%)
+        sc_url = (
+            f"https://baseballsavant.mlb.com/leaderboard/statcast"
+            f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+        )
+        # Expected stats (xwOBA)
+        ex_url = (
+            f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
+            f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+        )
+
+        hh_pct = barrel_pct = bbe = xwoba = None
+
+        try:
+            sc_text = _fetch_savant_csv(sc_url)
+            sc_rows = list(csv.DictReader(io.StringIO(sc_text)))
+            sc_match = _match_player(sc_rows, query)
+            if sc_match:
+                hh_pct = float(sc_match.get("ev95percent", 0) or 0)
+                barrel_pct = float(sc_match.get("brl_percent", 0) or 0)
+                bbe = int(sc_match.get("attempts", 0) or 0)
+        except Exception as e:
+            print(f"  Statcast CSV error ({year}): {e}", file=sys.stderr)
+
+        try:
+            ex_text = _fetch_savant_csv(ex_url)
+            ex_rows = list(csv.DictReader(io.StringIO(ex_text)))
+            ex_match = _match_player(ex_rows, query)
+            if ex_match:
+                xwoba = float(ex_match.get("est_woba", 0) or 0)
+                if bbe is None:
+                    bbe = int(ex_match.get("bip", 0) or 0)
+        except Exception as e:
+            print(f"  Expected CSV error ({year}): {e}", file=sys.stderr)
+
+        if hh_pct is not None or xwoba is not None:
+            parts = [f"{label}:"]
+            if xwoba:
+                parts.append(f"xwOBA {xwoba:.3f}")
+            if hh_pct is not None:
+                parts.append(f"HH% {hh_pct:.1f}%")
+            if barrel_pct is not None:
+                parts.append(f"Barrel% {barrel_pct:.1f}%")
+            if bbe:
+                parts.append(f"BBE {bbe}")
+            print("  " + " | ".join(parts))
+        else:
+            print(f"  {label}: no data found")
+
+    print()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Yahoo Fantasy API Query Tool")
     sub = parser.add_subparsers(dest="command")
@@ -319,9 +426,19 @@ def main():
     player_parser = sub.add_parser("player", help="Look up a specific player")
     player_parser.add_argument("player", help="Player name to search")
 
+    # Savant Statcast lookup
+    savant_parser = sub.add_parser("savant", help="Look up Statcast data from Baseball Savant")
+    savant_parser.add_argument("player", help="Player name to search")
+    savant_parser.add_argument("--year", "-y", help="Specific year (default: 2026 + 2025)")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
+        return
+
+    # Savant command doesn't need Yahoo auth
+    if args.command == "savant":
+        cmd_savant(args)
         return
 
     env = load_env()
