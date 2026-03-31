@@ -243,30 +243,60 @@ def fetch_lineups(date_str, season):
     return team_lineups
 
 
+def _parse_pitcher_stats(data):
+    """Parse pitcher stats from API response into dict."""
+    stat_groups = data.get("stats", [])
+    splits = stat_groups[0].get("splits", []) if stat_groups else []
+    if not splits:
+        return None
+    s = splits[0]["stat"]
+    ip = parse_ip(s.get("inningsPitched", 0))
+    hr = int(s.get("homeRuns", 0))
+    bb = int(s.get("baseOnBalls", 0))
+    hr9 = round(hr * 9 / ip, 1) if ip > 0 else 0
+    bb9 = round(bb * 9 / ip, 1) if ip > 0 else 0
+    return {
+        "era": s.get("era", "—"),
+        "hr9": hr9,
+        "bb9": bb9,
+        "ip": s.get("inningsPitched", "0"),
+    }
+
+
 def fetch_pitcher_season_stats(pitcher_id, season):
-    """Fetch pitcher's season stats (ERA, WHIP, K/9)."""
+    """Fetch pitcher's current + prior season stats (ERA, HR/9, BB/9)."""
     try:
         data = api_get(
             f"/people/{pitcher_id}/stats?stats=season&season={season}&group=pitching"
         )
-        stat_groups = data.get("stats", [])
-        splits = stat_groups[0].get("splits", []) if stat_groups else []
-        if not splits:
-            return None
-        s = splits[0]["stat"]
-        ip = parse_ip(s.get("inningsPitched", 0))
-        k = int(s.get("strikeOuts", 0))
-        k9 = round(k * 9 / ip, 1) if ip > 0 else 0
-        return {
-            "era": s.get("era", "—"),
-            "whip": s.get("whip", "—"),
-            "k9": k9,
-            "ip": f"{s.get('inningsPitched', '0')}",
-            "record": f"{s.get('wins', 0)}-{s.get('losses', 0)}",
-        }
+        current = _parse_pitcher_stats(data)
+        # Fetch prior year for small-sample context
+        prior = None
+        try:
+            data_prev = api_get(
+                f"/people/{pitcher_id}/stats?stats=season&season={season - 1}&group=pitching"
+            )
+            prior = _parse_pitcher_stats(data_prev)
+        except Exception:
+            pass
+        return {"current": current, "prior": prior}
     except Exception as e:
         print(f"Pitcher stats fetch failed ({pitcher_id}): {e}", file=sys.stderr)
         return None
+
+
+def format_pitcher_stats(stats):
+    """Format pitcher stats dict into display string (prior + current)."""
+    if not stats:
+        return ""
+    parts = []
+    prior = stats.get("prior")
+    current = stats.get("current")
+    if prior:
+        parts.append(f"去年: {prior['era']} ERA / {prior['hr9']} HR9 / {prior['bb9']} BB9, {prior['ip']} IP")
+    if current:
+        parts.append(f"本季: {current['era']} ERA / {current['hr9']} HR9 / {current['bb9']} BB9, {current['ip']} IP")
+    return " | ".join(parts)
 
 
 def fetch_team_hitting(team_id, season):
@@ -708,8 +738,9 @@ def analyze(config, target_date, env=None, morning=False):
             if sp_info:
                 sp_label = sp_info["name"]
                 st = sp_info.get("stats")
-                if st:
-                    sp_label += f", {st['era']} ERA / {st['k9']} K9"
+                stat_str = format_pitcher_stats(st)
+                if stat_str:
+                    sp_label += f" — {stat_str}"
                 lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} ({sp_label})")
             else:
                 lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} (SP TBD)")
@@ -722,17 +753,23 @@ def analyze(config, target_date, env=None, morning=False):
         for sp in sp_starts:
             opp_team_id = config["teams"].get(sp["opponent"])
             hitting = fetch_team_hitting(opp_team_id, season) if opp_team_id else None
-            # Base line: name vs opponent + hitting stats
+            # Line 1: name vs opponent
             parts = [f"  {sp['name']} ({sp['info']['team']}) vs {sp['opponent']}"]
-            if hitting:
-                parts.append(f"對手打線 AVG {hitting['avg']} / OPS {hitting['ops']}")
             # Park factor
             pf_label = get_park_factor(sp.get("venue_id"))
             if pf_label:
                 parts.append(pf_label)
             lines.append(" — ".join(parts))
-            # Recent 3 starts
+            # Line 2: SP's own stats (prior + current)
             mlb_id = sp["info"].get("mlb_id")
+            if mlb_id:
+                sp_own_stats = fetch_pitcher_season_stats(mlb_id, season)
+                stat_str = format_pitcher_stats(sp_own_stats)
+                if stat_str:
+                    lines.append(f"    {stat_str}")
+            # Line 3: opponent hitting
+            if hitting:
+                lines.append(f"    對手打線 AVG {hitting['avg']} / OPS {hitting['ops']}")
             if mlb_id:
                 try:
                     gamelog = fetch_pitcher_gamelog(mlb_id, season)
