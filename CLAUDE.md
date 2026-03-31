@@ -141,7 +141,7 @@
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
 | **Jordan Walker** | STL | LF/RF | 連 2 週 xwOBA > .300 + HH% > 41% (P50) | Kwan |
-| **Jesús Sánchez** | TOR | LF/CF/RF | 查 Statcast vs Kwan 基準，2/3 勝出 | Kwan 或 CF backup |
+| Jesús Sánchez | TOR | LF/CF/RF | BN 有空位 + 連 2 週 xwOBA > .320 | Kwan 或 CF backup（條件 Pass） |
 | **Colt Keith** | DET | 1B/2B/3B | 連 2 週 xwOBA > .280 + BB% > 8% | Walker(1B) |
 
 **投手**
@@ -155,7 +155,7 @@
 **近期行動**：
 - **Hancock 接近觸發**（03-31）：首秀 6 IP / 0 H / 9K（W），等 4/3-4/4 vs LAA 第 2 場驗證
 - **Walker EV 100.4 mph**（03-31）：Statcast 極強（xwOBA .688 / HH% 88.9%），Week 1 通過觸發，需 Week 2 驗證
-- **Sánchez 新加入**（03-31）：CF 資格 + .444/1.361，3% owned，需 /player-eval 深入查
+- **Sánchez 條件 Pass**（03-31）：/player-eval 結果 — 核心 3 指標只 HH% 勝出（1/3），xwOBA/BB% 與 Kwan 同區間。工具好但產出未兌現 + BN 無空位
 - **Vásquez 新加入**（03-31）：首場 6 IP / 8K / 0.00 ERA，24% owned 上升中
 - **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
 - **NA 格空位**：考慮 stash Dylan Crews（WSH, CF/RF），離 MLB 最近的 CF prospect，填 CF 弱點。待決定

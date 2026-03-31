@@ -24,9 +24,10 @@
 - 03-30：[waiver-scan] DET 年輕核心，多位置彈性（1B/2B/3B）。開季 .444/1.101/0HR/2BB。16% owned。**有 1B 資格**可直接替 Walker，O'Hearn 被搶後的替代監控目標。
 - 03-31：[waiver-scan] Statcast：xwOBA .426 / HH% 40% / Barrel% 0%。xwOBA 好但 Barrel% 0% = 靠接觸非力量，HR 潛力待驗證。繼續觀察。
 
-### Jesús Sánchez (TOR, LF/CF/RF)
-觸發：查 Statcast 確認 xwOBA/HH% vs Kwan 基準（.310/.19%），2 項勝出 → 考慮取代 Kwan 或作 CF backup
-- 03-31：[waiver-scan] 3% owned，Yahoo 排名 CF #1 FA。.444/1.361/1HR/2BB。LF/CF/RF 三資格 = Kwan 替換 + CF 深度雙重解。需跑 /player-eval 查 2025 全季 Statcast + 角色確認（TOR 是否給每日先發？）。
+### Jesús Sánchez (TOR, LF/CF/RF) — 條件 Pass
+重評條件：BN 有空位 + 連 2 週 xwOBA > .320 (P60+)
+- 03-31：[waiver-scan] 3% owned，Yahoo 排名 CF #1 FA。.444/1.361/1HR/2BB。LF/CF/RF 三資格。
+- 03-31：[eval] vs Kwan(LF)。2025: .237/.699 OPS / 14 HR / BB% 8.5%。Statcast: xwOBA .323 (~P60) / HH% 43.4% (~P55) / Barrel% 11.1%。核心 3 指標只 HH% 顯著勝出（1/3，不滿足 2/3 門檻）。xwOBA/BB% 與 Kwan 在同一百分位區間。2025 後半季 HOU 崩盤 .611 OPS。Steamer 只預測 369 PA。工具差距大（Bat Speed 93 pct）但產出未兌現。BN 無空位。**不換，但 CF 資格 + power 工具有 upside，列條件 Pass 觀察。**
 
 ### Randy Vásquez (SD, SP)
 觸發：前 2-3 場 ERA < 4.00 + K/9 > 7 → 串流或取代後段 SP
