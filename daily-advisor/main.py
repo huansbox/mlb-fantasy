@@ -1,6 +1,8 @@
 """Daily Advisor — Fantasy Baseball 每日陣容建議產生器"""
 
 import argparse
+import csv
+import io
 import json
 import os
 import subprocess
@@ -332,6 +334,103 @@ def format_batter_stats(current, prior, proj):
         parts.append(f"預測: {proj['ops']:.3f} OPS / {proj['hr_ab']:.3f} HR/AB / {proj['bb_pct']}% BB")
     if current:
         parts.append(f"本季: {current['ops']} OPS / {current['hr_ab']:.3f} HR/AB / {current['bb_pct']}% BB ({current['pa']} PA)")
+    return " | ".join(parts)
+
+
+def fetch_savant_statcast(year, roster_ids):
+    """Fetch Statcast data (Hard-Hit%, Barrel%) from Baseball Savant CSV.
+
+    Returns dict: player_id → {hh_pct, barrel_pct, bbe}
+    """
+    url = (
+        f"https://baseballsavant.mlb.com/leaderboard/statcast"
+        f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+    )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp = urllib.request.urlopen(req, timeout=15)
+        text = resp.read().decode("utf-8-sig")
+        reader = csv.DictReader(io.StringIO(text))
+        result = {}
+        id_set = set(str(i) for i in roster_ids)
+        for row in reader:
+            pid = row.get("player_id", "").strip()
+            if pid in id_set:
+                bip = int(row.get("attempts", 0) or 0)
+                result[int(pid)] = {
+                    "hh_pct": float(row.get("ev95percent", 0) or 0),
+                    "barrel_pct": float(row.get("brl_percent", 0) or 0),
+                    "bbe": bip,
+                }
+        return result
+    except Exception as e:
+        print(f"Savant statcast fetch failed ({year}): {e}", file=sys.stderr)
+        return {}
+
+
+def fetch_savant_expected(year, roster_ids):
+    """Fetch expected stats (xwOBA) from Baseball Savant CSV.
+
+    Returns dict: player_id → {xwoba, pa}
+    """
+    url = (
+        f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
+        f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+    )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp = urllib.request.urlopen(req, timeout=15)
+        text = resp.read().decode("utf-8-sig")
+        reader = csv.DictReader(io.StringIO(text))
+        result = {}
+        id_set = set(str(i) for i in roster_ids)
+        for row in reader:
+            pid = row.get("player_id", "").strip()
+            if pid in id_set:
+                result[int(pid)] = {
+                    "xwoba": float(row.get("est_woba", 0) or 0),
+                    "pa": int(row.get("pa", 0) or 0),
+                }
+        return result
+    except Exception as e:
+        print(f"Savant expected fetch failed ({year}): {e}", file=sys.stderr)
+        return {}
+
+
+def fetch_savant_for_roster(roster_ids, season):
+    """Fetch Savant data for current + prior year, return merged dict per player."""
+    result = {}
+    for year in [season, season - 1]:
+        label = "current" if year == season else "prior"
+        sc = fetch_savant_statcast(year, roster_ids)
+        ex = fetch_savant_expected(year, roster_ids)
+        for pid in roster_ids:
+            if pid not in result:
+                result[pid] = {}
+            s = sc.get(pid, {})
+            e = ex.get(pid, {})
+            if s or e:
+                result[pid][label] = {
+                    "hh_pct": s.get("hh_pct", 0),
+                    "barrel_pct": s.get("barrel_pct", 0),
+                    "bbe": s.get("bbe", 0),
+                    "xwoba": e.get("xwoba", 0),
+                }
+    return result
+
+
+def format_savant_stats(savant_data):
+    """Format Savant stats for display."""
+    if not savant_data:
+        return ""
+    parts = []
+    for label, key in [("去年", "prior"), ("本季", "current")]:
+        d = savant_data.get(key)
+        if d and (d["bbe"] > 0 or d["xwoba"] > 0):
+            parts.append(
+                f"{label}: {d['hh_pct']:.0f}% HH / {d['barrel_pct']:.1f}% Barrel"
+                f" / {d['xwoba']:.3f} xwOBA ({d['bbe']} BBE)"
+            )
     return " | ".join(parts)
 
 
@@ -776,6 +875,10 @@ def analyze(config, target_date, env=None, morning=False):
             prior = fetch_batter_season_stats(mlb_id, season - 1)
             batter_stats_cache[mlb_id] = {"current": current, "prior": prior}
 
+    # ── Pre-fetch Savant Statcast data ──
+    roster_ids = [b["mlb_id"] for b in batters if b.get("mlb_id")]
+    savant_cache = fetch_savant_for_roster(roster_ids, season)
+
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
     lines.append("我的打者：")
@@ -805,6 +908,9 @@ def analyze(config, target_date, env=None, morning=False):
             batter_line = format_batter_stats(bs.get("current"), bs.get("prior"), proj)
             if batter_line:
                 lines.append(f"    {batter_line}")
+            savant_line = format_savant_stats(savant_cache.get(mlb_id))
+            if savant_line:
+                lines.append(f"    Statcast: {savant_line}")
 
     # ── Section 2: SP starts ──
     lines.append("\n我的 SP 明日先發：")
