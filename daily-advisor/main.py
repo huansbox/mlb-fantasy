@@ -701,6 +701,12 @@ def analyze(config, target_date, env=None, morning=False):
                     my_key, access_token, config["mlb_id_map"]
                 )
                 print("Using live Yahoo roster.", file=sys.stderr)
+                # Merge static config fields (proj) into Yahoo roster data
+                config_batters = {b["name"]: b for b in config["batters"]}
+                for b in batters:
+                    cb = config_batters.get(b["name"], {})
+                    if "proj" in cb and "proj" not in b:
+                        b["proj"] = cb["proj"]
         except Exception as e:
             print(f"Yahoo roster fetch failed, using config: {e}", file=sys.stderr)
 
