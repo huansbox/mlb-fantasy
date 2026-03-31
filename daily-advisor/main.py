@@ -112,6 +112,59 @@ def team_abbr(name_or_id, season=2026):
     return m.get(str(name_or_id), str(name_or_id))
 
 
+# ── Park Factors (runs, 100 = neutral) ──
+# Source: ESPN Park Factors (5-year avg), updated 2025 offseason.
+# >100 = hitter-friendly, <100 = pitcher-friendly.
+PARK_FACTORS = {
+    # venue_id: (abbr, factor)
+    15: ("AZ", 104),     # Chase Field
+    680: ("ATL", 99),    # Truist Park
+    2: ("BAL", 101),     # Camden Yards
+    3: ("BOS", 104),     # Fenway Park
+    17: ("CHC", 100),    # Wrigley Field
+    4: ("CWS", 101),     # Guaranteed Rate Field
+    2602: ("CIN", 106),  # Great American Ball Park
+    5: ("CLE", 96),      # Progressive Field
+    19: ("COL", 114),    # Coors Field
+    2394: ("DET", 97),   # Comerica Park
+    2392: ("HOU", 100),  # Minute Maid Park
+    7: ("KC", 101),      # Kauffman Stadium
+    1: ("LAA", 97),      # Angel Stadium
+    22: ("LAD", 96),     # Dodger Stadium
+    4169: ("MIA", 93),   # LoanDepot Park
+    32: ("MIL", 101),    # American Family Field
+    3312: ("MIN", 100),  # Target Field
+    3289: ("NYM", 96),   # Citi Field
+    3313: ("NYY", 107),  # Yankee Stadium
+    10: ("ATH", 96),     # Oakland Coliseum (or Sacramento)
+    2681: ("PHI", 103),  # Citizens Bank Park
+    31: ("PIT", 96),     # PNC Park
+    2680: ("SD", 93),    # Petco Park
+    2395: ("SF", 95),    # Oracle Park
+    3309: ("SEA", 95),   # T-Mobile Park
+    14: ("STL", 97),     # Busch Stadium
+    12: ("TB", 95),      # Tropicana Field
+    5325: ("TEX", 103),  # Globe Life Field
+    2536: ("TOR", 100),  # Rogers Centre
+    3714: ("WSH", 99),   # Nationals Park
+}
+
+
+def get_park_factor(venue_id):
+    """Return park factor label for a venue. Empty string if neutral/unknown."""
+    if not venue_id:
+        return ""
+    pf = PARK_FACTORS.get(venue_id)
+    if not pf:
+        return ""
+    _, factor = pf
+    if factor >= 106:
+        return f"PF {factor} (打者有利)"
+    elif factor <= 95:
+        return f"PF {factor} (投手有利)"
+    return ""
+
+
 # ── Data fetching ──
 
 
@@ -123,6 +176,7 @@ def fetch_schedule(date_str):
         for g in d["games"]:
             away = g["teams"]["away"]
             home = g["teams"]["home"]
+            venue = g.get("venue", {})
             games.append({
                 "away_team": away["team"]["name"],
                 "home_team": home["team"]["name"],
@@ -131,6 +185,8 @@ def fetch_schedule(date_str):
                 "away_pitcher_id": away.get("probablePitcher", {}).get("id"),
                 "home_pitcher_id": home.get("probablePitcher", {}).get("id"),
                 "game_time": g.get("gameDate", ""),
+                "venue_name": venue.get("name", ""),
+                "venue_id": venue.get("id"),
             })
     return games
 
@@ -631,7 +687,13 @@ def analyze(config, target_date, env=None, morning=False):
             name = g.get(pitcher_key)
             if name and name in my_sp_names:
                 opp = team_abbr(g[opp_side], season)
-                sp_starts.append({"name": name, "opponent": opp, "info": my_sp_names[name]})
+                sp_starts.append({
+                    "name": name,
+                    "opponent": opp,
+                    "info": my_sp_names[name],
+                    "venue_id": g.get("venue_id"),
+                    "venue_name": g.get("venue_name", ""),
+                })
 
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
@@ -660,13 +722,30 @@ def analyze(config, target_date, env=None, morning=False):
         for sp in sp_starts:
             opp_team_id = config["teams"].get(sp["opponent"])
             hitting = fetch_team_hitting(opp_team_id, season) if opp_team_id else None
+            # Base line: name vs opponent + hitting stats
+            parts = [f"  {sp['name']} ({sp['info']['team']}) vs {sp['opponent']}"]
             if hitting:
-                lines.append(
-                    f"  {sp['name']} ({sp['info']['team']}) vs {sp['opponent']}"
-                    f" — 對手打線 AVG {hitting['avg']} / OPS {hitting['ops']}"
-                )
-            else:
-                lines.append(f"  {sp['name']} ({sp['info']['team']}) vs {sp['opponent']}")
+                parts.append(f"對手打線 AVG {hitting['avg']} / OPS {hitting['ops']}")
+            # Park factor
+            pf_label = get_park_factor(sp.get("venue_id"))
+            if pf_label:
+                parts.append(pf_label)
+            lines.append(" — ".join(parts))
+            # Recent 3 starts
+            mlb_id = sp["info"].get("mlb_id")
+            if mlb_id:
+                try:
+                    gamelog = fetch_pitcher_gamelog(mlb_id, season)
+                    recent = gamelog[-3:] if len(gamelog) >= 3 else gamelog
+                    if recent:
+                        lines.append(f"    近 {len(recent)} 場：")
+                        for gl in reversed(recent):
+                            lines.append(
+                                f"      {gl['date']} vs {team_abbr(gl['opponent'], season)}"
+                                f": {gl['ip']:.1f} IP / {gl['er']} ER / {gl['k']} K"
+                            )
+                except Exception:
+                    pass
     else:
         lines.append("  (無)")
 

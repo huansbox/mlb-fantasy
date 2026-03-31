@@ -12,6 +12,14 @@
 - Punt SV+H + 軟 Punt SB
 - 目標：R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中贏 8+
 
+決策框架（按優先順序）：
+1. H2H 態勢決定攻守模式：
+   - 領先 8+ → 保護模式（守比率，邊緣 SP 可坐）
+   - 7-5 / 7-6 → 穩住模式（維持優勢，不冒險）
+   - 6-6 以下 → 進攻模式（SP 全開，拼 counting stats）
+2. 比率類別（AVG/OPS/ERA/WHIP）領先時 → 保護優先，matchup 差的邊緣 SP 寧可坐
+3. 週初（Mon-Wed）可冒險，週末（Fri-Sun）優先鎖定領先類別
+
 輸出格式要求：
 - 使用 Telegram Markdown 格式
 - 簡潔直接，只列需要行動的項目
