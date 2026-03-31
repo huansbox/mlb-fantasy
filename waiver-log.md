@@ -5,6 +5,7 @@
 ### Emerson Hancock (SEA, SP)
 觸發：前 2-3 場 ERA < 3.50 + K/9 > 8 → 取代 Singer（首選候選）
 - 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
+- 03-31：[waiver-scan] 首秀確認 3/29 vs CLE：6 IP / 0 H / 0 R / 1 BB / 9K（W）— 六局無安打。NBC Sports 建議「立刻撿」。下一場預計 4/3-4/4 vs LAA。**接近觸發條件，第 2 場是關鍵驗證。**
 
 ### Andrew Painter (PHI, SP)
 觸發：前 2-3 場穩定投 6+ IP → 取代 Singer（備選，Hancock 優先）
@@ -14,12 +15,22 @@
 - 03-30：[eval] vs Singer，結論：**不換**。預測 111 IP / 4.62 ERA / 1.39 WHIP / ~100 K / 7 QS，全面輸 Singer（168 IP / 4.30 ERA / 1.30 WHIP / 136 K / 11 QS）。局數限制 110-130 IP 是硬傷，IP + QS 雙打折。TJS 術後球速/fastball shape 仍未完全恢復。降級為 Hancock 之後的備選。
 
 ### Jordan Walker (STL, LF/RF)
-觸發：連 2 週 OPS > .750 + BB% > 8% → 取代 Kwan
+觸發：連 2 週 xwOBA > .300 + HH% > 41% (P50) → 取代 Kwan
 - 03-30：[waiver-scan] 23 歲前 top prospect，2024-2025 低潮後 make-or-break 年。休季 Driveline 揮棒重建，STL 給每日 RF 先發。84th percentile sprint speed。開季 .400/1.400/1HR/2BB（5 PA，極小樣本）。3% owned。LF/RF 資格 = Kwan 替換方向。風險：過去兩年 AVG ~.220，approach 仍待驗證。
+- 03-31：[waiver-scan] Statcast 驚人 — Avg EV 100.4 mph / HH% 88.9% / Barrel% 33.3% / xwOBA .688（~9 BBE 極小樣本但 EV 是真實訊號）。3/29 vs TB 三分全壘打（EV 105.8）。9% owned 上升中。vs Kwan 基準（.310 xwOBA / 19% HH%）：即使打對折仍大幅勝出。**Week 1 通過觸發條件，需 Week 2 驗證。**
 
 ### Colt Keith (DET, 1B/2B/3B)
-觸發：連 2 週 OPS > .720 + BB% > 8% → 取代 Walker(1B)
+觸發：連 2 週 xwOBA > .280 + BB% > 8% → 取代 Walker(1B)
 - 03-30：[waiver-scan] DET 年輕核心，多位置彈性（1B/2B/3B）。開季 .444/1.101/0HR/2BB。16% owned。**有 1B 資格**可直接替 Walker，O'Hearn 被搶後的替代監控目標。
+- 03-31：[waiver-scan] Statcast：xwOBA .426 / HH% 40% / Barrel% 0%。xwOBA 好但 Barrel% 0% = 靠接觸非力量，HR 潛力待驗證。繼續觀察。
+
+### Jesús Sánchez (TOR, LF/CF/RF)
+觸發：查 Statcast 確認 xwOBA/HH% vs Kwan 基準（.310/.19%），2 項勝出 → 考慮取代 Kwan 或作 CF backup
+- 03-31：[waiver-scan] 3% owned，Yahoo 排名 CF #1 FA。.444/1.361/1HR/2BB。LF/CF/RF 三資格 = Kwan 替換 + CF 深度雙重解。需跑 /player-eval 查 2025 全季 Statcast + 角色確認（TOR 是否給每日先發？）。
+
+### Randy Vásquez (SD, SP)
+觸發：前 2-3 場 ERA < 4.00 + K/9 > 7 → 串流或取代後段 SP
+- 03-31：[waiver-scan] 24% owned 快速上升。首場 6 IP / 0.00 ERA / 0.83 WHIP / 8K。去年底子普通但開季亮眼。1 場不足，等第 2 場。
 
 ### 串流 SP 評估（2026-03-30）
 
@@ -108,6 +119,9 @@
 
 ### Justin Crawford (PHI, CF) — Pass
 - 03-27：PHI 先發 CF，MiLB .334/46SB 但只有 7 HR。預測 .286/7HR/29SB/.720 OPS。速度型球員在 punt SB 格式下價值大打折，扣掉 SB 後 profile 不如 Kwan。CF 資格有用但 Frelick 已覆蓋。
+
+### Owen Caissie (MIA, CF/RF) — Pass
+- 03-31：[waiver-scan] 已轉隊至 MIA（換 Cabrera）。角色為 RF/DH，不是 CF。.385/1.198/1HR，EV 98.3 / HH% 50% 亮眼，但不符 CF 需求且 MIA 打線弱。不追蹤。
 
 ### Alejandro Kirk (TOR, C) — Pass
 - 03-26：[eval] vs Langeliers，結論：不換。AVG/BB% 較優（.281/9.5% vs .277/~7%）但 HR 差距致命（15 vs 31）。Langeliers 是 top-5 C（ADP 55），Kirk 的比率優勢不足以彌補 counting stats 降級。
