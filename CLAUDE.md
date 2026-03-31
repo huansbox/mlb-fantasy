@@ -140,8 +140,8 @@
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Jordan Walker** | STL | LF/RF | 連 2 週 OPS > .750 + BB% > 8% | Kwan |
-| **Colt Keith** | DET | 1B/2B/3B | 連 2 週 OPS > .720 + BB% > 8% | Walker(1B) |
+| **Jordan Walker** | STL | LF/RF | 連 2 週 xwOBA > .300 + HH% > 41% (P50) | Kwan |
+| **Colt Keith** | DET | 1B/2B/3B | 連 2 週 xwOBA > .280 + BB% > 8% | Walker(1B) |
 
 **投手**
 
@@ -165,9 +165,9 @@
 
 | 條件 | 動作 |
 |------|------|
-| Walker 連 2 週 AVG < .200 | 撿 Colt Keith（有 1B 資格），drop Walker |
-| Kwan 連 2 週 OPS < .700 且無 power 改善 | 撿 Jordan Walker（LF/RF），drop Kwan |
-| Kwan 維持 OPS > .750 + HR pace > 15 | 不動，春訓 bat speed 改善兌現中 |
+| Walker 連 2 週 xwOBA < .262 (P25) + HH% < 36% (P25) | 撿 Colt Keith（有 1B 資格），drop Walker |
+| Kwan 連 2 週 xwOBA < .280 + HH% 無改善跡象 | 撿 Jordan Walker（LF/RF），drop Kwan |
+| Kwan xwOBA > .300 + HH% > 41% (P50) | 不動，過程指標顯示生產力正常 |
 | Singer 連 2 場 ERA > 5.00 + Hancock 連 2 場好投 | 撿 Hancock，drop Singer |
 | Singer 連 2 場 ERA > 5.00 + Hancock 一般但 Painter 穩定 6+ IP | 撿 Painter，drop Singer（備選） |
 | Singer 回穩（ERA < 4.50） | 不動，Singer 局數優勢（168 IP）仍是核心價值 |
@@ -185,7 +185,7 @@
 
 1. **移除打者 K（負向）** → 高三振球員完全解鎖（Judge、Schwarber 大升）
 2. **SLG → OPS** → 加入 OBP 維度，BB 雙重計算（BB 欄 + OPS 的 OBP）
-3. **BB 保留、AVG 保留** → 與 8×8 相同
+3. **BB 保留、AVG 保留但評估改用 xwOBA** → AVG 仍是計分類別，但 FA 評估用 xwOBA（穩定性高 2-3 倍，AVG 需 500+ PA 才穩定）
 4. **IP 取代投手 BB** → 工作馬 SP 暴漲（Webb +7、Valdez +5），控球型溢價消失
 5. **SV+H 合併** → RP 價值腰斬（覆蓋 1 類別而非 2）+ IP -2 再重創
 6. **勝負制（14 類別合計贏 8+）** → 可策略性 punt 2 項
@@ -228,7 +228,7 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 ## 45 秒速查決策規則（7×7 確認版）
 
-- **打者**：BB% > 10% → OPS > .830 → AVG > .260，兩項通過就選
+- **打者**：比較 xwOBA / BB% / Hard-Hit% 三項 vs 現有球員，2 項勝出就選。參照 MLB 百分位（P50：xwOBA .298 / BB% 8.2% / HH% 41%）判斷水準
 - **SP**：IP > 180 → ERA < 3.50，兩項通過就選
 - **RP**：最後幾輪才拿
 - **不確定時**：選高 BB 打者、高 IP 工作馬 SP、有 2B/3B 資格的
@@ -273,8 +273,25 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 
 ### Waiver Wire 篩選框架
 
-**正選級（先發）**：BB% > 10% → OPS > .830 → AVG > .260，兩項通過
-**替補級（backup）**：BB% > 8% → OPS > .720 → AVG > .240，不傷比率優先
+**打者評估（相對比較法 — 無固定門檻）**：以 3 項核心指標比較 FA vs 被取代球員：
+- **xwOBA**（取代 AVG，穩定性更高）
+- **BB%**（BB 欄 + OPS 的 OBP 端，7×7 雙重計算）
+- **Hard-Hit%**（過程指標，小樣本即有預測力）
+
+FA 在 3 項中至少 2 項優於被取代者 → 值得行動。差距在同一百分位區間內（如 P50-P75）視為不顯著；跨一個區間以上才視為有意義優勢。
+
+**2025 MLB 百分位分布**（評估參考框架）：
+
+| 百分位 | xwOBA | BB% | Hard-Hit% | Barrel% |
+|--------|-------|-----|-----------|---------|
+| P25 | .262 | 6.2% | 36% | 5.0% |
+| P50 | .298 | 8.2% | 41% | 8.2% |
+| P75 | .327 | 10.5% | 46% | 11.4% |
+| P90 | .350 | 12.7% | 50% | 14.2% |
+
+（2025 全季數據；2026 分布約 Week 6-8 更新）
+
+**數據來源**：傳統 stats（OPS/HR-AB/BB%）= MLB Stats API；Statcast（HH%/Barrel%/xwOBA）= Baseball Savant CSV。取當季 + 前一年，附樣本量（PA/BBE）。
 
 ### SP 篩選標準
 - **選秀/正選級**：IP > 180 → ERA < 3.50，兩項通過

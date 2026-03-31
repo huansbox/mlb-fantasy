@@ -44,12 +44,14 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 
 ### 打者 — WebSearch 查詢清單
 
-1. `{球員名} {去年} stats batting` → 取得 AVG / OBP / SLG / OPS / HR / SB / BB%
-2. `{球員名} {今年} projected stats fantasy` → Steamer/ATC 預測
-3. `{球員名} {今年} news spring training` → 近況、傷病、WBC、角色
-4. `{球員名} position eligibility yahoo fantasy` → Yahoo 守位資格
+1. `{球員名} {去年} stats batting` → 取得 OPS / HR / SB / BB%
+2. `{球員名} {去年} statcast baseball savant xwOBA hard-hit barrel` → 取得 xwOBA、Hard-Hit%、Barrel%、BBE
+3. `{球員名} {今年} projected stats fantasy` → Steamer/ATC 預測
+4. `{球員名} {今年} statcast xwOBA hard-hit%` → 當季 Statcast（開季後）
+5. `{球員名} {今年} news spring training` → 近況、傷病、WBC、角色
+6. `{球員名} position eligibility yahoo fantasy` → Yahoo 守位資格
 
-**必須取得（不可用「大概」代替）**：AVG、OPS、HR、BB%、上場場次、守位資格
+**必須取得（不可用「大概」代替）**：xwOBA、HH%、Barrel%、OPS、HR、BB%、上場場次、守位資格、PA/BBE（樣本量）
 
 ### 投手 — WebSearch 查詢清單
 
@@ -75,18 +77,35 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 
 ## Step 2：7×7 篩選框架
 
-### 打者門檻
+### 打者評估（相對比較法 — 無固定門檻）
 
-**正選級**（兩項通過）：BB% > 10%、OPS > .830、AVG > .260
+**核心 3 指標**：xwOBA、BB%、Hard-Hit%
+**輔助指標**：Barrel%（確認 HH% 品質）、OPS（計分類別直接影響）
 
-**替補級**（不傷比率）：BB% > 8%、OPS > .720、AVG > .240
+**評估方法**：
+1. 將 FA 的 3 項核心指標逐項比較被取代球員
+2. FA 在 3 項中至少 2 項優於被取代者 → 值得行動
+3. 差距顯著性：差距在同一百分位區間內（如 P50-P75）視為不顯著；跨一個區間以上才視為有意義優勢
+4. 樣本量加權：當季 PA < 50 / BBE < 30 → 以前一年為主要基準，當季僅作傾向參考
+
+**2025 MLB 百分位分布**：
+
+| 百分位 | xwOBA | BB% | Hard-Hit% | Barrel% |
+|--------|-------|-----|-----------|---------|
+| P25 | .262 | 6.2% | 36% | 5.0% |
+| P50 | .298 | 8.2% | 41% | 8.2% |
+| P75 | .327 | 10.5% | 46% | 11.4% |
+| P90 | .350 | 12.7% | 50% | 14.2% |
+（2025 全季數據；2026 分布約 Week 6-8 更新）
 
 **格式特殊規則**：
 - BB% 是最高效指標（BB 欄 + OPS 的 OBP 端，雙重計算）
-- 無打者 K 類別 → K% 不直接扣分，只間接拖 AVG
-- Punt SB → 速度價值打折，但非零（偶爾能贏）
-- AVG 是比率類別 → 一個 .220 打者每天固定拖全隊 AVG，比 counting stats 少幾分更致命
+- 無打者 K 類別 → K% 不直接扣分
+- Punt SB → 速度價值打折，但非零
+- AVG 仍是計分類別 → xwOBA 低的打者通常也拖 AVG，但不單獨用 AVG 作篩選門檻
 - 外野分拆 LF/CF/RF → CF 資格在當前陣容溢價最高（Buxton 傷病風險），評估 OF 必須區分具體位置
+- 不使用連續場次 hot/cold streaks 作為評估依據（零預測力）
+- 不使用 BvP 歷史對戰（樣本太小）
 
 ### 投手門檻
 
@@ -101,7 +120,9 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 ## Step 3：比較與輸出
 
 用表格逐項列出 7×7 類別的實際數值對比：
-- 打者欄位：AVG / HR / RBI / OPS / BB% / SB（權重低）/ 守位（LF/CF/RF 分開）/ 近況
+- 打者欄位：xwOBA / HH% / Barrel% / OPS / BB% / HR / RBI / SB（權重低）/ 守位（LF/CF/RF 分開）
+  - 附 MLB 百分位定位（如 xwOBA .320 = ~P70）
+  - 附樣本量（PA / BBE）
 - 投手欄位：IP（權重高）/ ERA / WHIP / K/9 / QS 潛力 / W 支援 / SV+H（Punt，不追）/ 近況
 
 末行給明確決策結論。**「不動也是策略」** — 如果 FA 球員未明顯優於現有球員，結論應為「不換」。
@@ -135,7 +156,7 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 
 - [ ] 所有數值都來自搜尋結果，沒有用「大概」替代？查不到的有標記？
 - [ ] 有沒有查近況（春訓/WBC/傷病/角色變化）？球員有沒有轉隊？
-- [ ] AVG 差距有沒有考慮比率拖累效應？
+- [ ] xwOBA/HH% 差距有沒有跨百分位區間？同區間內的差距不算顯著
 - [ ] 投手有沒有確認預測 IP？（IP 受限 → IP + QS 都打折）
 - [ ] 小樣本數據有沒有標記？（< 80 場/IP、季初 < 30 PA）
 - [ ] 有沒有回到陣容脈絡判斷邊際效益？不動是否才是最佳策略？
