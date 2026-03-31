@@ -1,17 +1,17 @@
 {
   "batters": [
-    {"name": "Shea Langeliers",   "mlb_id": 669127, "team": "ATH", "positions": ["C"],        "role": "starter", "proj": {"ops": .795, "hr_ab": .060, "bb_pct": 7.5}},
-    {"name": "Christian Walker",   "mlb_id": 572233, "team": "HOU", "positions": ["1B"],       "role": "starter", "proj": {"ops": .734, "hr_ab": .051, "bb_pct": 8.5}},
-    {"name": "Jazz Chisholm Jr.",  "mlb_id": 665862, "team": "NYY", "positions": ["2B", "3B"], "role": "starter", "proj": {"ops": .763, "hr_ab": .054, "bb_pct": 9.5}},
-    {"name": "Manny Machado",      "mlb_id": 592518, "team": "SD",  "positions": ["3B"],       "role": "starter", "proj": {"ops": .795, "hr_ab": .049, "bb_pct": 8.1}},
-    {"name": "Ezequiel Tovar",     "mlb_id": 678662, "team": "COL", "positions": ["SS"],       "role": "starter", "proj": {"ops": .745, "hr_ab": .036, "bb_pct": 5.2}},
-    {"name": "Jose Altuve",        "mlb_id": 514888, "team": "HOU", "positions": ["2B", "LF"], "role": "starter", "proj": {"ops": .767, "hr_ab": .039, "bb_pct": 8.3}},
-    {"name": "Byron Buxton",       "mlb_id": 621439, "team": "MIN", "positions": ["CF"],       "role": "starter", "proj": {"ops": .802, "hr_ab": .058, "bb_pct": 7.7}},
-    {"name": "Lawrence Butler",    "mlb_id": 671732, "team": "ATH", "positions": ["CF", "RF"], "role": "starter", "proj": {"ops": .747, "hr_ab": .044, "bb_pct": 8.8}},
-    {"name": "Ozzie Albies",       "mlb_id": 645277, "team": "ATL", "positions": ["2B"],       "role": "starter", "proj": {"ops": .740, "hr_ab": .034, "bb_pct": 7.6}},
-    {"name": "Steven Kwan",        "mlb_id": 680757, "team": "CLE", "positions": ["LF"],       "role": "starter", "proj": {"ops": .746, "hr_ab": .021, "bb_pct": 9.5}},
-    {"name": "Sal Frelick",        "mlb_id": 686217, "team": "MIL", "positions": ["LF", "CF", "RF"], "role": "bench", "proj": {"ops": .727, "hr_ab": .020, "bb_pct": 8.2}},
-    {"name": "Giancarlo Stanton",  "mlb_id": 519317, "team": "NYY", "positions": ["LF", "RF"], "role": "bench", "proj": {"ops": .775, "hr_ab": .068, "bb_pct": 9.3}}
+    {"name": "Shea Langeliers",   "mlb_id": 669127, "team": "ATH", "positions": ["C"],        "role": "starter", "proj": {"ops": 0.795, "hr_ab": 0.060, "bb_pct": 7.5}},
+    {"name": "Christian Walker",   "mlb_id": 572233, "team": "HOU", "positions": ["1B"],       "role": "starter", "proj": {"ops": 0.734, "hr_ab": 0.051, "bb_pct": 8.5}},
+    {"name": "Jazz Chisholm Jr.",  "mlb_id": 665862, "team": "NYY", "positions": ["2B", "3B"], "role": "starter", "proj": {"ops": 0.763, "hr_ab": 0.054, "bb_pct": 9.5}},
+    {"name": "Manny Machado",      "mlb_id": 592518, "team": "SD",  "positions": ["3B"],       "role": "starter", "proj": {"ops": 0.795, "hr_ab": 0.049, "bb_pct": 8.1}},
+    {"name": "Ezequiel Tovar",     "mlb_id": 678662, "team": "COL", "positions": ["SS"],       "role": "starter", "proj": {"ops": 0.745, "hr_ab": 0.036, "bb_pct": 5.2}},
+    {"name": "Jose Altuve",        "mlb_id": 514888, "team": "HOU", "positions": ["2B", "LF"], "role": "starter", "proj": {"ops": 0.767, "hr_ab": 0.039, "bb_pct": 8.3}},
+    {"name": "Byron Buxton",       "mlb_id": 621439, "team": "MIN", "positions": ["CF"],       "role": "starter", "proj": {"ops": 0.802, "hr_ab": 0.058, "bb_pct": 7.7}},
+    {"name": "Lawrence Butler",    "mlb_id": 671732, "team": "ATH", "positions": ["CF", "RF"], "role": "starter", "proj": {"ops": 0.747, "hr_ab": 0.044, "bb_pct": 8.8}},
+    {"name": "Ozzie Albies",       "mlb_id": 645277, "team": "ATL", "positions": ["2B"],       "role": "starter", "proj": {"ops": 0.740, "hr_ab": 0.034, "bb_pct": 7.6}},
+    {"name": "Steven Kwan",        "mlb_id": 680757, "team": "CLE", "positions": ["LF"],       "role": "starter", "proj": {"ops": 0.746, "hr_ab": 0.021, "bb_pct": 9.5}},
+    {"name": "Sal Frelick",        "mlb_id": 686217, "team": "MIL", "positions": ["LF", "CF", "RF"], "role": "bench", "proj": {"ops": 0.727, "hr_ab": 0.020, "bb_pct": 8.2}},
+    {"name": "Giancarlo Stanton",  "mlb_id": 519317, "team": "NYY", "positions": ["LF", "RF"], "role": "bench", "proj": {"ops": 0.775, "hr_ab": 0.068, "bb_pct": 9.3}}
   ],
   "pitchers": [
     {"name": "Tarik Skubal",    "mlb_id": 669373, "team": "DET", "type": "SP", "role": "starter"},
