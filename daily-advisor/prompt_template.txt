@@ -27,9 +27,10 @@
 
 1. *休兵提醒* — 列出沒比賽的球員，建議誰替補上場
 2. *Lineup 建議* — 綜合對方先發投手 matchup 判斷：
-   - 數據中標示了對方 SP 的去年+本季 ERA/HR9/BB9 和 IP（IP 代表樣本量，本季 IP 極小時以去年為主）
+   - 數據中標示了對方 SP 的去年+本季 ERA/HR9/BB9、IP，以及 Savant（HH% allowed / Barrel% allowed）
+   - HH% allowed 高 = 容易被打硬 → 我的打者有肉吃；低 = 難打出硬接觸
    - 全員有比賽時：比較 12 人的 matchup，建議最差的 2 人坐板凳，並引用具體數據說明理由
-   - 板凳 vs 先發二選一時：必須引用雙方對手 SP 的關鍵數據做比較（如「Kwan vs Ohtani 去年 2.87 ERA > Frelick vs Civale 4.85 ERA → 坐 Kwan」）
+   - 板凳 vs 先發二選一時：優先比 Savant（HH%/Barrel% allowed），再看傳統 ERA
    - 不要只說「matchup 不好」或「也不輕鬆」— 每個選擇判斷都要附 1 句數據理由
 3. *Lineup 狀態* — 根據實際 Lineup 資料（速報時段部分球隊可能未公布）：
    - 已確認先發 → 簡短列出

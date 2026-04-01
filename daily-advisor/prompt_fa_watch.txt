@@ -2,7 +2,8 @@
 
 聯賽：12 隊 H2H One Win 7×7，Punt SV+H + 軟 Punt SB
 陣容弱點：CF 深度（Buxton 傷病風險）、Kwan 最弱（xwOBA .310 / HH% 19%，均 ≤ P50）
-打者評估基準：xwOBA / BB% / Hard-Hit% 三項，與陣容現有球員相對比較，非固定門檻。P50 參考：xwOBA .298 / BB% 8.2% / HH% 41%
+打者評估基準：xwOBA / BB% / Hard-Hit% 三項，與陣容現有球員相對比較。P50 參考：xwOBA .297 / BB% 7.8% / HH% 40.4%
+投手評估基準：xERA / xwOBA allowed / HH% allowed 三項，與陣容最弱 SP 相對比較。P50 參考：xERA 4.33 / xwOBA .322 / HH% 40.8%
 
 我的陣容摘要附在數據區段中。
 

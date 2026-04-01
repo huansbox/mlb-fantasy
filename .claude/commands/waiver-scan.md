@@ -77,12 +77,17 @@ Yahoo API 只能看到「誰是 FA」和排名，無法看到新聞脈絡。用 
 **次要找**：
 - 打者 FA — 用 3 項核心指標（xwOBA / BB% / Hard-Hit%）比較 roster-baseline.md 中最弱正選打者：
   - FA 在 3 項中至少 2 項優於被取代者 → 加入觀察
-  - 參照 MLB 百分位判斷顯著性（P50：xwOBA .298 / BB% 8.2% / HH% 41%）
-  - 數據來源：Yahoo API（OPS/BB%）+ WebSearch 補 Savant（xwOBA/HH%/Barrel%）
+  - 參照 MLB 百分位判斷顯著性（見 CLAUDE.md 百分位表，差距 ≥ 10 百分位點 = 有意義）
+  - 數據來源：`python daily-advisor/yahoo_query.py savant "{球員名}"`（xwOBA/HH%/Barrel%）+ Yahoo API（OPS/BB%）
   - 小樣本（PA < 50）時以前一年為主
-- SP 分兩層篩選（不變）：
-  - 全季型：預測 IP > 150 + ERA < 4.00（in-season FA 整體質量低於選秀，門檻放寬）
+- SP FA — 用 3 項核心指標（xERA / xwOBA allowed / HH% allowed）比較 roster-baseline.md 中最弱 SP：
+  - FA 在 3 項中至少 2 項優於被取代者 → 加入觀察
+  - 參照 MLB 百分位判斷顯著性（見 CLAUDE.md 投手百分位表，差距 ≥ 10 百分位點 = 有意義）
+  - 數據來源：`python daily-advisor/yahoo_query.py savant "{球員名}"`（自動偵測投手）+ WebSearch 補 IP 預測
+  - 小樣本（BBE < 30）時以前一年為主
+  - 全季型門檻：xERA < P50 (4.33) + 預測 IP > 150
   - 串流型：下週有 2 先發 + 對戰後段打線，不看全季預測
+  - xERA vs ERA 差距 > 0.50 → 標記運氣成分
 
 > 12 隊聯賽中 xwOBA > P90 (.350) 的 FA 基本不存在。若出現，代表是其他 manager 的 drop 失誤，需特別注意。
 

@@ -2,9 +2,10 @@
 
 聯賽：12 隊 H2H One Win 7×7，Punt SV+H + 軟 Punt SB
 打者篩選：比較 FA vs 我的最弱球員的 3 項核心指標（xwOBA / BB% / Hard-Hit%），2 項勝出就值得觀察。
-MLB 百分位參考（2025 全季）：P25 xwOBA .262 / BB% 6.2% / HH% 36% | P50 .298 / 8.2% / 41% | P75 .327 / 10.5% / 46%
-數據來源：附帶的 FA 數據若包含 OPS/BB% 等傳統 stats，可用於初篩；xwOBA/HH% 若無數據則建議跑 /player-eval 深入查。
-SP in-season 門檻：預測 IP > 150 + ERA < 4.00（開季正選門檻 IP>180/ERA<3.50 的放寬版）
+打者百分位參考（2025）：P25 xwOBA .261 / BB% 5.8% / HH% 34.6% | P50 .297 / 7.8% / 40.4% | P70 .321 / 9.6% / 44.7% | P90 .349 / 12.2% / 49.7%
+投手百分位參考（2025，P90=菁英=低值）：P50 xERA 4.33 / xwOBA .322 / HH% 40.8% | P70 xERA 3.74 / xwOBA .301 / HH% 38.0% | P90 xERA 2.98 / xwOBA .270 / HH% 34.1%
+數據來源：附帶的 FA 數據若包含 OPS/BB%/ERA 等傳統 stats，可用於初篩；xwOBA/HH%/xERA 若無數據則建議跑 /player-eval 深入查。
+SP 篩選：3 項核心指標（xERA / xwOBA allowed / HH% allowed）比較我的最弱 SP，2 項勝出就值得觀察。門檻：xERA < P50 (4.33) + 預測 IP > 150。xERA vs ERA 差距 > 0.50 → 標記運氣。
 跳過：純速度型（punt SB）、RP/CL（punt SV+H）
 
 我的陣容和弱點附在數據區段中。

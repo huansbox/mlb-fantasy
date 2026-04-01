@@ -62,13 +62,23 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 
 **必須取得（不可用「大概」代替）**：xwOBA、HH%、Barrel%、OPS、HR、BB%、上場場次、守位資格、PA/BBE（樣本量）
 
-### 投手 — WebSearch 查詢清單
+### 投手 — 資料蒐集
+
+**Step 1.1：Savant Statcast（優先，取代 WebSearch）**
+
+```bash
+python daily-advisor/yahoo_query.py savant "{球員名}"
+```
+
+> 自動偵測投手，回傳 2025 + 2026 的 xERA / xwOBA allowed / HH% allowed / Barrel% allowed / BBE。
+
+**Step 1.2：WebSearch 補充**
 
 1. `{球員名} {去年} stats ERA WHIP strikeouts innings` → 完整投球數據
 2. `{球員名} {今年} projected stats fantasy SP` → 預測 IP / ERA / K
 3. `{球員名} {今年} news injury rotation` → 傷病、輪值順位、IP 限制
 
-**必須取得**：ERA、WHIP、K/9、**預測全季 IP**、球隊名（判斷 W 支援）
+**必須取得**：xERA、xwOBA allowed、HH% allowed、ERA、WHIP、K/9、**預測全季 IP**、球隊名（判斷 W 支援）、BBE（樣本量）
 
 ### 高風險觸發點（查到以下情況需額外處理）
 
@@ -97,15 +107,9 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 3. 差距顯著性：差距在同一百分位區間內（如 P50-P75）視為不顯著；跨一個區間以上才視為有意義優勢
 4. 樣本量加權：當季 PA < 50 / BBE < 30 → 以前一年為主要基準，當季僅作傾向參考
 
-**2025 MLB 百分位分布**：
+**2025 MLB 百分位分布**（P90 = 菁英，投打通用）：見 CLAUDE.md 百分位表（9 格版：P25/P40/P45/P50/P55/P60/P70/P80/P90）。
 
-| 百分位 | xwOBA | BB% | Hard-Hit% | Barrel% |
-|--------|-------|-----|-----------|---------|
-| P25 | .262 | 6.2% | 36% | 5.0% |
-| P50 | .298 | 8.2% | 41% | 8.2% |
-| P75 | .327 | 10.5% | 46% | 11.4% |
-| P90 | .350 | 12.7% | 50% | 14.2% |
-（2025 全季數據；2026 分布約 Week 6-8 更新）
+**顯著性規則**：差距 ≥ 10 百分位點 = 有意義。
 
 **格式特殊規則**：
 - BB% 是最高效指標（BB 欄 + OPS 的 OBP 端，雙重計算）
@@ -116,12 +120,24 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 - 不使用連續場次 hot/cold streaks 作為評估依據（零預測力）
 - 不使用 BvP 歷史對戰（樣本太小）
 
-### 投手門檻
+### 投手評估（相對比較法 — 同打者邏輯）
 
-**SP**（兩項通過）：預測 IP > 180、ERA < 3.50
+**核心 3 指標**：xERA、xwOBA allowed、HH% allowed
+**輔助指標**：Barrel% allowed（確認 HH% 品質）、ERA（計分類別直接影響）、IP（工作量類別）
+
+**評估方法**：
+1. 將 FA SP 的 3 項核心指標逐項比較被取代投手
+2. FA 在 3 項中至少 2 項優於被取代者 → 值得行動
+3. 顯著性：差距 ≥ 10 百分位點 = 有意義（見 CLAUDE.md 百分位表）
+4. 樣本量加權：當季 BBE < 30 / IP < 15 → 以前一年為主要基準
+5. **xERA vs ERA 差距 > 0.50** → 標記運氣成分（ERA 低但 xERA 高 = 運氣好，遲早崩）
+
+**SP 門檻**：
+- **正選級**：xERA < P60 (4.04) + IP > 180
+- **FA 放寬版**：xERA < P50 (4.33) + IP > 150
 
 **格式特殊規則**：
-- **IP 是獨立類別** → 局數怪物（190 IP / ERA 3.80）格式價值 > 精品短局型（100 IP / ERA 3.00）
+- **IP 是獨立類別** → 局數怪物（190 IP / xERA 4.00）格式價值 > 精品短局型（100 IP / xERA 3.00）
 - QS 需要 6+ IP → IP 受限（傷癒、新秀保護）的投手 QS 打折
 - W 受球隊影響 → 強隊 SP 有 W 加成
 - Punt SV+H → RP 只看 ERA/WHIP 比率，不追救援
@@ -132,7 +148,10 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 - 打者欄位：xwOBA / HH% / Barrel% / OPS / BB% / HR / RBI / SB（權重低）/ 守位（LF/CF/RF 分開）
   - 附 MLB 百分位定位（如 xwOBA .320 = ~P70）
   - 附樣本量（PA / BBE）
-- 投手欄位：IP（權重高）/ ERA / WHIP / K/9 / QS 潛力 / W 支援 / SV+H（Punt，不追）/ 近況
+- 投手欄位：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / IP（權重高）/ ERA / WHIP / K/9 / QS 潛力 / W 支援 / SV+H（Punt，不追）/ 近況
+  - 附 MLB 百分位定位（如 xERA 3.50 = ~P75）
+  - 附樣本量（BBE）
+  - xERA vs ERA 差距 > 0.50 時標記運氣方向
 
 末行給明確決策結論。**「不動也是策略」** — 如果 FA 球員未明顯優於現有球員，結論應為「不換」。
 
@@ -165,7 +184,7 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 
 - [ ] 所有數值都來自搜尋結果，沒有用「大概」替代？查不到的有標記？
 - [ ] 有沒有查近況（春訓/WBC/傷病/角色變化）？球員有沒有轉隊？
-- [ ] xwOBA/HH% 差距有沒有跨百分位區間？同區間內的差距不算顯著
-- [ ] 投手有沒有確認預測 IP？（IP 受限 → IP + QS 都打折）
+- [ ] xwOBA/HH% 差距有沒有 ≥ 10 百分位點？不到就不算顯著
+- [ ] 投手有沒有查 xERA + 確認預測 IP？（xERA vs ERA 差距 > 0.50 要標記運氣）
 - [ ] 小樣本數據有沒有標記？（< 80 場/IP、季初 < 30 PA）
 - [ ] 有沒有回到陣容脈絡判斷邊際效益？不動是否才是最佳策略？

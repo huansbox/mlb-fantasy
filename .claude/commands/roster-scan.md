@@ -37,7 +37,7 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 python daily-advisor/roster_stats.py
 ```
 
-> 輸出 markdown 表格：打者（G/PA/xwOBA/HH%/Barrel%/OPS/HR/BB%/BBE + 去年基準）+ 投手（GS/IP/ERA/WHIP/K/W/QS）。
+> 輸出 markdown 表格：打者（G/PA/xwOBA/HH%/Barrel%/OPS/HR/BB%/BBE + 去年基準）+ 投手（GS/IP/ERA/WHIP/K/W/QS + xERA/xwOBA/HH%/Barrel%/BBE + 去年基準）。
 > 直接複製到 roster-baseline.md，不需手動搜尋。
 > VPS 上需加 `export $(cat /etc/calorie-bot/op-token.env) &&` 前綴。
 
@@ -75,9 +75,9 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 
 **投手表格**：
 ```markdown
-| 球員 | 隊伍 | GS | IP | ERA | WHIP | K | W | QS | 趨勢 |
+| 球員 | 隊伍 | GS | IP | ERA | WHIP | K | W | QS | xERA | xwOBA | HH% | Barrel% | BBE | 趨勢 |
 ```
-> QS：有實際數據時填入，無數據時用粗估（ERA < 3.50 ≈ 18-22 QS；3.50-4.00 ≈ 14-17；4.00-4.50 ≈ 10-13）。
+> QS：有實際數據時填入，無數據時用粗估（xERA < 3.50 ≈ 18-22 QS；3.50-4.00 ≈ 14-17；4.00-4.50 ≈ 10-13）。
 
 ### 趨勢標記規則
 
@@ -85,10 +85,10 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 
 | 標記 | 含義 | 打者觸發條件 | 投手觸發條件 |
 |------|------|------------|------------|
-| ▲ | 超越預測 | xwOBA 比前一年高 .025+ 或 HH% 高 5+ 百分點 | ERA 比預測低 0.50+ 或 K/9 超預測 1.0+ |
-| — | 符合預測 | xwOBA/HH% 在前一年 ±10% 內 | 各項在預測值 ±10% 內 |
-| ▼ | 低於預測 | xwOBA 比前一年低 .025+ 或 HH% 低 5+ 百分點 | ERA 比預測高 0.50+ 或 IP pace 低於預測 15%+ |
-| ⚠️ | 需要關注 | 連 2 週 ▼ 或觸及 CLAUDE.md 行動觸發規則 | 連 2 週 ▼ 或 WHIP > 1.50 |
+| ▲ | 超越預測 | xwOBA 比前一年高 .025+ 或 HH% 高 5+ 百分點 | xERA 比前一年低 0.30+ 或 HH% allowed 低 3+ 百分點 |
+| — | 符合預測 | xwOBA/HH% 在前一年 ±10% 內 | xERA/HH% allowed 在前一年 ±10% 內 |
+| ▼ | 低於預測 | xwOBA 比前一年低 .025+ 或 HH% 低 5+ 百分點 | xERA 比前一年高 0.30+ 或 HH% allowed 高 3+ 百分點 |
+| ⚠️ | 需要關注 | 連 2 週 ▼ 或觸及 CLAUDE.md 行動觸發規則 | 連 2 週 ▼ 或 xERA > P25 (5.62) |
 
 > **小樣本警告**：Week 3-6 期間，所有趨勢標記後加註 `(小樣本)` 提醒。
 
@@ -116,14 +116,16 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 2. **過程指標警報**：
    - 任何正選打者 xwOBA < .262 (P25) + HH% < 36% (P25)（過程指標雙低 = 結構性問題，非小樣本噪音）
    - Barrel% 同時 < 5% (P25) 時加重標記
-   - 任何 SP ERA > 5.50 且 WHIP > 1.60（拖比率）
+   - 任何 SP xERA > P25 (5.62) + HH% allowed > P25 (44.2%)（過程指標雙差 = 結構性問題）
+   - ERA > 5.50 且 WHIP > 1.60 輔助確認（結果指標也差 → 更確定）
 
 ### 需要觀察（標記但不立即行動）
 
 3. **表現偏離預測**：
    - 打者 xwOBA 比前一年低 .030+ 且 BBE > 30（過程指標偏離比結果指標更早示警）
    - 打者 HH% 比前一年低 5+ 百分點且 BBE > 30
-   - SP ERA 比預測高 1.00+ 且已過 20 IP
+   - SP xERA 比前一年高 0.50+ 且 BBE > 30（過程指標偏離比 ERA 更早示警）
+   - SP HH% allowed 比前一年高 3+ 百分點且 BBE > 30
 
 4. **正面驚喜**：
    - 任何球員大幅超越預測 → 標記「勿 drop」，避免被短期低潮誤判
