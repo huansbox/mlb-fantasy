@@ -21,6 +21,7 @@ from main import (
     fetch_savant_statcast,
     fetch_savant_expected,
     fetch_pitcher_gamelog,
+    fetch_savant_for_pitchers,
     parse_ip,
 )
 
@@ -164,9 +165,15 @@ def main():
         print(f"| {b['name']} | {pos} | {g} | {pa} | {xwoba} | {hh} | {barrel} | {ops} | {hr} | {bb_pct} | {bbe} | {xwoba_pri} | {hh_pri} |")
 
     # ── Pitchers ──
-    print(f"\n=== 投手（{season}）===\n")
-    print("| 球員 | 隊伍 | Type | GS | IP | ERA | WHIP | K | W | QS |")
-    print("|------|------|------|----|----|-----|------|---|---|----|")
+    pitcher_ids = [p["mlb_id"] for p in pitchers if p.get("mlb_id")]
+
+    print("Fetching pitcher Savant CSV...", file=sys.stderr)
+    pitcher_savant = fetch_savant_for_pitchers(pitcher_ids, season)
+
+    print(f"\n=== 投手（{season} 本季 + {season-1} 基準）===\n")
+    header = f"| 球員 | 隊伍 | Type | GS | IP | ERA | WHIP | K | W | QS | xERA | xwOBA | HH% | Barrel% | BBE | xERA({season-1}) | HH%({season-1}) |"
+    print(header)
+    print("|------|------|------|----|----|-----|------|---|---|----|------|-------|------|---------|-----|-----------|---------|")
 
     print("Fetching pitcher stats...", file=sys.stderr)
     for p in pitchers:
@@ -174,11 +181,27 @@ def main():
         if not mid:
             continue
         d = fetch_pitcher_full(mid, season)
+        sv_cur = (pitcher_savant.get(mid) or {}).get("current") or {}
+        sv_pri = (pitcher_savant.get(mid) or {}).get("prior") or {}
         if not d:
             role = "IL" if p.get("role") == "IL" else p["type"]
-            print(f"| {p['name']} | {p['team']} | {role} | — | — | — | — | — | — | — |")
+            xera = fmt(sv_cur.get("xera"), ".2f")
+            xwoba = fmt(sv_cur.get("xwoba"))
+            hh = f"{sv_cur['hh_pct']:.1f}%" if sv_cur.get("hh_pct") else "—"
+            barrel = f"{sv_cur['barrel_pct']:.1f}%" if sv_cur.get("barrel_pct") else "—"
+            bbe = sv_cur.get("bbe", 0) or "—"
+            xera_pri = fmt(sv_pri.get("xera"), ".2f")
+            hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
+            print(f"| {p['name']} | {p['team']} | {role} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
             continue
-        print(f"| {p['name']} | {p['team']} | {p['type']} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} |")
+        xera = fmt(sv_cur.get("xera"), ".2f")
+        xwoba = fmt(sv_cur.get("xwoba"))
+        hh = f"{sv_cur['hh_pct']:.1f}%" if sv_cur.get("hh_pct") else "—"
+        barrel = f"{sv_cur['barrel_pct']:.1f}%" if sv_cur.get("barrel_pct") else "—"
+        bbe = sv_cur.get("bbe", 0) or "—"
+        xera_pri = fmt(sv_pri.get("xera"), ".2f")
+        hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
+        print(f"| {p['name']} | {p['team']} | {p['type']} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
 
 
 if __name__ == "__main__":

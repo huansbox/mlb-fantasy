@@ -337,14 +337,16 @@ def format_batter_stats(current, prior, proj):
     return " | ".join(parts)
 
 
-def fetch_savant_statcast(year, roster_ids):
+def fetch_savant_statcast(year, roster_ids, player_type="batter"):
     """Fetch Statcast data (Hard-Hit%, Barrel%) from Baseball Savant CSV.
 
+    Works for both batters and pitchers (same CSV structure).
+    For pitchers, values represent "allowed" metrics.
     Returns dict: player_id → {hh_pct, barrel_pct, bbe}
     """
     url = (
         f"https://baseballsavant.mlb.com/leaderboard/statcast"
-        f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+        f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
     )
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -368,14 +370,14 @@ def fetch_savant_statcast(year, roster_ids):
         return {}
 
 
-def fetch_savant_expected(year, roster_ids):
-    """Fetch expected stats (xwOBA) from Baseball Savant CSV.
+def fetch_savant_expected(year, roster_ids, player_type="batter"):
+    """Fetch expected stats (xwOBA, and xERA for pitchers) from Baseball Savant CSV.
 
-    Returns dict: player_id → {xwoba, pa}
+    Returns dict: player_id → {xwoba, pa} (batter) or {xwoba, xera, pa} (pitcher)
     """
     url = (
         f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
-        f"?type=batter&year={year}&position=&team=&min=1&csv=true"
+        f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
     )
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -387,14 +389,89 @@ def fetch_savant_expected(year, roster_ids):
         for row in reader:
             pid = row.get("player_id", "").strip()
             if pid in id_set:
-                result[int(pid)] = {
+                entry = {
                     "xwoba": float(row.get("est_woba", 0) or 0),
                     "pa": int(row.get("pa", 0) or 0),
                 }
+                if player_type == "pitcher":
+                    xera = row.get("xera")
+                    entry["xera"] = float(xera) if xera else 0
+                result[int(pid)] = entry
         return result
     except Exception as e:
         print(f"Savant expected fetch failed ({year}): {e}", file=sys.stderr)
         return {}
+
+
+def fetch_savant_for_pitchers(pitcher_ids, season):
+    """Fetch Savant data for pitchers: current + prior year.
+
+    Returns dict: player_id → {current: {hh_pct, barrel_pct, bbe, xwoba, xera},
+                                prior: {...}}
+    """
+    result = {}
+    for year in [season, season - 1]:
+        label = "current" if year == season else "prior"
+        sc = fetch_savant_statcast(year, pitcher_ids, player_type="pitcher")
+        ex = fetch_savant_expected(year, pitcher_ids, player_type="pitcher")
+        for pid in pitcher_ids:
+            if pid not in result:
+                result[pid] = {}
+            s = sc.get(pid, {})
+            e = ex.get(pid, {})
+            if s or e:
+                result[pid][label] = {
+                    "hh_pct": s.get("hh_pct", 0),
+                    "barrel_pct": s.get("barrel_pct", 0),
+                    "bbe": s.get("bbe", 0),
+                    "xwoba": e.get("xwoba", 0),
+                    "xera": e.get("xera", 0),
+                }
+    return result
+
+
+def format_pitcher_savant(savant_data):
+    """Format my SP's Savant stats: xERA + xwOBA allowed."""
+    if not savant_data:
+        return ""
+    parts = []
+    for label, key in [("去年", "prior"), ("本季", "current")]:
+        d = savant_data.get(key)
+        if not d:
+            continue
+        items = []
+        if d["xera"]:
+            items.append(f"{d['xera']:.2f} xERA")
+        if d["xwoba"]:
+            items.append(f"{d['xwoba']:.3f} xwOBA")
+        if d["hh_pct"]:
+            items.append(f"{d['hh_pct']:.0f}% HH")
+        if d["barrel_pct"]:
+            items.append(f"{d['barrel_pct']:.1f}% Barrel")
+        if d["bbe"]:
+            items.append(f"{d['bbe']} BBE")
+        if items:
+            parts.append(f"{label}: {' / '.join(items)}")
+    return " | ".join(parts)
+
+
+def format_opp_sp_savant(savant_data):
+    """Format opponent SP's Savant stats: HH% + Barrel% allowed (concise)."""
+    if not savant_data:
+        return ""
+    d = savant_data.get("current")
+    if not d or (not d["hh_pct"] and not d["barrel_pct"]):
+        d = savant_data.get("prior")
+    if not d:
+        return ""
+    items = []
+    if d["hh_pct"]:
+        items.append(f"{d['hh_pct']:.0f}% HH allowed")
+    if d["barrel_pct"]:
+        items.append(f"{d['barrel_pct']:.1f}% Barrel allowed")
+    if d["bbe"]:
+        items.append(f"{d['bbe']} BBE")
+    return " / ".join(items) if items else ""
 
 
 def fetch_savant_for_roster(roster_ids, season):
@@ -875,9 +952,18 @@ def analyze(config, target_date, env=None, morning=False):
             prior = fetch_batter_season_stats(mlb_id, season - 1)
             batter_stats_cache[mlb_id] = {"current": current, "prior": prior}
 
-    # ── Pre-fetch Savant Statcast data ──
+    # ── Pre-fetch Savant Statcast data (batters) ──
     roster_ids = [b["mlb_id"] for b in batters if b.get("mlb_id")]
     savant_cache = fetch_savant_for_roster(roster_ids, season)
+
+    # ── Pre-fetch Savant Statcast data (pitchers: my SP + opponent SP) ──
+    all_pitcher_ids = [p["mlb_id"] for p in pitchers if p.get("mlb_id")]
+    opp_sp_ids = [
+        sp_info["id"] for sp_info in opp_sp_map.values()
+        if sp_info.get("id")
+    ]
+    all_pitcher_ids_set = list(set(all_pitcher_ids + opp_sp_ids))
+    pitcher_savant_cache = fetch_savant_for_pitchers(all_pitcher_ids_set, season)
 
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
@@ -895,6 +981,11 @@ def analyze(config, target_date, env=None, morning=False):
                 stat_str = format_pitcher_stats(st)
                 if stat_str:
                     sp_label += f" — {stat_str}"
+                # Opponent SP Savant (HH%/Barrel% allowed)
+                opp_sp_id = sp_info.get("id")
+                opp_savant_str = format_opp_sp_savant(pitcher_savant_cache.get(opp_sp_id)) if opp_sp_id else ""
+                if opp_savant_str:
+                    sp_label += f" | Savant: {opp_savant_str}"
                 lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} ({sp_label})")
             else:
                 lines.append(f"  [{tag}] {b['name']} ({pos}, {b['team']}) → vs {opp} (SP TBD)")
@@ -932,6 +1023,11 @@ def analyze(config, target_date, env=None, morning=False):
                 stat_str = format_pitcher_stats(sp_own_stats)
                 if stat_str:
                     lines.append(f"    {stat_str}")
+                # Line 2b: SP's Savant stats (xERA, xwOBA allowed, HH%, Barrel%)
+                sp_savant = pitcher_savant_cache.get(mlb_id)
+                sp_savant_str = format_pitcher_savant(sp_savant)
+                if sp_savant_str:
+                    lines.append(f"    Savant: {sp_savant_str}")
             # Line 3: opponent hitting
             if hitting:
                 lines.append(f"    對手打線 AVG {hitting['avg']} / OPS {hitting['ops']}")

@@ -347,62 +347,105 @@ def _match_player(rows, query):
     return matches[0][0] if matches else None
 
 
+def _savant_lookup(query, year, player_type):
+    """Fetch Savant data for a single player from CSV.
+
+    Returns dict with found data, or None if player not found.
+    """
+    sc_url = (
+        f"https://baseballsavant.mlb.com/leaderboard/statcast"
+        f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
+    )
+    ex_url = (
+        f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
+        f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
+    )
+
+    hh_pct = barrel_pct = bbe = xwoba = xera = None
+
+    try:
+        sc_text = _fetch_savant_csv(sc_url)
+        sc_rows = list(csv.DictReader(io.StringIO(sc_text)))
+        sc_match = _match_player(sc_rows, query)
+        if sc_match:
+            hh_pct = float(sc_match.get("ev95percent", 0) or 0)
+            barrel_pct = float(sc_match.get("brl_percent", 0) or 0)
+            bbe = int(sc_match.get("attempts", 0) or 0)
+    except Exception as e:
+        print(f"  Statcast CSV error ({year}): {e}", file=sys.stderr)
+
+    try:
+        ex_text = _fetch_savant_csv(ex_url)
+        ex_rows = list(csv.DictReader(io.StringIO(ex_text)))
+        ex_match = _match_player(ex_rows, query)
+        if ex_match:
+            xwoba = float(ex_match.get("est_woba", 0) or 0)
+            if bbe is None:
+                bbe = int(ex_match.get("bip", 0) or 0)
+            if player_type == "pitcher":
+                raw = ex_match.get("xera")
+                xera = float(raw) if raw else None
+    except Exception as e:
+        print(f"  Expected CSV error ({year}): {e}", file=sys.stderr)
+
+    if hh_pct is None and xwoba is None:
+        return None
+    return {
+        "hh_pct": hh_pct, "barrel_pct": barrel_pct,
+        "bbe": bbe, "xwoba": xwoba, "xera": xera,
+    }
+
+
+def _print_savant_line(label, data, player_type):
+    """Print one year's Savant data line."""
+    parts = [f"{label}:"]
+    if player_type == "pitcher" and data.get("xera") is not None:
+        parts.append(f"xERA {data['xera']:.2f}")
+    if data.get("xwoba"):
+        tag = "xwOBA allowed" if player_type == "pitcher" else "xwOBA"
+        parts.append(f"{tag} {data['xwoba']:.3f}")
+    if data.get("hh_pct") is not None:
+        tag = "HH% allowed" if player_type == "pitcher" else "HH%"
+        parts.append(f"{tag} {data['hh_pct']:.1f}%")
+    if data.get("barrel_pct") is not None:
+        tag = "Barrel% allowed" if player_type == "pitcher" else "Barrel%"
+        parts.append(f"{tag} {data['barrel_pct']:.1f}%")
+    if data.get("bbe"):
+        parts.append(f"BBE {data['bbe']}")
+    print("  " + " | ".join(parts))
+
+
 def cmd_savant(args):
-    """Look up a player's Statcast data from Baseball Savant CSV."""
+    """Look up a player's Statcast data from Baseball Savant CSV.
+
+    Tries batter first; if not found, falls back to pitcher.
+    """
     query = args.player
     years = [int(args.year)] if args.year else [2026, 2025]
 
     print(f"=== {query} — Statcast ===\n")
 
+    # Detect player type: try batter first, fallback to pitcher
+    detected_type = None
+    for player_type in ["batter", "pitcher"]:
+        test = _savant_lookup(query, years[0], player_type)
+        if test:
+            detected_type = player_type
+            break
+
+    if not detected_type:
+        print(f"  Player not found in batter or pitcher CSV for {years[0]}")
+        print()
+        return
+
+    if detected_type == "pitcher":
+        print(f"  (detected as pitcher)\n")
+
     for year in years:
         label = "本季" if year == 2026 else str(year)
-
-        # Statcast (HH%, Barrel%)
-        sc_url = (
-            f"https://baseballsavant.mlb.com/leaderboard/statcast"
-            f"?type=batter&year={year}&position=&team=&min=1&csv=true"
-        )
-        # Expected stats (xwOBA)
-        ex_url = (
-            f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
-            f"?type=batter&year={year}&position=&team=&min=1&csv=true"
-        )
-
-        hh_pct = barrel_pct = bbe = xwoba = None
-
-        try:
-            sc_text = _fetch_savant_csv(sc_url)
-            sc_rows = list(csv.DictReader(io.StringIO(sc_text)))
-            sc_match = _match_player(sc_rows, query)
-            if sc_match:
-                hh_pct = float(sc_match.get("ev95percent", 0) or 0)
-                barrel_pct = float(sc_match.get("brl_percent", 0) or 0)
-                bbe = int(sc_match.get("attempts", 0) or 0)
-        except Exception as e:
-            print(f"  Statcast CSV error ({year}): {e}", file=sys.stderr)
-
-        try:
-            ex_text = _fetch_savant_csv(ex_url)
-            ex_rows = list(csv.DictReader(io.StringIO(ex_text)))
-            ex_match = _match_player(ex_rows, query)
-            if ex_match:
-                xwoba = float(ex_match.get("est_woba", 0) or 0)
-                if bbe is None:
-                    bbe = int(ex_match.get("bip", 0) or 0)
-        except Exception as e:
-            print(f"  Expected CSV error ({year}): {e}", file=sys.stderr)
-
-        if hh_pct is not None or xwoba is not None:
-            parts = [f"{label}:"]
-            if xwoba:
-                parts.append(f"xwOBA {xwoba:.3f}")
-            if hh_pct is not None:
-                parts.append(f"HH% {hh_pct:.1f}%")
-            if barrel_pct is not None:
-                parts.append(f"Barrel% {barrel_pct:.1f}%")
-            if bbe:
-                parts.append(f"BBE {bbe}")
-            print("  " + " | ".join(parts))
+        data = _savant_lookup(query, year, detected_type)
+        if data:
+            _print_savant_line(label, data, detected_type)
         else:
             print(f"  {label}: no data found")
 
