@@ -48,7 +48,7 @@
 | CF | Byron Buxton | MIN | CF | +5 | K 受益，**玻璃體質** |
 | RF | Lawrence Butler | ATH | CF/RF | +5 | K 受益 |
 | Util | Ozzie Albies | ATL | 2B | +5 | |
-| Util | Steven Kwan | CLE | LF | +2 | ⚠️ 全隊最弱，替換候選 |
+| Util | Jordan Walker | STL | LF/RF | — | 23 歲，Driveline 改造後 breakout 候選 |
 
 ### 板凳打者
 
@@ -68,7 +68,7 @@
 | RP | Robert Garcia | TEX | — | 比率用 |
 | RP | Garrett Whitlock | BOS | — | 比率用 |
 | P | Brayan Bello | BOS | — | |
-| P | Zack Littell | WSH | — | |
+| P | Parker Messick | CLE | — | Savant P80-90，113 IP 預測 |
 | P | Brady Singer | CIN | — | |
 
 ### 板凳投手
@@ -134,14 +134,14 @@
 
 **聯盟威脅**：BUMMER（54K/1.93 ERA/0.90 WHIP + .298 AVG，投打均衡最強隊）
 
-### Watchlist（2026-03-31）
+### Watchlist（2026-04-01）
 
 **打者**
 
 | 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
 |------|------|------|---------|---------|
-| **Jordan Walker** | STL | LF/RF | 連 2 週 xwOBA > .300 + HH% > 41% (P50) | Kwan |
-| Jesús Sánchez | TOR | LF/CF/RF | BN 有空位 + 連 2 週 xwOBA > .320 | Kwan 或 CF backup（條件 Pass） |
+| **Dominic Canzone** | SEA | LF/RF | 確認 platoon，BN 有空位時撿來當 RHP matchup 武器 | — |
+| Jesús Sánchez | TOR | LF/CF/RF | BN 有空位 + 連 2 週 xwOBA > .320 | CF backup（條件 Pass） |
 | **Colt Keith** | DET | 1B/2B/3B | 連 2 週 xwOBA > .280 + BB% > 8% | Walker(1B) |
 
 **投手**
@@ -153,25 +153,25 @@
 | Andrew Painter | PHI | SP | 前 2-3 場穩定投 6+ IP + xERA < P50 (4.33) | Singer（備選，局數限制硬傷） |
 
 **近期行動**：
+- **Walker 已加入**（04-01）：drop Kwan，add Walker。xwOBA .578 / HH% 75% (>P90)，23 歲 everyday player，STL RF 先發
+- **Messick 已加入**（04-01）：drop Littell，add Messick。Savant P80-90，CLE 保證先發
+- **Canzone 新加入 Watchlist**（04-01）：Savant 三項 >P90 (187 BBE) 但確認是 platoon（只打 RHP）。82 G/2025。BN 有空位時可撿當 matchup 武器
 - **Hancock 接近觸發**（03-31）：首秀 6 IP / 0 H / 9K（W），等 4/3-4/4 vs LAA 第 2 場驗證
-- **Walker EV 100.4 mph**（03-31）：Statcast 極強（xwOBA .688 / HH% 88.9%），Week 1 通過觸發，需 Week 2 驗證
-- **Sánchez 條件 Pass**（03-31）：/player-eval 結果 — 核心 3 指標只 HH% 勝出（1/3），xwOBA/BB% 與 Kwan 同區間。工具好但產出未兌現 + BN 無空位
 - **Vásquez 新加入**（03-31）：首場 6 IP / 8K / 0.00 ERA，24% owned 上升中
 - **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
 - **NA 格空位**：考慮 stash Dylan Crews（WSH, CF/RF），離 MLB 最近的 CF prospect，填 CF 弱點。待決定
-- ~~TODO~~：速報已加入「打者 vs 對方先發投手」matchup 資訊（SP 名字 + 本季 ERA/K9）✅
 
 **已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
 
-**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）、Canzone（LF/RF，預測回歸 .245/.741）、Hoskins（1B，AVG ~.230 + 傷病史）
+**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）、Hoskins（1B，AVG ~.230 + 傷病史）、Kwan（dropped 04-01，HH% <P25 / Barrel% <P25 = 零 power + 7×7 格式錯配）、Littell（dropped 04-01，WSH 弱隊 + xERA P50 + K 最低）
 
 ### 行動觸發規則
 
 | 條件 | 動作 |
 |------|------|
-| Walker 連 2 週 xwOBA < .262 (P25) + HH% < 36% (P25) | 撿 Colt Keith（有 1B 資格），drop Walker |
-| Kwan 連 2 週 xwOBA < .280 + HH% 無改善跡象 | 撿 Jordan Walker（LF/RF），drop Kwan |
-| Kwan xwOBA > .300 + HH% > 41% (P50) | 不動，過程指標顯示生產力正常 |
+| Walker(1B) 連 2 週 xwOBA < .262 (P25) + HH% < 36% (P25) | 撿 Colt Keith（有 1B 資格），drop Walker(1B) |
+| Walker(STL) 連 3 週 xwOBA < P25 (.261) + HH% 回落 < P50 (40.4%) | 評估 drop，Canzone 或 FA 替補 |
+| Walker(STL) 維持 xwOBA > P50 (.297) + HH% > P70 (44.7%) | 不動，breakout 確認中 |
 | Singer 連 2 場 xERA > P25 (5.62) + Hancock 連 2 場 xERA < P60 (4.04) | 撿 Hancock，drop Singer |
 | Singer 連 2 場 xERA > P25 (5.62) + Hancock 一般但 Painter 穩定 6+ IP | 撿 Painter，drop Singer（備選） |
 | Singer xERA 回穩 < P50 (4.33) | 不動，Singer 局數優勢（168 IP）仍是核心價值 |
