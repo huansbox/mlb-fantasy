@@ -14,10 +14,9 @@
 - 03-30：3/31 確認先發（PHI vs WSH）。被 RALLY MONKEY drop 回到 FA pool（30% owned）。
 - 03-30：[eval] vs Singer，結論：**不換**。預測 111 IP / 4.62 ERA / 1.39 WHIP / ~100 K / 7 QS，全面輸 Singer（168 IP / 4.30 ERA / 1.30 WHIP / 136 K / 11 QS）。局數限制 110-130 IP 是硬傷，IP + QS 雙打折。TJS 術後球速/fastball shape 仍未完全恢復。降級為 Hancock 之後的備選。
 
-### Jordan Walker (STL, LF/RF)
-觸發：連 2 週 xwOBA > .300 + HH% > 41% (P50) → 取代 Kwan
-- 03-30：[waiver-scan] 23 歲前 top prospect，2024-2025 低潮後 make-or-break 年。休季 Driveline 揮棒重建，STL 給每日 RF 先發。84th percentile sprint speed。開季 .400/1.400/1HR/2BB（5 PA，極小樣本）。3% owned。LF/RF 資格 = Kwan 替換方向。風險：過去兩年 AVG ~.220，approach 仍待驗證。
-- 03-31：[waiver-scan] Statcast 驚人 — Avg EV 100.4 mph / HH% 88.9% / Barrel% 33.3% / xwOBA .688（~9 BBE 極小樣本但 EV 是真實訊號）。3/29 vs TB 三分全壘打（EV 105.8）。9% owned 上升中。vs Kwan 基準（.310 xwOBA / 19% HH%）：即使打對折仍大幅勝出。**Week 1 通過觸發條件，需 Week 2 驗證。**
+### Dominic Canzone (SEA, LF/RF) — platoon 確認，待 BN 空位
+觸發：BN 有空位時撿來當 RHP matchup 武器
+- 04-01：[eval] 重新評估（新 Statcast 框架）。2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。傳統 .300/.840 完全驗證。但確認為**硬 platoon**（只打 RHP）：2025 僅 82 場，vs RHP .308/.524/10HR/141 wRC+。2026 開季 5 場中 2 場只有 1 AB（替補），3/31 後無出賽（%owned 下降原因）。打 RHP 時是菁英，但全季僅 ~100 場 + Daily-Tomorrow 每日管理成本。**目前 BN 無空位（Frelick CF 保險不可 drop），13% owned 不會被搶，等 Walker 穩定後再評估。**
 
 ### Colt Keith (DET, 1B/2B/3B)
 觸發：連 2 週 xwOBA > .280 + BB% > 8% → 取代 Walker(1B)
@@ -86,6 +85,18 @@
 
 ## 已結案
 
+### Jordan Walker (STL, LF/RF) — ✅ 已加入陣容
+- 04-01：drop Kwan，add Walker。3 agent 評估一致認為 Kwan 為 drop 候選（HH% <P25 / Barrel% <P25 = 零 power + 7×7 格式錯配）。Walker 23 歲 everyday player + HH% >P90 (238 BBE) + Driveline 改造 breakout 候選。2026 開季 xwOBA .578 / HH% 75% (12 BBE)。
+
+### Parker Messick (CLE, SP) — ✅ 已加入陣容
+- 04-01：drop Littell，add Messick。3 agent 評估：Littell 全員末位（WSH 弱隊 + 低 K + xERA P50 說 2025 是運氣）。Messick Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE），CLE 保證先發。Steamer 113 IP / 4.33 ERA 保守但 Savant 技能信號強。
+
+### Steven Kwan (CLE, LF) — dropped
+- 04-01：HH% 19.3% (<P25) / Barrel% 1.9% (<P25) / xwOBA .310 全靠接觸率。7×7 移除 K 懲罰後低 K 優勢消失，只剩 AVG 一項貢獻。2026 開季 0% HH (19 BBE) 確認弱點延續。LF only 無位置彈性。被 Walker 取代。
+
+### Zack Littell (WSH, SP) — dropped
+- 04-01：2025 ERA 3.81 / WHIP 1.10 看似好但 xERA 4.36 (P50-55) = 運氣。WSH 弱隊 W/QS 打折，K 投射 113 為四人最低。被 Messick 取代。
+
 ### Ryan O'Hearn (PIT, 1B/LF/RF) — 被搶
 - 03-30：被聯賽其他隊 rostered。替代監控：Colt Keith(1B 方向)、Jordan Walker(LF 方向)。
 
@@ -97,8 +108,9 @@
 - 03-26：STL 開幕戰先發，被低估的 breakout 候選。已被聯賽 rostered。
 - 03-27：[eval] 被 drop 到 FA，觸發重評。2025: 4.21 ERA/1.31 WHIP/122K/151.2 IP。2026 預測 ~4.44 ERA/152 IP，逐項輸現有後段 4 SP（Singer/Bello/Bassitt/Littell）。春訓新 splitter 有潛力但僅小樣本。不撿。
 
-### Dominic Canzone (SEA, LF/RF) — Pass
-- 03-29：[eval] vs Kwan(LF)，結論：不換。2025 .300/.840 是 82G 小樣本，預測系統一致回歸至 .245/.741（Composite）。正選篩選 0/3、替補勉強 2/3。vs Kwan：HR +5 / RBI +4，但 AVG -32pt / R -26 / BB -23 / SB -12。BB 雙重計算下 Kwan 格式價值明顯更高。Opening Day 2 HR 不改變結論。
+### Dominic Canzone (SEA, LF/RF) — Pass → 觀察中（重新評估）
+- 03-29：[eval] 舊框架 Pass（預測回歸 .245/.741，Kwan BB 優勢）。
+- 04-01：[eval] **新 Statcast 框架翻轉判斷**。2025 Savant 三項全 >P90（187 BBE），遠勝 Kwan。但確認為硬 platoon（只打 RHP，82 G）。**移回觀察中，待 BN 空位。**
 
 ### Francisco Alvarez (NYM, C) — Pass
 - 03-29：[eval] vs Langeliers(C)。2025: .256/.787 OPS/11HR/BB% 9.7%（76G 傷縮）。Steamer 2026: .241/.775 OPS/18HR。替補級篩選 2/3 通過但正選級 0/3。Langeliers 7 類別全勝（HR+9, R+20, RBI+21, OPS+.021）。C 位非弱點，BN 3 格無 drop 目標。不撿不追蹤。
