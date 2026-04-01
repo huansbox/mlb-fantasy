@@ -16,6 +16,45 @@ from zoneinfo import ZoneInfo
 ET = ZoneInfo("America/New_York")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ── 2025 MLB Statcast percentile breakpoints (P90 = elite for both) ──
+# Batters: higher value = better
+BATTER_PCTILES = {
+    "xwoba":      [(25,.261),(40,.286),(45,.293),(50,.297),(55,.302),(60,.307),(70,.321),(80,.331),(90,.349)],
+    "hh_pct":     [(25,34.6),(40,38.3),(45,39.0),(50,40.4),(55,41.5),(60,42.6),(70,44.7),(80,46.7),(90,49.7)],
+    "barrel_pct": [(25,4.7),(40,6.5),(45,7.1),(50,7.8),(55,8.5),(60,9.1),(70,10.3),(80,12.0),(90,14.0)],
+}
+# Pitchers: lower value = better, but P90 = elite = lowest value
+PITCHER_PCTILES = {
+    "xera":       [(25,5.62),(40,4.64),(45,4.48),(50,4.33),(55,4.16),(60,4.04),(70,3.74),(80,3.43),(90,2.98)],
+    "xwoba":      [(25,.361),(40,.332),(45,.327),(50,.322),(55,.316),(60,.312),(70,.301),(80,.289),(90,.270)],
+    "hh_pct":     [(25,44.2),(40,42.2),(45,41.6),(50,40.8),(55,40.2),(60,39.4),(70,38.0),(80,36.4),(90,34.1)],
+    "barrel_pct": [(25,10.1),(40,9.1),(45,8.9),(50,8.5),(55,8.1),(60,7.9),(70,7.1),(80,6.3),(90,4.9)],
+}
+
+
+def pctile_tag(value, metric, player_type="batter"):
+    """Return percentile range tag like '(P70-80)' or '(>P90)'."""
+    table = BATTER_PCTILES if player_type == "batter" else PITCHER_PCTILES
+    bp = table.get(metric)
+    if not bp or value is None:
+        return ""
+    higher_better = (player_type == "batter")
+    # Find the highest percentile bracket the value qualifies for
+    matched = None
+    for pct, thresh in reversed(bp):
+        if (higher_better and value >= thresh) or (not higher_better and value <= thresh):
+            matched = pct
+            break
+    if matched is None:
+        return "(<P25)"
+    if matched == 90:
+        return "(>P90)"
+    # Find next bracket above
+    for i, (pct, _) in enumerate(bp):
+        if pct == matched and i + 1 < len(bp):
+            return f"(P{matched}-{bp[i+1][0]})"
+    return f"(P{matched})"
 MLB_API = "https://statsapi.mlb.com/api/v1"
 YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
@@ -431,7 +470,7 @@ def fetch_savant_for_pitchers(pitcher_ids, season):
 
 
 def format_pitcher_savant(savant_data):
-    """Format my SP's Savant stats: xERA + xwOBA allowed."""
+    """Format my SP's Savant stats with percentile tags."""
     if not savant_data:
         return ""
     parts = []
@@ -441,13 +480,13 @@ def format_pitcher_savant(savant_data):
             continue
         items = []
         if d["xera"]:
-            items.append(f"{d['xera']:.2f} xERA")
+            items.append(f"{d['xera']:.2f} xERA {pctile_tag(d['xera'], 'xera', 'pitcher')}")
         if d["xwoba"]:
-            items.append(f"{d['xwoba']:.3f} xwOBA")
+            items.append(f"{d['xwoba']:.3f} xwOBA {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
         if d["hh_pct"]:
-            items.append(f"{d['hh_pct']:.0f}% HH")
+            items.append(f"{d['hh_pct']:.0f}% HH {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
         if d["barrel_pct"]:
-            items.append(f"{d['barrel_pct']:.1f}% Barrel")
+            items.append(f"{d['barrel_pct']:.1f}% Barrel {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
         if d["bbe"]:
             items.append(f"{d['bbe']} BBE")
         if items:
@@ -456,7 +495,7 @@ def format_pitcher_savant(savant_data):
 
 
 def format_opp_sp_savant(savant_data):
-    """Format opponent SP's Savant stats: HH% + Barrel% allowed (concise)."""
+    """Format opponent SP's Savant stats with percentile tags (concise)."""
     if not savant_data:
         return ""
     d = savant_data.get("current")
@@ -466,9 +505,9 @@ def format_opp_sp_savant(savant_data):
         return ""
     items = []
     if d["hh_pct"]:
-        items.append(f"{d['hh_pct']:.0f}% HH allowed")
+        items.append(f"{d['hh_pct']:.0f}% HH allowed {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
     if d["barrel_pct"]:
-        items.append(f"{d['barrel_pct']:.1f}% Barrel allowed")
+        items.append(f"{d['barrel_pct']:.1f}% Barrel allowed {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
     if d["bbe"]:
         items.append(f"{d['bbe']} BBE")
     return " / ".join(items) if items else ""
@@ -497,16 +536,19 @@ def fetch_savant_for_roster(roster_ids, season):
 
 
 def format_savant_stats(savant_data):
-    """Format Savant stats for display."""
+    """Format batter Savant stats with percentile tags."""
     if not savant_data:
         return ""
     parts = []
     for label, key in [("去年", "prior"), ("本季", "current")]:
         d = savant_data.get(key)
         if d and (d["bbe"] > 0 or d["xwoba"] > 0):
+            hh_tag = pctile_tag(d["hh_pct"], "hh_pct")
+            brl_tag = pctile_tag(d["barrel_pct"], "barrel_pct")
+            xw_tag = pctile_tag(d["xwoba"], "xwoba")
             parts.append(
-                f"{label}: {d['hh_pct']:.0f}% HH / {d['barrel_pct']:.1f}% Barrel"
-                f" / {d['xwoba']:.3f} xwOBA ({d['bbe']} BBE)"
+                f"{label}: {d['hh_pct']:.0f}% HH {hh_tag} / {d['barrel_pct']:.1f}% Barrel {brl_tag}"
+                f" / {d['xwoba']:.3f} xwOBA {xw_tag} ({d['bbe']} BBE)"
             )
     return " | ".join(parts)
 

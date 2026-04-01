@@ -22,6 +22,7 @@ from main import (
     fetch_savant_expected,
     fetch_pitcher_gamelog,
     fetch_savant_for_pitchers,
+    pctile_tag,
     parse_ip,
 )
 
@@ -155,9 +156,12 @@ def main():
         ops = cur.get("ops", "—")
         hr = cur.get("hr", 0)
         bb_pct = f"{cur['bb_pct']:.1f}%" if cur.get("bb_pct") is not None else "—"
-        xwoba = fmt(sv_cur.get("xwoba"))
-        hh = f"{sv_cur['hh_pct']:.1f}%" if sv_cur.get("hh_pct") is not None else "—"
-        barrel = f"{sv_cur['barrel_pct']:.1f}%" if sv_cur.get("barrel_pct") is not None else "—"
+        xw_v = sv_cur.get("xwoba")
+        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba')}" if xw_v else "—"
+        hh_v = sv_cur.get("hh_pct")
+        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct')}" if hh_v else "—"
+        brl_v = sv_cur.get("barrel_pct")
+        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct')}" if brl_v else "—"
         bbe = sv_cur.get("bbe", 0)
         xwoba_pri = fmt(sv_pri.get("xwoba"))
         hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") is not None else "—"
@@ -183,24 +187,22 @@ def main():
         d = fetch_pitcher_full(mid, season)
         sv_cur = (pitcher_savant.get(mid) or {}).get("current") or {}
         sv_pri = (pitcher_savant.get(mid) or {}).get("prior") or {}
-        if not d:
-            role = "IL" if p.get("role") == "IL" else p["type"]
-            xera = fmt(sv_cur.get("xera"), ".2f")
-            xwoba = fmt(sv_cur.get("xwoba"))
-            hh = f"{sv_cur['hh_pct']:.1f}%" if sv_cur.get("hh_pct") else "—"
-            barrel = f"{sv_cur['barrel_pct']:.1f}%" if sv_cur.get("barrel_pct") else "—"
-            bbe = sv_cur.get("bbe", 0) or "—"
-            xera_pri = fmt(sv_pri.get("xera"), ".2f")
-            hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
-            print(f"| {p['name']} | {p['team']} | {role} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
-            continue
-        xera = fmt(sv_cur.get("xera"), ".2f")
-        xwoba = fmt(sv_cur.get("xwoba"))
-        hh = f"{sv_cur['hh_pct']:.1f}%" if sv_cur.get("hh_pct") else "—"
-        barrel = f"{sv_cur['barrel_pct']:.1f}%" if sv_cur.get("barrel_pct") else "—"
+        # Format pitcher Savant values with percentile tags
+        xe_v = sv_cur.get("xera")
+        xera = f"{xe_v:.2f} {pctile_tag(xe_v, 'xera', 'pitcher')}" if xe_v else "—"
+        xw_v = sv_cur.get("xwoba")
+        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba', 'pitcher')}" if xw_v else "—"
+        hh_v = sv_cur.get("hh_pct")
+        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct', 'pitcher')}" if hh_v else "—"
+        brl_v = sv_cur.get("barrel_pct")
+        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct', 'pitcher')}" if brl_v else "—"
         bbe = sv_cur.get("bbe", 0) or "—"
         xera_pri = fmt(sv_pri.get("xera"), ".2f")
         hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
+        if not d:
+            role = "IL" if p.get("role") == "IL" else p["type"]
+            print(f"| {p['name']} | {p['team']} | {role} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
+            continue
         print(f"| {p['name']} | {p['team']} | {p['type']} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
 
 

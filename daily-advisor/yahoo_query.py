@@ -11,6 +11,9 @@ import urllib.parse
 import urllib.request
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+from main import pctile_tag  # noqa: E402
+
 YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
 YAHOO_TOKEN_FILE = os.path.join(SCRIPT_DIR, "yahoo_token.json")
@@ -397,19 +400,19 @@ def _savant_lookup(query, year, player_type):
 
 
 def _print_savant_line(label, data, player_type):
-    """Print one year's Savant data line."""
+    """Print one year's Savant data line with percentile tags."""
     parts = [f"{label}:"]
     if player_type == "pitcher" and data.get("xera") is not None:
-        parts.append(f"xERA {data['xera']:.2f}")
+        parts.append(f"xERA {data['xera']:.2f} {pctile_tag(data['xera'], 'xera', 'pitcher')}")
     if data.get("xwoba"):
         tag = "xwOBA allowed" if player_type == "pitcher" else "xwOBA"
-        parts.append(f"{tag} {data['xwoba']:.3f}")
+        parts.append(f"{tag} {data['xwoba']:.3f} {pctile_tag(data['xwoba'], 'xwoba', player_type)}")
     if data.get("hh_pct") is not None:
         tag = "HH% allowed" if player_type == "pitcher" else "HH%"
-        parts.append(f"{tag} {data['hh_pct']:.1f}%")
+        parts.append(f"{tag} {data['hh_pct']:.1f}% {pctile_tag(data['hh_pct'], 'hh_pct', player_type)}")
     if data.get("barrel_pct") is not None:
         tag = "Barrel% allowed" if player_type == "pitcher" else "Barrel%"
-        parts.append(f"{tag} {data['barrel_pct']:.1f}%")
+        parts.append(f"{tag} {data['barrel_pct']:.1f}% {pctile_tag(data['barrel_pct'], 'barrel_pct', player_type)}")
     if data.get("bbe"):
         parts.append(f"BBE {data['bbe']}")
     print("  " + " | ".join(parts))
