@@ -3,12 +3,12 @@
 ## 觀察中
 
 ### Emerson Hancock (SEA, SP)
-觸發：前 2-3 場 ERA < 3.50 + K/9 > 8 → 取代 Singer（首選候選）
+觸發：前 2-3 場 xERA < P60 (4.04) + K/9 > 8 → 取代 Singer（首選候選）
 - 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
 - 03-31：[waiver-scan] 首秀確認 3/29 vs CLE：6 IP / 0 H / 0 R / 1 BB / 9K（W）— 六局無安打。NBC Sports 建議「立刻撿」。下一場預計 4/3-4/4 vs LAA。**接近觸發條件，第 2 場是關鍵驗證。**
 
 ### Andrew Painter (PHI, SP)
-觸發：前 2-3 場穩定投 6+ IP → 取代 Singer（備選，Hancock 優先）
+觸發：前 2-3 場穩定投 6+ IP + xERA < P50 (4.33) → 取代 Singer（備選，Hancock 優先）
 - 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
 - 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
 - 03-30：3/31 確認先發（PHI vs WSH）。被 RALLY MONKEY drop 回到 FA pool（30% owned）。
@@ -30,7 +30,7 @@
 - 03-31：[eval] vs Kwan(LF)。2025: .237/.699 OPS / 14 HR / BB% 8.5%。Statcast: xwOBA .323 (~P60) / HH% 43.4% (~P55) / Barrel% 11.1%。核心 3 指標只 HH% 顯著勝出（1/3，不滿足 2/3 門檻）。xwOBA/BB% 與 Kwan 在同一百分位區間。2025 後半季 HOU 崩盤 .611 OPS。Steamer 只預測 369 PA。工具差距大（Bat Speed 93 pct）但產出未兌現。BN 無空位。**不換，但 CF 資格 + power 工具有 upside，列條件 Pass 觀察。**
 
 ### Randy Vásquez (SD, SP)
-觸發：前 2-3 場 ERA < 4.00 + K/9 > 7 → 串流或取代後段 SP
+觸發：前 2-3 場 xERA < P50 (4.33) + K/9 > 7 → 串流或取代後段 SP
 - 03-31：[waiver-scan] 24% owned 快速上升。首場 6 IP / 0.00 ERA / 0.83 WHIP / 8K。去年底子普通但開季亮眼。1 場不足，等第 2 場。
 
 ### 串流 SP 評估（2026-03-30）
