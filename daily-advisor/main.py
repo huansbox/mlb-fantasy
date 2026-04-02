@@ -1382,12 +1382,12 @@ def main():
 
     print(advice)
 
+    if args.no_send:
+        return
+
     # Archive to GitHub Issue
     _, _, week_number = get_fantasy_week(target_date, config)
     save_github_issue(target_date, week_number, data_summary, advice, morning=args.morning)
-
-    if args.no_send:
-        return
 
     print("\nSending to Telegram...", file=sys.stderr)
     ok = send_telegram(advice, env)
