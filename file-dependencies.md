@@ -237,8 +237,8 @@
 | 事件 | 動作 |
 |------|------|
 | 球員受傷/表現差 | 查 waiver-log.md 有無現成候選 → 有：`/player-eval` 確認 → 執行。沒有：`/waiver-scan` 找人 → `/player-eval` → 執行 |
-| Add/Drop 執行後 | 跑同步腳本更新 config → push → VPS pull |
-| FAAB 出價 | 更新 config 的 faab_remaining |
+| Add/Drop 執行後 | **自動**：roster_sync.py（TW 15:10 cron）偵測 transactions → 更新 config → git push → Telegram 通知 |
+| FAAB 出價 | 更新 config 的 faab_remaining + CLAUDE.md FAAB 餘額 |
 | Watchlist 觸發 | `/player-eval` 深入評估 → 決定行動 |
 
 ### 檔案索引
@@ -251,6 +251,7 @@
 | `week-reviews.md` | 累積式週覆盤記錄 |
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
+| `daily-advisor/roster_sync.py` | 陣容自動同步（Yahoo → config，cron TW 15:10） |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 
 ---
@@ -331,15 +332,15 @@
 - [x] |xERA-ERA|（SP/RP 分開）
 - [x] 寫入 CLAUDE.md + main.py
 
-### roster_config.json — 部分完成（`97a11d1`）
+### roster_config.json — ✅ 全部完成（`97a11d1` + `1e07fbe`）
 
 - [x] 移除 Kwan、Littell
 - [x] 新增 Walker(STL)、Messick
 - [x] 移除 `role`、`type`、`proj` 欄位
 - [x] 投打統一用 `positions`
 - [x] league 加 `faab_remaining`
-- [ ] 新增 `yahoo_player_key` 欄位 — 待 roster_sync.py
-- [ ] 新增 `prior_stats` 欄位（去年數據）— 待 roster_sync.py
+- [x] 新增 `yahoo_player_key` 欄位 — roster_sync.py --init 完成（2026-04-03）
+- [x] 新增 `prior_stats` 欄位（2025 Savant + MLB Stats）— roster_sync.py --init 完成（2026-04-03）
 
 ### Skills + prompt 檔 — ✅ 全部完成（`0d0331e`）
 
@@ -368,17 +369,23 @@
 
 ---
 
-## 未完成（下次 session）
+## 已完成（2026-04-03）
 
-### 新腳本（roster_sync.py）
+### roster_sync.py — ✅ 完成（`feat/roster-sync` → merged）
 
-- [ ] 從 Yahoo API 拉即時陣容更新 config
-- [ ] 新球員自動查 mlb_id（MLB API people/search）
-- [ ] 查不到的標記 `"mlb_id": null`
-- [ ] prior_stats 在球員首次加入時寫入（Savant CSV + MLB Stats API）
-- [ ] 加入 `yahoo_player_key` 欄位
+- [x] 從 Yahoo API 拉即時陣容更新 config
+- [x] 新球員自動查 mlb_id（MLB API people/search）
+- [x] 查不到的標記 `"mlb_id": null`
+- [x] prior_stats 在球員首次加入時寫入（Savant CSV + MLB Stats API）
+- [x] 加入 `yahoo_player_key` 欄位
+- [x] Yahoo transactions API 作為 gate（有新 add/drop 才做完整 sync）
+- [x] VPS cron 部署（TW 15:10 = UTC 07:10）
 
-### roster_config.json 補齊
+### roster_config.json 補齊 — ✅ 完成
 
-- [ ] `yahoo_player_key`（依賴 roster_sync.py）
-- [ ] `prior_stats`（依賴 roster_sync.py）
+- [x] `yahoo_player_key`（23 人全部回填）
+- [x] `prior_stats`（打者 9 欄 / SP 9 欄 / RP 10 欄）
+
+## 未完成
+
+- [ ] weekly_scan.py 投手 Statcast（目前只餵傳統 stats 給 Claude）
