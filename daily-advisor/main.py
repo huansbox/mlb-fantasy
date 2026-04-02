@@ -103,6 +103,18 @@ def load_config():
     for p in config.get("batters", []) + config.get("pitchers", []):
         if p.get("mlb_id"):
             config["mlb_id_map"][p["name"]] = p["mlb_id"]
+    # Derive role/type for config entries (Yahoo API path generates these at runtime)
+    for b in config.get("batters", []):
+        if "role" not in b:
+            b["role"] = "starter"
+        if "positions" not in b:
+            b["positions"] = []
+    for p in config.get("pitchers", []):
+        if "role" not in p:
+            p["role"] = "starter"
+        if "type" not in p:
+            positions = p.get("positions", [])
+            p["type"] = "SP" if "SP" in positions else ("RP" if "RP" in positions else "SP")
     return config
 
 
@@ -884,7 +896,8 @@ def calc_weekly_ip(config, target_date, pitchers_list=None):
     week_start, week_end, _ = get_fantasy_week(target_date, config)
     season = config["league"]["season"]
     src = pitchers_list if pitchers_list else config["pitchers"]
-    active_pitchers = [p for p in src if p["role"] != "IL"]
+    # Note: config fallback sets all roles to "starter" (no IL info); Yahoo API path is accurate
+    active_pitchers = [p for p in src if p.get("role") != "IL"]
 
     entries = []
     total_ip = 0.0
