@@ -58,6 +58,70 @@ def write_last_sync(ts):
         f.write(str(ts))
 
 
+def find_my_team_key(league_key, token):
+    """Find our team_key from Yahoo league teams endpoint."""
+    data = yahoo_api_get(f"/league/{league_key}/teams", token)
+    teams = data["fantasy_content"]["league"][1]["teams"]
+    for k, v in teams.items():
+        if k == "count":
+            continue
+        for item in v["team"][0]:
+            if isinstance(item, dict) and "is_owned_by_current_login" in item:
+                for it in v["team"][0]:
+                    if isinstance(it, dict) and "team_key" in it:
+                        return it["team_key"]
+    raise RuntimeError("Could not find my team key")
+
+
+def fetch_full_roster(team_key, token):
+    """Fetch roster from Yahoo API, return list of player dicts.
+
+    Each dict: {name, yahoo_player_key, team, positions, selected_pos}
+    """
+    data = yahoo_api_get(f"/team/{team_key}/roster", token)
+    players_data = data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
+
+    players = []
+    for k, v in players_data.items():
+        if k == "count":
+            continue
+        player = v["player"]
+        info = player[0]
+        pos_data = player[1]
+
+        name = team_val = display_pos = player_key = None
+        for item in info:
+            if isinstance(item, dict):
+                if "name" in item:
+                    name = item["name"].get("full")
+                if "editorial_team_abbr" in item:
+                    team_val = item["editorial_team_abbr"].upper()
+                if "display_position" in item:
+                    display_pos = item["display_position"]
+                if "player_key" in item:
+                    player_key = item["player_key"]
+
+        selected_pos = "BN"
+        sel = pos_data.get("selected_position", [{}])
+        for s in sel:
+            if isinstance(s, dict) and "position" in s:
+                selected_pos = s["position"]
+
+        if not name or not display_pos:
+            continue
+
+        positions = [p.strip() for p in display_pos.split(",")]
+        players.append({
+            "name": name,
+            "yahoo_player_key": player_key,
+            "team": team_val or "?",
+            "positions": positions,
+            "selected_pos": selected_pos,
+        })
+
+    return players
+
+
 def main():
     parser = argparse.ArgumentParser(description="Sync Yahoo roster to roster_config.json")
     parser.add_argument("--init", action="store_true", help="Full bootstrap: pull entire roster and build config")
