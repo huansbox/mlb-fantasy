@@ -24,6 +24,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get as yahoo_api_get,
     YAHOO_STAT_MAP,
+    pitcher_type,
 )
 
 ET = ZoneInfo("America/New_York")
@@ -326,7 +327,7 @@ def fetch_sp_schedules(config, opp_roster, week_start, week_end):
     Returns: (my_sp_schedule, opp_sp_schedule)
     """
     my_sps = {p["name"]: p["team"] for p in config.get("pitchers", [])
-              if p.get("type") == "SP" and p.get("role") != "IL"}
+              if pitcher_type(p) == "SP"}
     opp_sps = {p["name"]: p["team"] for p in opp_roster.get("pitchers", [])
                if p.get("type") == "SP" and p.get("role") != "IL"}
     all_sp_names = set(my_sps.keys()) | set(opp_sps.keys())
