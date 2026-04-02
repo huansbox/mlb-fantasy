@@ -1,38 +1,508 @@
 {
   "batters": [
-    {"name": "Shea Langeliers",   "mlb_id": 669127, "team": "ATH", "positions": ["C"]},
-    {"name": "Christian Walker",   "mlb_id": 572233, "team": "HOU", "positions": ["1B"]},
-    {"name": "Jazz Chisholm Jr.",  "mlb_id": 665862, "team": "NYY", "positions": ["2B", "3B"]},
-    {"name": "Manny Machado",      "mlb_id": 592518, "team": "SD",  "positions": ["3B"]},
-    {"name": "Ezequiel Tovar",     "mlb_id": 678662, "team": "COL", "positions": ["SS"]},
-    {"name": "Jose Altuve",        "mlb_id": 514888, "team": "HOU", "positions": ["2B", "LF"]},
-    {"name": "Byron Buxton",       "mlb_id": 621439, "team": "MIN", "positions": ["CF"]},
-    {"name": "Lawrence Butler",    "mlb_id": 671732, "team": "ATH", "positions": ["CF", "RF"]},
-    {"name": "Ozzie Albies",       "mlb_id": 645277, "team": "ATL", "positions": ["2B"]},
-    {"name": "Jordan Walker",      "mlb_id": 691023, "team": "STL", "positions": ["LF", "RF"]},
-    {"name": "Sal Frelick",        "mlb_id": 686217, "team": "MIL", "positions": ["LF", "CF", "RF"]},
-    {"name": "Giancarlo Stanton",  "mlb_id": 519317, "team": "NYY", "positions": ["LF", "RF"]}
+    {
+      "name": "Shea Langeliers",
+      "mlb_id": 669127,
+      "team": "ATH",
+      "positions": [
+        "C"
+      ],
+      "yahoo_player_key": "469.p.11728",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.328,
+        "barrel_pct": 11.2,
+        "hh_pct": 44.9,
+        "bb_pct": 6.9,
+        "ops": 0.861,
+        "pa_per_team_g": 3.23,
+        "pa": 523,
+        "g": 123
+      }
+    },
+    {
+      "name": "Christian Walker",
+      "mlb_id": 572233,
+      "team": "HOU",
+      "positions": [
+        "1B"
+      ],
+      "yahoo_player_key": "469.p.9846",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.314,
+        "barrel_pct": 12.9,
+        "hh_pct": 46.1,
+        "bb_pct": 6.2,
+        "ops": 0.718,
+        "pa_per_team_g": 3.95,
+        "pa": 640,
+        "g": 154
+      }
+    },
+    {
+      "name": "Jazz Chisholm Jr.",
+      "mlb_id": 665862,
+      "team": "NYY",
+      "positions": [
+        "2B",
+        "3B"
+      ],
+      "yahoo_player_key": "469.p.10839",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.346,
+        "barrel_pct": 15.0,
+        "hh_pct": 43.3,
+        "bb_pct": 10.9,
+        "ops": 0.813,
+        "pa_per_team_g": 3.28,
+        "pa": 531,
+        "g": 130
+      }
+    },
+    {
+      "name": "Manny Machado",
+      "mlb_id": 592518,
+      "team": "SD",
+      "positions": [
+        "3B"
+      ],
+      "yahoo_player_key": "469.p.9111",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.355,
+        "barrel_pct": 12.9,
+        "hh_pct": 51.5,
+        "bb_pct": 8.1,
+        "ops": 0.795,
+        "pa_per_team_g": 4.19,
+        "pa": 678,
+        "g": 159
+      }
+    },
+    {
+      "name": "Ezequiel Tovar",
+      "mlb_id": 678662,
+      "team": "COL",
+      "positions": [
+        "SS"
+      ],
+      "yahoo_player_key": "469.p.12322",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.319,
+        "barrel_pct": 9.3,
+        "hh_pct": 38.9,
+        "bb_pct": 5.4,
+        "ops": 0.694,
+        "pa_per_team_g": 2.41,
+        "pa": 390,
+        "g": 95
+      }
+    },
+    {
+      "name": "Jose Altuve",
+      "mlb_id": 514888,
+      "team": "HOU",
+      "positions": [
+        "2B",
+        "LF"
+      ],
+      "yahoo_player_key": "469.p.8996",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.3,
+        "barrel_pct": 6.2,
+        "hh_pct": 30.9,
+        "bb_pct": 8.4,
+        "ops": 0.771,
+        "pa_per_team_g": 4.04,
+        "pa": 654,
+        "g": 155
+      }
+    },
+    {
+      "name": "Byron Buxton",
+      "mlb_id": 621439,
+      "team": "MIN",
+      "positions": [
+        "CF"
+      ],
+      "yahoo_player_key": "469.p.9590",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.35,
+        "barrel_pct": 17.6,
+        "hh_pct": 53.8,
+        "bb_pct": 7.6,
+        "ops": 0.878,
+        "pa_per_team_g": 3.35,
+        "pa": 542,
+        "g": 126
+      }
+    },
+    {
+      "name": "Lawrence Butler",
+      "mlb_id": 671732,
+      "team": "ATH",
+      "positions": [
+        "CF",
+        "RF"
+      ],
+      "yahoo_player_key": "469.p.12719",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.304,
+        "barrel_pct": 9.2,
+        "hh_pct": 44.4,
+        "bb_pct": 9.4,
+        "ops": 0.71,
+        "pa_per_team_g": 3.89,
+        "pa": 630,
+        "g": 152
+      }
+    },
+    {
+      "name": "Ozzie Albies",
+      "mlb_id": 645277,
+      "team": "ATL",
+      "positions": [
+        "2B"
+      ],
+      "yahoo_player_key": "469.p.10237",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.299,
+        "barrel_pct": 4.9,
+        "hh_pct": 30.7,
+        "bb_pct": 8.2,
+        "ops": 0.671,
+        "pa_per_team_g": 4.12,
+        "pa": 667,
+        "g": 157
+      }
+    },
+    {
+      "name": "Jordan Walker",
+      "mlb_id": 691023,
+      "team": "STL",
+      "positions": [
+        "LF",
+        "RF"
+      ],
+      "yahoo_player_key": "469.p.12024",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.278,
+        "barrel_pct": 10.9,
+        "hh_pct": 50.0,
+        "bb_pct": 7.3,
+        "ops": 0.584,
+        "pa_per_team_g": 2.44,
+        "pa": 396,
+        "g": 111
+      }
+    },
+    {
+      "name": "Sal Frelick",
+      "mlb_id": 686217,
+      "team": "MIL",
+      "positions": [
+        "LF",
+        "CF",
+        "RF"
+      ],
+      "yahoo_player_key": "469.p.12476",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.299,
+        "barrel_pct": 3.1,
+        "hh_pct": 27.4,
+        "bb_pct": 7.9,
+        "ops": 0.756,
+        "pa_per_team_g": 3.67,
+        "pa": 594,
+        "g": 142
+      }
+    },
+    {
+      "name": "Giancarlo Stanton",
+      "mlb_id": 519317,
+      "team": "NYY",
+      "positions": [
+        "LF",
+        "RF"
+      ],
+      "yahoo_player_key": "469.p.8634",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.354,
+        "barrel_pct": 22.1,
+        "hh_pct": 55.2,
+        "bb_pct": 10.3,
+        "ops": 0.944,
+        "pa_per_team_g": 1.73,
+        "pa": 281,
+        "g": 77
+      }
+    }
   ],
   "pitchers": [
-    {"name": "Tarik Skubal",     "mlb_id": 669373, "team": "DET", "positions": ["SP"]},
-    {"name": "Chris Sale",       "mlb_id": 519242, "team": "ATL", "positions": ["SP"]},
-    {"name": "Cole Ragans",      "mlb_id": 666142, "team": "KC",  "positions": ["SP"]},
-    {"name": "Aaron Nola",       "mlb_id": 605400, "team": "PHI", "positions": ["SP"]},
-    {"name": "Robert Garcia",    "mlb_id": 676395, "team": "TEX", "positions": ["RP"]},
-    {"name": "Garrett Whitlock", "mlb_id": 676477, "team": "BOS", "positions": ["RP"]},
-    {"name": "Brayan Bello",     "mlb_id": 678394, "team": "BOS", "positions": ["SP"]},
-    {"name": "Parker Messick",   "mlb_id": 800048, "team": "CLE", "positions": ["SP"]},
-    {"name": "Brady Singer",     "mlb_id": 663903, "team": "CIN", "positions": ["SP"]},
-    {"name": "Chris Bassitt",    "mlb_id": 605135, "team": "BAL", "positions": ["SP"]},
-    {"name": "Merrill Kelly",    "mlb_id": 518876, "team": "AZ",  "positions": ["SP"]}
+    {
+      "name": "Tarik Skubal",
+      "mlb_id": 669373,
+      "team": "DET",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.11763",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 2.71,
+        "xwoba_allowed": 0.258,
+        "hh_pct_allowed": 33.0,
+        "barrel_pct_allowed": 8.1,
+        "bbe": 469,
+        "era": 2.21,
+        "ip_per_gs": 6.3,
+        "ip": 195.3
+      }
+    },
+    {
+      "name": "Chris Sale",
+      "mlb_id": 519242,
+      "team": "ATL",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.8780",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 2.87,
+        "xwoba_allowed": 0.265,
+        "hh_pct_allowed": 35.4,
+        "barrel_pct_allowed": 6.3,
+        "bbe": 302,
+        "era": 2.58,
+        "ip_per_gs": 6.3,
+        "ip": 125.7
+      }
+    },
+    {
+      "name": "Cole Ragans",
+      "mlb_id": 666142,
+      "team": "KC",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.10610",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 2.67,
+        "xwoba_allowed": 0.256,
+        "hh_pct_allowed": 39.4,
+        "barrel_pct_allowed": 9.5,
+        "bbe": 137,
+        "era": 4.67,
+        "ip_per_gs": 4.7,
+        "ip": 61.7
+      }
+    },
+    {
+      "name": "Aaron Nola",
+      "mlb_id": 605400,
+      "team": "PHI",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.9882",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.13,
+        "xwoba_allowed": 0.315,
+        "hh_pct_allowed": 43.3,
+        "barrel_pct_allowed": 9.1,
+        "bbe": 275,
+        "era": 6.01,
+        "ip_per_gs": 5.5,
+        "ip": 94.3
+      }
+    },
+    {
+      "name": "Robert Garcia",
+      "mlb_id": 676395,
+      "team": "TEX",
+      "positions": [
+        "RP"
+      ],
+      "yahoo_player_key": "469.p.60615",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.82,
+        "xwoba_allowed": 0.304,
+        "hh_pct_allowed": 34.3,
+        "barrel_pct_allowed": 7.9,
+        "bbe": 178,
+        "era": 2.95,
+        "k_per_9": 9.56,
+        "ip_per_team_g": 0.4,
+        "ip": 64.0
+      }
+    },
+    {
+      "name": "Garrett Whitlock",
+      "mlb_id": 676477,
+      "team": "BOS",
+      "positions": [
+        "RP"
+      ],
+      "yahoo_player_key": "469.p.11358",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 2.8,
+        "xwoba_allowed": 0.262,
+        "hh_pct_allowed": 36.4,
+        "barrel_pct_allowed": 8.7,
+        "bbe": 173,
+        "era": 2.25,
+        "k_per_9": 11.38,
+        "ip_per_team_g": 0.44,
+        "ip": 72.0
+      }
+    },
+    {
+      "name": "Brayan Bello",
+      "mlb_id": 678394,
+      "team": "BOS",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.12330",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.48,
+        "xwoba_allowed": 0.327,
+        "hh_pct_allowed": 39.3,
+        "barrel_pct_allowed": 7.1,
+        "bbe": 504,
+        "era": 3.35,
+        "ip_per_gs": 6.0,
+        "ip": 166.7
+      }
+    },
+    {
+      "name": "Parker Messick",
+      "mlb_id": 800048,
+      "team": "CLE",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.60042",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.07,
+        "xwoba_allowed": 0.274,
+        "hh_pct_allowed": 29.8,
+        "barrel_pct_allowed": 5.8,
+        "bbe": 121,
+        "era": 2.72,
+        "ip_per_gs": 5.7,
+        "ip": 39.7
+      }
+    },
+    {
+      "name": "Brady Singer",
+      "mlb_id": 663903,
+      "team": "CIN",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.11323",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.27,
+        "xwoba_allowed": 0.32,
+        "hh_pct_allowed": 40.7,
+        "barrel_pct_allowed": 9.4,
+        "bbe": 479,
+        "era": 4.03,
+        "ip_per_gs": 5.3,
+        "ip": 169.7
+      }
+    },
+    {
+      "name": "Chris Bassitt",
+      "mlb_id": 605135,
+      "team": "BAL",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.9799",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.16,
+        "xwoba_allowed": 0.316,
+        "hh_pct_allowed": 36.6,
+        "barrel_pct_allowed": 8.5,
+        "bbe": 505,
+        "era": 3.96,
+        "ip_per_gs": 5.5,
+        "ip": 170.3
+      }
+    },
+    {
+      "name": "Merrill Kelly",
+      "mlb_id": 518876,
+      "team": "AZ",
+      "positions": [
+        "SP"
+      ],
+      "yahoo_player_key": "469.p.11251",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.16,
+        "xwoba_allowed": 0.316,
+        "hh_pct_allowed": 43.5,
+        "barrel_pct_allowed": 9.2,
+        "bbe": 531,
+        "era": 3.52,
+        "ip_per_gs": 5.8,
+        "ip": 184.0
+      }
+    }
   ],
   "teams": {
-    "ATH": 133, "ATL": 144, "AZ": 109, "BAL": 110, "BOS": 111,
-    "CHC": 112, "CIN": 113, "CLE": 114, "COL": 115, "CWS": 145,
-    "DET": 116, "HOU": 117, "KC": 118, "LAA": 108, "LAD": 119,
-    "MIA": 146, "MIL": 158, "MIN": 142, "NYM": 121, "NYY": 147,
-    "PHI": 143, "PIT": 134, "SD": 135, "SEA": 136, "SF": 137,
-    "STL": 138, "TB": 139, "TEX": 140, "TOR": 141, "WSH": 120
+    "ATH": 133,
+    "ATL": 144,
+    "AZ": 109,
+    "BAL": 110,
+    "BOS": 111,
+    "CHC": 112,
+    "CIN": 113,
+    "CLE": 114,
+    "COL": 115,
+    "CWS": 145,
+    "DET": 116,
+    "HOU": 117,
+    "KC": 118,
+    "LAA": 108,
+    "LAD": 119,
+    "MIA": 146,
+    "MIL": 158,
+    "MIN": 142,
+    "NYM": 121,
+    "NYY": 147,
+    "PHI": 143,
+    "PIT": 134,
+    "SD": 135,
+    "SEA": 136,
+    "SF": 137,
+    "STL": 138,
+    "TB": 139,
+    "TEX": 140,
+    "TOR": 141,
+    "WSH": 120
   },
   "league": {
     "min_ip": 40,
