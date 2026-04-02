@@ -28,6 +28,7 @@
 | `GET /league/{key}/players;search={name}` | 球員姓名搜尋 | `cmd_player()` |
 | `GET /league/{key}/players;player_keys={key}/stats` | 指定球員本季數據 | `cmd_player()` 二段查詢 |
 | `GET /league/{key}/players;player_keys={key}/percent_owned` | 指定球員持有率 | `cmd_player()` 二段查詢 |
+| `GET /league/{key}/transactions;team_key={my_key}` | 我方 add/drop 異動檢查 | `roster_sync.py` |
 
 ## 可用但尚未使用的端點
 
