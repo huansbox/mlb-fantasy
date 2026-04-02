@@ -196,11 +196,11 @@
 
 ### 每日
 
-| 時間 (TW) | 做什麼 | 自動/手動 | 相關檔案 |
-|-----------|--------|----------|----------|
-| 22:15 | 收速報 → 設隔日 lineup | 自動推送 | `main.py` |
-| 05:00 | 收最終報 → 確認/微調 lineup | 自動推送 | `main.py` |
-| 07:00 | 看 FA Watch → 有異常才行動 | 自動推送 | `fa_watch.py` |
+| 時間 (TW) | 做什麼 | 說明 |
+|-----------|--------|------|
+| 22:15 | 收速報 → 設隔日 lineup → 睡覺 | 自動推送 |
+| 05:00 | 最終報產出 | 自動推送（睡眠中） |
+| 07:00 | 起床看最終報 + FA Watch → 微調（如需要） | 兩份一起看 |
 
 ### 每週（週一）
 
@@ -226,11 +226,12 @@
 
 ### 事件觸發
 
-| 事件 | 動作 | 相關檔案 |
-|------|------|----------|
-| Add/Drop | 跑同步腳本更新 config → push → VPS pull | `roster_config.json` |
-| FAAB 出價 | 更新 config 的 faab_remaining | `roster_config.json` |
-| Watchlist 觸發 | `/player-eval` 深入評估 → 決定行動 | `waiver-log.md` |
+| 事件 | 動作 |
+|------|------|
+| 球員受傷/表現差 | 查 waiver-log.md 有無現成候選 → 有：`/player-eval` 確認 → 執行。沒有：`/waiver-scan` 找人 → `/player-eval` → 執行 |
+| Add/Drop 執行後 | 跑同步腳本更新 config → push → VPS pull |
+| FAAB 出價 | 更新 config 的 faab_remaining |
+| Watchlist 觸發 | `/player-eval` 深入評估 → 決定行動 |
 
 ### 檔案索引
 
@@ -308,6 +309,8 @@
 - [ ] 移除選秀日工具 + 數據來源（#16）
 - [ ] 篩選框架統一為打者/SP/RP 三段（#15）
 - [ ] 文件結構 + SOP 合併為賽季運營 SOP（#14+#15）
+- [ ] 加待辦提醒：Week 6-8 更新百分位表為 2026 賽季數據（CLAUDE.md + main.py + prompt 檔）
+- [ ] 加待辦提醒：交易策略（有需要時再建）
 
 ### roster_config.json
 
