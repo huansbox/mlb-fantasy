@@ -5,11 +5,14 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 
 # 陣容基準卡週更 SOP
 
-定期更新 `roster-baseline.md`，追蹤現有球員實際表現 vs 預測，標記需要行動的異常。
+定期更新 `roster-baseline.md`，追蹤現有球員實際表現 vs 前一年數據，標記需要行動的異常。
 
 > 本 skill 負責「更新自家陣容數據」。發現替換需求後：
 > - 找 FA 候選人 → 觸發 `waiver-scan`
 > - 評估特定球員 → 觸發 `player-eval`
+
+> **評估標準**：見 `CLAUDE.md`「球員評估框架」（唯一定義）。本 SOP 不複製評估標準。
+> **陣容來源**：`daily-advisor/roster_config.json`（唯一名單來源）。
 
 ## 適用時機
 
@@ -22,10 +25,11 @@ description: "Fantasy Baseball 陣容基準卡週更。更新 roster-baseline.md
 ## Step 1：讀取現況
 
 1. 讀 `roster-baseline.md` — 上次更新日期 + 現有基準數據
-2. 讀 `CLAUDE.md` — 確認當前陣容（是否有異動後未更新基準卡的球員）
-3. 確認今天日期和賽季週數
+2. 讀 `daily-advisor/roster_config.json` — 確認當前陣容（唯一名單來源）
+3. 讀 `CLAUDE.md` — 確認評估框架（百分位表、指標定義）
+4. 確認今天日期和賽季週數
 
-**陣容異動檢查**：如果 CLAUDE.md 陣容與 `roster-baseline.md` 不一致（有新球員或 drop 球員），先同步名單再進入 Step 2。
+**陣容異動檢查**：如果 roster_config.json 陣容與 `roster-baseline.md` 不一致（有新球員或 drop 球員），先同步名單再進入 Step 2。
 
 ## Step 2：蒐集實際數據
 
@@ -54,41 +58,36 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 roster_stats.py 無法取得的資訊才用 WebSearch：
 - 傷病 / IL 更新
 - 角色變動（先發 → 替補、輪值調整）
-- Steamer ROS 更新預測
 
 ### 效率技巧
 
 - **不再需要並行 Agent 搜尋** — roster_stats.py 一次跑完全陣容（~30 秒）
-- **單一來源優先**：如果 FanGraphs 或 ESPN 的一個頁面能拉到多人數據，優先用
-- **RP 簡化**：Punt SV+H 策略下，RP 只需更新 ERA / WHIP / IP，不追 SV+H
+- **RP 簡化**：Punt SV+H 策略下，RP 重點看 ERA/WHIP/K/9，不追 SV+H
 
 ## Step 3：更新 roster-baseline.md
 
 ### 表格格式（in-season 版本）
 
-開季後第一次更新時，將表格格式從「預測版」切換為「實際 + 預測對照版」：
-
 **打者表格**：
 ```markdown
-| 球員 | 位置 | G | PA | xwOBA | HH% | Barrel% | OPS | HR | BB% | BBE | 趨勢 |
+| 球員 | 位置 | G | PA | xwOBA | Barrel% | BB% | HH% | OPS | PA/TG | HR | BBE | 趨勢 |
 ```
 
 **投手表格**：
 ```markdown
-| 球員 | 隊伍 | GS | IP | ERA | WHIP | K | W | QS | xERA | xwOBA | HH% | Barrel% | BBE | 趨勢 |
+| 球員 | 隊伍 | GS | IP | xERA | xwOBA | HH% | Barrel% | ERA | IP/GS | WHIP | K | W | QS | BBE | 趨勢 |
 ```
-> QS：有實際數據時填入，無數據時用粗估（xERA < 3.50 ≈ 18-22 QS；3.50-4.00 ≈ 14-17；4.00-4.50 ≈ 10-13）。
 
 ### 趨勢標記規則
 
-對比預測值（開季版基準卡的 Steamer 數據），標記趨勢：
+對比前一年數據（roster_config.json 的 prior_stats），標記趨勢：
 
 | 標記 | 含義 | 打者觸發條件 | 投手觸發條件 |
 |------|------|------------|------------|
-| ▲ | 超越預測 | xwOBA 比前一年高 .025+ 或 HH% 高 5+ 百分點 | xERA 比前一年低 0.30+ 或 HH% allowed 低 3+ 百分點 |
-| — | 符合預測 | xwOBA/HH% 在前一年 ±10% 內 | xERA/HH% allowed 在前一年 ±10% 內 |
-| ▼ | 低於預測 | xwOBA 比前一年低 .025+ 或 HH% 低 5+ 百分點 | xERA 比前一年高 0.30+ 或 HH% allowed 高 3+ 百分點 |
-| ⚠️ | 需要關注 | 連 2 週 ▼ 或觸及 CLAUDE.md 行動觸發規則 | 連 2 週 ▼ 或 xERA > P25 (5.62) |
+| ▲ | 超越前一年 | xwOBA 高 .025+ 或 Barrel% 高 3+ 百分點 | xERA 低 0.30+ 或 HH% allowed 低 3+ 百分點 |
+| — | 持平 | 核心指標在前一年 ±10% 內 | 同上 |
+| ▼ | 低於前一年 | xwOBA 低 .025+ 或 Barrel% 低 3+ 百分點 | xERA 高 0.30+ 或 HH% allowed 高 3+ 百分點 |
+| ⚠️ | 需要關注 | 連 2 週 ▼ | 連 2 週 ▼ |
 
 > **小樣本警告**：Week 3-6 期間，所有趨勢標記後加註 `(小樣本)` 提醒。
 
@@ -104,43 +103,36 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 
 ## Step 4：異常標記與行動建議
 
-更新完數據後，檢查以下觸發條件：
+更新完數據後，依 CLAUDE.md 評估框架檢查：
 
 ### 自動觸發（直接建議行動）
 
-1. **CLAUDE.md 行動觸發規則命中**：
-   - 讀取 CLAUDE.md「行動觸發規則」表格，逐條比對當前數據
-   - 任何條件命中 → 提示用戶並建議對應行動
-   - ⚠️ 不硬編碼球員名稱，陣容會隨賽季變動，一律以 CLAUDE.md 即時版本為準
+1. **過程指標警報**（引用 CLAUDE.md 百分位表判斷）：
+   - 打者：核心 3 指標中 2 項 < P25 → 結構性問題
+   - SP：核心 3 指標中 2 項 < P25 → 結構性問題
+   - 輔助確認：傳統 stats 也差時更確定
 
-2. **過程指標警報**：
-   - 任何正選打者 xwOBA < .262 (P25) + HH% < 36% (P25)（過程指標雙低 = 結構性問題，非小樣本噪音）
-   - Barrel% 同時 < 5% (P25) 時加重標記
-   - 任何 SP xERA > P25 (5.62) + HH% allowed > P25 (44.2%)（過程指標雙差 = 結構性問題）
-   - ERA > 5.50 且 WHIP > 1.60 輔助確認（結果指標也差 → 更確定）
+2. **排名觸發**：
+   - 打者排在全隊最弱 5 人 + 核心指標持續 ▼ → 建議 waiver-scan 找替換
+   - SP 排在最弱 4 人 + 核心指標持續 ▼ → 同上
 
 ### 需要觀察（標記但不立即行動）
 
-3. **表現偏離預測**：
-   - 打者 xwOBA 比前一年低 .030+ 且 BBE > 30（過程指標偏離比結果指標更早示警）
-   - 打者 HH% 比前一年低 5+ 百分點且 BBE > 30
-   - SP xERA 比前一年高 0.50+ 且 BBE > 30（過程指標偏離比 ERA 更早示警）
-   - SP HH% allowed 比前一年高 3+ 百分點且 BBE > 30
+3. **表現偏離前一年**：
+   - 打者核心指標比前一年顯著下降（≥ 10 百分位點）且 BBE > 30
+   - SP 核心指標比前一年顯著下降（≥ 10 百分位點）且 BBE > 30
 
 4. **正面驚喜**：
-   - 任何球員大幅超越預測 → 標記「勿 drop」，避免被短期低潮誤判
+   - 任何球員大幅超越前一年 → 標記「勿 drop」，避免被短期低潮誤判
 
 ### 分流規則（決定下一步）
 
 | 情境 | 行動 |
 |------|------|
-| 觸發規則命中（CLAUDE.md 行動觸發） | → `waiver-scan`（找替換候選人） |
+| 核心指標雙低 + BBE > 30 | → `waiver-scan`（找替換候選人） |
 | ▼ 但仍在小樣本期（< 50 PA / < 20 IP） | → 不動，下週再看 |
-| 比率拖累警報 + 已超過 50 PA / 20 IP | → `player-eval`（確認是否結構性問題） |
 | 已知特定替換候選人（waiver-log 觀察中有人） | → `player-eval`（直接比較） |
-| 所有球員符合預測或超越 | → 不動 |
-
-> 建議行動時同時引用 `roster-baseline.md` 替換門檻，確認候選人達標。
+| 所有球員持平或超越 | → 不動 |
 
 ## Step 5：輸出摘要
 
@@ -153,8 +145,8 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 - 數據來源：{來源}
 
 ### 趨勢摘要
-- ▲ 超越預測：{球員列表}
-- ▼ 低於預測：{球員列表}
+- ▲ 超越前一年：{球員列表}
+- ▼ 低於前一年：{球員列表}
 - ⚠️ 需要關注：{球員列表 + 原因}
 
 ### 行動建議
@@ -167,10 +159,9 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 ## 錯誤檢查（更新前必過）
 
 - [ ] 所有數據來自搜尋結果，無「大概」估算？
-- [ ] 陣容名單與 CLAUDE.md 一致？（無遺漏、無多餘）
-- [ ] 趨勢標記有對照預測基準值？
+- [ ] 陣容名單與 roster_config.json 一致？（無遺漏、無多餘）
+- [ ] 趨勢標記有對照 prior_stats 基準值？
 - [ ] 小樣本期間（< Week 7）有加註 `(小樣本)`？
-- [ ] 行動觸發規則有讀取 CLAUDE.md 最新版？
 
 ## 與其他 SOP 的整合
 
@@ -178,5 +169,5 @@ roster_stats.py 無法取得的資訊才用 WebSearch：
 roster-scan（本 SOP）
   ├─ 發現替換需求 → waiver-scan（找 FA 候選人）
   ├─ 特定球員疑問 → player-eval（深入評估）
-  └─ 陣容異動後 → 更新 CLAUDE.md + roster-baseline.md
+  └─ 陣容異動後 → 更新 roster_config.json + roster-baseline.md
 ```
