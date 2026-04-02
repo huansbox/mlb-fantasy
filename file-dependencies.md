@@ -299,54 +299,86 @@
 
 ---
 
-## 待執行變更總表
+## 變更完成記錄
 
-### CLAUDE.md
+> 2026-04-02 session 完成。
 
-- [ ] 移除「vs 選秀前變更」表（#2）
-- [ ] 陣容改為核心 3 人 + 連結 config（#3）
-- [ ] 執行中策略不綁球員名，串流 SP 改中性描述（#4）
-- [ ] Waiver 規則加 FAAB 餘額（#6）
-- [ ] 陣容風險改為指引到動態計算（#7）
-- [ ] 移除 Week 1 複盤（#8）
-- [ ] 移除 Watchlist（#9）→ 指引到 waiver-log.md
-- [ ] 移除行動觸發規則（#10）→ 合併到 waiver-log.md
-- [ ] 移除格式狀態 + 7×7 特性（#11）
-- [ ] 移除核心分析框架 + 分析結論（#12）
-- [ ] 移除 45 秒速查決策規則（#13）
-- [ ] 移除選秀日工具 + 數據來源（#16）
-- [ ] 篩選框架統一為打者/SP/RP 三段（#15）
-- [ ] 文件結構 + SOP 合併為賽季運營 SOP（#14+#15）
-- [ ] 加待辦提醒：Week 6-8 更新百分位表為 2026 賽季數據（CLAUDE.md + main.py + prompt 檔）
-- [ ] 加待辦提醒：交易策略（有需要時再建）
+### CLAUDE.md — ✅ 全部完成（`97a11d1`）
 
-### roster_config.json
+- [x] 移除「vs 選秀前變更」表（#2）
+- [x] 陣容改為核心 3 人 + 連結 config（#3）
+- [x] 執行中策略不綁球員名，串流 SP 改中性描述（#4）
+- [x] Waiver 規則加 FAAB 餘額（#6）
+- [x] 陣容風險改為指引到動態計算（#7）
+- [x] 移除 Week 1 複盤（#8）
+- [x] 移除 Watchlist（#9）→ 指引到 waiver-log.md
+- [x] 移除行動觸發規則（#10）→ 合併到 waiver-log.md
+- [x] 移除格式狀態 + 7×7 特性（#11）
+- [x] 移除核心分析框架 + 分析結論（#12）
+- [x] 移除 45 秒速查決策規則（#13）
+- [x] 移除選秀日工具 + 數據來源（#16）
+- [x] 篩選框架統一為打者/SP/RP 三段（#15）
+- [x] 文件結構 + SOP 合併為賽季運營 SOP（#14+#15）
+- [x] 加待辦提醒：Week 6-8 更新百分位表
+- [x] 加待辦提醒：交易策略
 
-- [ ] 移除 Kwan、Littell
-- [ ] 新增 Walker(STL)、Messick
-- [ ] 移除 `role`、`type`、`proj` 欄位
-- [ ] 新增 `yahoo_player_key` 欄位
-- [ ] 新增 `prior_stats` 欄位（去年數據）
-- [ ] 投打統一用 `positions`
-- [ ] league 加 `faab_remaining`
+### 百分位表 — ✅ 全部完成（`602873a`, `27f5fb1`）
+
+- [x] PA/Team_G（打者）
+- [x] IP/GS（SP）→ 改為三級分類（分布太集中）
+- [x] K/9（RP）
+- [x] IP/Team_G（RP）
+- [x] |xERA-ERA|（SP/RP 分開）
+- [x] 寫入 CLAUDE.md + main.py
+
+### roster_config.json — 部分完成（`97a11d1`）
+
+- [x] 移除 Kwan、Littell
+- [x] 新增 Walker(STL)、Messick
+- [x] 移除 `role`、`type`、`proj` 欄位
+- [x] 投打統一用 `positions`
+- [x] league 加 `faab_remaining`
+- [ ] 新增 `yahoo_player_key` 欄位 — 待 roster_sync.py
+- [ ] 新增 `prior_stats` 欄位（去年數據）— 待 roster_sync.py
+
+### Skills + prompt 檔 — ✅ 全部完成（`0d0331e`）
+
+- [x] player-eval：評估標準改為引用 CLAUDE.md（不複製）
+- [x] waiver-scan：同上 + 移除同步 CLAUDE.md watchlist 的指引
+- [x] roster-scan：加指引讀 roster_config.json
+- [x] prompt_fa_watch.txt：移除寫死的弱點描述
+- [x] prompt_weekly_scan.txt：更新指標 + 百分位參考
+
+### 程式碼修改 — ✅ 全部完成（`c618f5e`）
+
+- [x] yahoo_query.py：新增 is_pitcher / pitcher_type / calc_position_depth helpers
+- [x] fa_watch.py：DAILY_QUERIES 改為動態計算零替補位置
+- [x] fa_watch.py：build_fa_watch_data() 動態產出位置深度 + 風險摘要
+- [x] weekly_scan.py：同上
+- [x] main.py：config fallback 路徑 derive role/type from positions
+- [x] roster_stats.py：移除 role/type 依賴
+- [x] weekly_review.py：config 路徑修復
+- [x] main.py：新增百分位表（RP_PCTILES + pctile_tag RP 支援）
+
+### VPS 部署 — ✅ 完成
+
+- [x] git pull 同步至 `c618f5e`
+- [x] gh CLI 認證修復
+- [x] GitHub Issue labels 建立（fa-watch / waiver-scan / daily-report）
+
+---
+
+## 未完成（下次 session）
 
 ### 新腳本（roster_sync.py）
 
 - [ ] 從 Yahoo API 拉即時陣容更新 config
-- [ ] 新球員自動查 mlb_id
-- [ ] prior_stats 在球員首次加入時寫入
+- [ ] 新球員自動查 mlb_id（MLB API people/search）
+- [ ] 查不到的標記 `"mlb_id": null`
+- [ ] prior_stats 在球員首次加入時寫入（Savant CSV + MLB Stats API）
+- [ ] 加入 `yahoo_player_key` 欄位
 
-### 程式碼修改
+### roster_config.json 補齊
 
-- [ ] fa_watch.py：DAILY_QUERIES 改為動態計算零替補位置
-- [ ] fa_watch.py：build_fa_watch_data() 動態產出位置深度 + 風險摘要
-- [ ] weekly_scan.py：同上
-- [ ] prompt_fa_watch.txt：移除寫死的弱點描述（第 4 行）
-- [ ] 各腳本移除 `role` 依賴
-- [ ] main.py / prompt 檔：新增百分位表（PA/Team_G、IP/GS 等）
-
-### Skills
-
-- [ ] player-eval：評估標準改為引用 CLAUDE.md（不複製）
-- [ ] waiver-scan：同上 + 移除同步 CLAUDE.md watchlist 的指引
-- [ ] roster-scan：加指引讀 roster_config.json
+- [ ] `yahoo_player_key`（依賴 roster_sync.py）
+- [ ] `prior_stats`（依賴 roster_sync.py）
