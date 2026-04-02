@@ -92,6 +92,40 @@ def load_config():
         return json.load(f)
 
 
+# ── Roster helpers ──
+
+ALL_BATTER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"]
+
+
+def is_pitcher(player):
+    """Check if player is pitcher based on positions array."""
+    return any(p in ("SP", "RP") for p in player.get("positions", []))
+
+
+def pitcher_type(player):
+    """Derive SP/RP from positions array. Returns 'SP', 'RP', or None."""
+    positions = player.get("positions", [])
+    if "SP" in positions:
+        return "SP"
+    if "RP" in positions:
+        return "RP"
+    return None
+
+
+def calc_position_depth(config):
+    """Calculate position coverage from config.
+
+    Returns dict of positions with <= 1 player covering them.
+    Example: {"C": 1, "SS": 1} means C and SS have only 1 player each.
+    """
+    coverage = {pos: 0 for pos in ALL_BATTER_POSITIONS}
+    for b in config.get("batters", []):
+        for pos in b.get("positions", []):
+            if pos in coverage:
+                coverage[pos] += 1
+    return {pos: count for pos, count in coverage.items() if count <= 1}
+
+
 def extract_player_info(player_data):
     """Extract player fields from Yahoo's nested player structure."""
     info = player_data[0]
