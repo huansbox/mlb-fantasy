@@ -655,8 +655,8 @@ def run_init(my_key, token, config, dry_run):
     for ptype in ("batter", "pitcher"):
         batch = fetch_savant_batch(all_ids, 2025, ptype)
         for mid, data in batch.items():
-            if data:  # Only merge non-empty results (avoid overwriting with {})
-                savant_data[mid] = data
+            if data:  # Only merge non-empty results
+                savant_data.setdefault(mid, {}).update(data)
 
     config = update_config(config, roster, diff, savant_data=savant_data)
     save_config(config)
