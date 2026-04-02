@@ -15,11 +15,12 @@ from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
     send_telegram,
+    pitcher_type, calc_position_depth,
 )
 from fa_watch import (
     collect_fa_snapshot, load_fa_history, save_fa_history,
     calc_owned_changes, format_change_rankings,
-    WEEKLY_QUERIES, TPE,
+    build_position_queries, TPE,
 )
 
 SUMMARY_FILE = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
@@ -29,17 +30,19 @@ def build_weekly_data(today_str, snapshot, changes, ref_1d, ref_3d, config):
     """Build comprehensive data summary for claude -p."""
     lines = [f"=== Weekly Deep Scan ({today_str}) ===\n"]
 
-    # Roster summary (R6)
+    # Roster summary
     lines.append("--- 我的陣容 ---")
     for b in config.get("batters", []):
-        role = "BN" if b["role"] == "bench" else b["role"]
-        lines.append(f"  [{role}] {b['name']} ({b['team']}, {'/'.join(b['positions'])})")
+        lines.append(f"  {b['name']} ({b['team']}, {'/'.join(b['positions'])})")
     for p in config.get("pitchers", []):
-        role = "BN" if p["role"] == "bench" else ("IL" if p["role"] == "IL" else p["type"])
-        lines.append(f"  [{role}] {p['name']} ({p['team']}, {p['type']})")
+        p_type = pitcher_type(p) or "P"
+        lines.append(f"  {p['name']} ({p['team']}, {p_type})")
 
-    # Full FA rankings by position
-    for pos in ["CF", "SP", "LF", "1B", "2B"]:
+    # Full FA rankings by position (dynamic from config)
+    thin = calc_position_depth(config)
+    scan_positions = list(thin.keys()) + ["SP"]
+    scan_positions = list(dict.fromkeys(scan_positions))  # dedupe, preserve order
+    for pos in scan_positions:
         pos_players = [
             (n, i) for n, i in snapshot.items()
             if pos in i["position"].split(",")
@@ -144,7 +147,8 @@ def main():
 
         print(f"[Weekly Scan] {today_str}...", file=sys.stderr)
 
-        snapshot = collect_fa_snapshot(access_token, config, queries=WEEKLY_QUERIES)  # (R4)
+        queries = build_position_queries(config, weekly=True)
+        snapshot = collect_fa_snapshot(access_token, config, queries=queries)
 
         history = load_fa_history()
         changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)

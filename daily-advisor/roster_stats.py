@@ -15,6 +15,7 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 
+from yahoo_query import pitcher_type
 from main import (
     load_config,
     api_get,
@@ -199,11 +200,11 @@ def main():
         bbe = sv_cur.get("bbe", 0) or "—"
         xera_pri = fmt(sv_pri.get("xera"), ".2f")
         hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
+        p_type = pitcher_type(p) or "P"
         if not d:
-            role = "IL" if p.get("role") == "IL" else p["type"]
-            print(f"| {p['name']} | {p['team']} | {role} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
+            print(f"| {p['name']} | {p['team']} | {p_type} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
             continue
-        print(f"| {p['name']} | {p['team']} | {p['type']} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
+        print(f"| {p['name']} | {p['team']} | {p_type} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
 
 
 if __name__ == "__main__":
