@@ -58,20 +58,13 @@
 
 ### 功能開發
 
-#### 1. roster_sync.py（新腳本）
-從 Yahoo API 自動同步陣容到 roster_config.json。目前 add/drop 後需手動更新 config。
+#### ~~1. roster_sync.py（新腳本）~~ ✅ 2026-04-03 完成
+- `--init` bootstrap + daily cron（TW 15:10）已部署 VPS
+- 23 人 yahoo_player_key + prior_stats（2025 Savant + MLB Stats）全部寫入
+- transactions gate：只在有新 add/drop 時才更新，auto git push + Telegram 通知
 
-需要實作：
-- 從 Yahoo API 拉即時陣容（名單、positions、selected_position）
-- 新球員自動查 mlb_id（MLB API `people/search`）
-- 查不到的標記 `"mlb_id": null`
-- 加入 `yahoo_player_key` 欄位
-- `prior_stats` 在球員首次加入時寫入（Savant CSV + MLB Stats API 算好存入）
-
-#### 2. roster_config.json 補齊欄位
-依賴 roster_sync.py：
-- `yahoo_player_key`（Yahoo API 自動取得）
-- `prior_stats`（去年數據，schema 已定義在 `file-dependencies.md`）
+#### ~~2. roster_config.json 補齊欄位~~ ✅ 2026-04-03 完成
+- yahoo_player_key + prior_stats 已由 roster_sync.py --init 寫入
 
 #### 3. weekly_scan.py 投手 Statcast
 目前 weekly_scan 只餵傳統 stats（ERA/WHIP/K/IP）給 Claude，沒有 Savant 數據。
@@ -82,7 +75,6 @@
 #### 4. Walker(STL) 開季驗證
 - breakout 確認：xwOBA > P50 (.297) + HH% > P70 (44.7%)
 - drop 評估：連 3 週 xwOBA < P25 (.261)
-- 已記到 CLAUDE.md 待辦
 
 #### 5. Messick 開季驗證
 Savant P80-90 是否持續。CLE 是否限制局數。
@@ -96,13 +88,8 @@ BN 有空位時撿當 RHP matchup 武器。13% owned 不急。
 
 ### VPS 待驗證
 
-#### 8. 百分位標籤實測
-VPS 已 pull 但尚未跑 `--no-send` 驗證新百分位標籤（PA/Team_G、RP K/9 等）在速報中正確顯示。
-```bash
-cd /opt/mlb-fantasy
-export $(cat /etc/calorie-bot/op-token.env)
-python daily-advisor/main.py --no-send
-```
+#### ~~8. 百分位標籤實測~~ ✅ 2026-04-03 完成
+`--no-send` 測試通過，百分位標籤正常顯示。同時修復了 `--no-send` 仍建 GitHub Issue 的 bug。
 
 ---
 

@@ -36,8 +36,8 @@
 ### 功能開發（下次 session）
 
 - [ ] **#8 weekly_scan.py 投手 Statcast** — 目前只餵傳統 stats 給 Claude，沒有 Savant 數據
-- [ ] **roster_sync.py 新腳本** — Yahoo API 自動同步陣容 + mlb_id 查詢 + prior_stats 寫入
-- [ ] **roster_config.json 補齊** — yahoo_player_key + prior_stats 欄位（依賴 roster_sync.py）
+- [x] **roster_sync.py 新腳本** — 2026-04-03 完成，含 --init bootstrap + daily cron（TW 15:10），VPS 已部署
+- [x] **roster_config.json 補齊** — 2026-04-03 完成，23 人 yahoo_player_key + prior_stats 已寫入
 
 ## 04-01 Session 完成事項（原始記錄）
 
