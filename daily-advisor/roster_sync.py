@@ -618,10 +618,15 @@ def run_init(my_key, token, config, dry_run):
         for p in config.get(section, [])
         if not p.get("yahoo_player_key")
     )
+    needs_stats = sum(
+        1 for section in ("batters", "pitchers")
+        for p in config.get(section, [])
+        if not p.get("prior_stats") and p.get("mlb_id")
+    )
 
-    print(f"Diff: +{len(added)} added, -{len(dropped)} dropped, {needs_key} need yahoo_player_key", file=sys.stderr)
+    print(f"Diff: +{len(added)} added, -{len(dropped)} dropped, {needs_key} need key, {needs_stats} need prior_stats", file=sys.stderr)
 
-    if not added and not dropped and needs_key == 0:
+    if not added and not dropped and needs_key == 0 and needs_stats == 0:
         print("No changes needed.", file=sys.stderr)
         return
 
@@ -632,6 +637,8 @@ def run_init(my_key, token, config, dry_run):
             print(f"  - {p['name']}", file=sys.stderr)
         if needs_key:
             print(f"  {needs_key} players will get yahoo_player_key backfilled", file=sys.stderr)
+        if needs_stats:
+            print(f"  {needs_stats} players will get prior_stats backfilled", file=sys.stderr)
         print("[DRY RUN] No changes written.", file=sys.stderr)
         return
 
