@@ -652,8 +652,11 @@ def run_init(my_key, token, config, dry_run):
 
     print("Batch-fetching 2025 Savant data...", file=sys.stderr)
     savant_data = {}
-    savant_data.update(fetch_savant_batch(all_ids, 2025, "batter"))
-    savant_data.update(fetch_savant_batch(all_ids, 2025, "pitcher"))
+    for ptype in ("batter", "pitcher"):
+        batch = fetch_savant_batch(all_ids, 2025, ptype)
+        for mid, data in batch.items():
+            if data:  # Only merge non-empty results (avoid overwriting with {})
+                savant_data[mid] = data
 
     config = update_config(config, roster, diff, savant_data=savant_data)
     save_config(config)
