@@ -16,29 +16,33 @@ from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
     send_telegram,
+    is_pitcher, pitcher_type, calc_position_depth,
 )
 
 TPE = ZoneInfo("Asia/Taipei")
 
-# Default queries for daily watch (R3: ALL 50 + lastweek)
-DAILY_QUERIES = [
+# Base queries (always included)
+BASE_QUERIES = [
     ("ALL", "status=A;sort=AR;count=50"),
     ("ALL-lastweek", "status=A;sort=AR;sort_type=lastweek;count=20"),
-    ("CF", "status=A;position=CF;sort=AR;count=10"),
     ("SP", "status=A;position=SP;sort=AR;count=10"),
-    ("1B", "status=A;position=1B;sort=AR;count=10"),
 ]
 
-# Expanded queries for weekly scan (R4)
-WEEKLY_QUERIES = [
+BASE_WEEKLY_QUERIES = [
     ("ALL", "status=A;sort=AR;count=50"),
     ("ALL-lastweek", "status=A;sort=AR;sort_type=lastweek;count=30"),
-    ("CF", "status=A;position=CF;sort=AR;count=15"),
     ("SP", "status=A;position=SP;sort=AR;count=20"),
-    ("1B", "status=A;position=1B;sort=AR;count=10"),
-    ("LF", "status=A;position=LF;sort=AR;count=10"),
-    ("2B", "status=A;position=2B;sort=AR;count=10"),
 ]
+
+
+def build_position_queries(config, weekly=False):
+    """Build FA queries dynamically: base + thin positions from config."""
+    base = list(BASE_WEEKLY_QUERIES if weekly else BASE_QUERIES)
+    thin = calc_position_depth(config)
+    count = 15 if weekly else 10
+    for pos in thin:
+        base.append((pos, f"status=A;position={pos};sort=AR;count={count}"))
+    return base
 
 
 # ── Snapshot collection ──
@@ -196,27 +200,28 @@ def build_fa_watch_data(today_str, snapshot, changes, ref_1d, ref_3d, config):
     rankings = format_change_rankings(changes, ref_1d, ref_3d)
     lines.append(rankings)
 
-    # (R6) Roster summary
+    # Roster summary
     lines.append("\n--- 我的陣容 ---")
     for b in config.get("batters", []):
-        role = "BN" if b["role"] == "bench" else b["role"]
-        lines.append(f"  [{role}] {b['name']} ({b['team']}, {'/'.join(b['positions'])})")
+        lines.append(f"  {b['name']} ({b['team']}, {'/'.join(b['positions'])})")
     for p in config.get("pitchers", []):
-        role = "BN" if p["role"] == "bench" else ("IL" if p["role"] == "IL" else p["type"])
-        lines.append(f"  [{role}] {p['name']} ({p['team']}, {p['type']})")
+        p_type = pitcher_type(p) or "P"
+        lines.append(f"  {p['name']} ({p['team']}, {p_type})")
 
-    # Key position FA top players
-    lines.append("\n--- 弱點位置 FA ---")
-    for pos in ["CF", "SP", "1B"]:
-        pos_players = [
-            (n, i) for n, i in snapshot.items()
-            if pos in i["position"].split(",")
-        ]
-        pos_players.sort(key=lambda x: x[1]["pct"], reverse=True)
-        top = pos_players[:3]
-        if top:
-            names = ", ".join(f"{n}({i['pct']}%)" for n, i in top)
-            lines.append(f"  {pos}: {names}")
+    # Dynamic weak position FA (positions with <= 1 player)
+    thin = calc_position_depth(config)
+    if thin:
+        lines.append(f"\n--- 零/薄替補位置 FA（{', '.join(thin.keys())}）---")
+        for pos in thin:
+            pos_players = [
+                (n, i) for n, i in snapshot.items()
+                if pos in i["position"].split(",")
+            ]
+            pos_players.sort(key=lambda x: x[1]["pct"], reverse=True)
+            top = pos_players[:3]
+            if top:
+                names = ", ".join(f"{n}({i['pct']}%)" for n, i in top)
+                lines.append(f"  {pos}（覆蓋 {thin[pos]} 人）: {names}")
 
     # (R9) Weekly scan summary with freshness check
     summary_path = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
@@ -332,7 +337,8 @@ def main():
         today_str = args.date or datetime.now(TPE).strftime("%Y-%m-%d")  # (R2)
 
         print(f"[FA Watch] {today_str}...", file=sys.stderr)
-        snapshot = collect_fa_snapshot(access_token, config)
+        queries = build_position_queries(config)
+        snapshot = collect_fa_snapshot(access_token, config, queries)
 
         history = load_fa_history()
         changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
