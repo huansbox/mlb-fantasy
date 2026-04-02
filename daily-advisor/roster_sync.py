@@ -495,7 +495,7 @@ def update_config(config, yahoo_roster, diff, savant_data=None):
         else:
             config["batters"].append(entry)
 
-    # Backfill yahoo_player_key + update team/positions for existing players
+    # Backfill yahoo_player_key, team, positions, prior_stats for existing players
     yahoo_by_name = {p["name"]: p for p in yahoo_roster}
     for section in ("batters", "pitchers"):
         for p in config[section]:
@@ -505,6 +505,16 @@ def update_config(config, yahoo_roster, diff, savant_data=None):
                     p["yahoo_player_key"] = yp["yahoo_player_key"]
                 p["team"] = yp["team"]
                 p["positions"] = yp["positions"]
+            # Backfill prior_stats if missing and mlb_id available
+            if not p.get("prior_stats") and p.get("mlb_id"):
+                savant = savant_data.get(p["mlb_id"]) if savant_data else None
+                p_type = pitcher_type(p)
+                if p_type == "SP":
+                    p["prior_stats"] = build_prior_stats_sp(p["mlb_id"], savant)
+                elif p_type == "RP":
+                    p["prior_stats"] = build_prior_stats_rp(p["mlb_id"], savant)
+                else:
+                    p["prior_stats"] = build_prior_stats_batter(p["mlb_id"], savant)
 
     return config
 
