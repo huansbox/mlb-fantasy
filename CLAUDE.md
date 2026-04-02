@@ -24,72 +24,22 @@
   - Trade Review：Commissioner，Reject Time 2 天
 - **季後賽**：4 隊，Week 24-25（至 9/20）
 
-### vs 選秀前設定的變更
+## 核心球員
 
-| 項目 | 選秀前 | 開季版 | 影響 |
-|------|--------|--------|------|
-| 外野位 | OF×3 | **LF/CF/RF** | 需個別對位，CF 最稀缺 |
-| Min IP | 65 | **40** | 壓力大降，4 SP 基本穩過 |
-| Divisions | 兩個聯盟 | **無** | 排名單一化 |
-| Bench | 未指定 | **3 格** | 替補空間緊 |
+不可動的核心（can't cut 等級）：
+- **Tarik Skubal**（DET, SP）— 全聯盟 #1
+- **Jazz Chisholm Jr.**（NYY, 2B/3B）— 2B 稀缺
+- **Manny Machado**（SD, 3B）— 穩定輸出
 
-## 現役陣容（2026-03-26）
-
-### 打者
-
-| 位置 | 球員 | 隊伍 | 資格 | 7×7 VOR | 備註 |
-|------|------|------|------|---------|------|
-| C | Shea Langeliers | ATH | C | — | |
-| 1B | Christian Walker | HOU | 1B | — | |
-| 2B | Jazz Chisholm Jr. | NYY | 2B/3B | +5 | K 受益，2B 稀缺 |
-| 3B | Manny Machado | SD | 3B | +5 | 穩定 |
-| SS | Ezequiel Tovar | COL | SS | — | |
-| LF | Jose Altuve | HOU | 2B/LF | +4 | K 輸家但堪用 |
-| CF | Byron Buxton | MIN | CF | +5 | K 受益，**玻璃體質** |
-| RF | Lawrence Butler | ATH | CF/RF | +5 | K 受益 |
-| Util | Ozzie Albies | ATL | 2B | +5 | |
-| Util | Jordan Walker | STL | LF/RF | — | 23 歲，Driveline 改造後 breakout 候選 |
-
-### 板凳打者
-
-| 球員 | 隊伍 | 資格 | 備註 |
-|------|------|------|------|
-| Sal Frelick | MIL | LF/CF/RF | Buxton 保險，CF backup |
-| Giancarlo Stanton | NYY | LF/RF | 純砲 |
-
-### 投手
-
-| 位置 | 球員 | 隊伍 | 7×7 VOR | 備註 |
-|------|------|------|---------|------|
-| SP | Tarik Skubal | DET | **+12** | 全聯盟 #1 |
-| SP | Chris Sale | ATL | +4 | 局數風險 |
-| SP | Cole Ragans | KC | +4 | |
-| SP | Aaron Nola | PHI | +5 | 工作馬 |
-| RP | Robert Garcia | TEX | — | 比率用 |
-| RP | Garrett Whitlock | BOS | — | 比率用 |
-| P | Brayan Bello | BOS | — | |
-| P | Parker Messick | CLE | — | Savant P80-90，113 IP 預測 |
-| P | Brady Singer | CIN | — | |
-
-### 板凳投手
-
-| 球員 | 隊伍 | 備註 |
-|------|------|------|
-| Chris Bassitt | BAL | SP 深度 |
-
-### 傷兵
-
-| 球員 | 隊伍 | 狀態 |
-|------|------|------|
-| Merrill Kelly | AZ | IL15，佔 IL 格 |
+> 完整陣容見 `daily-advisor/roster_config.json`（唯一名單來源）。
 
 ## 執行中策略
 
-- **Punt SV+H**：RP（Garcia/Whitlock）純比率用，不追救援
-- **軟 Punt SB**：不刻意追速度，但 Chisholm/Albies/Buxton 偶爾能贏
+- **Punt SV+H**：RP 純比率用，不追救援
+- **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
 - **SP 重裝**：9 SP 深度，40 IP 門檻輕鬆過
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
-- **不常態串流 SP**：FA 池 SP 品質太差（12 隊聯賽好 SP 都被持有），串流的 K 增幅低、ERA/WHIP 風險高，只在特定情境精準使用 1-2 次（見下方）
+- **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
@@ -108,207 +58,116 @@
 - **上場時效**：claim → 隔日 TW 15:00 處理 → Daily-Tomorrow 設 lineup → 再隔天上場（前置 2 天）
 - **被 drop 球員**：1 天 waiver period
 - **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
+- **FAAB 餘額**：$100（2026-04-02 更新，異動後手動更新此數字）
 - **每週上限**：6 次 add（add/drop 一組算 1 次）
 
 ### 陣容風險
 
-| 風險 | 說明 |
-|------|------|
-| **CF 深度** | 只有 Buxton + Butler + Frelick 有 CF 資格，Buxton 傷退 → 連鎖反應 |
-| **Kwan（VOR +2）** | 全隊最弱環節，K 移除輸家，第一替換候選 |
-| **BN 僅 3 格** | 替補空間緊，串流 SP 彈性有限 |
-| **IP/K 聯盟第 9** | Week 1 數據偏低（5 天短週），Week 2 完整週驗證中 |
-| **WHIP 聯盟第 7** | RP 比率貢獻待觀察（Garcia/Whitlock） |
+由自動化腳本從 `roster_config.json` + 即時數據動態計算（見 `fa_watch.py` / `weekly_scan.py` 輸出）。
+包含位置深度（零替補位置）和球員表現急迫性。
 
-### Week 1 複盤（2026-03-30）
+> FA 觀察追蹤見 `waiver-log.md`（觀察中 / 觸發條件 / 已結案）。
 
-**戰績**：10W-4L vs Droptheball（本週勝）
+## 球員評估框架
 
-**聯盟排名（12 隊）**：
-- 頂尖：HR(T1)、OPS(2)
-- 強：R(T3)、AVG(4)、W(T3)
-- 中上：ERA(5)、BB(T5)
-- 中段：QS(T4)、RBI(T5)
-- **需改善**：IP(9)、K(9)、WHIP(7)
-- Punt 項：SB(T9)、SV+H(5)
+> 唯一定義。Skills（/player-eval、/waiver-scan、/roster-scan）引用此處，不複製。
 
-**聯盟威脅**：BUMMER（54K/1.93 ERA/0.90 WHIP + .298 AVG，投打均衡最強隊）
+### 通用規則
 
-### Watchlist（2026-04-01）
+- 所有指標參照百分位表（2025 MLB 數據），差距 ≥ 10 百分位點 = 有意義
+- 取當季 + 前一年數據對照，附樣本量（PA / BBE / IP）
+- 「不動也是策略」— FA 未明顯優於現有球員 → 不換
+- 轉隊確認：球員目前球隊 = 數據球隊？不符就重新評估
+- 12 隊聯賽 xwOBA > P90 的 FA 基本不存在 → 出現代表 drop 失誤
 
-**打者**
+### 打者評估
 
-| 球員 | 隊伍 | 位置 | 觸發條件 | 取代目標 |
-|------|------|------|---------|---------|
-| **Dominic Canzone** | SEA | LF/RF | 確認 platoon，BN 有空位時撿來當 RHP matchup 武器 | — |
-| Jesús Sánchez | TOR | LF/CF/RF | BN 有空位 + 連 2 週 xwOBA > .320 | CF backup（條件 Pass） |
-| **Colt Keith** | DET | 1B/2B/3B | 連 2 週 xwOBA > .280 + BB% > 8% | Walker(1B) |
+**評估流程**：
+1. 品質 + 產量指標排序全隊打者 → 產出「最弱 5 人」（不看守位）
+2. FA/交易候選只跟這 5 人比較 → 這步加入脈絡
 
-**投手**
+**核心 3 指標**（品質，2 項勝出 = 值得行動）：
+- **xwOBA** — 打擊品質總指標，取代 AVG
+- **BB%** — 最高效指標（BB 欄 + OPS 的 OBP 端，7×7 雙重計算）
+- **Barrel%** — HR 最佳預測指標，7×7 無 K 懲罰下 power 是核心價值
 
-| 球員 | 隊伍 | 類型 | 觸發條件 | 取代目標 |
-|------|------|------|---------|---------|
-| **Emerson Hancock** | SEA | SP | 前 2-3 場 xERA < P60 (4.04) + K/9 > 8 | Singer（首選候選） |
-| Randy Vásquez | SD | SP | 前 2-3 場 xERA < P50 (4.33) + K/9 > 7 | 串流或後段 SP |
-| Andrew Painter | PHI | SP | 前 2-3 場穩定投 6+ IP + xERA < P50 (4.33) | Singer（備選，局數限制硬傷） |
+**產量指標**：
+- **PA / Team_G** — 同時反映上場率、打序位置、球隊進攻環境
 
-**近期行動**：
-- **Walker 已加入**（04-01）：drop Kwan，add Walker。xwOBA .578 / HH% 75% (>P90)，23 歲 everyday player，STL RF 先發
-- **Messick 已加入**（04-01）：drop Littell，add Messick。Savant P80-90，CLE 保證先發
-- **Canzone 新加入 Watchlist**（04-01）：Savant 三項 >P90 (187 BBE) 但確認是 platoon（只打 RHP）。82 G/2025。BN 有空位時可撿當 matchup 武器
-- **Hancock 接近觸發**（03-31）：首秀 6 IP / 0 H / 9K（W），等 4/3-4/4 vs LAA 第 2 場驗證
-- **Vásquez 新加入**（03-31）：首場 6 IP / 8K / 0.00 ERA，24% owned 上升中
-- **Singer 留著觀察**：Week 1 一場 6.75 ERA 是噪音，去年 169.2 IP / 4.03 ERA 是穩定工作馬
-- **NA 格空位**：考慮 stash Dylan Crews（WSH, CF/RF），離 MLB 最近的 CF prospect，填 CF 弱點。待決定
+**輔助指標**：
+- HH%（確認整體接觸品質，Barrel% 的上層指標）
+- OPS（計分類別直接影響）
 
-**已被聯賽搶走**：McGonigle、Basallo、Wetherholt、McLean、Misiorowski、Pepiot、Benge、**O'Hearn**
+**樣本量加權**：
+- 當季 PA < 50 / BBE < 30 → 前一年為主，當季僅傾向參考
+- 上季 < 80 場 → 需查 career stats，不可只看單季
 
-**已評估 Pass**：Correa（3B/SS，.734 OPS 不過門檻）、Liberatore（SP，預測 4.44 ERA/152 IP，不勝現有後段 SP）、Severino（ATH SP，FA 串流候選但 K 低/matchup 差）、Hoskins（1B，AVG ~.230 + 傷病史）、Kwan（dropped 04-01，HH% <P25 / Barrel% <P25 = 零 power + 7×7 格式錯配）、Littell（dropped 04-01，WSH 弱隊 + xERA P50 + K 最低）
+**7×7 格式規則**：
+- 無 K 類別 → 高 K 打者無懲罰
+- Punt SB → 速度價值打折，但非零
+- 不使用 hot/cold streaks（零預測力）
+- 不使用 BvP 歷史對戰（樣本太小）
 
-### 行動觸發規則
+**陣容脈絡**（Step 2 時考慮）：
+- 守位需求：填什麼位？升級、backup、重複？
+- 單點故障：是否解決零替補位置風險？
+- 邊際遞減：陣容已有強項再加同類型，效益低
+- BN 只有 3 格，每格珍貴
 
-| 條件 | 動作 |
-|------|------|
-| Walker(1B) 連 2 週 xwOBA < .262 (P25) + HH% < 36% (P25) | 撿 Colt Keith（有 1B 資格），drop Walker(1B) |
-| Walker(STL) 連 3 週 xwOBA < P25 (.261) + HH% 回落 < P50 (40.4%) | 評估 drop，Canzone 或 FA 替補 |
-| Walker(STL) 維持 xwOBA > P50 (.297) + HH% > P70 (44.7%) | 不動，breakout 確認中 |
-| Singer 連 2 場 xERA > P25 (5.62) + Hancock 連 2 場 xERA < P60 (4.04) | 撿 Hancock，drop Singer |
-| Singer 連 2 場 xERA > P25 (5.62) + Hancock 一般但 Painter 穩定 6+ IP | 撿 Painter，drop Singer（備選） |
-| Singer xERA 回穩 < P50 (4.33) | 不動，Singer 局數優勢（168 IP）仍是核心價值 |
-| Buxton 進 IL | Frelick 頂 CF，BN 空位補 OF |
+### SP 評估
 
-## 格式狀態
+**評估流程**：同打者邏輯，排出隊上最弱 4 位 SP → FA 只跟最弱的比
 
-- **選秀準備階段**：已完成（2026-03-13 確認 7×7）
-- **開季管理階段**：進行中（2026-03-26 起）
-- 原 8×8 分析保留作參考（`分析1`、`分析2`、`分析3`）
+**核心 3 指標**（品質，2 項勝出 = 值得行動）：
+- **xERA** — 取代 ERA，排除 BABIP/運氣噪音
+- **xwOBA allowed** — 被打品質總指標
+- **HH% allowed** — 核心（ERA/WHIP 受所有硬接觸影響，比 Barrel% 更廣）
 
-## 7×7 格式關鍵特性
+**產量指標**：
+- **IP/GS** — 每次先發平均局數，涵蓋 IP/QS/W 產量天花板
 
-### vs 原 8×8 的結構性改變（僅兩項打者改動）
+**輔助指標**：
+- Barrel% allowed（確認 HR 被打風險）
+- ERA（計分類別直接影響）
+- |xERA - ERA| 差距用百分位判斷，差距大 = 回歸風險
 
-1. **移除打者 K（負向）** → 高三振球員完全解鎖（Judge、Schwarber 大升）
-2. **SLG → OPS** → 加入 OBP 維度，BB 雙重計算（BB 欄 + OPS 的 OBP）
-3. **BB 保留、AVG 保留但評估改用 xwOBA** → AVG 仍是計分類別，但 FA 評估用 xwOBA（穩定性高 2-3 倍，AVG 需 500+ PA 才穩定）
-4. **IP 取代投手 BB** → 工作馬 SP 暴漲（Webb +7、Valdez +5），控球型溢價消失
-5. **SV+H 合併** → RP 價值腰斬（覆蓋 1 類別而非 2）+ IP -2 再重創
-6. **勝負制（14 類別合計贏 8+）** → 可策略性 punt 2 項
+**樣本量加權**：
+- 當季 BBE < 30 / IP < 15 → 前一年為主
+- 上季 < 80 IP → 用預期值區間而非單點估計
 
-### 勝負制策略含義
+**7×7 格式規則**：
+- IP 是獨立類別 → 局數怪物 > 精品短局型
+- QS 需 6+ IP → IP/GS 低的投手 QS 打折
+- W 受球隊影響 → 強隊 SP 有 W 加成
+- 串流 SP：下週有 2 先發 + 對戰後段打線，不看全季指標
 
-- **Punt SB + Punt SV+H**：放棄 2/14 → 需贏 8/12 = 67% → 完全可行
-- **力量 punt 路線**：專攻 R, HR, RBI, BB, AVG, OPS + SP 六項
-- **解鎖球員**：Alvarez（零 SB）、Olson（高 K→無懲罰）、Schwarber（K 移除翻身）
+### RP 評估
 
-## 核心分析框架
+**策略前提**：Punt SV+H（不主動追），但 RP 仍貢獻 ERA/WHIP/K。
 
-三層遞進分析：
+**評估流程**：只有 2 人，不排最弱清單。FA 有無優於目前 2 位 RP → 有就換。
 
-```
-Layer 1：格式類別貢獻評分（每位球員在 7 項中的 +2 到 -2 評分）
-Layer 2：跨守位替代價值 VOR（相對於守位替代水平的超額貢獻）
-Layer 3：ADP 套利標記（格式排名 vs 市場 ADP 的落差）
-+ Layer 4：勝負制 punt 路線適配性
-```
+**品質指標**：xERA、xwOBA allowed、HH% allowed（同 SP）
+**輔助**：Barrel% allowed、ERA、|xERA - ERA| 百分位
+**產量**：K/9、IP / Team_G、SV+H（留意但不追）
 
-## 7×7 已確立的分析結論
+注意：RP 百分位分布和 SP 不同，需分開計算。
 
-### VOR Top 5
-Skubal(+12) >> Judge(+10) > Soto(+9) > Crochet/Skenes(+8) > Vlad/Acuña/Henderson/Ramírez(+7)
-
-### SP 價值排序（IP 類別加持）
-Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo(+5)
-
-### K 移除影響
-- **大升**：Judge(+10→+11)、Schwarber(+3→+4)、De La Cruz(+4→+5)、Olson(+4→+5)
-- **大降**：Vlad(+10→+8)、Ramírez(+9→+7)、Betts(+6→+4)、Kwan(+4→+2)、Perdomo(+2→0)
-
-### RP 大幅貶值
-- 所有 RP 受 IP -2 結構性懲罰 + SV+H 合併
-- RP 從「前 4 輪必搶」降為「最後幾輪隨緣」
-
-### 守位稀缺性（維持）
-2B（最稀缺）> SS > 1B ≈ 3B > C > OF
-
-## 45 秒速查決策規則（7×7 確認版）
-
-- **打者**：比較 xwOBA / BB% / HH% 三項 vs 現有球員，2 項勝出就選。參照百分位表判斷顯著性
-- **SP（正選級）**：xERA < P60 (4.04) + IP > 180，兩項通過就選
-- **SP（FA 放寬版）**：xERA < P50 (4.33) + IP > 150，ERA 輔助確認（xERA 與 ERA 差距大 = 運氣成分）
-- **RP**：最後幾輪才拿
-- **不確定時**：選高 BB 打者、高 IP + 低 xERA 工作馬 SP、有 2B/3B 資格的
-
-## 文件結構
-
-### In-Season 管理
-
-| 文件 | 用途 | 狀態 |
-|------|------|------|
-| `賽季管理入門.md` | H2H One Win 賽季管理入門要點（週例行、決策樹、punt 紀律） | ✅ 開季參考 |
-| `waiver-log.md` | 球員觀察追蹤 log（觀察中 / 條件 Pass / 已結案） | 🔄 進行中 |
-| `league-scouting.md` | 聯盟 12 隊 GM 策略分析（開季基準 snapshot） | ✅ 2026-03-30 |
-| `roster-baseline.md` | 陣容基準卡（全員預測/實際數據，eval 比較用） | 🔄 進行中 |
-| `.claude/commands/player-eval.md` | 球員評估 SOP（`/player-eval`） | ✅ 完成 |
-| `.claude/commands/waiver-scan.md` | Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢） | ✅ 完成 |
-| `.claude/commands/roster-scan.md` | 陣容基準卡週更 SOP（`/roster-scan`） | ✅ 完成 |
-| `daily-advisor/yahoo_query.py` | Yahoo FA 查詢 CLI（skill 透過 Bash 呼叫） | ✅ 完成 |
-| `daily-advisor/` | 每日陣容建議產生器，兩階段：速報（台灣 22:15，含 Lineup）+ 最終報（台灣 05:00） | ✅ Phase 2 已部署 |
-| `daily-advisor/fa_watch.py` | Daily FA Watch（每日 07:00，%owned 追蹤 + claude -p） | ✅ 完成 |
-| `daily-advisor/weekly_scan.py` | Weekly Deep Scan（每週一 19:30，完整 FA 分析） | ✅ 完成 |
-| `daily-advisor/weekly_review.py` | 週覆盤資料準備（cron 週一 TW 18:00） | ✅ 完成 |
-| `daily-advisor/weekly-data/` | 週覆盤 JSON 資料（week-N.json） | 🔄 自動產生 |
-| `.claude/commands/weekly-review.md` | 週覆盤互動 SOP（`/weekly-review`） | ✅ 完成 |
-| `week-reviews.md` | 累積式週覆盤記錄（預測 + 覆盤 + 學習） | 🔄 進行中 |
-| `daily-advisor-spec.md` | Daily Advisor 需求規格與 API 研究筆記 | ✅ 參考 |
-| `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考（已用 + 可用） | ✅ 參考 |
-
-### 選秀準備（已完成，留作參考）
-
-| 文件 | 用途 |
-|------|------|
-| `7x7-選秀分析.md` | 7×7 確認版分析（類別評分+VOR+策略） |
-| `作戰策略.md` | 7×7 選秀日決策樹（R1-R5 + 守位檢查） |
-| `draft-helper.html` | 選秀日互動助手（7×7 確認版分數） |
-| `draft-sim.js` | 蒙地卡羅選秀模擬器（200 次 × 12 順位） |
-| `分析1-格式類別貢獻評分.md` | 原 8×8 打者+投手八項評分 |
-| `分析2-跨守位替代價值VOR.md` | 原 8×8 跨守位統一排名 |
-| `分析3-實戰選秀排名與行動指南.md` | 原 8×8 ADP 套利+行動指南 |
-
-## In-Season 管理決策規則
-
-### Waiver Wire 篩選框架
-
-**打者評估（相對比較法 — 無固定門檻）**：以 3 項核心指標比較 FA vs 被取代球員：
-- **xwOBA**（取代 AVG，穩定性更高）
-- **BB%**（BB 欄 + OPS 的 OBP 端，7×7 雙重計算）
-- **Hard-Hit%**（過程指標，小樣本即有預測力）
-
-**投手評估（相對比較法 — 同打者邏輯）**：以 3 項核心指標比較 FA SP vs 被取代投手：
-- **xERA**（取代 ERA，過程指標，排除 BABIP/運氣噪音）
-- **xwOBA allowed**（被打品質總指標，對應打者的 xwOBA）
-- **HH% allowed**（被打硬的頻率，過程指標，小樣本即有預測力）
-- 輔助：**Barrel% allowed**（確認 HH% 品質）、**ERA**（計分類別直接影響）、**IP**（工作量）
-
-**相對比較規則（投打通用）**：
-- FA 在 3 項核心指標中至少 2 項優於被取代者 → 值得行動
-- **顯著性**：差距 ≥ 10 百分位點 = 有意義（密集區跨 2 格，稀疏區跨 1 格）
-- 同一百分位區間內的差距視為不顯著
-
-**2025 MLB 百分位分布**（P90 = 菁英，投打通用）：
+### 2025 MLB 百分位分布（P90 = 菁英）
 
 打者（數值越高越好）：
 
-| 百分位 | xwOBA | BB% | HH% | Barrel% |
-|--------|-------|-----|------|---------|
-| P25 | .261 | 5.8% | 34.6% | 4.7% |
-| P40 | .286 | 7.0% | 38.3% | 6.5% |
-| P45 | .293 | 7.4% | 39.0% | 7.1% |
-| **P50** | **.297** | **7.8%** | **40.4%** | **7.8%** |
-| P55 | .302 | 8.2% | 41.5% | 8.5% |
-| P60 | .307 | 8.7% | 42.6% | 9.1% |
-| P70 | .321 | 9.6% | 44.7% | 10.3% |
-| P80 | .331 | 10.8% | 46.7% | 12.0% |
-| P90 | .349 | 12.2% | 49.7% | 14.0% |
+| 百分位 | xwOBA | BB% | Barrel% | HH% |
+|--------|-------|-----|---------|------|
+| P25 | .261 | 5.8% | 4.7% | 34.6% |
+| P40 | .286 | 7.0% | 6.5% | 38.3% |
+| P45 | .293 | 7.4% | 7.1% | 39.0% |
+| **P50** | **.297** | **7.8%** | **7.8%** | **40.4%** |
+| P55 | .302 | 8.2% | 8.5% | 41.5% |
+| P60 | .307 | 8.7% | 9.1% | 42.6% |
+| P70 | .321 | 9.6% | 10.3% | 44.7% |
+| P80 | .331 | 10.8% | 12.0% | 46.7% |
+| P90 | .349 | 12.2% | 14.0% | 49.7% |
 
 投手（數值越低越好，P90 = 菁英 = 低值）：
 
@@ -324,52 +183,68 @@ Skubal(+12) >> Webb/Sánchez(+7) > Crochet/Skenes(+8) > Gilbert(+6) > Valdez/Woo
 | P80 | 3.43 | .289 | 36.4% | 6.3% |
 | P90 | 2.98 | .270 | 34.1% | 4.9% |
 
-（2025 全季，打者 min 50 PA/BBE，投手 min 50 PA/BBE；2026 分布約 Week 6-8 更新）
+（2025 全季，打者 min 50 PA/BBE，投手 min 50 PA/BBE）
 
-**數據來源**：傳統 stats（OPS/HR-AB/BB%/ERA/WHIP）= MLB Stats API；Statcast（xwOBA/HH%/Barrel%/xERA）= Baseball Savant CSV。取當季 + 前一年，附樣本量（PA/BBE）。
+**待計算的百分位表**：PA/Team_G（打者）、IP/GS（SP）、K/9（RP）、IP/Team_G（RP）、|xERA-ERA|（SP/RP 分開）
 
-### SP 篩選標準
-- **選秀/正選級**：xERA < P60 (4.04) + IP > 180，兩項通過
-- **In-Season FA 放寬版**：xERA < P50 (4.33) + IP > 150（FA 池質量低於選秀，門檻放寬）
-- xERA 與 ERA 差距 > 0.50 → 標記運氣成分（正向或負向）
-- 40 IP 門檻低，通常不需刻意串流
+**數據來源**：傳統 stats = MLB Stats API / Yahoo API；Statcast = Baseball Savant CSV。取當季 + 前一年，附樣本量。
 
-### 每週 SOP
+## 賽季運營 SOP
 
-**自動化（VPS cron）**
+### 每日
 
-| 時間 (TW) | 頻率 | Job | 輸出 |
-|-----------|------|-----|------|
-| 每天 22:15 | 每日 | 速報 | Telegram + Issue（SP 排程 + 對戰 + Lineup） |
-| 每天 05:00 | 每日 | 最終報 | Telegram + Issue（Lineup 確認 + 夜場調整） |
-| 每天 07:00 | 每日 | FA Watch | Telegram + Issue（%owned 變動追蹤） |
-| 週一 18:00 | 每週 | Weekly Review Prep | `week-N.json` 存 repo |
-| 週一 19:30 | 每週 | Weekly Scan | Telegram + Issue（FA 深度掃描 + 覆盤提醒） |
+| 時間 (TW) | 做什麼 | 說明 |
+|-----------|--------|------|
+| 22:15 | 收速報 → 設隔日 lineup → 睡覺 | 自動推送 |
+| 05:00 | 最終報產出 | 自動推送（睡眠中） |
+| 07:00 | 起床看最終報 + FA Watch → 微調（如需要） | 兩份一起看 |
 
-**每日動作**
-1. TW 22:15 收到速報 → 設好隔日 lineup → 睡覺
-2. TW 07:00 醒來看最終報 + FA Watch → 夜場球員微調（如需要）
+### 每週（週一）
 
-**週一 Session（覆盤 + 預測 + FA 按需）**
-1. 看 Weekly Scan Telegram 報告（FA 池快照）
-2. `/weekly-review`：Phase 1 覆盤上週 → Phase 2 預測本週
-3. 按需：`/player-eval`（深入評估特定球員）或 `/waiver-scan`（補 WebSearch 新聞面）
+| 順序 | 做什麼 | 說明 |
+|------|--------|------|
+| 1 | 收 Weekly Scan 報告（19:30 自動） | 自動推送 |
+| 2 | `/weekly-review`：覆盤上週 + 預測本週 | 手動 session |
+| 3 | 按需：`/player-eval` 或 `/waiver-scan` | 手動 session |
 
-**週中決策點**
-- 週四：檢查 IP 進度（速報會提醒），不夠才考慮精準串流 1 場
-- 觸發條件達成時：執行 Watchlist 行動（見行動觸發規則）
+### 週中決策點
 
-**低頻任務**
-- `/roster-scan`：2-3 週一次（30+ PA 後才有統計意義）
+| 時間 | 做什麼 |
+|------|--------|
+| 週四 | 檢查 IP 進度（速報會提醒），不夠才考慮串流 |
+| 任何時候 | waiver-log.md 觸發條件達成 → 執行行動 |
 
-## 選秀日工具（已完成，留作參考）
+### 低頻（2-3 週一次）
 
-- **Draft Helper**：https://huansbox.github.io/mlb-fantasy/draft-helper.html
+| 做什麼 | 條件 |
+|--------|------|
+| `/roster-scan` 陣容健檢 | 30+ PA 累積後才有統計意義 |
+| 聯賽偵察更新 | 對手有大幅異動時 |
 
-## 數據來源與限制
+### 事件觸發
 
-- **排名以 Yahoo App Projected Rank 為準**（2026-03-12/13 擷取，前 202 名）
-- **預測數據**：Steamer 2026 預測（前 30 打者 + 32 SP 有完整數據，其餘推估）
-- **數據盲點**：缺乏春訓表現、小聯盟數據，系統性低估突破型新秀
-- **OPS 數據**：基於 Steamer AVG/BB%/SLG 推算 OBP+SLG，非精確值
-- **7×7 計算公式**：7×7 淨分 = 8×8 淨分 - K 欄分數 - SLG 分數 + OPS 分數
+| 事件 | 動作 |
+|------|------|
+| 球員受傷/表現差 | 查 waiver-log.md 有無候選 → 有：`/player-eval` 確認 → 執行。沒有：`/waiver-scan` 找人 → `/player-eval` → 執行 |
+| Add/Drop 執行後 | 跑同步腳本更新 roster_config.json → push → VPS pull |
+| FAAB 出價 | 更新 roster_config.json 的 faab_remaining + 本文件 FAAB 餘額 |
+| waiver-log.md 觸發條件達成 | `/player-eval` 深入評估 → 決定行動 |
+
+### 檔案索引
+
+| 文件 | 用途 |
+|------|------|
+| `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據） |
+| `waiver-log.md` | FA 觀察追蹤（觀察中 / 條件 Pass / 已結案） |
+| `roster-baseline.md` | 陣容基準卡（全員數據，eval 比較用） |
+| `week-reviews.md` | 累積式週覆盤記錄 |
+| `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
+| `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
+| `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
+
+## 待辦
+
+- [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + main.py + prompt 檔）
+- [ ] 計算新百分位表：PA/Team_G、IP/GS、K/9、IP/Team_G、|xERA-ERA|
+- [ ] 交易策略：有需要時再建
+- [ ] Walker(STL) 觀察：breakout 確認（xwOBA > P50 + HH% > P70）或 drop 評估（連 3 週 xwOBA < P25）→ 移至 roster-baseline.md 追蹤
