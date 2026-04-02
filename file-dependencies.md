@@ -154,19 +154,27 @@
 | `role` | **移除** | — | 從 API `selected_position` 即時取得 |
 | `proj` | **移除** | — | Steamer 預測，in-season 無用 |
 
-### prior_stats 具體欄位（待確認）
+### prior_stats 欄位（已確認）
 
-打者：
-- xwOBA、BB%、Barrel%、HH%、OPS、PA/Team_G
-- PA、G（樣本量參考）
+由同步腳本從 Savant CSV + MLB Stats API 抓取原始數據後算好存入。
 
-投手（SP）：
-- xERA、xwOBA allowed、HH% allowed、Barrel% allowed、ERA
-- IP/GS、IP（全季）
-- BBE（樣本量參考）
+**打者**：
+- `season`：2025
+- `xwoba`, `bb_pct`, `barrel_pct`, `hh_pct`, `ops`（品質+輔助）
+- `pa_per_team_g`（產量，腳本算：PA ÷ 球隊總場次）
+- `pa`, `g`（樣本量）
 
-投手（RP）：
-- 同 SP + K/9、IP/Team_G
+**SP**：
+- `season`：2025
+- `xera`, `xwoba_allowed`, `hh_pct_allowed`, `barrel_pct_allowed`, `era`（品質+輔助）
+- `ip_per_gs`（產量，腳本算：IP ÷ GS）
+- `ip`, `bbe`（樣本量）
+
+**RP**：
+- `season`：2025
+- `xera`, `xwoba_allowed`, `hh_pct_allowed`, `barrel_pct_allowed`, `era`（品質+輔助）
+- `k_per_9`, `ip_per_team_g`（產量，腳本算）
+- `ip`, `bbe`（樣本量）
 
 ### league 區段
 
