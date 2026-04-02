@@ -56,9 +56,29 @@ mlb_search(\"Parker Messick\")
 
 Expected: Each returns at least one result with correct id. Record actual behavior for Jr. and accent handling.
 
-- [ ] **Step 2: Document findings**
+- [ ] **Step 2: Verify Savant CSV column names**
 
-If search doesn't handle Jr./accents well, note the workaround (strip suffix, try without accent) for Task 5.
+```bash
+python3 -c "
+import urllib.request, csv, io
+for label, url in [
+    ('statcast', 'https://baseballsavant.mlb.com/leaderboard/statcast?type=batter&year=2025&min=1&csv=true'),
+    ('expected', 'https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=batter&year=2025&min=1&csv=true'),
+]:
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    resp = urllib.request.urlopen(req, timeout=30)
+    text = resp.read().decode('utf-8-sig')
+    row = next(csv.DictReader(io.StringIO(text)))
+    id_col = 'player_id' if 'player_id' in row else ('mlbam_id' if 'mlbam_id' in row else '???')
+    print(f'{label}: ID column = {id_col}, first 8 cols = {list(row.keys())[:8]}')
+"
+```
+
+Record the actual ID column name for each CSV. Task 6 code must use the correct column.
+
+- [ ] **Step 3: Document findings**
+
+If search doesn't handle Jr./accents well, note the workaround (strip suffix, try without accent) for Task 5. If CSV column names differ from `player_id`, update Task 6 code accordingly.
 
 ---
 
@@ -152,13 +172,14 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 2: Verify scaffold runs**
+- [ ] **Step 2: Verify import chain and scaffold runs**
 
 ```bash
-cd daily-advisor && python3 roster_sync.py --help
+cd daily-advisor && python3 -c "from yahoo_query import load_env, refresh_token, api_get, is_pitcher, pitcher_type; print('import OK')"
+python3 roster_sync.py --help
 ```
 
-Expected: Help text with `--init` and `--dry-run` flags.
+Expected: "import OK" then help text with `--init` and `--dry-run` flags. The import chain (roster_sync → yahoo_query → main.py) must not error.
 
 - [ ] **Step 3: Commit**
 
@@ -245,26 +266,27 @@ def fetch_full_roster(team_key, token):
     return players
 ```
 
-- [ ] **Step 3: Verify on VPS with a test print**
+- [ ] **Step 3: Verify on VPS with inline test** (not through main(), which calls functions defined in later tasks)
 
-Add temporary code at end of `main()` init branch:
-
-```python
-    if args.init:
-        roster = fetch_full_roster(my_key, token)
-        for p in roster:
-            print(f"  {p['name']:25s} {p['yahoo_player_key']:15s} {p['team']:4s} {','.join(p['positions']):12s} [{p['selected_pos']}]")
-        return
-```
-
-Run on VPS:
 ```bash
-ssh root@107.175.30.172 "export $(cat /etc/calorie-bot/op-token.env) && export PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin && cd /opt/mlb-fantasy && python3 daily-advisor/roster_sync.py --init --dry-run"
+ssh root@107.175.30.172 "export $(cat /etc/calorie-bot/op-token.env) && export PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin && cd /opt/mlb-fantasy && python3 -c '
+import sys; sys.path.insert(0, \"daily-advisor\")
+from roster_sync import load_env, find_my_team_key, fetch_full_roster
+from yahoo_query import refresh_token
+env = load_env()
+token = refresh_token(env)
+import json; config = json.load(open(\"daily-advisor/roster_config.json\"))
+my_key = find_my_team_key(config[\"league\"][\"league_key\"], token)
+print(\"Team key:\", my_key)
+roster = fetch_full_roster(my_key, token)
+for p in roster:
+    print(f\"  {p[\"name\"]:25s} {p[\"yahoo_player_key\"]:15s} {p[\"team\"]:4s} {\",\".join(p[\"positions\"]):12s} [{p[\"selected_pos\"]}]\")
+'"
 ```
 
 Expected: All 23 roster players listed with correct names, player_keys, positions.
 
-- [ ] **Step 4: Remove temporary test code, commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add daily-advisor/roster_sync.py
@@ -355,41 +377,15 @@ git commit -m "feat(roster-sync): transactions gate + .last_sync state file"
 - [ ] **Step 1: Add diff_roster()**
 
 ```python
-def diff_roster(yahoo_roster, config):
-    """Compare Yahoo roster vs config by yahoo_player_key.
+def diff_roster(yahoo_roster, config, init=False):
+    """Compare Yahoo roster vs config.
 
     Returns {added: [yahoo_player_dicts], dropped: [config_player_dicts]}.
-    For --init (config has no yahoo_player_key), falls back to name matching.
+    init=True: use name matching (config may not have yahoo_player_key yet).
+    init=False: use yahoo_player_key matching (normal daily mode).
     """
-    # Build config player key sets
-    config_players = {}
-    for section in ("batters", "pitchers"):
-        for p in config.get(section, []):
-            key = p.get("yahoo_player_key")
-            if key:
-                config_players[key] = p
-            else:
-                # Fallback: name-based for --init bootstrap
-                config_players[f"name:{p['name']}"] = p
-
-    # Build Yahoo player key set
-    yahoo_players = {}
-    for p in yahoo_roster:
-        key = p["yahoo_player_key"]
-        yahoo_players[key] = p
-        # Also add name-based key for --init matching
-        yahoo_players[f"name:{p['name']}"] = p
-
-    yahoo_keys = {p["yahoo_player_key"] for p in yahoo_roster}
-    config_keys = set()
-    for section in ("batters", "pitchers"):
-        for p in config.get(section, []):
-            k = p.get("yahoo_player_key")
-            if k:
-                config_keys.add(k)
-
-    # If config has no yahoo_player_keys yet (--init), use name matching
-    if not config_keys:
+    if init:
+        # Name-based matching for bootstrap
         config_names = set()
         for section in ("batters", "pitchers"):
             for p in config.get(section, []):
@@ -404,6 +400,15 @@ def diff_roster(yahoo_roster, config):
                 if p["name"] in dropped_names:
                     dropped.append(p)
         return {"added": added, "dropped": dropped}
+
+    # Key-based matching for daily mode
+    yahoo_keys = {p["yahoo_player_key"] for p in yahoo_roster}
+    config_keys = set()
+    for section in ("batters", "pitchers"):
+        for p in config.get(section, []):
+            k = p.get("yahoo_player_key")
+            if k:
+                config_keys.add(k)
 
     added_keys = yahoo_keys - config_keys
     dropped_keys = config_keys - yahoo_keys
@@ -503,62 +508,89 @@ git commit -m "feat(roster-sync): MLB API mlb_id search with Jr./accent fallback
 **Files:**
 - Modify: `daily-advisor/roster_sync.py`
 
-- [ ] **Step 1: Add Savant CSV single-player lookup**
+- [ ] **Step 1: Add Savant CSV helpers — batch (for --init) and single-player (for daily)**
 
 ```python
-def fetch_savant_player(mlb_id, year, player_type="batter"):
-    """Fetch Savant data for a single player from full CSV.
+def _download_savant_csv(leaderboard, player_type, year):
+    """Download a Savant CSV and return list of row dicts.
 
-    Returns {xwoba, hh_pct, barrel_pct, bbe, pa} for batter,
-    or {xwoba, xera, hh_pct, barrel_pct, bbe} for pitcher.
-    Returns None if player not found.
+    leaderboard: 'statcast' or 'expected_statistics'
     """
-    pid_str = str(mlb_id)
-
-    # Statcast CSV (Hard-Hit%, Barrel%)
-    sc_url = (
-        f"https://baseballsavant.mlb.com/leaderboard/statcast"
+    url = (
+        f"https://baseballsavant.mlb.com/leaderboard/{leaderboard}"
         f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
     )
-    # Expected stats CSV (xwOBA, xERA)
-    ex_url = (
-        f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
-        f"?type={player_type}&year={year}&position=&team=&min=1&csv=true"
-    )
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    resp = urllib.request.urlopen(req, timeout=30)
+    text = resp.read().decode("utf-8-sig")
+    return list(csv.DictReader(io.StringIO(text)))
 
-    sc_data = ex_data = None
-    for url, label in [(sc_url, "statcast"), (ex_url, "expected")]:
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            resp = urllib.request.urlopen(req, timeout=30)
-            text = resp.read().decode("utf-8-sig")
-            reader = csv.DictReader(io.StringIO(text))
-            for row in reader:
-                if row.get("player_id", "").strip() == pid_str:
-                    if label == "statcast":
-                        sc_data = row
-                    else:
-                        ex_data = row
-                    break
-        except Exception as e:
-            print(f"  Savant {label} fetch failed ({year}): {e}", file=sys.stderr)
 
-    if not sc_data and not ex_data:
-        return None
+def _find_id_column(row):
+    """Detect the player ID column name in a Savant CSV row."""
+    # Statcast uses 'player_id', expected_statistics may use 'player_id' or 'mlbam_id'
+    for col in ("player_id", "mlbam_id"):
+        if col in row:
+            return col
+    return None
 
+
+def _extract_savant_row(row, player_type):
+    """Extract relevant fields from a Savant CSV row."""
     result = {}
-    if ex_data:
-        result["xwoba"] = float(ex_data.get("est_woba", 0) or 0)
-        result["pa"] = int(ex_data.get("pa", 0) or 0)
+    # Expected stats fields
+    if "est_woba" in row:
+        result["xwoba"] = float(row.get("est_woba", 0) or 0)
+        result["pa"] = int(row.get("pa", 0) or 0)
         if player_type == "pitcher":
-            xera = ex_data.get("xera")
+            xera = row.get("xera")
             result["xera"] = float(xera) if xera else 0
-    if sc_data:
-        result["hh_pct"] = float(sc_data.get("ev95percent", 0) or 0)
-        result["barrel_pct"] = float(sc_data.get("brl_percent", 0) or 0)
-        result["bbe"] = int(sc_data.get("attempts", 0) or 0)
+    # Statcast fields
+    if "ev95percent" in row:
+        result["hh_pct"] = float(row.get("ev95percent", 0) or 0)
+        result["barrel_pct"] = float(row.get("brl_percent", 0) or 0)
+        result["bbe"] = int(row.get("attempts", 0) or 0)
+    return result
+
+
+def fetch_savant_batch(mlb_ids, year, player_type="batter"):
+    """Fetch Savant data for multiple players. Downloads each CSV once.
+
+    Returns dict: mlb_id → {xwoba, hh_pct, barrel_pct, bbe, pa, [xera]}
+    Used by --init for efficiency (4 CSV downloads total vs 46).
+    """
+    id_set = {str(mid) for mid in mlb_ids if mid}
+    result = {mid: {} for mid in mlb_ids if mid}
+
+    for leaderboard in ("statcast", "expected_statistics"):
+        try:
+            rows = _download_savant_csv(leaderboard, player_type, year)
+            if not rows:
+                continue
+            id_col = _find_id_column(rows[0])
+            if not id_col:
+                print(f"  WARNING: No ID column found in {leaderboard} CSV", file=sys.stderr)
+                continue
+            for row in rows:
+                pid = row.get(id_col, "").strip()
+                if pid in id_set:
+                    extracted = _extract_savant_row(row, player_type)
+                    result[int(pid)].update(extracted)
+        except Exception as e:
+            print(f"  Savant {leaderboard} batch fetch failed ({year}): {e}", file=sys.stderr)
 
     return result
+
+
+def fetch_savant_player(mlb_id, year, player_type="batter"):
+    """Fetch Savant data for a single player. Downloads full CSV each time.
+
+    Used by daily mode for individual new players.
+    Returns dict of Savant fields, or None if not found.
+    """
+    result = fetch_savant_batch([mlb_id], year, player_type)
+    data = result.get(mlb_id, {})
+    return data if data else None
 ```
 
 - [ ] **Step 2: Add MLB Stats API prior season stats fetch**
@@ -587,12 +619,27 @@ def fetch_mlb_season_stats(mlb_id, season, group="hitting"):
 - [ ] **Step 3: Add prior_stats builders for batter/SP/RP**
 
 ```python
-FULL_SEASON_GAMES = 162  # 2025 full season
+# 2025 full season = 162 games for all teams.
+# Approximation: ignores mid-season trades. Accurate enough for baseline metrics.
+FULL_SEASON_GAMES = 162
 
 
-def build_prior_stats_batter(mlb_id):
-    """Build prior_stats dict for a batter using 2025 data."""
-    savant = fetch_savant_player(mlb_id, 2025, "batter")
+def _parse_ip(ip_str):
+    """Convert baseball IP notation (6.1 = 6⅓) to float."""
+    s = str(ip_str)
+    if "." in s:
+        whole, frac = s.split(".", 1)
+        return int(whole) + int(frac) / 3
+    return float(s) if s else 0
+
+
+def build_prior_stats_batter(mlb_id, savant=None):
+    """Build prior_stats dict for a batter using 2025 data.
+
+    savant: pre-fetched Savant data (from batch), or None to fetch individually.
+    """
+    if savant is None:
+        savant = fetch_savant_player(mlb_id, 2025, "batter")
     mlb_stats = fetch_mlb_season_stats(mlb_id, 2025, "hitting")
 
     if not savant and not mlb_stats:
@@ -619,9 +666,13 @@ def build_prior_stats_batter(mlb_id):
     return result
 
 
-def build_prior_stats_sp(mlb_id):
-    """Build prior_stats dict for an SP using 2025 data."""
-    savant = fetch_savant_player(mlb_id, 2025, "pitcher")
+def build_prior_stats_sp(mlb_id, savant=None):
+    """Build prior_stats dict for an SP using 2025 data.
+
+    savant: pre-fetched Savant data (from batch), or None to fetch individually.
+    """
+    if savant is None:
+        savant = fetch_savant_player(mlb_id, 2025, "pitcher")
     mlb_stats = fetch_mlb_season_stats(mlb_id, 2025, "pitching")
 
     if not savant and not mlb_stats:
@@ -638,25 +689,22 @@ def build_prior_stats_sp(mlb_id):
 
     if mlb_stats:
         era = mlb_stats.get("era", "0")
-        ip_str = mlb_stats.get("inningsPitched", "0")
+        ip = _parse_ip(mlb_stats.get("inningsPitched", "0"))
         gs = int(mlb_stats.get("gamesStarted", 0))
-        # Parse IP (6.1 = 6.333)
-        ip = 0
-        if "." in str(ip_str):
-            whole, frac = str(ip_str).split(".", 1)
-            ip = int(whole) + int(frac) / 3
-        else:
-            ip = float(ip_str)
         result["era"] = float(era) if era != "—" else 0
         result["ip_per_gs"] = round(ip / gs, 1) if gs > 0 else 0
-        result["ip"] = ip_str
+        result["ip"] = round(ip, 1)
 
     return result
 
 
-def build_prior_stats_rp(mlb_id):
-    """Build prior_stats dict for an RP using 2025 data."""
-    savant = fetch_savant_player(mlb_id, 2025, "pitcher")
+def build_prior_stats_rp(mlb_id, savant=None):
+    """Build prior_stats dict for an RP using 2025 data.
+
+    savant: pre-fetched Savant data (from batch), or None to fetch individually.
+    """
+    if savant is None:
+        savant = fetch_savant_player(mlb_id, 2025, "pitcher")
     mlb_stats = fetch_mlb_season_stats(mlb_id, 2025, "pitching")
 
     if not savant and not mlb_stats:
@@ -673,19 +721,12 @@ def build_prior_stats_rp(mlb_id):
 
     if mlb_stats:
         era = mlb_stats.get("era", "0")
-        ip_str = mlb_stats.get("inningsPitched", "0")
+        ip = _parse_ip(mlb_stats.get("inningsPitched", "0"))
         k = int(mlb_stats.get("strikeOuts", 0))
-        # Parse IP
-        ip = 0
-        if "." in str(ip_str):
-            whole, frac = str(ip_str).split(".", 1)
-            ip = int(whole) + int(frac) / 3
-        else:
-            ip = float(ip_str)
         result["era"] = float(era) if era != "—" else 0
         result["k_per_9"] = round(k * 9 / ip, 2) if ip > 0 else 0
         result["ip_per_team_g"] = round(ip / FULL_SEASON_GAMES, 2)
-        result["ip"] = ip_str
+        result["ip"] = round(ip, 1)
 
     return result
 ```
@@ -707,8 +748,11 @@ git commit -m "feat(roster-sync): prior_stats from Savant CSV + MLB Stats API"
 - [ ] **Step 1: Add update_config()**
 
 ```python
-def enrich_new_player(player):
-    """For a new player from Yahoo roster, look up mlb_id and prior_stats."""
+def enrich_new_player(player, savant_data=None):
+    """For a new player from Yahoo roster, look up mlb_id and prior_stats.
+
+    savant_data: pre-fetched Savant dict for this player (from batch), or None.
+    """
     name = player["name"]
     positions = player["positions"]
 
@@ -724,23 +768,25 @@ def enrich_new_player(player):
     }
 
     if mlb_id:
+        savant = savant_data.get(mlb_id) if savant_data else None
         p_type = pitcher_type(entry)
         if p_type == "SP":
-            entry["prior_stats"] = build_prior_stats_sp(mlb_id)
+            entry["prior_stats"] = build_prior_stats_sp(mlb_id, savant)
         elif p_type == "RP":
-            entry["prior_stats"] = build_prior_stats_rp(mlb_id)
+            entry["prior_stats"] = build_prior_stats_rp(mlb_id, savant)
         else:
-            entry["prior_stats"] = build_prior_stats_batter(mlb_id)
+            entry["prior_stats"] = build_prior_stats_batter(mlb_id, savant)
     else:
         entry["prior_stats"] = None
 
     return entry
 
 
-def update_config(config, yahoo_roster, diff):
+def update_config(config, yahoo_roster, diff, savant_data=None):
     """Apply diff to config: remove dropped, add new players.
 
     Also updates yahoo_player_key, team, and positions for existing players.
+    savant_data: pre-fetched batch Savant data (for --init efficiency).
     """
     added = diff["added"]
     dropped = diff["dropped"]
@@ -755,7 +801,7 @@ def update_config(config, yahoo_roster, diff):
 
     # Add new players
     for player in added:
-        entry = enrich_new_player(player)
+        entry = enrich_new_player(player, savant_data=savant_data)
         if is_pitcher(entry):
             config["pitchers"].append(entry)
         else:
@@ -897,7 +943,7 @@ def run_init(my_key, token, config, dry_run):
     roster = fetch_full_roster(my_key, token)
     print(f"Yahoo roster: {len(roster)} players", file=sys.stderr)
 
-    diff = diff_roster(roster, config)
+    diff = diff_roster(roster, config, init=True)
     added = diff["added"]
     dropped = diff["dropped"]
 
@@ -924,7 +970,28 @@ def run_init(my_key, token, config, dry_run):
         print("[DRY RUN] No changes written.", file=sys.stderr)
         return
 
-    config = update_config(config, roster, diff)
+    # Batch-fetch Savant data for all players needing prior_stats (4 CSV downloads)
+    savant_data = {}
+    all_mlb_ids = [p.get("mlb_id") for section in ("batters", "pitchers") for p in config.get(section, []) if p.get("mlb_id")]
+    # Also search mlb_ids for newly added players
+    for p in added:
+        mid = search_mlb_id(p["name"])
+        if mid:
+            all_mlb_ids.append(mid)
+    batter_ids = []
+    pitcher_ids = []
+    for p in roster:
+        # Classify each player for Savant fetch
+        if any(pos in ("SP", "RP") for pos in p["positions"]):
+            pitcher_ids.extend([mid for mid in all_mlb_ids])  # will be filtered by CSV
+        else:
+            batter_ids.extend([mid for mid in all_mlb_ids])
+    # Simpler: just fetch both types for all IDs (Savant CSV ignores IDs not in the data)
+    print("Batch-fetching 2025 Savant data...", file=sys.stderr)
+    savant_data.update(fetch_savant_batch(all_mlb_ids, 2025, "batter"))
+    savant_data.update(fetch_savant_batch(all_mlb_ids, 2025, "pitcher"))
+
+    config = update_config(config, roster, diff, savant_data=savant_data)
     save_config(config)
     write_last_sync(int(time.time()))
     print("Config updated and saved.", file=sys.stderr)
