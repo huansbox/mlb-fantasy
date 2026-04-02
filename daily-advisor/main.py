@@ -1448,13 +1448,20 @@ def save_github_issue(target_date, week_number, data_summary, advice, morning=Fa
 
 </details>
 """
+    label = f"week-{week_number}"
     try:
+        # Ensure label exists (ignore failure if already exists)
+        subprocess.run(
+            ["gh", "label", "create", label, "--repo", repo,
+             "--color", "0E8A16", "--force"],
+            capture_output=True, text=True, timeout=10,
+        )
         result = subprocess.run(
             ["gh", "issue", "create",
              "--repo", repo,
              "--title", title,
              "--body", body,
-             "--label", f"week-{week_number}"],
+             "--label", label],
             capture_output=True, text=True, encoding="utf-8", timeout=30,
         )
         if result.returncode == 0:
