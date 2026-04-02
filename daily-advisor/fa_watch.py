@@ -16,7 +16,7 @@ from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
     send_telegram,
-    is_pitcher, pitcher_type, calc_position_depth,
+    pitcher_type, calc_position_depth,
 )
 
 TPE = ZoneInfo("Asia/Taipei")
@@ -52,10 +52,10 @@ def collect_fa_snapshot(access_token, config, queries=None):
     """Query FA players across positions. Returns {name: {team, position, pct, stats}}.
 
     Args:
-        queries: list of (label, filter_str) tuples. Defaults to DAILY_QUERIES.
+        queries: list of (label, filter_str) tuples. Defaults to dynamic position queries.
     """
     if queries is None:
-        queries = DAILY_QUERIES
+        queries = build_position_queries(config)
     league_key = config["league"]["league_key"]
     snapshot = {}
 
