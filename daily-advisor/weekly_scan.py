@@ -305,16 +305,18 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type)
     return d
 
 
-def enrich_layer3(filtered, savant_2026, config):
-    """Layer 3: Pure enrichment — 2025 Savant + MLB Stats + derived metrics.
+def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
+    """Layer 3: Pure enrichment — prior Savant + MLB Stats + derived metrics.
 
     No quality filtering. mlb_id already obtained in Layer 2.
+    savant_prior: True = fetch 2025 data (default). False = skip all 2025.
     """
     standings = _fetch_team_games()
 
-    # Always download 2025 CSVs (auxiliary context for Claude)
-    print("  Downloading 2025 Savant CSVs...", file=sys.stderr)
-    savant_2025 = download_savant_csvs(2025)
+    savant_2025 = None
+    if savant_prior:
+        print("  Downloading 2025 Savant CSVs...", file=sys.stderr)
+        savant_2025 = download_savant_csvs(2025)
 
     enriched = []
     for p in filtered:
@@ -327,26 +329,33 @@ def enrich_layer3(filtered, savant_2026, config):
             print(f"  SKIP {p['name']}: no mlb_id", file=sys.stderr)
             continue
 
-        # 2025 Savant (auxiliary context)
-        p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
-
-        # MLB Stats API (both years)
+        # 2026 MLB Stats (always)
         p["mlb_2026"] = fetch_mlb_season_stats(mlb_id, 2026, group)
-        p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+
+        # 2025 data (optional — skip when 2026 sample is sufficient)
+        if savant_prior:
+            p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
+            p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+        else:
+            p["savant_2025"] = None
+            p["mlb_2025"] = None
 
         # Derived metrics
         s26 = p.get("savant_2026")
         s25 = p.get("savant_2025")
-        if fa_type == "batter":
-            p["derived_2026"] = _compute_derived_batter(
-                p["mlb_2026"], standings, team, 2026)
-            p["derived_2025"] = _compute_derived_batter(
-                p["mlb_2025"], standings, team, 2025)
+        p["derived_2026"] = (
+            _compute_derived_batter(p["mlb_2026"], standings, team, 2026)
+            if fa_type == "batter" else
+            _compute_derived_pitcher(s26, p["mlb_2026"], standings, team, 2026, fa_type)
+        )
+        if savant_prior:
+            p["derived_2025"] = (
+                _compute_derived_batter(p["mlb_2025"], standings, team, 2025)
+                if fa_type == "batter" else
+                _compute_derived_pitcher(s25, p["mlb_2025"], standings, team, 2025, fa_type)
+            )
         else:
-            p["derived_2026"] = _compute_derived_pitcher(
-                s26, p["mlb_2026"], standings, team, 2026, fa_type)
-            p["derived_2025"] = _compute_derived_pitcher(
-                s25, p["mlb_2025"], standings, team, 2025, fa_type)
+            p["derived_2025"] = {}
 
         enriched.append(p)
         time.sleep(0.2)  # MLB API rate limit
@@ -870,7 +879,8 @@ def main():
         history = load_fa_history()
         changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
         history[today_str] = {
-            name: {"pct": info["pct"]} for name, info in snapshot.items()
+            name: {"pct": info["pct"], "team": info["team"], "position": info["position"]}
+            for name, info in snapshot.items()
         }
         sorted_dates = sorted(history.keys())
         if len(sorted_dates) > 14:

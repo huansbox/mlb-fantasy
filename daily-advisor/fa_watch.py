@@ -1,8 +1,9 @@
-"""Daily FA Watch — %owned tracking + market monitoring."""
+"""Daily FA Watch — %owned tracking + Statcast quality monitoring."""
 
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -15,7 +16,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
-    send_telegram,
+    send_telegram, _normalize,
     pitcher_type, calc_position_depth,
 )
 
@@ -189,76 +190,219 @@ def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
     return "\n".join(lines)
 
 
+# ── Candidate collection (from fa_history + waiver-log, no broad Yahoo query) ──
+
+# Regex: "### Player Name (TEAM, Position)" — half-width parens, 2-3 char team abbr
+_WAIVER_PLAYER_RE = re.compile(r"^### (.+?) \((\w{2,3}), (.+?)\)")
+
+
+def parse_waiver_log_watchlist():
+    """Parse waiver-log.md '觀察中' section for player names + team + position."""
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    if not os.path.exists(waiver_log_path):
+        return []
+    with open(waiver_log_path, encoding="utf-8") as f:
+        content = f.read()
+    players = []
+    in_section = False
+    for line in content.split("\n"):
+        if line.startswith("## 觀察中"):
+            in_section = True
+            continue
+        if line.startswith("## ") and in_section:
+            break
+        if in_section and line.startswith("### "):
+            if "已在陣容" in line or "條件 Pass" in line:
+                continue
+            m = _WAIVER_PLAYER_RE.match(line)
+            if m:
+                players.append({
+                    "name": m.group(1).strip(),
+                    "team": m.group(2),
+                    "position": m.group(3).split(")")[0].strip(),
+                })
+    return players
+
+
+def collect_candidates(history, today_str, top_n=5):
+    """Combine %owned risers (from fa_history) + waiver-log watchlist.
+
+    Returns list of dicts {name, team, position, pct} for Statcast pipeline.
+    Does NOT require a live Yahoo snapshot — reads accumulated fa_history.
+    """
+    # Find latest two dates in history for %owned delta
+    dates = sorted(d for d in history.keys() if d <= today_str)
+    latest = dates[-1] if dates else None
+    prev = dates[-2] if len(dates) >= 2 else None
+
+    risers = []
+    if latest and prev:
+        snap_now = history[latest]
+        snap_prev = history[prev]
+        for name, info in snap_now.items():
+            pct_now = info.get("pct", 0)
+            pct_prev = snap_prev.get(name, {}).get("pct", pct_now)
+            delta = pct_now - pct_prev
+            if delta > 0:
+                risers.append({
+                    "name": name,
+                    "team": info.get("team", ""),
+                    "position": info.get("position", ""),
+                    "pct": pct_now,
+                    "d1": delta,
+                })
+        risers.sort(key=lambda x: x["d1"], reverse=True)
+        risers = risers[:top_n]
+
+    # Waiver-log watchlist
+    watchlist = parse_waiver_log_watchlist()
+
+    # Merge + deduplicate (normalize names for accent matching)
+    seen = set()
+    candidates = []
+    for item in risers:
+        key = _normalize(item["name"])
+        if key not in seen:
+            seen.add(key)
+            candidates.append(item)
+    for item in watchlist:
+        key = _normalize(item["name"])
+        if key not in seen:
+            seen.add(key)
+            # Add pct from latest history if available
+            pct = 0
+            if latest:
+                for hname, hinfo in history[latest].items():
+                    if _normalize(hname) == key:
+                        pct = hinfo.get("pct", 0)
+                        break
+            candidates.append({**item, "pct": pct})
+
+    print(f"  Candidates: {len(risers)} risers + {len(watchlist)} watchlist "
+          f"→ {len(candidates)} total", file=sys.stderr)
+    return candidates
+
+
+# ── Statcast pipeline (lazy import weekly_scan to avoid circular dependency) ──
+
+
+def run_statcast_pipeline(candidates, config):
+    """Download Savant CSVs, quality filter, enrich candidates.
+
+    Returns (enriched_list, savant_2026_csvs). enriched_list may be empty.
+    """
+    # Lazy import: weekly_scan imports fa_watch at module level
+    from weekly_scan import (
+        download_savant_csvs, filter_by_savant, enrich_layer3,
+    )
+
+    # Build snapshot-like dict for filter_by_savant
+    candidate_snapshot = {
+        c["name"]: {
+            "team": c["team"],
+            "position": c["position"],
+            "pct": c.get("pct", 0),
+            "stats": {},
+            "waiver_date": "",
+        }
+        for c in candidates
+    }
+
+    print("  Downloading 2026 Savant CSVs...", file=sys.stderr)
+    savant_2026 = download_savant_csvs(2026)
+
+    # Quality filter (P40/P50 thresholds, 2/3 pass)
+    filtered = filter_by_savant(candidate_snapshot, savant_2026)
+
+    if not filtered:
+        print("  No candidates passed quality filter", file=sys.stderr)
+        return [], savant_2026
+
+    # Enrichment (savant_prior=True for early season 2025 context)
+    enriched = enrich_layer3(filtered, savant_2026, config, savant_prior=True)
+
+    return enriched, savant_2026
+
+
 # ── Data summary for claude -p ──
 
 
-def build_fa_watch_data(today_str, snapshot, changes, ref_1d, ref_3d, config):
-    """Build data summary for claude -p."""
+def build_fa_watch_data(today_str, enriched, changes, ref_1d, ref_3d,
+                        config, savant_2026, history):
+    """Build Statcast-enriched data summary for claude -p."""
+    # Lazy import: weekly_scan imports fa_watch at module level
+    from weekly_scan import (
+        build_roster_summary, _format_fa_batter, _format_fa_pitcher,
+        _extract_eval_framework,
+    )
+
     lines = [f"=== FA Watch ({today_str}) ===\n"]
 
-    # %owned changes
+    # 1. Evaluation framework from CLAUDE.md
+    framework = _extract_eval_framework()
+    if framework:
+        lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
+
+    # 2. Roster summary (with 2026 Statcast)
+    lines.append(build_roster_summary(config, savant_2026))
+
+    # 3. FA candidates (Statcast enriched)
+    if enriched:
+        fa_batters = [p for p in enriched if p["fa_type"] == "batter"]
+        fa_sps = [p for p in enriched if p["fa_type"] == "sp"]
+        fa_rps = [p for p in enriched if p["fa_type"] == "rp"]
+
+        if fa_batters:
+            lines.append(f"\n--- FA 打者候選 ({len(fa_batters)} 人) ---")
+            for p in fa_batters:
+                lines.append(_format_fa_batter(p))
+        if fa_sps:
+            lines.append(f"\n--- FA SP 候選 ({len(fa_sps)} 人) ---")
+            for p in fa_sps:
+                lines.append(_format_fa_pitcher(p))
+        if fa_rps:
+            lines.append(f"\n--- FA RP 候選 ({len(fa_rps)} 人) ---")
+            for p in fa_rps:
+                lines.append(_format_fa_pitcher(p))
+
+        lines.append(f"\n（共 {len(enriched)} 人通過品質門檻，"
+                     f"來源：%owned risers + waiver-log 觀察中）")
+    else:
+        lines.append("\n--- FA 候選 ---\n（無候選通過 Statcast 品質門檻）")
+
+    # 4. %owned changes overview
     rankings = format_change_rankings(changes, ref_1d, ref_3d)
-    lines.append(rankings)
+    lines.append(f"\n--- %owned 變動 ---\n{rankings}")
 
-    # Roster summary
-    lines.append("\n--- 我的陣容 ---")
-    for b in config.get("batters", []):
-        lines.append(f"  {b['name']} ({b['team']}, {'/'.join(b['positions'])})")
-    for p in config.get("pitchers", []):
-        p_type = pitcher_type(p) or "P"
-        lines.append(f"  {p['name']} ({p['team']}, {p_type})")
+    # 5. Watchlist status
+    watchlist = parse_waiver_log_watchlist()
+    if watchlist:
+        enriched_names = {_normalize(p["name"]) for p in enriched} if enriched else set()
+        latest_date = sorted(history.keys())[-1] if history else None
+        latest_snap = history.get(latest_date, {}) if latest_date else {}
+        lines.append("\n--- 觀察中球員 %owned ---")
+        for w in watchlist:
+            key = _normalize(w["name"])
+            # Look up %owned from history
+            pct = "N/A"
+            for hname, hinfo in latest_snap.items():
+                if _normalize(hname) == key:
+                    pct = f"{hinfo.get('pct', 0)}%"
+                    break
+            tag = " [Statcast ✓]" if key in enriched_names else ""
+            lines.append(f"  {w['name']} ({w['team']}, {w['position']}): {pct}{tag}")
 
-    # Dynamic weak position FA (positions with <= 1 player)
-    thin = calc_position_depth(config)
-    if thin:
-        lines.append(f"\n--- 零/薄替補位置 FA（{', '.join(thin.keys())}）---")
-        for pos in thin:
-            pos_players = [
-                (n, i) for n, i in snapshot.items()
-                if pos in i["position"].split(",")
-            ]
-            pos_players.sort(key=lambda x: x[1]["pct"], reverse=True)
-            top = pos_players[:3]
-            if top:
-                names = ", ".join(f"{n}({i['pct']}%)" for n, i in top)
-                lines.append(f"  {pos}（覆蓋 {thin[pos]} 人）: {names}")
-
-    # (R9) Weekly scan summary with freshness check
+    # 6. Weekly scan summary (reference)
     summary_path = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
     if os.path.exists(summary_path):
         mtime = os.path.getmtime(summary_path)
         age_days = (datetime.now().timestamp() - mtime) / 86400
         with open(summary_path, encoding="utf-8") as f:
             summary = f.read().strip()
-        if age_days > 7:
-            lines.append(f"\n--- 本週 Deep Scan 摘要（⚠️ {int(age_days)} 天前，可能過期） ---\n{summary}")
-        else:
-            lines.append(f"\n--- 本週 Deep Scan 摘要 ---\n{summary}")
-    else:
-        lines.append("\n（尚無 Weekly Deep Scan 摘要）")
+        freshness = f"⚠️ {int(age_days)} 天前" if age_days > 7 else f"{int(age_days)}d ago"
+        lines.append(f"\n--- 本週 Deep Scan 摘要（{freshness}）---\n{summary}")
 
-    # Watchlist status from waiver-log
-    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
-    if os.path.exists(waiver_log_path):
-        with open(waiver_log_path, encoding="utf-8") as f:
-            log_content = f.read()
-        in_watch = []
-        in_section = False
-        for line in log_content.split("\n"):
-            if line.startswith("## 觀察中"):
-                in_section = True
-                continue
-            if line.startswith("## ") and in_section:
-                break
-            if in_section and line.startswith("### "):
-                player_name = line.replace("### ", "").split("(")[0].strip()
-                pct = snapshot.get(player_name, {}).get("pct", "N/A")
-                in_watch.append(f"  {player_name}: {pct}%")
-        if in_watch:
-            lines.append("\n--- 觀察中球員 %owned ---")
-            lines.extend(in_watch)
-
-    # Tuesday reminder
+    # 7. Tuesday reminder
     day_of_week = datetime.strptime(today_str, "%Y-%m-%d").weekday()
     if day_of_week == 1:
         lines.append("\n今天是週二，建議開 Claude Code 跑 /waiver-scan")
@@ -322,46 +466,91 @@ def call_claude(data_summary):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Daily FA Watch")
+    parser = argparse.ArgumentParser(description="Daily FA Watch (with Statcast)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--no-send", action="store_true")
     parser.add_argument("--snapshot-only", action="store_true",
-                        help="Collect and save FA snapshot only (no Claude/Telegram)")
+                        help="Collect and save FA snapshot only (no Statcast/Claude/Telegram)")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
     args = parser.parse_args()
 
     env = load_env()
 
     try:
-        access_token = refresh_token(env)
+        today_str = args.date or datetime.now(TPE).strftime("%Y-%m-%d")
         config = load_config()
 
-        today_str = args.date or datetime.now(TPE).strftime("%Y-%m-%d")  # (R2)
-
-        print(f"[FA Watch] {today_str}...", file=sys.stderr)
-        queries = build_position_queries(config)
-        snapshot = collect_fa_snapshot(access_token, config, queries)
-
-        history = load_fa_history()
-        changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
-
-        history[today_str] = {name: {"pct": info["pct"]} for name, info in snapshot.items()}
-        sorted_dates = sorted(history.keys())
-        if len(sorted_dates) > 14:
-            for old_date in sorted_dates[:-14]:
-                del history[old_date]
-        save_fa_history(history)
-
+        # ── --snapshot-only: broad Yahoo query → save history → exit ──
         if args.snapshot_only:
-            print(f"[FA Watch] Snapshot saved ({len(snapshot)} players)", file=sys.stderr)
+            access_token = refresh_token(env)
+            print(f"[FA Watch snapshot] {today_str}...", file=sys.stderr)
+            queries = build_position_queries(config)
+            snapshot = collect_fa_snapshot(access_token, config, queries)
+            history = load_fa_history()
+            history[today_str] = {
+                name: {"pct": info["pct"], "team": info["team"],
+                       "position": info["position"]}
+                for name, info in snapshot.items()
+            }
+            sorted_dates = sorted(history.keys())
+            if len(sorted_dates) > 14:
+                for old_date in sorted_dates[:-14]:
+                    del history[old_date]
+            save_fa_history(history)
+            print(f"[FA Watch] Snapshot saved ({len(snapshot)} players)",
+                  file=sys.stderr)
             return
 
-        data_summary = build_fa_watch_data(today_str, snapshot, changes, ref_1d, ref_3d, config)
+        # ── Analysis mode: read fa_history + waiver-log → Statcast pipeline ──
+        print(f"[FA Watch] {today_str}...", file=sys.stderr)
+
+        # Phase 1: Collect candidates from accumulated history + waiver-log
+        history = load_fa_history()
+        candidates = collect_candidates(history, today_str)
+
+        # Compute %owned changes from history (for format_change_rankings)
+        dates = sorted(history.keys())
+        latest = dates[-1] if dates else None
+        latest_snap = history.get(latest, {})
+        # Build a snapshot-like structure for calc_owned_changes
+        pseudo_snapshot = {
+            name: {
+                "pct": info.get("pct", 0),
+                "team": info.get("team", ""),
+                "position": info.get("position", ""),
+            }
+            for name, info in latest_snap.items()
+        }
+        changes, ref_1d, ref_3d = calc_owned_changes(
+            pseudo_snapshot, history, latest or today_str)
+
+        # Phase 2: Statcast pipeline
+        enriched = []
+        savant_2026 = None
+        if candidates:
+            result = run_statcast_pipeline(candidates, config)
+            enriched, savant_2026 = result
+            # Attach d1/d3 from history changes
+            changes_by_norm = {
+                _normalize(c["name"]): c for c in changes
+            }
+            for p in enriched:
+                c = changes_by_norm.get(_normalize(p["name"]), {})
+                p["d1"] = c.get("d1")
+                p["d3"] = c.get("d3")
+        else:
+            print("  No candidates to evaluate", file=sys.stderr)
+
+        # Phase 3: Build data for Claude
+        data_summary = build_fa_watch_data(
+            today_str, enriched, changes, ref_1d, ref_3d,
+            config, savant_2026, history)
 
         if args.dry_run:
             print(data_summary)
             return
 
+        # Phase 4: Claude analysis → Telegram + GitHub Issue
         print("Calling claude -p...", file=sys.stderr)
         advice = call_claude(data_summary)
         if not advice:
@@ -382,7 +571,6 @@ def main():
         print("Sent." if ok else "Failed.", file=sys.stderr)
 
     except Exception as e:
-        # (R10)
         print(f"FA Watch error: {e}", file=sys.stderr)
         try:
             send_telegram(f"FA Watch failed: {e}", env)
