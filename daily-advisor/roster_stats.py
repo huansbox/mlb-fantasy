@@ -156,7 +156,8 @@ def main():
         pa = cur.get("pa", 0)
         ops = cur.get("ops", "—")
         hr = cur.get("hr", 0)
-        bb_pct = f"{cur['bb_pct']:.1f}%" if cur.get("bb_pct") is not None else "—"
+        bb_v = cur.get("bb_pct")
+        bb_pct = f"{bb_v:.1f}% {pctile_tag(bb_v, 'bb_pct')}" if bb_v is not None else "—"
         xw_v = sv_cur.get("xwoba")
         xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba')}" if xw_v else "—"
         hh_v = sv_cur.get("hh_pct")
