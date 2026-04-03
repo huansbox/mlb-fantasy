@@ -111,20 +111,23 @@ def _match_by_name(name, name_index):
 
 
 def _extract_savant_for_player(name, fa_type, savant_csvs):
-    """Extract combined Savant data by name matching across sc+ex CSVs."""
+    """Extract combined Savant data + mlb_id by name matching across sc+ex CSVs."""
     if fa_type == "batter":
         sc_key, ex_key, p_type = "batter_sc", "batter_ex", "batter"
     else:
         sc_key, ex_key, p_type = "pitcher_sc", "pitcher_ex", "pitcher"
 
     data = {}
-    sc_row = _match_by_name(name, savant_csvs[sc_key][0])
-    if sc_row:
-        data.update(_extract_savant_row(sc_row, p_type))
-    ex_row = _match_by_name(name, savant_csvs[ex_key][0])
-    if ex_row:
-        data.update(_extract_savant_row(ex_row, p_type))
-    return data if data else None
+    mlb_id = None
+    for csv_key in (sc_key, ex_key):
+        row = _match_by_name(name, savant_csvs[csv_key][0])
+        if row:
+            data.update(_extract_savant_row(row, p_type))
+            if mlb_id is None:
+                id_col = _find_id_column(row)
+                if id_col and row.get(id_col, "").strip():
+                    mlb_id = int(row[id_col])
+    return (data if data else None, mlb_id)
 
 
 def _extract_savant_by_id(mlb_id, fa_type, savant_csvs):
@@ -170,38 +173,33 @@ def _check_thresholds(metrics, thresholds):
 
 
 def filter_by_savant(snapshot, savant_2026):
-    """Layer 2: Filter FA by Savant 2026 quality. BBE < 50 / no-match deferred to Layer 3."""
+    """Layer 2: Filter FA by 2026 Savant quality (P40/P50 threshold, 2/3 pass).
+
+    Name match → get Savant + mlb_id. Failures fallback to search_mlb_id.
+    No BBE-based deferral — all filtering uses 2026 data regardless of sample size.
+    """
     results = []
     matched = 0
+    fallback = 0
     total = len(snapshot)
 
     for name, info in snapshot.items():
         fa_type = _classify_fa_type(info["position"])
-        savant = _extract_savant_for_player(name, fa_type, savant_2026)
+        savant, mlb_id = _extract_savant_for_player(name, fa_type, savant_2026)
 
-        entry = {
-            "name": name,
-            "team": info["team"],
-            "position": info["position"],
-            "pct": info["pct"],
-            "stats": info.get("stats", {}),
-            "waiver_date": info.get("waiver_date", ""),
-            "fa_type": fa_type,
-            "savant_2026": savant,
-            "bbe": savant.get("bbe", 0) if savant else 0,
-            "passed_l2": False,
-            "deferred": False,
-        }
-
+        # Name match failed → search_mlb_id fallback
         if savant is None:
-            entry["deferred"] = True
-            results.append(entry)
-            continue
+            mlb_id = search_mlb_id(name)
+            if mlb_id:
+                savant = _extract_savant_by_id(mlb_id, fa_type, savant_2026)
+                if savant:
+                    fallback += 1
+            if savant is None:
+                continue  # No Savant data at all → skip
+        else:
+            matched += 1
 
-        matched += 1
-        bbe = entry["bbe"]
-
-        # Build metrics for threshold check (0 → None: _extract_savant_row defaults missing to 0)
+        # Build metrics (0 → None: _extract_savant_row defaults missing to 0)
         metrics = {
             "xwoba": savant.get("xwoba") or None,
             "hh_pct": savant.get("hh_pct") or None,
@@ -220,24 +218,24 @@ def filter_by_savant(snapshot, savant_2026):
             else RP_THRESHOLDS
         )
 
-        if bbe < 30:
-            entry["deferred"] = True
-        elif bbe <= 50:
-            if _check_thresholds(metrics, thresholds) >= 2:
-                entry["passed_l2"] = True
-            else:
-                entry["deferred"] = True
-        else:
-            if _check_thresholds(metrics, thresholds) >= 2:
-                entry["passed_l2"] = True
-            else:
-                continue  # filtered out
+        if _check_thresholds(metrics, thresholds) < 2:
+            continue  # Doesn't meet 2026 quality threshold
 
-        results.append(entry)
+        results.append({
+            "name": name,
+            "team": info["team"],
+            "position": info["position"],
+            "pct": info["pct"],
+            "stats": info.get("stats", {}),
+            "waiver_date": info.get("waiver_date", ""),
+            "fa_type": fa_type,
+            "savant_2026": savant,
+            "mlb_id": mlb_id,
+            "bbe": savant.get("bbe", 0),
+        })
 
-    match_pct = matched * 100 // total if total else 0
-    print(f"  Layer 2: {total} FA → {matched} matched ({match_pct}%) "
-          f"→ {len(results)} passed/deferred", file=sys.stderr)
+    print(f"  Layer 2: {total} FA → {matched} name-matched + {fallback} fallback "
+          f"→ {len(results)} passed", file=sys.stderr)
     return results
 
 
@@ -307,110 +305,36 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type)
     return d
 
 
-def _build_metrics(savant, mlb_stats, fa_type):
-    """Build threshold-check metrics dict from Savant + MLB Stats.
-    Uses `or None` to convert 0 defaults from _extract_savant_row to None."""
-    m = {
-        "xwoba": (savant.get("xwoba") or None) if savant else None,
-        "hh_pct": (savant.get("hh_pct") or None) if savant else None,
-        "barrel_pct": (savant.get("barrel_pct") or None) if savant else None,
-        "xera": (savant.get("xera") or None) if savant else None,
-    }
-    if fa_type == "batter" and mlb_stats:
-        pa = int(mlb_stats.get("plateAppearances", 0))
-        bb = int(mlb_stats.get("baseOnBalls", 0))
-        if pa > 0:
-            m["bb_pct"] = bb / pa * 100
-    return m
-
-
-def _final_bbe_check(player, fa_type):
-    """Final BBE quality gate for deferred players (uses already-fetched data)."""
-    bbe = player["bbe"]
-    thresholds = (
-        BATTER_THRESHOLDS if fa_type == "batter"
-        else SP_THRESHOLDS if fa_type == "sp"
-        else RP_THRESHOLDS
-    )
-
-    if bbe < 30:
-        # Only 2025
-        s25 = player.get("savant_2025")
-        if not s25:
-            return False
-        return _check_thresholds(
-            _build_metrics(s25, player.get("mlb_2025"), fa_type), thresholds
-        ) >= 2
-
-    elif bbe <= 50:
-        # 2026 already failed in L2 → check 2025
-        s25 = player.get("savant_2025")
-        if not s25:
-            return False
-        return _check_thresholds(
-            _build_metrics(s25, player.get("mlb_2025"), fa_type), thresholds
-        ) >= 2
-
-    else:
-        # BBE > 50, deferred due to name-match failure → check precise 2026
-        s26 = player.get("savant_2026")
-        if not s26:
-            return False
-        m = _build_metrics(s26, player.get("mlb_2026"), fa_type)
-        # Fallback: Yahoo BB / Savant PA for batter BB%
-        if fa_type == "batter" and m.get("bb_pct") is None:
-            yahoo_bb = player.get("stats", {}).get("BB")
-            pa = s26.get("pa")
-            if yahoo_bb and pa and int(pa) > 0:
-                m["bb_pct"] = int(yahoo_bb) / int(pa) * 100
-        return _check_thresholds(m, thresholds) >= 2
-
-
 def enrich_layer3(filtered, savant_2026, config):
-    """Layer 3: mlb_id → precise Savant → MLB Stats → derived metrics."""
+    """Layer 3: Pure enrichment — 2025 Savant + MLB Stats + derived metrics.
+
+    No quality filtering. mlb_id already obtained in Layer 2.
+    """
     standings = _fetch_team_games()
 
-    # Lazy 2025 CSV download if any deferred player exists
-    has_deferred = any(p["deferred"] for p in filtered)
-    savant_2025 = None
-    if has_deferred:
-        print("  Downloading 2025 Savant CSVs (deferred players)...", file=sys.stderr)
-        savant_2025 = download_savant_csvs(2025)
+    # Always download 2025 CSVs (auxiliary context for Claude)
+    print("  Downloading 2025 Savant CSVs...", file=sys.stderr)
+    savant_2025 = download_savant_csvs(2025)
 
     enriched = []
     for p in filtered:
-        name = p["name"]
+        mlb_id = p.get("mlb_id")
         fa_type = p["fa_type"]
         group = "hitting" if fa_type == "batter" else "pitching"
+        team = p["team"]
 
-        mlb_id = search_mlb_id(name)
         if not mlb_id:
-            print(f"  SKIP {name}: mlb_id not found", file=sys.stderr)
+            print(f"  SKIP {p['name']}: no mlb_id", file=sys.stderr)
             continue
 
-        # Precise 2026 Savant by ID
-        precise_2026 = _extract_savant_by_id(mlb_id, fa_type, savant_2026)
-        if precise_2026:
-            p["savant_2026"] = precise_2026
-            p["bbe"] = precise_2026.get("bbe", 0)
-
-        # 2025 Savant if BBE < 50
-        if savant_2025 and p["bbe"] < 50:
-            p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
-        else:
-            p["savant_2025"] = None
+        # 2025 Savant (auxiliary context)
+        p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
 
         # MLB Stats API (both years)
         p["mlb_2026"] = fetch_mlb_season_stats(mlb_id, 2026, group)
         p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
 
-        # BBE final gate for deferred players
-        if p["deferred"] and not p["passed_l2"]:
-            if not _final_bbe_check(p, fa_type):
-                continue
-
         # Derived metrics
-        team = p["team"]
         s26 = p.get("savant_2026")
         s25 = p.get("savant_2025")
         if fa_type == "batter":
@@ -424,7 +348,6 @@ def enrich_layer3(filtered, savant_2026, config):
             p["derived_2025"] = _compute_derived_pitcher(
                 s25, p["mlb_2025"], standings, team, 2025, fa_type)
 
-        p["mlb_id"] = mlb_id
         enriched.append(p)
         time.sleep(0.2)  # MLB API rate limit
 
@@ -854,13 +777,12 @@ def main():
         filtered = filter_by_savant(snapshot, savant_2026)
 
         if args.dry_run:
-            print(f"\n=== Layer 2 Results ({len(filtered)} passed/deferred) ===\n")
+            print(f"\n=== Layer 2 Results ({len(filtered)} passed) ===\n")
             for p in filtered:
-                tag = "PASS" if p["passed_l2"] else "DEFER"
                 s = p.get("savant_2026") or {}
                 xw = f"{s['xwoba']:.3f}" if s.get("xwoba") else "—"
                 xe = f"{s['xera']:.2f}" if s.get("xera") else "—"
-                print(f"  [{tag:5}] {p['name']:22} {p['team']:5} {p['fa_type']:6} "
+                print(f"  {p['name']:22} {p['team']:5} {p['fa_type']:6} "
                       f"BBE={p['bbe']:>3}  xwOBA={xw:>6}  xERA={xe:>5}")
             print(f"\n{build_roster_summary(config)}")
             return
