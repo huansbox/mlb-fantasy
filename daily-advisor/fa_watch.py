@@ -325,6 +325,8 @@ def main():
     parser = argparse.ArgumentParser(description="Daily FA Watch")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--no-send", action="store_true")
+    parser.add_argument("--snapshot-only", action="store_true",
+                        help="Collect and save FA snapshot only (no Claude/Telegram)")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
     args = parser.parse_args()
 
@@ -350,6 +352,10 @@ def main():
                 del history[old_date]
         save_fa_history(history)
 
+        if args.snapshot_only:
+            print(f"[FA Watch] Snapshot saved ({len(snapshot)} players)", file=sys.stderr)
+            return
+
         data_summary = build_fa_watch_data(today_str, snapshot, changes, ref_1d, ref_3d, config)
 
         if args.dry_run:
@@ -366,10 +372,10 @@ def main():
 
         print(advice)
 
-        save_github_issue(today_str, data_summary, advice)
-
         if args.no_send:
             return
+
+        save_github_issue(today_str, data_summary, advice)
 
         print("Sending to Telegram...", file=sys.stderr)
         ok = send_telegram(advice, env)

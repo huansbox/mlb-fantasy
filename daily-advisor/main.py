@@ -55,7 +55,8 @@ def pctile_tag(value, metric, player_type="batter"):
     bp = table.get(metric)
     if not bp or value is None:
         return ""
-    higher_better = (player_type == "batter")
+    # Auto-detect direction: if P90 > P25, higher value = better percentile
+    higher_better = bp[-1][1] > bp[0][1]
     # Find the highest percentile bracket the value qualifies for
     matched = None
     for pct, thresh in reversed(bp):
