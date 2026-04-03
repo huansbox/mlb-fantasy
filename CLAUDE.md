@@ -150,7 +150,7 @@
 **品質指標**（核心，2 項勝出 = 值得行動）：xERA、xwOBA allowed、HH% allowed（同 SP）
 **輔助**：Barrel% allowed、ERA、|xERA - ERA| 百分位
 **產量**：K/9、IP / Team_G
-**加分項**：SV+H — 同等品質下優先選有 SV+H 的，但不因 SV+H 而降低品質門檻
+**加分項**：SV+H — 品質小輸也值得換（RP 只佔 2 格，比率影響有限；但 SV+H 是獨立類別，多贏 1 類 = 多 1 勝，且多隊 punt SV+H → 門檻低）
 
 注意：RP 百分位分布和 SP 不同，需分開計算。
 
