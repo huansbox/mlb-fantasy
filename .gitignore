@@ -4,3 +4,5 @@ daily-advisor/yahoo_token.json
 daily-advisor/fa_history.json
 daily-advisor/weekly_scan_summary.txt
 daily-advisor/.last_sync
+*.stackdump
+__pycache__/
