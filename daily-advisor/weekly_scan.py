@@ -634,10 +634,31 @@ def _format_owned_risers(changes):
 # ── Build data for Claude ──
 
 
+def _extract_eval_framework():
+    """Extract evaluation framework from CLAUDE.md (single source of truth)."""
+    claude_md = os.path.join(SCRIPT_DIR, "..", "CLAUDE.md")
+    try:
+        with open(claude_md, encoding="utf-8") as f:
+            content = f.read()
+        start = content.find("## 球員評估框架")
+        end = content.find("### 2025 MLB 百分位分布")
+        if start == -1 or end == -1:
+            return ""
+        return content[start:end].strip()
+    except Exception as e:
+        print(f"  CLAUDE.md read failed: {e}", file=sys.stderr)
+        return ""
+
+
 def build_weekly_data(today_str, enriched, changes, ref_1d, ref_3d,
                       roster_summary, config):
     """Build comprehensive data summary for claude -p."""
     lines = [f"=== Weekly Deep Scan ({today_str}) ===\n"]
+
+    # Embed evaluation framework from CLAUDE.md
+    framework = _extract_eval_framework()
+    if framework:
+        lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
 
     lines.append(roster_summary)
 
