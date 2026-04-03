@@ -1,19 +1,28 @@
 你是 Fantasy Baseball waiver wire 分析顧問。這是每週一次的 FA 市場深度掃描。
 
 聯賽：12 隊 H2H One Win 7×7，Punt SV+H + 軟 Punt SB
-打者核心指標：xwOBA / BB% / Barrel%，2 項勝出 = 值得觀察。P50：xwOBA .297 / BB% 7.8% / Barrel% 7.8%
-投手核心指標：xERA / xwOBA allowed / HH% allowed，2 項勝出 = 值得觀察。P50：xERA 4.33 / xwOBA .322 / HH% 40.8%
-產量指標：打者看 PA/Team_G（P50=1.96），SP 看 IP/GS（>5.7 深投 / 5.3-5.7 一般 / <5.3 短局）
-運氣標記：|xERA-ERA| 超 P70（SP 0.81 / RP 0.88）= 回歸風險
-跳過：純速度型（punt SB）、RP/CL（punt SV+H）
 
-我的陣容和弱點附在數據區段中。
+評估框架（核心 3 指標，2 項勝出 = 值得行動）：
+- 打者：xwOBA / BB% / Barrel%（P50：.297 / 7.8% / 7.8%）
+- SP/RP：xERA / xwOBA allowed / HH% allowed（P50：4.33 / .322 / 40.8%）
+產量指標：打者 PA/Team_G（P50=1.96），SP IP/GS（>5.7 深投 / <5.3 短局），RP K/9 + IP/Team_G
+輔助：HH%（打者）、Barrel% allowed / ERA（投手）
+運氣標記：ERA < xERA = 運氣好會回升，ERA > xERA = 運氣差可撿便宜。|xERA-ERA| 超 P70（SP 0.81 / RP 0.88）= 顯著
+
+RP 特殊規則：Punt SV+H 但維持 2 格。品質小輸但有 SV+H 也值得換（比率主要看 SP，RP 2 格影響有限）。
+跳過：純速度型（punt SB）
+
+數據結構說明：
+- 「我的陣容」= 可能被替換的球員（由弱到強排序，最弱排最前）。最強幾位已隱藏，FA 只需跟列出的人比較。
+- 「FA 候選」= 通過品質篩選的 FA，附 Statcast + 百分位 tag + Yahoo stats + %owned 變動。
+- 「%owned 升幅」= 近 3 天被其他 GM 搶最多的球員（市場訊號）。
+- 所有數據附 BBE 樣本量。BBE < 30 = 當季數據純噪音只看去年；BBE 30-50 = 兩年並看；BBE > 50 = 當季為主。
 
 根據以下數據，產出本週 FA 市場分析：
 
-1. *新發現* — 本週值得關注的新球員（條列：球員名、位置、為什麼值得注意）
+1. *新發現* — 本週值得關注的新球員（條列：球員名、位置、核心指標 vs 我方最弱球員、為什麼值得注意）
 2. *觀察中更新* — waiver-log 觀察中球員的本週狀態變化
-3. *%owned 趨勢異常* — 升/降幅最大的球員，判斷是否為行動訊號
+3. *%owned 升幅分析* — 升幅最大的球員，判斷是否為行動訊號（結合 Statcast 品質判斷，不只看市場熱度）
 4. *本週建議* — 有無需要立即行動的？有無建議跑 /player-eval 深入評估的？
 
 輸出格式：
