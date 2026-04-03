@@ -358,43 +358,88 @@ def enrich_layer3(filtered, savant_2026, config):
 # ── Roster summary ──
 
 
-def build_roster_summary(config):
-    """Build my roster summary from prior_stats, weakest first, strongest hidden."""
-    lines = ["--- 我的陣容（由弱到強，最強已隱藏）---"]
+def build_roster_summary(config, savant_2026=None):
+    """Build roster summary: 2026 Statcast primary, 2025 prior_stats as auxiliary."""
+    lines = [
+        "--- 我的陣容（由弱到強，最強已隱藏）---",
+        "  排序依據：打者 xwOBA / SP xERA（2026 優先，無 2026 用 2025）",
+    ]
+
+    def _get_sort_key_batter(b):
+        s26 = _lookup_roster_savant(b, "batter", savant_2026)
+        if s26 and s26.get("xwoba"):
+            return s26["xwoba"]
+        return b.get("prior_stats", {}).get("xwoba", 0)
+
+    def _get_sort_key_sp(p):
+        s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
+        if s26 and s26.get("xera"):
+            return s26["xera"]
+        return p.get("prior_stats", {}).get("xera", 99)
 
     # Batters: sort by xwOBA ascending, hide top 5
-    batters = sorted(
-        config["batters"],
-        key=lambda b: b.get("prior_stats", {}).get("xwoba", 0),
-    )
+    batters = sorted(config["batters"], key=_get_sort_key_batter)
     show_b = max(len(batters) - 5, 0)
     if show_b:
         lines.append("[打者]")
         for b in batters[:show_b]:
-            lines.append(_fmt_roster_batter(b))
+            lines.append(_fmt_roster_batter(b, savant_2026))
 
     # SP: sort by xERA descending (worst first), hide top 3
     sps = [p for p in config["pitchers"] if "SP" in p.get("positions", [])]
-    sps.sort(key=lambda p: p.get("prior_stats", {}).get("xera", 99), reverse=True)
+    sps.sort(key=_get_sort_key_sp, reverse=True)
     show_sp = max(len(sps) - 3, 0)
     if show_sp:
         lines.append("[SP]")
         for p in sps[:show_sp]:
-            lines.append(_fmt_roster_sp(p))
+            lines.append(_fmt_roster_pitcher(p, "pitcher", savant_2026))
 
     # RP: show all
     rps = [p for p in config["pitchers"] if "RP" in p.get("positions", [])]
     if rps:
         lines.append("[RP]")
         for p in rps:
-            lines.append(_fmt_roster_rp(p))
+            lines.append(_fmt_roster_pitcher(p, "rp", savant_2026))
 
     return "\n".join(lines)
 
 
-def _fmt_roster_batter(b):
+def _lookup_roster_savant(player, p_type, savant_2026):
+    """Look up a roster player's 2026 Savant data by mlb_id."""
+    if not savant_2026 or not player.get("mlb_id"):
+        return None
+    return _extract_savant_by_id(player["mlb_id"], p_type, savant_2026)
+
+
+def _fmt_roster_batter(b, savant_2026=None):
     ps = b.get("prior_stats", {})
+    s26 = _lookup_roster_savant(b, "batter", savant_2026)
     pos = "/".join(b.get("positions", []))
+
+    # Primary: 2026 if available
+    if s26 and (s26.get("xwoba") or s26.get("barrel_pct")):
+        bbe = s26.get("bbe", 0)
+        parts = [f"[2026 BBE {bbe}]"]
+        if s26.get("xwoba"):
+            parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'batter')}")
+        if s26.get("barrel_pct") is not None and s26["barrel_pct"]:
+            parts.append(f"Barrel% {s26['barrel_pct']:.1f}% {pctile_tag(s26['barrel_pct'], 'barrel_pct', 'batter')}")
+        if s26.get("hh_pct") is not None and s26["hh_pct"]:
+            parts.append(f"HH% {s26['hh_pct']:.1f}%")
+        line = f"  {b['name']}({b['team']}) {pos} — {' | '.join(parts)}"
+        # Auxiliary: 2025 one-liner
+        y25 = []
+        if ps.get("xwoba"):
+            y25.append(f"xwOBA {ps['xwoba']:.3f}")
+        if ps.get("bb_pct") is not None:
+            y25.append(f"BB% {ps['bb_pct']:.1f}%")
+        if ps.get("barrel_pct") is not None:
+            y25.append(f"Barrel% {ps['barrel_pct']:.1f}%")
+        if y25:
+            line += f"\n    2025: {' | '.join(y25)}"
+        return line
+
+    # Fallback: 2025 only
     parts = []
     if ps.get("xwoba"):
         parts.append(f"xwOBA {ps['xwoba']:.3f} {pctile_tag(ps['xwoba'], 'xwoba', 'batter')}")
@@ -408,46 +453,61 @@ def _fmt_roster_batter(b):
         parts.append(f"OPS {ps['ops']:.3f}")
     if ps.get("pa_per_team_g") is not None:
         parts.append(f"PA/TG {ps['pa_per_team_g']:.2f}")
-    return f"  {b['name']}({b['team']}) {pos} — {' | '.join(parts)}"
+    return f"  {b['name']}({b['team']}) {pos} — [2025] {' | '.join(parts)}"
 
 
-def _fmt_roster_sp(p):
+def _fmt_roster_pitcher(p, pt, savant_2026=None):
+    """Format roster pitcher (SP or RP). pt = 'pitcher' or 'rp'."""
     ps = p.get("prior_stats", {})
+    s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
+
+    # Primary: 2026 if available
+    if s26 and (s26.get("xera") or s26.get("xwoba")):
+        bbe = s26.get("bbe", 0)
+        parts = [f"[2026 BBE {bbe}]"]
+        if s26.get("xera"):
+            parts.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', pt)}")
+        if s26.get("xwoba"):
+            parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
+        if s26.get("hh_pct") is not None and s26["hh_pct"]:
+            parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
+        if pt == "rp" and ps.get("k_per_9") is not None:
+            parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
+        line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
+        # Auxiliary: 2025 one-liner
+        y25 = []
+        if ps.get("xera"):
+            y25.append(f"xERA {ps['xera']:.2f}")
+        if ps.get("xwoba_allowed"):
+            y25.append(f"xwOBA {ps['xwoba_allowed']:.3f}")
+        if ps.get("hh_pct_allowed") is not None:
+            y25.append(f"HH% {ps['hh_pct_allowed']:.1f}%")
+        if y25:
+            line += f"\n    2025: {' | '.join(y25)}"
+        return line
+
+    # Fallback: 2025 only
     parts = []
     if ps.get("xera"):
-        parts.append(f"xERA {ps['xera']:.2f} {pctile_tag(ps['xera'], 'xera', 'pitcher')}")
+        parts.append(f"xERA {ps['xera']:.2f} {pctile_tag(ps['xera'], 'xera', pt)}")
     if ps.get("xwoba_allowed"):
-        parts.append(f"xwOBA {ps['xwoba_allowed']:.3f} {pctile_tag(ps['xwoba_allowed'], 'xwoba', 'pitcher')}")
+        parts.append(f"xwOBA {ps['xwoba_allowed']:.3f} {pctile_tag(ps['xwoba_allowed'], 'xwoba', pt)}")
     if ps.get("hh_pct_allowed") is not None:
-        parts.append(f"HH% {ps['hh_pct_allowed']:.1f}% {pctile_tag(ps['hh_pct_allowed'], 'hh_pct', 'pitcher')}")
+        parts.append(f"HH% {ps['hh_pct_allowed']:.1f}% {pctile_tag(ps['hh_pct_allowed'], 'hh_pct', pt)}")
     if ps.get("barrel_pct_allowed") is not None:
         parts.append(f"Barrel% {ps['barrel_pct_allowed']:.1f}%")
     if ps.get("era") is not None:
         parts.append(f"ERA {ps['era']:.2f}")
-    if ps.get("ip_per_gs") is not None:
-        tier = " [深投]" if ps["ip_per_gs"] > 5.7 else (" [短局]" if ps["ip_per_gs"] < 5.3 else "")
-        parts.append(f"IP/GS {ps['ip_per_gs']:.1f}{tier}")
-    return f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
-
-
-def _fmt_roster_rp(p):
-    ps = p.get("prior_stats", {})
-    parts = []
-    if ps.get("xera"):
-        parts.append(f"xERA {ps['xera']:.2f} {pctile_tag(ps['xera'], 'xera', 'rp')}")
-    if ps.get("xwoba_allowed"):
-        parts.append(f"xwOBA {ps['xwoba_allowed']:.3f} {pctile_tag(ps['xwoba_allowed'], 'xwoba', 'rp')}")
-    if ps.get("hh_pct_allowed") is not None:
-        parts.append(f"HH% {ps['hh_pct_allowed']:.1f}% {pctile_tag(ps['hh_pct_allowed'], 'hh_pct', 'rp')}")
-    if ps.get("barrel_pct_allowed") is not None:
-        parts.append(f"Barrel% {ps['barrel_pct_allowed']:.1f}%")
-    if ps.get("era") is not None:
-        parts.append(f"ERA {ps['era']:.2f}")
-    if ps.get("k_per_9") is not None:
-        parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
-    if ps.get("ip_per_team_g") is not None:
-        parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
-    return f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
+    if pt == "rp":
+        if ps.get("k_per_9") is not None:
+            parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
+        if ps.get("ip_per_team_g") is not None:
+            parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
+    else:
+        if ps.get("ip_per_gs") is not None:
+            tier = " [深投]" if ps["ip_per_gs"] > 5.7 else (" [短局]" if ps["ip_per_gs"] < 5.3 else "")
+            parts.append(f"IP/GS {ps['ip_per_gs']:.1f}{tier}")
+    return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}"
 
 
 # ── Output formatting ──
@@ -455,10 +515,10 @@ def _fmt_roster_rp(p):
 
 def _bbe_label(bbe):
     if bbe < 30:
-        return f"BBE {bbe} (只看去年)"
+        return f"BBE {bbe} (低信心)"
     elif bbe <= 50:
-        return f"BBE {bbe} (兩年並看)"
-    return f"BBE {bbe} (當季為主)"
+        return f"BBE {bbe} (中等信心)"
+    return f"BBE {bbe} (高信心)"
 
 
 def _fmt_owned_change(d1, d3):
@@ -634,8 +694,18 @@ def _format_owned_risers(changes):
 # ── Build data for Claude ──
 
 
+_FRAMEWORK_SKIP_PATTERNS = [
+    "唯一定義。Skills",           # meta comment
+    "**評估流程**",               # code already handles sorting
+    "上季 < 80 場",              # Claude can't query career stats
+    "上季 < 80 IP",              # Claude can't compute intervals
+    "串流 SP：",                  # not weekly scan's job
+    "不使用 BvP",                # data not provided
+]
+
+
 def _extract_eval_framework():
-    """Extract evaluation framework from CLAUDE.md (single source of truth)."""
+    """Extract evaluation framework from CLAUDE.md, trimmed for weekly scan."""
     claude_md = os.path.join(SCRIPT_DIR, "..", "CLAUDE.md")
     try:
         with open(claude_md, encoding="utf-8") as f:
@@ -644,7 +714,23 @@ def _extract_eval_framework():
         end = content.find("### 2025 MLB 百分位分布")
         if start == -1 or end == -1:
             return ""
-        return content[start:end].strip()
+        raw = content[start:end].strip()
+        # Post-process: remove lines irrelevant to weekly scan
+        lines = raw.split("\n")
+        filtered = []
+        skip_indent = False
+        for line in lines:
+            # Skip numbered sub-steps under "評估流程"
+            if skip_indent:
+                if line.startswith("1. ") or line.startswith("2. "):
+                    continue
+                skip_indent = False
+            if any(p in line for p in _FRAMEWORK_SKIP_PATTERNS):
+                if "評估流程" in line:
+                    skip_indent = True
+                continue
+            filtered.append(line)
+        return "\n".join(filtered).strip()
     except Exception as e:
         print(f"  CLAUDE.md read failed: {e}", file=sys.stderr)
         return ""
@@ -805,7 +891,7 @@ def main():
                 xe = f"{s['xera']:.2f}" if s.get("xera") else "—"
                 print(f"  {p['name']:22} {p['team']:5} {p['fa_type']:6} "
                       f"BBE={p['bbe']:>3}  xwOBA={xw:>6}  xERA={xe:>5}")
-            print(f"\n{build_roster_summary(config)}")
+            print(f"\n{build_roster_summary(config, savant_2026)}")
             return
 
         # ── Layer 3: Precise enrichment ──
@@ -820,7 +906,7 @@ def main():
             p["d3"] = c.get("d3")
 
         # Build data for Claude
-        roster_summary = build_roster_summary(config)
+        roster_summary = build_roster_summary(config, savant_2026)
         data_summary = build_weekly_data(
             today_str, enriched, changes, ref_1d, ref_3d, roster_summary, config
         )
