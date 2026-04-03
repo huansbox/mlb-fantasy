@@ -256,19 +256,24 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 ```
 CLAUDE.md（策略大腦 + 評估框架唯一定義）
-  ├─ 核心球員（3 人）+ 連結 roster_config.json
-  ├─ 評估框架（打者/SP/RP）+ 百分位表
-  ├─ 賽季運營 SOP
-  └─ 讀取者：skills（/player-eval, /waiver-scan, /roster-scan）
+  ├─ 評估框架（打者/SP/RP）+ 百分位表 + 賽季運營 SOP
+  ├─ 被讀取：所有 skill（/player-eval, /waiver-scan, /roster-scan, /weekly-review）
+  └─ 被更新：策略調整時手動改（唯一來源，skills 引用不複製）
 
 roster_config.json（陣容唯一來源）
   ├─ 球員名 / mlb_id / yahoo_player_key / positions / team / prior_stats
-  ├─ 讀取者：全部腳本（main.py, fa_watch.py, weekly_scan.py, roster_stats.py, weekly_review.py）
-  └─ 更新者：roster_sync.py（cron TW 15:10，偵測 add/drop → auto sync + git push）
+  ├─ 被讀取：main.py / fa_watch.py / weekly_scan.py / roster_stats.py / weekly_review.py
+  └─ 被更新：roster_sync.py（cron TW 15:10，偵測 add/drop → auto sync + git push）
 
 waiver-log.md（FA 追蹤唯一來源）
   ├─ 觀察中 / 條件 Pass / 已結案
-  └─ 讀取者：fa_watch.py / weekly_scan.py / skills
+  ├─ 被讀取：fa_watch.py / weekly_scan.py / skills
+  └─ 被更新：/player-eval / /waiver-scan skill
+
+roster-baseline.md（陣容基準卡）
+  ├─ 全員 stats + Statcast + 趨勢標記
+  ├─ 被讀取：/waiver-scan（比較 FA vs 現有）/ /roster-scan
+  └─ 被更新：/roster-scan skill（跑 roster_stats.py 產出）
 
 資料流：MLB Stats API + Yahoo Fantasy API + Baseball Savant CSV
   → Python 腳本組裝 → claude -p 分析 → Telegram 推送 + GitHub Issue 存檔
