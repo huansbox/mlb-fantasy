@@ -248,9 +248,31 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | 事件 | 動作 |
 |------|------|
 | 球員受傷/表現差 | 查 waiver-log.md 有無候選 → 有：`/player-eval` 確認 → 執行。沒有：`/waiver-scan` 找人 → `/player-eval` → 執行 |
-| Add/Drop 執行後 | 跑同步腳本更新 roster_config.json → push → VPS pull |
+| Add/Drop 執行後 | 自動：roster_sync.py（cron TW 15:10）偵測 → 更新 config → git push → Telegram 通知 |
 | FAAB 出價 | 更新 roster_config.json 的 faab_remaining + 本文件 FAAB 餘額 |
 | waiver-log.md 觸發條件達成 | `/player-eval` 深入評估 → 決定行動 |
+
+### 系統架構
+
+```
+CLAUDE.md（策略大腦 + 評估框架唯一定義）
+  ├─ 核心球員（3 人）+ 連結 roster_config.json
+  ├─ 評估框架（打者/SP/RP）+ 百分位表
+  ├─ 賽季運營 SOP
+  └─ 讀取者：skills（/player-eval, /waiver-scan, /roster-scan）
+
+roster_config.json（陣容唯一來源）
+  ├─ 球員名 / mlb_id / yahoo_player_key / positions / team / prior_stats
+  ├─ 讀取者：全部腳本（main.py, fa_watch.py, weekly_scan.py, roster_stats.py, weekly_review.py）
+  └─ 更新者：roster_sync.py（cron TW 15:10，偵測 add/drop → auto sync + git push）
+
+waiver-log.md（FA 追蹤唯一來源）
+  ├─ 觀察中 / 條件 Pass / 已結案
+  └─ 讀取者：fa_watch.py / weekly_scan.py / skills
+
+資料流：MLB Stats API + Yahoo Fantasy API + Baseball Savant CSV
+  → Python 腳本組裝 → claude -p 分析 → Telegram 推送 + GitHub Issue 存檔
+```
 
 ### 檔案索引
 
