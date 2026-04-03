@@ -299,7 +299,8 @@ roster-baseline.md（陣容基準卡）
 
 ## 待辦
 
+- [ ] 04-06 週一：觀察首次真實 weekly_scan 自動跑（Layer 2 通過率、Layer 3 耗時、Claude 品質）
+- [ ] fa_watch.py Statcast 整合（等 weekly_scan 實戰數據再決定範圍）
+- [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + main.py + prompt 檔）
-- [x] ~~計算新百分位表：PA/Team_G、IP/GS、K/9、IP/Team_G、|xERA-ERA|~~（已完成 2026-04-02）
 - [ ] 交易策略：有需要時再建
-- [ ] Walker(STL) 觀察：breakout 確認（xwOBA > P50 + HH% > P70）或 drop 評估（連 3 週 xwOBA < P25）→ 移至 roster-baseline.md 追蹤

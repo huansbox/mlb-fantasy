@@ -28,6 +28,11 @@
 - 03-31：[waiver-scan] 3% owned，Yahoo 排名 CF #1 FA。.444/1.361/1HR/2BB。LF/CF/RF 三資格。
 - 03-31：[eval] vs Kwan(LF)。2025: .237/.699 OPS / 14 HR / BB% 8.5%。Statcast: xwOBA .323 (~P60) / HH% 43.4% (~P55) / Barrel% 11.1%。核心 3 指標只 HH% 顯著勝出（1/3，不滿足 2/3 門檻）。xwOBA/BB% 與 Kwan 在同一百分位區間。2025 後半季 HOU 崩盤 .611 OPS。Steamer 只預測 369 PA。工具差距大（Bat Speed 93 pct）但產出未兌現。BN 無空位。**不換，但 CF 資格 + power 工具有 upside，列條件 Pass 觀察。**
 
+### Parker Messick (CLE, SP) — 已在陣容，開季驗證
+觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
+- 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。CLE 保證先發。
+- 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
+
 ### Randy Vásquez (SD, SP)
 觸發：前 2-3 場 xERA < P50 (4.33) + K/9 > 7 → 串流或取代後段 SP
 - 03-31：[waiver-scan] 24% owned 快速上升。首場 6 IP / 0.00 ERA / 0.83 WHIP / 8K。去年底子普通但開季亮眼。1 場不足，等第 2 場。
