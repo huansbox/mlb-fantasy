@@ -143,13 +143,14 @@
 
 ### RP 評估
 
-**策略前提**：Punt SV+H（不主動追），但 RP 仍貢獻 ERA/WHIP/K。
+**策略前提**：Punt SV+H（不主動追），但 RP 仍貢獻 ERA/WHIP/K。維持 2 位 RP，不會加到 3-4 位。
 
 **評估流程**：只有 2 人，不排最弱清單。FA 有無優於目前 2 位 RP → 有就換。
 
-**品質指標**：xERA、xwOBA allowed、HH% allowed（同 SP）
+**品質指標**（核心，2 項勝出 = 值得行動）：xERA、xwOBA allowed、HH% allowed（同 SP）
 **輔助**：Barrel% allowed、ERA、|xERA - ERA| 百分位
-**產量**：K/9、IP / Team_G、SV+H（留意但不追）
+**產量**：K/9、IP / Team_G
+**加分項**：SV+H — 同等品質下優先選有 SV+H 的，但不因 SV+H 而降低品質門檻
 
 注意：RP 百分位分布和 SP 不同，需分開計算。
 
