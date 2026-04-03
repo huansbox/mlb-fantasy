@@ -129,7 +129,9 @@
 **輔助指標**：
 - Barrel% allowed（確認 HR 被打風險）
 - ERA（計分類別直接影響）
-- |xERA - ERA| 差距用百分位判斷，差距大 = 回歸風險
+- |xERA - ERA| 運氣標記（百分位判斷幅度，P70+ = 顯著）：
+  - ERA < xERA（運氣好）→ ERA 預期回升，表現會變差（例：ERA 1.84 / xERA 3.36）
+  - ERA > xERA（運氣差）→ ERA 預期回降，撿便宜訊號（例：ERA 5.00 / xERA 3.50）
 
 **樣本量加權**：
 - 當季 BBE < 30 / IP < 15 → 前一年為主
@@ -148,7 +150,7 @@
 **評估流程**：只有 2 人，不排最弱清單。FA 有無優於目前 2 位 RP → 有就換。
 
 **品質指標**（核心，2 項勝出 = 值得行動）：xERA、xwOBA allowed、HH% allowed（同 SP）
-**輔助**：Barrel% allowed、ERA、|xERA - ERA| 百分位
+**輔助**：Barrel% allowed、ERA、|xERA - ERA| 運氣標記（同 SP：ERA < xERA = 運氣好會回升，ERA > xERA = 運氣差可撿便宜）
 **產量**：K/9、IP / Team_G
 **加分項**：SV+H — 品質小輸也值得換（RP 只佔 2 格，比率影響有限；但 SV+H 是獨立類別，多贏 1 類 = 多 1 勝，且多隊 punt SV+H → 門檻低）
 
