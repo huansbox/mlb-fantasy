@@ -321,14 +321,8 @@ def _parse_pitcher_stats(data):
         return None
     s = splits[0]["stat"]
     ip = parse_ip(s.get("inningsPitched", 0))
-    hr = int(s.get("homeRuns", 0))
-    bb = int(s.get("baseOnBalls", 0))
-    hr9 = round(hr * 9 / ip, 1) if ip > 0 else 0
-    bb9 = round(bb * 9 / ip, 1) if ip > 0 else 0
     return {
         "era": s.get("era", "—"),
-        "hr9": hr9,
-        "bb9": bb9,
         "ip": s.get("inningsPitched", "0"),
     }
 
@@ -363,9 +357,9 @@ def format_pitcher_stats(stats):
     prior = stats.get("prior")
     current = stats.get("current")
     if prior:
-        parts.append(f"去年: {prior['era']} ERA / {prior['hr9']} HR9 / {prior['bb9']} BB9, {prior['ip']} IP")
+        parts.append(f"去年: {prior['era']} ERA, {prior['ip']} IP")
     if current:
-        parts.append(f"本季: {current['era']} ERA / {current['hr9']} HR9 / {current['bb9']} BB9, {current['ip']} IP")
+        parts.append(f"本季: {current['era']} ERA, {current['ip']} IP")
     return " | ".join(parts)
 
 
@@ -524,20 +518,24 @@ def format_pitcher_savant(savant_data):
 
 
 def format_opp_sp_savant(savant_data):
-    """Format opponent SP's Savant stats with percentile tags (concise)."""
+    """Format opponent SP's Savant stats with percentile tags (aligned with CLAUDE.md framework)."""
     if not savant_data:
         return ""
     d = savant_data.get("current")
-    if not d or (not d["hh_pct"] and not d["barrel_pct"]):
+    if not d or (not d.get("hh_pct") and not d.get("xera")):
         d = savant_data.get("prior")
     if not d:
         return ""
     items = []
-    if d["hh_pct"]:
-        items.append(f"{d['hh_pct']:.0f}% HH allowed {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
-    if d["barrel_pct"]:
-        items.append(f"{d['barrel_pct']:.1f}% Barrel allowed {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
-    if d["bbe"]:
+    if d.get("xera"):
+        items.append(f"xERA {d['xera']:.2f} {pctile_tag(d['xera'], 'xera', 'pitcher')}")
+    if d.get("xwoba"):
+        items.append(f"xwOBA {d['xwoba']:.3f} {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
+    if d.get("hh_pct"):
+        items.append(f"HH% {d['hh_pct']:.0f}% {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
+    if d.get("barrel_pct"):
+        items.append(f"Barrel% {d['barrel_pct']:.1f}% {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
+    if d.get("bbe"):
         items.append(f"{d['bbe']} BBE")
     return " / ".join(items) if items else ""
 
