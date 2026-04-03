@@ -299,8 +299,44 @@ roster-baseline.md（陣容基準卡）
 
 ## 待辦
 
+### 優先：fa_watch Statcast 升級（迷你 weekly_scan）
+
+**方向已確認**：fa_watch 從「無 Statcast 的日常快報」改為「窄追 ~10 人的迷你 weekly_scan」。
+
+**候選來源**（取代原本的廣撈 6 queries）：
+- %owned 升幅 top 5（從 fa_history.json 的 24h 變動）
+- waiver-log.md 觀察中球員（~5 人）
+- 合計 ~10 人（去重）
+
+**流程**：
+1. 收集 ~10 名候選（Yahoo API 查 stats + %owned）
+2. 下載 2026 Savant CSV（4 個，複用 `download_savant_csvs`）
+3. 品質篩（複用 `_check_thresholds`，P40/P50 門檻）
+4. 通過者做 Layer 3 enrichment（複用 `enrich_layer3` 邏輯）
+5. 附陣容摘要（複用 `build_roster_summary`）
+6. 嵌入 CLAUDE.md 評估框架（複用 `_extract_eval_framework`）
+7. claude -p → Telegram
+
+**複用 weekly_scan 函數**：`download_savant_csvs` / `_extract_savant_for_player` / `_extract_savant_by_id` / `_classify_fa_type` / `_check_thresholds` / `enrich_layer3`（小改） / `build_roster_summary` / `_format_fa_batter` / `_format_fa_pitcher` / `_extract_eval_framework`
+
+**需新寫**：候選收集（%owned top + waiver-log 解析）、prompt 重寫、main() 流程串接
+
+**API 預算**：4 CSV + ~10 search_mlb_id + ~20 MLB Stats + 1 standings + 1 claude = ~36 calls/日，可接受
+
+**prompt 定位**：日常監控（追蹤中球員狀態 + %owned 異動預警），不是完整市場掃描
+
+**前置**：`prompt_fa_watch.txt` 已初步更新（移除硬編碼 P50），完整改寫等本項一起做
+
+### Prompt / Skills 對齊
+
+- [x] ~~`prompt_fa_watch.txt` 初步更新~~ → 移除硬編碼 P50 + 加 Statcast 定位說明（完整改寫等 fa_watch 升級一起做）
+- [ ] `.claude/commands/` skills（player-eval / waiver-scan / roster-scan / weekly-review）：確認都正確引用 CLAUDE.md，無殘留舊規則
+- [ ] `prompt_template.txt` + `prompt_template_morning.txt`：速報/最終報，涉及對手 SP 評估，檢查指標描述是否過時
+- [ ] `roster_stats.py` / `weekly_review.py`：數據管線，風險較低但需確認無衝突
+
+### 功能開發
+
 - [ ] 04-06 週一：觀察首次真實 weekly_scan 自動跑（Layer 2 通過率、Layer 3 耗時、Claude 品質）
-- [ ] fa_watch.py Statcast 整合（等 weekly_scan 實戰數據再決定範圍）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + main.py + prompt 檔）
 - [ ] 交易策略：有需要時再建
