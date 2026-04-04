@@ -2,26 +2,9 @@
 
 ## 觀察中
 
-### Emerson Hancock (SEA, SP)
-觸發：前 2-3 場 xERA < P60 (4.04) + K/9 > 8 → 取代 Singer（首選候選）
-- 03-30：[waiver-scan] 前 SEA top prospect，傷癒首次完整賽季。首場 6IP/9K/0.00ERA/0.17WHIP — K 率極亮眼（13.5 K/9）。SEA 投手友善主場。8% owned。1 場樣本不足，但若第二場維持 → 可能比 Painter 更值得撿。
-- 03-31：[waiver-scan] 首秀確認 3/29 vs CLE：6 IP / 0 H / 0 R / 1 BB / 9K（W）— 六局無安打。NBC Sports 建議「立刻撿」。下一場預計 4/3-4/4 vs LAA。**接近觸發條件，第 2 場是關鍵驗證。**
-
-### Andrew Painter (PHI, SP)
-觸發：前 2-3 場穩定投 6+ IP + xERA < P50 (4.33) → 取代 Singer（備選，Hancock 優先）
-- 03-26：傷癒進開季名單，stuff 頂級但 PHI 可能限制 IP。Razzball 排 #180 SP。觀察局數限制。
-- 03-29：[waiver-scan] Week 1 尚未先發，無新數據。持續觀察。
-- 03-30：3/31 確認先發（PHI vs WSH）。被 RALLY MONKEY drop 回到 FA pool（30% owned）。
-- 03-30：[eval] vs Singer，結論：**不換**。預測 111 IP / 4.62 ERA / 1.39 WHIP / ~100 K / 7 QS，全面輸 Singer（168 IP / 4.30 ERA / 1.30 WHIP / 136 K / 11 QS）。局數限制 110-130 IP 是硬傷，IP + QS 雙打折。TJS 術後球速/fastball shape 仍未完全恢復。降級為 Hancock 之後的備選。
-
 ### Dominic Canzone (SEA, LF/RF) — platoon 確認，待 BN 空位
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 重新評估（新 Statcast 框架）。2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。傳統 .300/.840 完全驗證。但確認為**硬 platoon**（只打 RHP）：2025 僅 82 場，vs RHP .308/.524/10HR/141 wRC+。2026 開季 5 場中 2 場只有 1 AB（替補），3/31 後無出賽（%owned 下降原因）。打 RHP 時是菁英，但全季僅 ~100 場 + Daily-Tomorrow 每日管理成本。**目前 BN 無空位（Frelick CF 保險不可 drop），13% owned 不會被搶，等 Walker 穩定後再評估。**
-
-### Colt Keith (DET, 1B/2B/3B)
-觸發：連 2 週 xwOBA > .280 + BB% > 8% → 取代 Walker(1B)
-- 03-30：[waiver-scan] DET 年輕核心，多位置彈性（1B/2B/3B）。開季 .444/1.101/0HR/2BB。16% owned。**有 1B 資格**可直接替 Walker，O'Hearn 被搶後的替代監控目標。
-- 03-31：[waiver-scan] Statcast：xwOBA .426 / HH% 40% / Barrel% 0%。xwOBA 好但 Barrel% 0% = 靠接觸非力量，HR 潛力待驗證。繼續觀察。
 
 ### Jesús Sánchez (TOR, LF/CF/RF) — 條件 Pass
 重評條件：BN 有空位 + 連 2 週 xwOBA > .320 (P60+)
@@ -32,10 +15,6 @@
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
 - 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。CLE 保證先發。
 - 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
-
-### Randy Vásquez (SD, SP)
-觸發：前 2-3 場 xERA < P50 (4.33) + K/9 > 7 → 串流或取代後段 SP
-- 03-31：[waiver-scan] 24% owned 快速上升。首場 6 IP / 0.00 ERA / 0.83 WHIP / 8K。去年底子普通但開季亮眼。1 場不足，等第 2 場。
 
 ### 串流 SP 評估（2026-03-30）
 
@@ -89,6 +68,18 @@
 - 策略確立：只在特定情境精準串流 1-2 次，不常態洗。詳見 CLAUDE.md 串流決策規則。
 
 ## 已結案
+
+### Emerson Hancock (SEA, SP) — 被搶（自動偵測）
+- 2026-04-04：Yahoo ownership_type=team，從觀察中移除。
+
+### Andrew Painter (PHI, SP) — 被搶（自動偵測）
+- 2026-04-04：Yahoo ownership_type=team，從觀察中移除。
+
+### Colt Keith (DET, 1B/2B/3B) — 被搶（自動偵測）
+- 2026-04-04：Yahoo ownership_type=team，從觀察中移除。
+
+### Randy Vásquez (SD, SP) — 被搶（自動偵測）
+- 2026-04-04：Yahoo ownership_type=team，從觀察中移除。
 
 ### Jordan Walker (STL, LF/RF) — ✅ 已加入陣容
 - 04-01：drop Kwan，add Walker。3 agent 評估一致認為 Kwan 為 drop 候選（HH% <P25 / Barrel% <P25 = 零 power + 7×7 格式錯配）。Walker 23 歲 everyday player + HH% >P90 (238 BBE) + Driveline 改造 breakout 候選。2026 開季 xwOBA .578 / HH% 75% (12 BBE)。
