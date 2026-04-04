@@ -283,46 +283,42 @@ def collect_candidates(history, today_str, top_n=5):
     return candidates
 
 
-def check_fa_status(candidates, access_token, config):
-    """Filter out candidates that have been rostered. Returns FA-only list.
+def _check_player_ownership(name, league_key, access_token):
+    """Check if a player is FA or rostered via Yahoo API (2 calls).
 
-    Two-step Yahoo query per candidate (~2 calls each):
-    1. search → get player_key
-    2. player_key → ownership_type (freeagents/waivers/team)
+    Returns ownership_type: 'freeagents', 'waivers', 'team', or None on error.
     """
+    players_data = _search_players(name, league_key, access_token)
+    if not players_data:
+        return None
+    for k, v in players_data.items():
+        if k == "count":
+            continue
+        p = extract_player_info(v["player"])
+        player_key = p.get("player_key")
+        if not player_key:
+            return None
+        od = api_get(
+            f"/league/{league_key}/players;player_keys={player_key}"
+            f";out=ownership",
+            access_token,
+        )
+        p2 = extract_player_info(
+            od["fantasy_content"]["league"][1]["players"]["0"]["player"])
+        return p2.get("ownership_type", "")
+    return None
+
+
+def check_fa_status(candidates, access_token, config):
+    """Filter out candidates that have been rostered. Returns FA-only list."""
     league_key = config["league"]["league_key"]
     fa_candidates = []
     for c in candidates:
         try:
-            # Step 1: search → player_key
-            players_data = _search_players(c["name"], league_key, access_token)
-            if players_data is None:
-                fa_candidates.append(c)
-                continue
-            player_key = None
-            for k, v in players_data.items():
-                if k == "count":
-                    continue
-                p = extract_player_info(v["player"])
-                player_key = p.get("player_key")
-                break
-            if not player_key:
-                fa_candidates.append(c)
-                continue
-
-            # Step 2: player_key → ownership
-            od = api_get(
-                f"/league/{league_key}/players;player_keys={player_key}"
-                f";out=percent_owned,ownership",
-                access_token,
-            )
-            p2 = extract_player_info(
-                od["fantasy_content"]["league"][1]["players"]["0"]["player"])
-            ownership = p2.get("ownership_type", "")
-
+            ownership = _check_player_ownership(
+                c["name"], league_key, access_token)
             if ownership == "team":
-                print(f"  SKIP {c['name']}: rostered (owned by league team)",
-                      file=sys.stderr)
+                print(f"  SKIP {c['name']}: rostered", file=sys.stderr)
             else:
                 fa_candidates.append(c)
             time.sleep(0.5)
@@ -332,6 +328,100 @@ def check_fa_status(candidates, access_token, config):
     print(f"  FA check: {len(candidates)} → {len(fa_candidates)} still FA",
           file=sys.stderr)
     return fa_candidates
+
+
+# ── Waiver-log auto-cleanup ──
+
+
+def cleanup_rostered_watchlist(access_token, config, today_str):
+    """Check watchlist players' FA status, auto-move rostered ones to 已結案.
+
+    Runs during --snapshot-only (TW 15:15). Modifies waiver-log.md + git commit.
+    Only checks active watchlist (not 條件 Pass — those track "被 drop 回 FA").
+    """
+    watchlist = parse_waiver_log_watchlist()
+    if not watchlist:
+        return
+
+    league_key = config["league"]["league_key"]
+    rostered = []
+    for w in watchlist:
+        try:
+            ownership = _check_player_ownership(
+                w["name"], league_key, access_token)
+            if ownership == "team":
+                rostered.append(w)
+                print(f"  Rostered: {w['name']}", file=sys.stderr)
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"  Ownership check failed for {w['name']}: {e}",
+                  file=sys.stderr)
+
+    if not rostered:
+        print("  Watchlist cleanup: all still FA", file=sys.stderr)
+        return
+
+    # Modify waiver-log.md: move rostered players from 觀察中 → 已結案
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    with open(waiver_log_path, encoding="utf-8") as f:
+        content = f.read()
+
+    closed_entries = []
+    for player in rostered:
+        name = re.escape(player["name"])
+        # Match: ### Name (Team, Pos)...\n + all lines until next ### or ##
+        pattern = re.compile(
+            rf"### {name} \([^)]+\)[^\n]*\n(?:(?!### |## ).*\n)*",
+            re.MULTILINE,
+        )
+        match = pattern.search(content)
+        if match:
+            content = content[:match.start()] + content[match.end():]
+            closed_entries.append(
+                f"### {player['name']} ({player['team']}, {player['position']})"
+                f" — 被搶（自動偵測）\n"
+                f"- {today_str}：Yahoo ownership_type=team，從觀察中移除。\n"
+            )
+
+    if not closed_entries:
+        return
+
+    # Insert at top of 已結案 section
+    closed_marker = "## 已結案\n"
+    if closed_marker in content:
+        pos = content.index(closed_marker) + len(closed_marker)
+        insert = "\n" + "\n".join(closed_entries)
+        content = content[:pos] + insert + content[pos:]
+
+    # Clean up excessive blank lines
+    content = re.sub(r"\n{3,}", "\n\n", content)
+
+    with open(waiver_log_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    names = ", ".join(p["name"] for p in rostered)
+    print(f"  Watchlist cleanup: moved {len(rostered)} to 已結案 ({names})",
+          file=sys.stderr)
+
+    # Git commit + push
+    try:
+        repo_root = os.path.join(SCRIPT_DIR, "..")
+        subprocess.run(
+            ["git", "add", "waiver-log.md"],
+            cwd=repo_root, capture_output=True, timeout=10,
+        )
+        subprocess.run(
+            ["git", "commit", "-m",
+             f"chore(waiver-log): auto-close rostered players ({names})"],
+            cwd=repo_root, capture_output=True, timeout=10,
+        )
+        subprocess.run(
+            ["git", "push"],
+            cwd=repo_root, capture_output=True, timeout=30,
+        )
+        print("  Git push OK", file=sys.stderr)
+    except Exception as e:
+        print(f"  Git push failed: {e}", file=sys.stderr)
 
 
 # ── Statcast pipeline (lazy import weekly_scan to avoid circular dependency) ──
@@ -550,6 +640,9 @@ def main():
             save_fa_history(history)
             print(f"[FA Watch] Snapshot saved ({len(snapshot)} players)",
                   file=sys.stderr)
+
+            # Auto-cleanup: move rostered watchlist players to 已結案
+            cleanup_rostered_watchlist(access_token, config, today_str)
             return
 
         # ── Analysis mode: read fa_history + waiver-log → Statcast pipeline ──
