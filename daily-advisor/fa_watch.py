@@ -16,7 +16,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
-    send_telegram, _normalize,
+    send_telegram, _normalize, _search_players,
     pitcher_type, calc_position_depth,
 )
 
@@ -283,6 +283,57 @@ def collect_candidates(history, today_str, top_n=5):
     return candidates
 
 
+def check_fa_status(candidates, access_token, config):
+    """Filter out candidates that have been rostered. Returns FA-only list.
+
+    Two-step Yahoo query per candidate (~2 calls each):
+    1. search → get player_key
+    2. player_key → ownership_type (freeagents/waivers/team)
+    """
+    league_key = config["league"]["league_key"]
+    fa_candidates = []
+    for c in candidates:
+        try:
+            # Step 1: search → player_key
+            players_data = _search_players(c["name"], league_key, access_token)
+            if players_data is None:
+                fa_candidates.append(c)
+                continue
+            player_key = None
+            for k, v in players_data.items():
+                if k == "count":
+                    continue
+                p = extract_player_info(v["player"])
+                player_key = p.get("player_key")
+                break
+            if not player_key:
+                fa_candidates.append(c)
+                continue
+
+            # Step 2: player_key → ownership
+            od = api_get(
+                f"/league/{league_key}/players;player_keys={player_key}"
+                f";out=percent_owned,ownership",
+                access_token,
+            )
+            p2 = extract_player_info(
+                od["fantasy_content"]["league"][1]["players"]["0"]["player"])
+            ownership = p2.get("ownership_type", "")
+
+            if ownership == "team":
+                print(f"  SKIP {c['name']}: rostered (owned by league team)",
+                      file=sys.stderr)
+            else:
+                fa_candidates.append(c)
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"  FA check failed for {c['name']}: {e}", file=sys.stderr)
+            fa_candidates.append(c)
+    print(f"  FA check: {len(candidates)} → {len(fa_candidates)} still FA",
+          file=sys.stderr)
+    return fa_candidates
+
+
 # ── Statcast pipeline (lazy import weekly_scan to avoid circular dependency) ──
 
 
@@ -503,10 +554,13 @@ def main():
 
         # ── Analysis mode: read fa_history + waiver-log → Statcast pipeline ──
         print(f"[FA Watch] {today_str}...", file=sys.stderr)
+        access_token = refresh_token(env)
 
-        # Phase 1: Collect candidates from accumulated history + waiver-log
+        # Phase 1: Collect candidates, then filter out rostered players
         history = load_fa_history()
         candidates = collect_candidates(history, today_str)
+        if candidates:
+            candidates = check_fa_status(candidates, access_token, config)
 
         # Compute %owned changes from history (for format_change_rankings)
         dates = sorted(history.keys())
