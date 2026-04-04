@@ -792,18 +792,6 @@ def build_weekly_data(today_str, enriched, changes, ref_1d, ref_3d,
         with open(waiver_log_path, encoding="utf-8") as f:
             lines.append(f"\n--- waiver-log.md ---\n{f.read()}")
 
-    # roster-baseline weaknesses
-    baseline_path = os.path.join(SCRIPT_DIR, "..", "roster-baseline.md")
-    if os.path.exists(baseline_path):
-        with open(baseline_path, encoding="utf-8") as f:
-            content = f.read()
-        for section in ["打者弱點摘要", "SP 弱點摘要", "替換門檻速查"]:
-            start = content.find(section)
-            if start != -1:
-                end = content.find("\n---", start)
-                if end == -1:
-                    end = len(content)
-                lines.append(f"\n--- {section} ---\n{content[start:end].strip()}")
 
     return "\n".join(lines)
 

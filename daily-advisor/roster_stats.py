@@ -1,4 +1,4 @@
-"""Roster Stats — automated data collection for roster-scan.
+"""Roster Stats — ad-hoc roster data collection.
 
 Replaces manual WebSearch by fetching all roster player stats from
 MLB Stats API + Baseball Savant CSV in one run.

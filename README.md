@@ -26,10 +26,8 @@
 
 - `賽季管理入門.md` — H2H One Win 賽季管理入門要點
 - `waiver-log.md` — 球員觀察追蹤記錄
-- `roster-baseline.md` — 陣容基準卡（全員預測/實際數據）
 - `.claude/commands/player-eval.md` — 球員評估 SOP（`/player-eval`）
 - `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
-- `.claude/commands/roster-scan.md` — 陣容基準卡週更 SOP（`/roster-scan`）
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
 - `daily-advisor/` — 每日陣容建議產生器（MLB Stats API + claude -p → Telegram 推送）
 
@@ -41,7 +39,7 @@
 
 ## 環境
 
-- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` / `roster-scan` skill
+- 需要 [Claude Code](https://claude.com/claude-code) 來使用 `player-eval` / `waiver-scan` skill
 - `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token + Yahoo OAuth token
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron 排程：
