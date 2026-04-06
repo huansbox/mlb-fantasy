@@ -63,11 +63,12 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 - MLB API 只提前 1-2 天公布 probable，更遠的日期需用輪值間隔推算
 
 **FAAB 時效與串流時程**：
-1. 提交 FAAB claim
-2. 隔日 TW 15:00 處理
-3. 處理後設 Daily-Tomorrow lineup
-4. **再隔天才上場（前置 2 天）**
-5. → 串流 SP 需提前 2 天 claim，才能趕上目標先發日
+1. 提交 FAAB claim（在每日 TW 15:00 前）
+2. 當日 TW 15:00（= ET 3AM）處理
+3. 處理後當晚設 Daily-Tomorrow lineup
+4. **隔天上場（前置 1 天）**
+5. → 串流 SP 需在目標先發日的**前一天** TW 15:00 前 claim
+6. ⚠️ 若 claim 在 TW 15:00 後提交，順延到次日處理（多等 1 天）
 
 **串流測試策略**（適用於觀察中候選 SP）：
 - 搶先發日最近的候選 → 看一場結果
@@ -78,7 +79,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 
 - **所有撿人走 FAAB**（waiver_rule: all），無即時 FA
 - **處理時間**：每日 ET 3AM（= TW 15:00）
-- **上場時效**：claim → 隔日 TW 15:00 處理 → Daily-Tomorrow 設 lineup → 再隔天上場（前置 2 天）
+- **上場時效**：claim（TW 15:00 前）→ 當日 TW 15:00 處理 → 當晚設 Daily-Tomorrow lineup → 隔天上場（前置 1 天）
 - **被 drop 球員**：1 天 waiver period
 - **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
 - **FAAB 餘額**：$100（2026-04-02 更新，異動後手動更新此數字）
