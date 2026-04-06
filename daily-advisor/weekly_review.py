@@ -38,6 +38,7 @@ CATEGORY_ORDER = ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS",
                    "IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"]
 
 # Single-point risk positions (only 1 eligible player on roster)
+# Single-slot positions with thin depth — if all eligible batters have off-day, it's a dead slot
 RISK_POSITIONS = ["C", "1B", "SS"]
 
 
