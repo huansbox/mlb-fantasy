@@ -29,7 +29,7 @@
 - `.claude/commands/player-eval.md` — 球員評估 SOP（`/player-eval`）
 - `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
-- `daily-advisor/` — 每日陣容建議產生器（MLB Stats API + claude -p → Telegram 推送）
+- `daily-advisor/daily_advisor.py` — 每日速報/最終報產生器（MLB Stats API + Savant + claude -p → Telegram 推送）
 
 ## 核心策略
 
