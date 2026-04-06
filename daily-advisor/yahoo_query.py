@@ -455,20 +455,22 @@ def _print_savant_line(label, data, player_type):
 def cmd_savant(args):
     """Look up a player's Statcast data from Baseball Savant CSV.
 
-    Tries batter first; if not found, falls back to pitcher.
+    Checks both batter and pitcher CSVs, picks the type with higher BBE.
     """
     query = args.player
     years = [int(args.year)] if args.year else [2026, 2025]
 
     print(f"=== {query} — Statcast ===\n")
 
-    # Detect player type: try batter first, fallback to pitcher
+    # Detect player type: check both CSVs, pick the one with more BBE
+    # (pitchers have hundreds of BBE as pitcher but few as batter)
     detected_type = None
-    for player_type in ["batter", "pitcher"]:
-        test = _savant_lookup(query, years[0], player_type)
-        if test:
-            detected_type = player_type
-            break
+    best_bbe = -1
+    for pt in ["batter", "pitcher"]:
+        test = _savant_lookup(query, years[0], pt)
+        if test and (test.get("bbe") or 0) > best_bbe:
+            best_bbe = test.get("bbe") or 0
+            detected_type = pt
 
     if not detected_type:
         print(f"  Player not found in batter or pitcher CSV for {years[0]}")
