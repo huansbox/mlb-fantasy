@@ -20,7 +20,7 @@ LAST_SYNC_PATH = os.path.join(SCRIPT_DIR, ".last_sync")
 MLB_API = "https://statsapi.mlb.com/api/v1"
 
 sys.path.insert(0, SCRIPT_DIR)
-from yahoo_query import load_env, refresh_token, api_get as yahoo_api_get, is_pitcher, pitcher_type  # noqa: E402
+from yahoo_query import load_env, refresh_token, api_get as yahoo_api_get, is_pitcher, pitcher_type, send_telegram  # noqa: E402
 
 
 def load_config():
@@ -522,11 +522,12 @@ def update_config(config, yahoo_roster, diff, savant_data=None):
 # ── Task 8: Git + Telegram ──
 
 
-def git_commit_and_push(added_names, dropped_names):
-    """Git add roster_config.json, commit, pull --rebase, push."""
+def git_commit_and_push(added_names, dropped_names, env=None):
+    """Git add, commit, pull --rebase, and push roster_config.json."""
     parts = [f"+{n}" for n in added_names] + [f"-{n}" for n in dropped_names]
     msg = f"roster: {', '.join(parts)}"
 
+    # Step 1: commit (clean working tree so rebase can work)
     try:
         subprocess.run(
             ["git", "add", "daily-advisor/roster_config.json"],
@@ -540,15 +541,22 @@ def git_commit_and_push(added_names, dropped_names):
         print(f"Git commit failed: {e}", file=sys.stderr)
         return False
 
+    # Step 2: pull --rebase to get on top of remote
     try:
         subprocess.run(
             ["git", "pull", "--rebase", "origin", "master"],
             cwd=REPO_ROOT, check=True, timeout=30,
         )
-    except subprocess.CalledProcessError as e:
-        print(f"Git pull --rebase failed (skip push): {e}", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
+                       capture_output=True, timeout=10)
+        alert = "[roster_sync] git pull --rebase failed — skipping push. Needs manual fix."
+        print(alert, file=sys.stderr)
+        if env:
+            send_telegram(alert, env)
         return False
 
+    # Step 3: push (should be fast-forward after rebase)
     try:
         subprocess.run(
             ["git", "push", "origin", "master"],
@@ -556,8 +564,11 @@ def git_commit_and_push(added_names, dropped_names):
         )
         print("Git push succeeded", file=sys.stderr)
         return True
-    except subprocess.CalledProcessError as e:
-        print(f"Git push failed (resolve manually): {e}", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        alert = "[roster_sync] git push failed — resolve manually."
+        print(alert, file=sys.stderr)
+        if env:
+            send_telegram(alert, env)
         return False
 
 
@@ -710,7 +721,7 @@ def run_daily(league_key, my_key, token, config, env, dry_run):
     write_last_sync(int(time.time()))
     print("Config updated.", file=sys.stderr)
 
-    git_commit_and_push(added_names, dropped_names)
+    git_commit_and_push(added_names, dropped_names, env=env)
     send_notification(added_names, dropped_names, env)
 
 

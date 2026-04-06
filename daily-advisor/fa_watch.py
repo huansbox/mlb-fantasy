@@ -333,7 +333,7 @@ def check_fa_status(candidates, access_token, config):
 # ── Waiver-log auto-cleanup ──
 
 
-def cleanup_rostered_watchlist(access_token, config, today_str):
+def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
     """Check watchlist players' FA status, auto-move rostered ones to 已結案.
 
     Runs during --snapshot-only (TW 15:15). Modifies waiver-log.md + git commit.
@@ -403,25 +403,51 @@ def cleanup_rostered_watchlist(access_token, config, today_str):
     print(f"  Watchlist cleanup: moved {len(rostered)} to 已結案 ({names})",
           file=sys.stderr)
 
-    # Git commit + push
+    # Git add, commit, pull --rebase, push
+    repo_root = os.path.join(SCRIPT_DIR, "..")
+
+    # Step 1: commit (clean working tree so rebase can work)
     try:
-        repo_root = os.path.join(SCRIPT_DIR, "..")
         subprocess.run(
             ["git", "add", "waiver-log.md"],
-            cwd=repo_root, capture_output=True, timeout=10,
+            cwd=repo_root, check=True, timeout=10,
         )
         subprocess.run(
             ["git", "commit", "-m",
              f"chore(waiver-log): auto-close rostered players ({names})"],
-            cwd=repo_root, capture_output=True, timeout=10,
+            cwd=repo_root, check=True, timeout=10,
         )
+    except subprocess.CalledProcessError as e:
+        print(f"  Git commit failed: {e}", file=sys.stderr)
+        return
+
+    # Step 2: pull --rebase to get on top of remote
+    try:
         subprocess.run(
-            ["git", "push"],
-            cwd=repo_root, capture_output=True, timeout=30,
+            ["git", "pull", "--rebase", "origin", "master"],
+            cwd=repo_root, check=True, timeout=30,
+        )
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
+                       capture_output=True, timeout=10)
+        alert = "[fa_watch] git pull --rebase failed — skipping push. Needs manual fix."
+        print(f"  {alert}", file=sys.stderr)
+        if env:
+            send_telegram(alert, env)
+        return
+
+    # Step 3: push (should be fast-forward after rebase)
+    try:
+        subprocess.run(
+            ["git", "push", "origin", "master"],
+            cwd=repo_root, check=True, timeout=30,
         )
         print("  Git push OK", file=sys.stderr)
-    except Exception as e:
-        print(f"  Git push failed: {e}", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        alert = "[fa_watch] git push failed — resolve manually."
+        print(f"  {alert}", file=sys.stderr)
+        if env:
+            send_telegram(alert, env)
 
 
 # ── Statcast pipeline (lazy import weekly_scan to avoid circular dependency) ──
@@ -642,7 +668,7 @@ def main():
                   file=sys.stderr)
 
             # Auto-cleanup: move rostered watchlist players to 已結案
-            cleanup_rostered_watchlist(access_token, config, today_str)
+            cleanup_rostered_watchlist(access_token, config, today_str, env=env)
             return
 
         # ── Analysis mode: read fa_history + waiver-log → Statcast pipeline ──

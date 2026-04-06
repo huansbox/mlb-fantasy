@@ -23,7 +23,7 @@ sys.path.insert(0, SCRIPT_DIR)
 # Shared helpers from yahoo_query.py (same pattern as weekly_scan.py / fa_watch.py)
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get as yahoo_api_get,
-    YAHOO_STAT_MAP,
+    send_telegram, YAHOO_STAT_MAP,
     pitcher_type,
 )
 
@@ -419,9 +419,11 @@ def compute_positional_coverage(config, week_start, week_end):
 # ── JSON Output & Git ──
 
 
-def git_push(json_path, week_number):
-    """Git add, commit, and push the weekly data file."""
+def git_push(json_path, week_number, env=None):
+    """Git add, commit, pull --rebase, and push the weekly data file."""
     rel_path = os.path.relpath(json_path, REPO_ROOT)
+
+    # Step 1: commit (clean working tree so rebase can work)
     try:
         subprocess.run(["git", "add", rel_path], cwd=REPO_ROOT, check=True, timeout=10)
         subprocess.run(
@@ -432,19 +434,29 @@ def git_push(json_path, week_number):
         print(f"  Git commit failed: {e}", file=sys.stderr)
         return
 
+    # Step 2: pull --rebase to get on top of remote
     try:
         subprocess.run(["git", "pull", "--rebase", "origin", "master"],
                        cwd=REPO_ROOT, check=True, timeout=30)
-    except subprocess.CalledProcessError as e:
-        print(f"  Git pull --rebase failed (skip push): {e}", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
+                       capture_output=True, timeout=10)
+        msg = "[weekly_review] git pull --rebase failed — skipping push. Needs manual fix."
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
         return
 
+    # Step 3: push (should be fast-forward after rebase)
     try:
         subprocess.run(["git", "push", "origin", "master"],
                        cwd=REPO_ROOT, check=True, timeout=30)
         print("  Git push succeeded", file=sys.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"  Git push failed (resolve manually): {e}", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        msg = "[weekly_review] git push failed — resolve manually."
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
 
 
 # ── Main ──
@@ -555,7 +567,7 @@ def main():
         f.write(json_str)
     print(f"  Written to {json_path}", file=sys.stderr)
 
-    git_push(json_path, week_number)
+    git_push(json_path, week_number, env=env)
     print("[Weekly Review] Done.", file=sys.stderr)
 
 
