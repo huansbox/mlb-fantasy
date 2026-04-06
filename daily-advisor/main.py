@@ -107,12 +107,14 @@ def load_config():
     # Derive role/type for config entries (Yahoo API path generates these at runtime)
     for b in config.get("batters", []):
         if "role" not in b:
-            b["role"] = "starter"
+            sp = b.get("selected_pos", "")
+            b["role"] = "IL" if sp in ("IL", "IL+") else ("bench" if sp == "BN" else "starter")
         if "positions" not in b:
             b["positions"] = []
     for p in config.get("pitchers", []):
         if "role" not in p:
-            p["role"] = "starter"
+            sp = p.get("selected_pos", "")
+            p["role"] = "IL" if sp in ("IL", "IL+") else ("bench" if sp == "BN" else "starter")
         if "type" not in p:
             positions = p.get("positions", [])
             p["type"] = "SP" if "SP" in positions else ("RP" if "RP" in positions else "SP")
