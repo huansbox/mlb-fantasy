@@ -170,35 +170,6 @@ def compute_category_ranks(all_teams, team_name="99 940"):
     return ranks
 
 
-def fetch_league_standings(league_key, access_token):
-    """Fetch league standings (W-L record and rank)."""
-    data = yahoo_api_get(f"/league/{league_key}/standings", access_token)
-    teams_node = data["fantasy_content"]["league"][1]["standings"][0]["teams"]
-
-    standings = []
-    for k, v in teams_node.items():
-        if k == "count":
-            continue
-        team_info = v["team"][0]
-        team_standings = v["team"][1].get("team_standings", {})
-
-        name = "?"
-        for item in team_info:
-            if isinstance(item, dict) and "name" in item:
-                name = item["name"]
-                break
-
-        record = team_standings.get("outcome_totals", {})
-        standings.append({
-            "team": name,
-            "wins": int(record.get("wins", 0)),
-            "losses": int(record.get("losses", 0)),
-            "rank": int(team_standings.get("rank", 0)),
-        })
-
-    standings.sort(key=lambda x: x["rank"])
-    return standings
-
 
 def fetch_daily_reports_metadata(week_number):
     """Fetch GitHub Issue metadata for daily reports of a given week."""
@@ -515,15 +486,11 @@ def main():
         print(f"  Computing category ranks...", file=sys.stderr)
         category_ranks = compute_category_ranks(all_teams, team_name)
 
-        print(f"  Fetching standings...", file=sys.stderr)
-        standings = fetch_league_standings(league_key, access_token)
-
         print(f"  Fetching daily report metadata...", file=sys.stderr)
         daily_reports = fetch_daily_reports_metadata(prev_week)
 
         review_data = {
             **(my_matchup or {}),
-            "league_standings": standings,
             "league_category_ranks": category_ranks,
             "daily_reports": daily_reports,
         }
