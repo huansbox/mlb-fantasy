@@ -304,12 +304,37 @@ def cmd_player(args, access_token, config):
             except Exception:
                 pass
 
+        # MLB API cross-check for roster status
+        mlb_status = None
+        mlb_team = None
+        try:
+            search_url = (
+                "https://statsapi.mlb.com/api/v1/people/search"
+                f"?names={urllib.parse.quote(p['name'])}&sportIds=1&active=true"
+            )
+            with urllib.request.urlopen(search_url, timeout=10) as resp:
+                mlb_data = json.loads(resp.read())
+            rows = mlb_data.get("people", [])
+            if rows:
+                pid = rows[0]["id"]
+                p_url = f"https://statsapi.mlb.com/api/v1/people/{pid}?hydrate=currentTeam"
+                with urllib.request.urlopen(p_url, timeout=10) as resp:
+                    pd2 = json.loads(resp.read())
+                person = pd2.get("people", [{}])[0]
+                ct = person.get("currentTeam", {})
+                mlb_team = ct.get("name")
+                mlb_status = person.get("status", {}).get("description", "Active")
+        except Exception:
+            pass
+
         po_str = f"{percent_owned}%" if percent_owned is not None else "—"
+        yahoo_status = p['status'] or '健康'
+        mlb_str = f"{mlb_status} - {mlb_team}" if mlb_status else "—"
         print(f"=== {p['name']} ===")
         print(f"隊伍: {p['team']}")
         print(f"位置: {p['position']}")
         print(f"持有率: {po_str}")
-        print(f"狀態: {p['status'] or '健康'}")
+        print(f"狀態: {yahoo_status} (Yahoo) | {mlb_str} (MLB)")
         if stats:
             print("--- 本季數據 ---")
             for name, val in stats.items():
@@ -421,7 +446,7 @@ def _savant_lookup(query, year, player_type):
                 bbe = int(ex_match.get("bip", 0) or 0)
             if player_type == "pitcher":
                 raw = ex_match.get("xera")
-                xera = float(raw) if raw else None
+                xera = float(raw) if raw and raw.strip() else None
     except Exception as e:
         print(f"  Expected CSV error ({year}): {e}", file=sys.stderr)
 
@@ -438,7 +463,7 @@ def _print_savant_line(label, data, player_type):
     parts = [f"{label}:"]
     if player_type == "pitcher" and data.get("xera") is not None:
         parts.append(f"xERA {data['xera']:.2f} {pctile_tag(data['xera'], 'xera', 'pitcher')}")
-    if data.get("xwoba"):
+    if data.get("xwoba") is not None:
         tag = "xwOBA allowed" if player_type == "pitcher" else "xwOBA"
         parts.append(f"{tag} {data['xwoba']:.3f} {pctile_tag(data['xwoba'], 'xwoba', player_type)}")
     if data.get("hh_pct") is not None:
@@ -455,20 +480,22 @@ def _print_savant_line(label, data, player_type):
 def cmd_savant(args):
     """Look up a player's Statcast data from Baseball Savant CSV.
 
-    Tries batter first; if not found, falls back to pitcher.
+    Checks both batter and pitcher CSVs, picks the type with higher BBE.
     """
     query = args.player
     years = [int(args.year)] if args.year else [2026, 2025]
 
     print(f"=== {query} — Statcast ===\n")
 
-    # Detect player type: try batter first, fallback to pitcher
+    # Detect player type: check both CSVs, pick the one with more BBE
+    # (pitchers have hundreds of BBE as pitcher but few as batter)
     detected_type = None
-    for player_type in ["batter", "pitcher"]:
-        test = _savant_lookup(query, years[0], player_type)
-        if test:
-            detected_type = player_type
-            break
+    best_bbe = -1
+    for pt in ["batter", "pitcher"]:
+        test = _savant_lookup(query, years[0], pt)
+        if test and (test.get("bbe") or 0) > best_bbe:
+            best_bbe = test.get("bbe") or 0
+            detected_type = pt
 
     if not detected_type:
         print(f"  Player not found in batter or pitcher CSV for {years[0]}")
@@ -487,6 +514,74 @@ def cmd_savant(args):
             print(f"  {label}: no data found")
 
     print()
+
+
+PITCHING_CATS = {"IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"}
+BATTING_CATS = {"R", "HR", "RBI", "SB", "BB", "AVG", "OPS"}
+
+
+def cmd_scoreboard(args, access_token, config):
+    """Show league-wide category standings for current week."""
+    league_key = config["league"]["league_key"]
+    team_name = config["league"].get("team_name", "")
+
+    sb = api_get(f"/league/{league_key}/scoreboard", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+
+    teams = []
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+        for tidx in ["0", "1"]:
+            tinfo = v["matchup"]["0"]["teams"][tidx]["team"][0]
+            tstats = v["matchup"]["0"]["teams"][tidx]["team"][1]["team_stats"]["stats"]
+            name = "?"
+            is_mine = False
+            for item in tinfo:
+                if isinstance(item, dict):
+                    if "name" in item:
+                        name = item["name"]
+                    if "is_owned_by_current_login" in item:
+                        is_mine = True
+            if not is_mine and name == team_name:
+                is_mine = True
+            row = {"name": name, "is_mine": is_mine}
+            for s in tstats:
+                sid = s["stat"]["stat_id"]
+                val = s["stat"]["value"]
+                if sid in YAHOO_STAT_MAP:
+                    cat, _ = YAHOO_STAT_MAP[sid]
+                    row[cat] = val
+            teams.append(row)
+
+    # Determine which categories to show
+    if args.pitching:
+        cats = [c for c in ["IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"] if c in PITCHING_CATS]
+        sort_key, sort_reverse = "ERA", False  # lower ERA = better → ascending
+    elif args.batting:
+        cats = [c for c in ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS"] if c in BATTING_CATS]
+        sort_key, sort_reverse = "OPS", True  # higher OPS = better → descending
+    else:
+        cats = ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS", "IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"]
+        sort_key, sort_reverse = "ERA", False
+
+    # Sort
+    def sort_val(t):
+        try:
+            return float(t.get(sort_key, ""))
+        except (ValueError, TypeError):
+            return float("-inf") if sort_reverse else float("inf")
+    teams.sort(key=sort_val, reverse=sort_reverse)
+
+    # Print
+    header = "| # | Team | " + " | ".join(cats) + " |"
+    sep = "|---|------|" + "|".join(["------"] * len(cats)) + "|"
+    print(header)
+    print(sep)
+    for i, t in enumerate(teams, 1):
+        mark = " *" if t["is_mine"] else ""
+        cols = [t.get(c, "-") for c in cats]
+        print(f"| {i} | {t['name'][:20]}{mark} | " + " | ".join(str(c) for c in cols) + " |")
 
 
 def main():
@@ -511,6 +606,11 @@ def main():
     savant_parser.add_argument("player", help="Player name to search")
     savant_parser.add_argument("--year", "-y", help="Specific year (default: 2026 + 2025)")
 
+    # Scoreboard
+    sb_parser = sub.add_parser("scoreboard", help="League scoreboard for current week")
+    sb_parser.add_argument("--pitching", action="store_true", help="Show pitching categories only")
+    sb_parser.add_argument("--batting", action="store_true", help="Show batting categories only")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -533,6 +633,8 @@ def main():
         cmd_fa(args, access_token, config)
     elif args.command == "player":
         cmd_player(args, access_token, config)
+    elif args.command == "scoreboard":
+        cmd_scoreboard(args, access_token, config)
 
 
 if __name__ == "__main__":

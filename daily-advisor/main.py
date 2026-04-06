@@ -502,15 +502,15 @@ def format_pitcher_savant(savant_data):
         if not d:
             continue
         items = []
-        if d["xera"]:
+        if d.get("xera") is not None:
             items.append(f"{d['xera']:.2f} xERA {pctile_tag(d['xera'], 'xera', 'pitcher')}")
-        if d["xwoba"]:
+        if d.get("xwoba") is not None:
             items.append(f"{d['xwoba']:.3f} xwOBA {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
-        if d["hh_pct"]:
+        if d.get("hh_pct") is not None:
             items.append(f"{d['hh_pct']:.0f}% HH {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
-        if d["barrel_pct"]:
+        if d.get("barrel_pct") is not None:
             items.append(f"{d['barrel_pct']:.1f}% Barrel {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
-        if d["bbe"]:
+        if d.get("bbe"):
             items.append(f"{d['bbe']} BBE")
         if items:
             parts.append(f"{label}: {' / '.join(items)}")
@@ -522,18 +522,18 @@ def format_opp_sp_savant(savant_data):
     if not savant_data:
         return ""
     d = savant_data.get("current")
-    if not d or (not d.get("hh_pct") and not d.get("xera")):
+    if not d or (d.get("hh_pct") is None and d.get("xera") is None):
         d = savant_data.get("prior")
     if not d:
         return ""
     items = []
-    if d.get("xera"):
+    if d.get("xera") is not None:
         items.append(f"xERA {d['xera']:.2f} {pctile_tag(d['xera'], 'xera', 'pitcher')}")
-    if d.get("xwoba"):
+    if d.get("xwoba") is not None:
         items.append(f"xwOBA {d['xwoba']:.3f} {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
-    if d.get("hh_pct"):
+    if d.get("hh_pct") is not None:
         items.append(f"HH% {d['hh_pct']:.0f}% {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
-    if d.get("barrel_pct"):
+    if d.get("barrel_pct") is not None:
         items.append(f"Barrel% {d['barrel_pct']:.1f}% {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
     if d.get("bbe"):
         items.append(f"{d['bbe']} BBE")

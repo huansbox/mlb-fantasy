@@ -283,7 +283,7 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type)
     d = {"era": era, "ip": round(ip, 1)}
 
     xera = savant.get("xera") if savant else None
-    if xera and era is not None:
+    if xera is not None and xera > 0 and era is not None:
         diff = abs(xera - era)
         d["era_diff"] = round(diff, 2)
         if era < xera:
@@ -426,19 +426,19 @@ def _fmt_roster_batter(b, savant_2026=None):
     pos = "/".join(b.get("positions", []))
 
     # Primary: 2026 if available
-    if s26 and (s26.get("xwoba") or s26.get("barrel_pct")):
+    if s26 and (s26.get("xwoba") is not None or s26.get("barrel_pct") is not None):
         bbe = s26.get("bbe", 0)
         parts = [f"[2026 BBE {bbe}]"]
-        if s26.get("xwoba"):
+        if s26.get("xwoba") is not None:
             parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'batter')}")
-        if s26.get("barrel_pct") is not None and s26["barrel_pct"]:
+        if s26.get("barrel_pct") is not None:
             parts.append(f"Barrel% {s26['barrel_pct']:.1f}% {pctile_tag(s26['barrel_pct'], 'barrel_pct', 'batter')}")
-        if s26.get("hh_pct") is not None and s26["hh_pct"]:
+        if s26.get("hh_pct") is not None:
             parts.append(f"HH% {s26['hh_pct']:.1f}%")
         line = f"  {b['name']}({b['team']}) {pos} — {' | '.join(parts)}"
         # Auxiliary: 2025 one-liner
         y25 = []
-        if ps.get("xwoba"):
+        if ps.get("xwoba") is not None:
             y25.append(f"xwOBA {ps['xwoba']:.3f}")
         if ps.get("bb_pct") is not None:
             y25.append(f"BB% {ps['bb_pct']:.1f}%")
@@ -450,7 +450,7 @@ def _fmt_roster_batter(b, savant_2026=None):
 
     # Fallback: 2025 only
     parts = []
-    if ps.get("xwoba"):
+    if ps.get("xwoba") is not None:
         parts.append(f"xwOBA {ps['xwoba']:.3f} {pctile_tag(ps['xwoba'], 'xwoba', 'batter')}")
     if ps.get("bb_pct") is not None:
         parts.append(f"BB% {ps['bb_pct']:.1f}% {pctile_tag(ps['bb_pct'], 'bb_pct', 'batter')}")
@@ -471,23 +471,23 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
     s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
 
     # Primary: 2026 if available
-    if s26 and (s26.get("xera") or s26.get("xwoba")):
+    if s26 and (s26.get("xera") is not None or s26.get("xwoba") is not None):
         bbe = s26.get("bbe", 0)
         parts = [f"[2026 BBE {bbe}]"]
-        if s26.get("xera"):
+        if s26.get("xera") is not None:
             parts.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', pt)}")
-        if s26.get("xwoba"):
+        if s26.get("xwoba") is not None:
             parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
-        if s26.get("hh_pct") is not None and s26["hh_pct"]:
+        if s26.get("hh_pct") is not None:
             parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
         if pt == "rp" and ps.get("k_per_9") is not None:
             parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
         line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
         # Auxiliary: 2025 one-liner
         y25 = []
-        if ps.get("xera"):
+        if ps.get("xera") is not None:
             y25.append(f"xERA {ps['xera']:.2f}")
-        if ps.get("xwoba_allowed"):
+        if ps.get("xwoba_allowed") is not None:
             y25.append(f"xwOBA {ps['xwoba_allowed']:.3f}")
         if ps.get("hh_pct_allowed") is not None:
             y25.append(f"HH% {ps['hh_pct_allowed']:.1f}%")
@@ -497,9 +497,9 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
 
     # Fallback: 2025 only
     parts = []
-    if ps.get("xera"):
+    if ps.get("xera") is not None:
         parts.append(f"xERA {ps['xera']:.2f} {pctile_tag(ps['xera'], 'xera', pt)}")
-    if ps.get("xwoba_allowed"):
+    if ps.get("xwoba_allowed") is not None:
         parts.append(f"xwOBA {ps['xwoba_allowed']:.3f} {pctile_tag(ps['xwoba_allowed'], 'xwoba', pt)}")
     if ps.get("hh_pct_allowed") is not None:
         parts.append(f"HH% {ps['hh_pct_allowed']:.1f}% {pctile_tag(ps['hh_pct_allowed'], 'hh_pct', pt)}")
@@ -550,7 +550,7 @@ def _format_fa_batter(p):
 
     # Quality
     q = []
-    if s26.get("xwoba"):
+    if s26.get("xwoba") is not None:
         q.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'batter')}")
     if d26.get("bb_pct") is not None:
         q.append(f"BB% {d26['bb_pct']:.1f}% {pctile_tag(d26['bb_pct'], 'bb_pct', 'batter')}")
@@ -583,7 +583,7 @@ def _format_fa_batter(p):
     # 2025
     if s25:
         y25 = []
-        if s25.get("xwoba"):
+        if s25.get("xwoba") is not None:
             y25.append(f"xwOBA {s25['xwoba']:.3f}")
         if d25.get("bb_pct") is not None:
             y25.append(f"BB% {d25['bb_pct']:.1f}%")
@@ -612,9 +612,9 @@ def _format_fa_pitcher(p):
 
     # Quality
     q = []
-    if s26.get("xera"):
+    if s26.get("xera") is not None:
         q.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', pt)}")
-    if s26.get("xwoba"):
+    if s26.get("xwoba") is not None:
         q.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
     if s26.get("hh_pct") is not None:
         q.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
@@ -662,9 +662,9 @@ def _format_fa_pitcher(p):
     # 2025
     if s25:
         y25 = []
-        if s25.get("xera"):
+        if s25.get("xera") is not None:
             y25.append(f"xERA {s25['xera']:.2f}")
-        if s25.get("xwoba"):
+        if s25.get("xwoba") is not None:
             y25.append(f"xwOBA {s25['xwoba']:.3f}")
         if s25.get("hh_pct") is not None:
             y25.append(f"HH% {s25['hh_pct']:.1f}%")
@@ -885,8 +885,8 @@ def main():
             print(f"\n=== Layer 2 Results ({len(filtered)} passed) ===\n")
             for p in filtered:
                 s = p.get("savant_2026") or {}
-                xw = f"{s['xwoba']:.3f}" if s.get("xwoba") else "—"
-                xe = f"{s['xera']:.2f}" if s.get("xera") else "—"
+                xw = f"{s['xwoba']:.3f}" if s.get("xwoba") is not None else "—"
+                xe = f"{s['xera']:.2f}" if s.get("xera") is not None else "—"
                 print(f"  {p['name']:22} {p['team']:5} {p['fa_type']:6} "
                       f"BBE={p['bbe']:>3}  xwOBA={xw:>6}  xERA={xe:>5}")
             print(f"\n{build_roster_summary(config, savant_2026)}")
