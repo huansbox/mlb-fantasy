@@ -491,6 +491,74 @@ def cmd_savant(args):
     print()
 
 
+PITCHING_CATS = {"IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"}
+BATTING_CATS = {"R", "HR", "RBI", "SB", "BB", "AVG", "OPS"}
+
+
+def cmd_scoreboard(args, access_token, config):
+    """Show league-wide category standings for current week."""
+    league_key = config["league"]["league_key"]
+    team_name = config["league"].get("team_name", "")
+
+    sb = api_get(f"/league/{league_key}/scoreboard", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+
+    teams = []
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+        for tidx in ["0", "1"]:
+            tinfo = v["matchup"]["0"]["teams"][tidx]["team"][0]
+            tstats = v["matchup"]["0"]["teams"][tidx]["team"][1]["team_stats"]["stats"]
+            name = "?"
+            is_mine = False
+            for item in tinfo:
+                if isinstance(item, dict):
+                    if "name" in item:
+                        name = item["name"]
+                    if "is_owned_by_current_login" in item:
+                        is_mine = True
+            if not is_mine and name == team_name:
+                is_mine = True
+            row = {"name": name, "is_mine": is_mine}
+            for s in tstats:
+                sid = s["stat"]["stat_id"]
+                val = s["stat"]["value"]
+                if sid in YAHOO_STAT_MAP:
+                    cat, _ = YAHOO_STAT_MAP[sid]
+                    row[cat] = val
+            teams.append(row)
+
+    # Determine which categories to show
+    if args.pitching:
+        cats = [c for c in ["IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"] if c in PITCHING_CATS]
+        sort_key, sort_reverse = "ERA", False  # lower ERA = better → ascending
+    elif args.batting:
+        cats = [c for c in ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS"] if c in BATTING_CATS]
+        sort_key, sort_reverse = "OPS", True  # higher OPS = better → descending
+    else:
+        cats = ["R", "HR", "RBI", "SB", "BB", "AVG", "OPS", "IP", "W", "K", "ERA", "WHIP", "QS", "SV+H"]
+        sort_key, sort_reverse = "ERA", False
+
+    # Sort
+    def sort_val(t):
+        try:
+            return float(t.get(sort_key, "99"))
+        except (ValueError, TypeError):
+            return 99
+    teams.sort(key=sort_val, reverse=sort_reverse)
+
+    # Print
+    header = "| # | Team | " + " | ".join(cats) + " |"
+    sep = "|---|------|" + "|".join(["------"] * len(cats)) + "|"
+    print(header)
+    print(sep)
+    for i, t in enumerate(teams, 1):
+        mark = " *" if t["is_mine"] else ""
+        cols = [t.get(c, "-") for c in cats]
+        print(f"| {i} | {t['name'][:20]}{mark} | " + " | ".join(str(c) for c in cols) + " |")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Yahoo Fantasy API Query Tool")
     sub = parser.add_subparsers(dest="command")
@@ -512,6 +580,11 @@ def main():
     savant_parser = sub.add_parser("savant", help="Look up Statcast data from Baseball Savant")
     savant_parser.add_argument("player", help="Player name to search")
     savant_parser.add_argument("--year", "-y", help="Specific year (default: 2026 + 2025)")
+
+    # Scoreboard
+    sb_parser = sub.add_parser("scoreboard", help="League scoreboard for current week")
+    sb_parser.add_argument("--pitching", action="store_true", help="Show pitching categories only")
+    sb_parser.add_argument("--batting", action="store_true", help="Show batting categories only")
 
     args = parser.parse_args()
     if not args.command:
@@ -535,6 +608,8 @@ def main():
         cmd_fa(args, access_token, config)
     elif args.command == "player":
         cmd_player(args, access_token, config)
+    elif args.command == "scoreboard":
+        cmd_scoreboard(args, access_token, config)
 
 
 if __name__ == "__main__":
