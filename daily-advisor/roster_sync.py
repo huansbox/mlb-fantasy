@@ -76,7 +76,7 @@ def find_my_team_key(league_key, token):
 def fetch_full_roster(team_key, token):
     """Fetch roster from Yahoo API, return list of player dicts.
 
-    Each dict: {name, yahoo_player_key, team, positions, selected_pos}
+    Each dict: {name, yahoo_player_key, team, positions, selected_pos, status}
     """
     data = yahoo_api_get(f"/team/{team_key}/roster", token)
     players_data = data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
@@ -89,7 +89,7 @@ def fetch_full_roster(team_key, token):
         info = player[0]
         pos_data = player[1]
 
-        name = team_val = display_pos = player_key = None
+        name = team_val = display_pos = player_key = status = None
         for item in info:
             if isinstance(item, dict):
                 if "name" in item:
@@ -100,6 +100,8 @@ def fetch_full_roster(team_key, token):
                     display_pos = item["display_position"]
                 if "player_key" in item:
                     player_key = item["player_key"]
+                if "status" in item:
+                    status = item["status"]
 
         selected_pos = "BN"
         sel = pos_data.get("selected_position", [{}])
@@ -117,6 +119,7 @@ def fetch_full_roster(team_key, token):
             "team": team_val or "?",
             "positions": positions,
             "selected_pos": selected_pos,
+            "status": status or "",
         })
 
     return players
@@ -456,6 +459,8 @@ def enrich_new_player(player, savant_data=None):
         "yahoo_player_key": player["yahoo_player_key"],
         "team": player["team"],
         "positions": player["positions"],
+        "selected_pos": player.get("selected_pos", ""),
+        "status": player.get("status", ""),
     }
 
     if mlb_id:
@@ -505,6 +510,8 @@ def update_config(config, yahoo_roster, diff, savant_data=None):
                     p["yahoo_player_key"] = yp["yahoo_player_key"]
                 p["team"] = yp["team"]
                 p["positions"] = yp["positions"]
+                p["selected_pos"] = yp.get("selected_pos", "")
+                p["status"] = yp.get("status", "")
             # Backfill prior_stats if missing and mlb_id available
             if not p.get("prior_stats") and p.get("mlb_id"):
                 savant = savant_data.get(p["mlb_id"]) if savant_data else None
