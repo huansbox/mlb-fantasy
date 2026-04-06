@@ -438,7 +438,7 @@ def _print_savant_line(label, data, player_type):
     parts = [f"{label}:"]
     if player_type == "pitcher" and data.get("xera") is not None:
         parts.append(f"xERA {data['xera']:.2f} {pctile_tag(data['xera'], 'xera', 'pitcher')}")
-    if data.get("xwoba"):
+    if data.get("xwoba") is not None:
         tag = "xwOBA allowed" if player_type == "pitcher" else "xwOBA"
         parts.append(f"{tag} {data['xwoba']:.3f} {pctile_tag(data['xwoba'], 'xwoba', player_type)}")
     if data.get("hh_pct") is not None:
