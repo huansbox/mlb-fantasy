@@ -241,7 +241,10 @@ def fetch_daily_reports_metadata(week_number):
 
 
 def fetch_next_opponent(league_key, access_token, week, team_name="99 940"):
-    """Get this week's opponent name and team_key."""
+    """Get this week's opponent and my team_key.
+
+    Returns: (opponent_dict, my_team_key) or (None, None).
+    """
     sb = yahoo_api_get(f"/league/{league_key}/scoreboard;week={week}", access_token)
     matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
 
@@ -263,16 +266,15 @@ def fetch_next_opponent(league_key, access_token, week, team_name="99 940"):
             pair.append({"name": name, "key": key})
 
         if pair[0]["name"] == team_name:
-            return pair[1]
+            return pair[1], pair[0]["key"]
         elif pair[1]["name"] == team_name:
-            return pair[0]
+            return pair[0], pair[1]["key"]
 
-    return None
+    return None, None
 
 
-def fetch_opponent_roster(team_key, access_token):
-    """Fetch opponent's full roster. Returns {"batters": [...], "pitchers": [...]}."""
-    roster_data = yahoo_api_get(f"/team/{team_key}/roster", access_token)
+def _parse_roster_players(roster_data):
+    """Parse Yahoo roster API response into batters/pitchers lists."""
     players = roster_data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
 
     batters = []
@@ -303,7 +305,7 @@ def fetch_opponent_roster(team_key, access_token):
         if not name or not display_pos:
             continue
 
-        if selected_pos in ("IL", "IL+"):
+        if selected_pos in ("IL", "IL+", "NA"):
             role = "IL"
         elif selected_pos == "BN":
             role = "bench"
@@ -321,13 +323,22 @@ def fetch_opponent_roster(team_key, access_token):
     return {"batters": batters, "pitchers": pitchers}
 
 
-def fetch_sp_schedules(config, opp_roster, week_start, week_end):
+def fetch_roster(team_key, access_token, date=None):
+    """Fetch a team's roster. Supports date parameter for historical snapshots."""
+    endpoint = f"/team/{team_key}/roster"
+    if date:
+        endpoint += f";date={date}"
+    roster_data = yahoo_api_get(endpoint, access_token)
+    return _parse_roster_players(roster_data)
+
+
+def fetch_sp_schedules(my_roster, opp_roster, week_start, week_end):
     """Fetch SP probable pitcher schedules for both teams.
 
     Returns: (my_sp_schedule, opp_sp_schedule)
     """
-    my_sps = {p["name"]: p["team"] for p in config.get("pitchers", [])
-              if pitcher_type(p) == "SP"}
+    my_sps = {p["name"]: p["team"] for p in my_roster.get("pitchers", [])
+              if p.get("type") == "SP" and p.get("role") != "IL"}
     opp_sps = {p["name"]: p["team"] for p in opp_roster.get("pitchers", [])
                if p.get("type") == "SP" and p.get("role") != "IL"}
     all_sp_names = set(my_sps.keys()) | set(opp_sps.keys())
@@ -368,9 +379,12 @@ def fetch_sp_schedules(config, opp_roster, week_start, week_end):
     return my_schedule, opp_schedule
 
 
-def compute_positional_coverage(config, week_start, week_end):
-    """Check daily positional coverage, identify dead slots (C/1B/SS)."""
-    batters = config.get("batters", [])
+def compute_positional_coverage(my_roster, config, week_start, week_end):
+    """Check daily positional coverage, identify dead slots (C/1B/SS).
+
+    Uses Yahoo API roster (my_roster) for active batters, config for team ID map.
+    """
+    batters = [b for b in my_roster.get("batters", []) if b.get("role") != "IL"]
     team_id_map = config.get("teams", {})
     # Reverse map: mlb_team_id → config abbreviation
     id_to_abbr = {v: k for k, v in team_id_map.items()}
@@ -517,20 +531,24 @@ def main():
 
     # ── Preview: this week's data ──
     print(f"  Fetching week {week_number} opponent...", file=sys.stderr)
-    next_opp = fetch_next_opponent(league_key, access_token, week_number, team_name)
+    next_opp, my_team_key = fetch_next_opponent(league_key, access_token, week_number, team_name)
 
     preview_data = {}
     if next_opp:
         print(f"  Opponent: {next_opp['name']}", file=sys.stderr)
 
-        print(f"  Fetching opponent roster...", file=sys.stderr)
-        opp_roster = fetch_opponent_roster(next_opp["key"], access_token)
+        roster_date = week_start.isoformat()
+        print(f"  Fetching my roster (date={roster_date})...", file=sys.stderr)
+        my_roster = fetch_roster(my_team_key, access_token, date=roster_date)
+
+        print(f"  Fetching opponent roster (date={roster_date})...", file=sys.stderr)
+        opp_roster = fetch_roster(next_opp["key"], access_token, date=roster_date)
 
         print(f"  Fetching SP schedules ({week_start} ~ {week_end})...", file=sys.stderr)
-        my_sp_sched, opp_sp_sched = fetch_sp_schedules(config, opp_roster, week_start, week_end)
+        my_sp_sched, opp_sp_sched = fetch_sp_schedules(my_roster, opp_roster, week_start, week_end)
 
         print(f"  Computing positional coverage...", file=sys.stderr)
-        pos_coverage = compute_positional_coverage(config, week_start, week_end)
+        pos_coverage = compute_positional_coverage(my_roster, config, week_start, week_end)
 
         preview_data = {
             "opponent_name": next_opp["name"],
