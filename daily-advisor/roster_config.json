@@ -18,7 +18,9 @@
         "pa_per_team_g": 3.23,
         "pa": 523,
         "g": 123
-      }
+      },
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Christian Walker",
@@ -38,7 +40,9 @@
         "pa_per_team_g": 3.95,
         "pa": 640,
         "g": 154
-      }
+      },
+      "selected_pos": "1B",
+      "status": ""
     },
     {
       "name": "Jazz Chisholm Jr.",
@@ -59,7 +63,9 @@
         "pa_per_team_g": 3.28,
         "pa": 531,
         "g": 130
-      }
+      },
+      "selected_pos": "Util",
+      "status": ""
     },
     {
       "name": "Manny Machado",
@@ -79,7 +85,9 @@
         "pa_per_team_g": 4.19,
         "pa": 678,
         "g": 159
-      }
+      },
+      "selected_pos": "3B",
+      "status": ""
     },
     {
       "name": "Ezequiel Tovar",
@@ -99,7 +107,9 @@
         "pa_per_team_g": 2.41,
         "pa": 390,
         "g": 95
-      }
+      },
+      "selected_pos": "SS",
+      "status": ""
     },
     {
       "name": "Jose Altuve",
@@ -120,7 +130,9 @@
         "pa_per_team_g": 4.04,
         "pa": 654,
         "g": 155
-      }
+      },
+      "selected_pos": "2B",
+      "status": ""
     },
     {
       "name": "Byron Buxton",
@@ -140,7 +152,9 @@
         "pa_per_team_g": 3.35,
         "pa": 542,
         "g": 126
-      }
+      },
+      "selected_pos": "CF",
+      "status": ""
     },
     {
       "name": "Lawrence Butler",
@@ -161,7 +175,9 @@
         "pa_per_team_g": 3.89,
         "pa": 630,
         "g": 152
-      }
+      },
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Ozzie Albies",
@@ -181,7 +197,9 @@
         "pa_per_team_g": 4.12,
         "pa": 667,
         "g": 157
-      }
+      },
+      "selected_pos": "Util",
+      "status": ""
     },
     {
       "name": "Jordan Walker",
@@ -202,7 +220,9 @@
         "pa_per_team_g": 2.44,
         "pa": 396,
         "g": 111
-      }
+      },
+      "selected_pos": "LF",
+      "status": ""
     },
     {
       "name": "Sal Frelick",
@@ -224,7 +244,9 @@
         "pa_per_team_g": 3.67,
         "pa": 594,
         "g": 142
-      }
+      },
+      "selected_pos": "RF",
+      "status": "DTD"
     },
     {
       "name": "Giancarlo Stanton",
@@ -245,7 +267,9 @@
         "pa_per_team_g": 1.73,
         "pa": 281,
         "g": 77
-      }
+      },
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Liam Hicks",
@@ -266,7 +290,9 @@
         "pa_per_team_g": 2.41,
         "pa": 390,
         "g": 119
-      }
+      },
+      "selected_pos": "C",
+      "status": ""
     }
   ],
   "pitchers": [
@@ -288,7 +314,9 @@
         "era": 2.21,
         "ip_per_gs": 6.3,
         "ip": 195.3
-      }
+      },
+      "selected_pos": "SP",
+      "status": ""
     },
     {
       "name": "Chris Sale",
@@ -308,7 +336,9 @@
         "era": 2.58,
         "ip_per_gs": 6.3,
         "ip": 125.7
-      }
+      },
+      "selected_pos": "SP",
+      "status": ""
     },
     {
       "name": "Cole Ragans",
@@ -328,7 +358,9 @@
         "era": 4.67,
         "ip_per_gs": 4.7,
         "ip": 61.7
-      }
+      },
+      "selected_pos": "SP",
+      "status": ""
     },
     {
       "name": "Aaron Nola",
@@ -348,7 +380,9 @@
         "era": 6.01,
         "ip_per_gs": 5.5,
         "ip": 94.3
-      }
+      },
+      "selected_pos": "SP",
+      "status": ""
     },
     {
       "name": "Robert Garcia",
@@ -369,7 +403,9 @@
         "k_per_9": 9.56,
         "ip_per_team_g": 0.4,
         "ip": 64.0
-      }
+      },
+      "selected_pos": "RP",
+      "status": ""
     },
     {
       "name": "Garrett Whitlock",
@@ -390,7 +426,9 @@
         "k_per_9": 11.38,
         "ip_per_team_g": 0.44,
         "ip": 72.0
-      }
+      },
+      "selected_pos": "NA",
+      "status": "NA"
     },
     {
       "name": "Brayan Bello",
@@ -410,7 +448,9 @@
         "era": 3.35,
         "ip_per_gs": 6.0,
         "ip": 166.7
-      }
+      },
+      "selected_pos": "P",
+      "status": ""
     },
     {
       "name": "Parker Messick",
@@ -430,7 +470,9 @@
         "era": 2.72,
         "ip_per_gs": 5.7,
         "ip": 39.7
-      }
+      },
+      "selected_pos": "P",
+      "status": ""
     },
     {
       "name": "Chris Bassitt",
@@ -450,7 +492,9 @@
         "era": 3.96,
         "ip_per_gs": 5.5,
         "ip": 170.3
-      }
+      },
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Merrill Kelly",
@@ -470,7 +514,9 @@
         "era": 3.52,
         "ip_per_gs": 5.8,
         "ip": 184.0
-      }
+      },
+      "selected_pos": "IL",
+      "status": "IL15"
     },
     {
       "name": "Matthew Liberatore",
@@ -490,7 +536,9 @@
         "era": 4.21,
         "ip_per_gs": 5.2,
         "ip": 151.7
-      }
+      },
+      "selected_pos": "P",
+      "status": ""
     }
   ],
   "teams": {
