@@ -304,12 +304,37 @@ def cmd_player(args, access_token, config):
             except Exception:
                 pass
 
+        # MLB API cross-check for roster status
+        mlb_status = None
+        mlb_team = None
+        try:
+            search_url = (
+                "https://statsapi.mlb.com/api/v1/people/search"
+                f"?names={urllib.parse.quote(p['name'])}&sportIds=1&active=true"
+            )
+            with urllib.request.urlopen(search_url, timeout=10) as resp:
+                mlb_data = json.loads(resp.read())
+            rows = mlb_data.get("people", [])
+            if rows:
+                pid = rows[0]["id"]
+                p_url = f"https://statsapi.mlb.com/api/v1/people/{pid}?hydrate=currentTeam"
+                with urllib.request.urlopen(p_url, timeout=10) as resp:
+                    pd2 = json.loads(resp.read())
+                person = pd2.get("people", [{}])[0]
+                ct = person.get("currentTeam", {})
+                mlb_team = ct.get("name")
+                mlb_status = person.get("status", {}).get("description", "Active")
+        except Exception:
+            pass
+
         po_str = f"{percent_owned}%" if percent_owned is not None else "—"
+        yahoo_status = p['status'] or '健康'
+        mlb_str = f"{mlb_status} - {mlb_team}" if mlb_status else "—"
         print(f"=== {p['name']} ===")
         print(f"隊伍: {p['team']}")
         print(f"位置: {p['position']}")
         print(f"持有率: {po_str}")
-        print(f"狀態: {p['status'] or '健康'}")
+        print(f"狀態: {yahoo_status} (Yahoo) | {mlb_str} (MLB)")
         if stats:
             print("--- 本季數據 ---")
             for name, val in stats.items():
