@@ -446,7 +446,7 @@ def _savant_lookup(query, year, player_type):
                 bbe = int(ex_match.get("bip", 0) or 0)
             if player_type == "pitcher":
                 raw = ex_match.get("xera")
-                xera = float(raw) if raw else None
+                xera = float(raw) if raw and raw.strip() else None
     except Exception as e:
         print(f"  Expected CSV error ({year}): {e}", file=sys.stderr)
 
@@ -568,9 +568,9 @@ def cmd_scoreboard(args, access_token, config):
     # Sort
     def sort_val(t):
         try:
-            return float(t.get(sort_key, "99"))
+            return float(t.get(sort_key, ""))
         except (ValueError, TypeError):
-            return 99
+            return float("-inf") if sort_reverse else float("inf")
     teams.sort(key=sort_val, reverse=sort_reverse)
 
     # Print

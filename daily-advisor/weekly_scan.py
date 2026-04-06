@@ -283,7 +283,7 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type)
     d = {"era": era, "ip": round(ip, 1)}
 
     xera = savant.get("xera") if savant else None
-    if xera and era is not None:
+    if xera is not None and xera > 0 and era is not None:
         diff = abs(xera - era)
         d["era_diff"] = round(diff, 2)
         if era < xera:
@@ -550,7 +550,7 @@ def _format_fa_batter(p):
 
     # Quality
     q = []
-    if s26.get("xwoba"):
+    if s26.get("xwoba") is not None:
         q.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'batter')}")
     if d26.get("bb_pct") is not None:
         q.append(f"BB% {d26['bb_pct']:.1f}% {pctile_tag(d26['bb_pct'], 'bb_pct', 'batter')}")
@@ -583,7 +583,7 @@ def _format_fa_batter(p):
     # 2025
     if s25:
         y25 = []
-        if s25.get("xwoba"):
+        if s25.get("xwoba") is not None:
             y25.append(f"xwOBA {s25['xwoba']:.3f}")
         if d25.get("bb_pct") is not None:
             y25.append(f"BB% {d25['bb_pct']:.1f}%")
@@ -612,9 +612,9 @@ def _format_fa_pitcher(p):
 
     # Quality
     q = []
-    if s26.get("xera"):
+    if s26.get("xera") is not None:
         q.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', pt)}")
-    if s26.get("xwoba"):
+    if s26.get("xwoba") is not None:
         q.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
     if s26.get("hh_pct") is not None:
         q.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
@@ -662,9 +662,9 @@ def _format_fa_pitcher(p):
     # 2025
     if s25:
         y25 = []
-        if s25.get("xera"):
+        if s25.get("xera") is not None:
             y25.append(f"xERA {s25['xera']:.2f}")
-        if s25.get("xwoba"):
+        if s25.get("xwoba") is not None:
             y25.append(f"xwOBA {s25['xwoba']:.3f}")
         if s25.get("hh_pct") is not None:
             y25.append(f"HH% {s25['hh_pct']:.1f}%")
