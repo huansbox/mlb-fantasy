@@ -6,3 +6,4 @@ daily-advisor/weekly_scan_summary.txt
 daily-advisor/.last_sync
 *.stackdump
 __pycache__/
+.DS_Store
