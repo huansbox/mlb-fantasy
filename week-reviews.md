@@ -65,38 +65,36 @@
 
 ## Week 3 vs Annbii Studio
 
-### 對手分析（2026-04-06）
+### 對手分析（2026-04-06 更新）
 
 **對手 build**：全押投手型（BN 3 格全放 SP，打者零替補）
 - 開季至今 5 次異動：砍打者（Hamilton/Caballero）加 SP，持續輪換串流 SP
 - SP 可用 ~9 人（6 active + 3 BN 輪換），RP 3 人（Rogers/Erceg/Uribe）
-- 打者零 BN = off day 直接空格，打者產出天花板鎖死
-- IL：Gerrit Cole + Ponce
+- 打者 10 active + 1 IL（Eldridge），零 BN = off day 直接空格
+- IL：Gerrit Cole + Ponce + Eldridge
 
-**對手 Week 2 數據**：R 23(#10) / HR 7(#6) / AVG .228(#10) / IP 68.1 / K 60 / SV+H 5
-
-### 預測（2026-04-06 產出）
+### 預測（2026-04-06 更新）
 | 類別 | 預測 | 信心 | 理由 |
 |------|------|------|------|
-| R | W | 高 | 我方 #4(32) vs 對手 #10(23)，打線深度結構性優勢 |
-| HR | W | 中 | 我方 #5(9) vs #6(7)，但對手有 Schwarber + Suárez power |
-| RBI | W | 高 | 我方 #3(36) vs #8(24)，差距大 |
-| SB | W | 低 | 雙方都不快（7 vs 2），punt SB 下不穩定 |
-| BB | Toss-up | 低 | 我方 #10(25) vs #4(28)，對手 Schwarber BB 機器。Altuve 27% BB rate 可能翻盤 |
-| AVG | W | 高 | 我方 #1(.256) vs #10(.228)，結構性優勢 |
-| OPS | W | 中 | .757 vs .721，我方領先但差距不大 |
-| IP | L | 高 | 對手 9 SP 串流 + BN 全投手 vs 我方 7 SP，局數差距結構性存在 |
-| W | L | 高 | 對手場次更多 + Crochet/Woo 品質好，我方 W 聯盟墊底 |
-| K | L | 高 | 對手 SP 場次多 + McLean/Crochet K 菁英 |
-| ERA | Toss-up | 中 | 4.07 vs 4.21 極接近。我方靠品質 SP 壓，但 Bassitt/Bello 有爆炸風險。對手串流 FA 池 SP 品質也不穩 |
-| WHIP | L | 中 | 1.34 vs 1.23，對手較好。但如果我方 bench 比率炸彈有機會翻盤 |
-| QS | Toss-up | 中 | 4 vs 3，看 SP 深投能力。Sale/Skubal 有 QS 保障 |
-| SV+H | L | 高 | 0 vs 5，對手 3 RP，我方 Whitlock NA 後幾乎無 SV+H |
+| R | W | 高 | 我方 #4(32) vs 對手打者零替補 + off day 空格 |
+| HR | W | 中 | Schwarber/Suárez/Trout 有 power，但我方打線更深 |
+| RBI | W | 高 | 我方 #3(36)，對手打者產出受限於零替補 |
+| SB | W | 低 | 雙方都不快，不穩定 |
+| BB | Toss-up | 低 | 我方 #10(25) 偏弱，對手有 Schwarber BB 機器 |
+| AVG | W | 高 | 我方 #1(.261)，結構性優勢 |
+| OPS | W | 中 | 我方 #3(.769)，領先但 Schwarber/Trout 可拉近 |
+| IP | L | 高 | 對手 9 SP + BN 全投手串流，局數結構性落後 |
+| W | L | 高 | 對手場次多 + Crochet/Woo 品質好 |
+| K | L | 高 | 對手 SP 場次多 + Crochet/McLean K 率高 |
+| ERA | Toss-up | 中 | 我方有 Sale/Skubal 壓陣，但 Bello/Bassitt 有爆炸風險；對手串流品質不穩 |
+| WHIP | Toss-up | 中 | 類似 ERA，雙方都有風險 |
+| QS | Toss-up | 中 | 我方 Sale/Skubal 穩 QS，但對手場次多也能堆 |
+| SV+H | L | 高 | 0 vs 對手 3 RP，punt |
 
-整體：8W-6L（險勝），反串流策略 — 靠打者 5-6 勝 + 保護 ERA/QS 過線
+整體：8W-6L（險勝），反串流 — 靠打者 6-7 勝打底 + 保護 ERA/WHIP 爭取翻盤。不追 IP/K/W。
 
 ### 策略
-- **保護比率為核心**：不串流，不追 IP/K/W。ERA 和 QS 是本週勝負手
+- **保護比率為核心**：不串流，不追 IP/K/W
 - **Bello 4/6 結果** → 爆則 drop / add Holmes（4/8 趕得上）
 - **Bassitt ~4/10 先發前**：依當時 ERA 領先幅度決定 bench or start
 - **打者正常排**：6 勝打底，off day 注意 4/9 HOU 休兵（C.Walker/Altuve 沒比賽）

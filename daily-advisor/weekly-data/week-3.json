@@ -680,6 +680,29 @@
         "dead_slots": []
       }
     },
-    "predicted_outcome": null
+    "predicted_outcome": {
+      "strong": [
+        "R",
+        "RBI",
+        "AVG"
+      ],
+      "toss_up": [
+        "HR",
+        "OPS",
+        "SB",
+        "BB",
+        "ERA",
+        "WHIP",
+        "QS"
+      ],
+      "weak": [
+        "IP",
+        "W",
+        "K",
+        "SV+H"
+      ],
+      "projected_record": "8-6",
+      "strategy": "反串流：靠打者 6-7 勝打底 + 保護 ERA/WHIP 爭取翻盤。不追 IP/K/W。"
+    }
   }
 }
