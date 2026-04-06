@@ -51,6 +51,29 @@
 | 對手弱到本週穩贏 | 可用 2-3 次異動測試串流效果 |
 | **預設** | **不串流，留異動額度給傷兵替補和 hot bat** |
 
+### 串流 SP 操作流程（2026-04-06 確立）
+
+**查先發日程的正確方法**：
+```bash
+# 用 MLB API 逐日查 probable pitcher（只提前 1-2 天公布）
+curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydrate=probablePitcher"
+```
+- ⚠️ **不要用 FanGraphs/FantasyPros 的 probables grid 推測**（常有錯誤，例如把 5 天間隔排成 3 天）
+- **正確方式**：查球員 game log 最後一場日期 + 5 天推算，再用 MLB API 確認
+- MLB API 只提前 1-2 天公布 probable，更遠的日期需用輪值間隔推算
+
+**FAAB 時效與串流時程**：
+1. 提交 FAAB claim
+2. 隔日 TW 15:00 處理
+3. 處理後設 Daily-Tomorrow lineup
+4. **再隔天才上場（前置 2 天）**
+5. → 串流 SP 需提前 2 天 claim，才能趕上目標先發日
+
+**串流測試策略**（適用於觀察中候選 SP）：
+- 搶先發日最近的候選 → 看一場結果
+- 好就留（轉為正式 roster），不好就 drop 換下一位候選
+- 每週 6 次異動上限需預留 1-2 次給傷兵替補
+
 ### Waiver 操作規則（聯賽設定確認 2026-03-30）
 
 - **所有撿人走 FAAB**（waiver_rule: all），無即時 FA
