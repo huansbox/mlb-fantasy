@@ -680,6 +680,29 @@
         "dead_slots": []
       }
     },
-    "predicted_outcome": null
+    "predicted_outcome": {
+      "strong": [
+        "R",
+        "RBI",
+        "AVG"
+      ],
+      "toss_up": [
+        "HR",
+        "OPS",
+        "SB",
+        "BB",
+        "ERA",
+        "QS"
+      ],
+      "weak": [
+        "IP",
+        "W",
+        "K",
+        "WHIP",
+        "SV+H"
+      ],
+      "projected_record": "8-6",
+      "strategy": "反串流：靠打者 5-6 勝 + 保護 ERA/QS 過線。不追 IP/K/W。Bench 比率炸彈。"
+    }
   }
 }
