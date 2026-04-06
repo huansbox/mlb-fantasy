@@ -246,6 +246,27 @@
         "pa": 281,
         "g": 77
       }
+    },
+    {
+      "name": "Liam Hicks",
+      "mlb_id": 689414,
+      "yahoo_player_key": "469.p.63648",
+      "team": "MIA",
+      "positions": [
+        "C",
+        "1B"
+      ],
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.315,
+        "barrel_pct": 3.5,
+        "hh_pct": 27.7,
+        "bb_pct": 11.0,
+        "ops": 0.692,
+        "pa_per_team_g": 2.41,
+        "pa": 390,
+        "g": 119
+      }
     }
   ],
   "pitchers": [
@@ -412,26 +433,6 @@
       }
     },
     {
-      "name": "Brady Singer",
-      "mlb_id": 663903,
-      "team": "CIN",
-      "positions": [
-        "SP"
-      ],
-      "yahoo_player_key": "469.p.11323",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.27,
-        "xwoba_allowed": 0.32,
-        "hh_pct_allowed": 40.7,
-        "barrel_pct_allowed": 9.4,
-        "bbe": 479,
-        "era": 4.03,
-        "ip_per_gs": 5.3,
-        "ip": 169.7
-      }
-    },
-    {
       "name": "Chris Bassitt",
       "mlb_id": 605135,
       "team": "BAL",
@@ -469,6 +470,26 @@
         "era": 3.52,
         "ip_per_gs": 5.8,
         "ip": 184.0
+      }
+    },
+    {
+      "name": "Matthew Liberatore",
+      "mlb_id": 669461,
+      "yahoo_player_key": "469.p.11397",
+      "team": "STL",
+      "positions": [
+        "SP"
+      ],
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.9,
+        "xwoba_allowed": 0.34,
+        "hh_pct_allowed": 41.1,
+        "barrel_pct_allowed": 10.6,
+        "bbe": 482,
+        "era": 4.21,
+        "ip_per_gs": 5.2,
+        "ip": 151.7
       }
     }
   ],
