@@ -12,7 +12,7 @@ import urllib.request
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
-from main import pctile_tag  # noqa: E402
+from daily_advisor import pctile_tag  # noqa: E402
 
 YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"

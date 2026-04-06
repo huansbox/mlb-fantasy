@@ -16,7 +16,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 
 from yahoo_query import pitcher_type
-from main import (
+from daily_advisor import (
     load_config,
     api_get,
     fetch_savant_statcast,

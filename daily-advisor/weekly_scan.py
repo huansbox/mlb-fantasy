@@ -21,7 +21,7 @@ from fa_watch import (
     collect_fa_snapshot, load_fa_history, save_fa_history,
     calc_owned_changes, TPE,
 )
-from main import pctile_tag
+from daily_advisor import pctile_tag
 from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
