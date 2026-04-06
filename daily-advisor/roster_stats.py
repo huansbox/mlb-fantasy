@@ -95,17 +95,17 @@ def fetch_savant_all(roster_ids, season):
             e = ex.get(pid, {})
             if s or e:
                 result[pid][label] = {
-                    "hh_pct": s.get("hh_pct", 0),
-                    "barrel_pct": s.get("barrel_pct", 0),
+                    "hh_pct": s.get("hh_pct"),
+                    "barrel_pct": s.get("barrel_pct"),
                     "bbe": s.get("bbe", 0),
-                    "xwoba": e.get("xwoba", 0),
+                    "xwoba": e.get("xwoba"),
                 }
     return result
 
 
 def fmt(val, spec=".3f"):
-    """Format a numeric value, return '—' if zero/None."""
-    if val is None or val == 0:
+    """Format a numeric value, return '—' if None."""
+    if val is None:
         return "—"
     return f"{val:{spec}}"
 
@@ -159,11 +159,11 @@ def main():
         bb_v = cur.get("bb_pct")
         bb_pct = f"{bb_v:.1f}% {pctile_tag(bb_v, 'bb_pct')}" if bb_v is not None else "—"
         xw_v = sv_cur.get("xwoba")
-        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba')}" if xw_v else "—"
+        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba')}" if xw_v is not None else "—"
         hh_v = sv_cur.get("hh_pct")
-        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct')}" if hh_v else "—"
+        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct')}" if hh_v is not None else "—"
         brl_v = sv_cur.get("barrel_pct")
-        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct')}" if brl_v else "—"
+        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct')}" if brl_v is not None else "—"
         bbe = sv_cur.get("bbe", 0)
         xwoba_pri = fmt(sv_pri.get("xwoba"))
         hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") is not None else "—"
@@ -191,16 +191,16 @@ def main():
         sv_pri = (pitcher_savant.get(mid) or {}).get("prior") or {}
         # Format pitcher Savant values with percentile tags
         xe_v = sv_cur.get("xera")
-        xera = f"{xe_v:.2f} {pctile_tag(xe_v, 'xera', 'pitcher')}" if xe_v else "—"
+        xera = f"{xe_v:.2f} {pctile_tag(xe_v, 'xera', 'pitcher')}" if xe_v is not None else "—"
         xw_v = sv_cur.get("xwoba")
-        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba', 'pitcher')}" if xw_v else "—"
+        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba', 'pitcher')}" if xw_v is not None else "—"
         hh_v = sv_cur.get("hh_pct")
-        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct', 'pitcher')}" if hh_v else "—"
+        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct', 'pitcher')}" if hh_v is not None else "—"
         brl_v = sv_cur.get("barrel_pct")
-        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct', 'pitcher')}" if brl_v else "—"
+        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct', 'pitcher')}" if brl_v is not None else "—"
         bbe = sv_cur.get("bbe", 0) or "—"
         xera_pri = fmt(sv_pri.get("xera"), ".2f")
-        hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") else "—"
+        hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") is not None else "—"
         p_type = pitcher_type(p) or "P"
         if not d:
             print(f"| {p['name']} | {p['team']} | {p_type} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
