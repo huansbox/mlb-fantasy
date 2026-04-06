@@ -4,7 +4,7 @@
     "2026-04-06",
     "2026-04-12"
   ],
-  "generated": "2026-04-06T00:47:23.960546-04:00",
+  "generated": "2026-04-06T06:00:10.073258-04:00",
   "review": {
     "opponent_name": "鍋's Neat Team",
     "categories": [
@@ -40,13 +40,13 @@
       },
       {
         "name": "AVG",
-        "mine": 0.256,
+        "mine": 0.261,
         "opp": 0.247,
         "result": "W"
       },
       {
         "name": "OPS",
-        "mine": 0.757,
+        "mine": 0.769,
         "opp": 0.662,
         "result": "W"
       },
@@ -100,25 +100,7 @@
     },
     "league_standings": [
       {
-        "team": "Annbii Studio",
-        "wins": 0,
-        "losses": 0,
-        "rank": 0
-      },
-      {
         "team": "992330",
-        "wins": 0,
-        "losses": 0,
-        "rank": 0
-      },
-      {
-        "team": "BUMMER",
-        "wins": 0,
-        "losses": 0,
-        "rank": 0
-      },
-      {
-        "team": "SerBowNee",
         "wins": 0,
         "losses": 0,
         "rank": 0
@@ -142,7 +124,7 @@
         "rank": 0
       },
       {
-        "team": "99 APO",
+        "team": "BUMMER",
         "wins": 0,
         "losses": 0,
         "rank": 0
@@ -154,13 +136,31 @@
         "rank": 0
       },
       {
-        "team": "99 TeTe",
+        "team": "Annbii Studio",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "SerBowNee",
         "wins": 0,
         "losses": 0,
         "rank": 0
       },
       {
         "team": "RALLY MONKEY®",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "99 APO",
+        "wins": 0,
+        "losses": 0,
+        "rank": 0
+      },
+      {
+        "team": "99 TeTe",
         "wins": 0,
         "losses": 0,
         "rank": 0
@@ -362,18 +362,6 @@
       ],
       "pitchers": [
         {
-          "name": "Michael McGreevy",
-          "team": "STL",
-          "type": "SP",
-          "role": "starter"
-        },
-        {
-          "name": "Clay Holmes",
-          "team": "NYM",
-          "type": "SP",
-          "role": "starter"
-        },
-        {
           "name": "Mick Abel",
           "team": "MIN",
           "type": "SP",
@@ -382,6 +370,18 @@
         {
           "name": "Simeon Woods Richardson",
           "team": "MIN",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Shane McClanahan",
+          "team": "TB",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Michael McGreevy",
+          "team": "STL",
           "type": "SP",
           "role": "starter"
         },
@@ -416,8 +416,8 @@
           "role": "starter"
         },
         {
-          "name": "Shane McClanahan",
-          "team": "TB",
+          "name": "Clay Holmes",
+          "team": "NYM",
           "type": "SP",
           "role": "bench"
         },
@@ -464,6 +464,13 @@
       },
       {
         "date": "2026-04-07",
+        "pitcher": "Matthew Liberatore",
+        "team": "STL",
+        "vs": "Washington Nationals",
+        "confirmed": true
+      },
+      {
+        "date": "2026-04-07",
         "pitcher": "Tarik Skubal",
         "team": "DET",
         "vs": "Minnesota Twins",
@@ -481,13 +488,6 @@
         "pitcher": "Aaron Nola",
         "team": "PHI",
         "vs": "San Francisco Giants",
-        "confirmed": true
-      },
-      {
-        "date": "2026-04-08",
-        "pitcher": "Brady Singer",
-        "team": "CIN",
-        "vs": "Miami Marlins",
         "confirmed": true
       }
     ],
@@ -542,7 +542,7 @@
         "confirmed": true
       }
     ],
-    "probable_as_of": "2026-04-06T00:47:23.960449-04:00",
+    "probable_as_of": "2026-04-06T06:00:10.073203-04:00",
     "positional_coverage": {
       "2026-04-06": {
         "players_with_games": [
@@ -553,7 +553,8 @@
           "Byron Buxton",
           "Ozzie Albies",
           "Jordan Walker",
-          "Sal Frelick"
+          "Sal Frelick",
+          "Liam Hicks"
         ],
         "players_no_game": [
           "Shea Langeliers",
@@ -561,9 +562,7 @@
           "Lawrence Butler",
           "Giancarlo Stanton"
         ],
-        "dead_slots": [
-          "C"
-        ]
+        "dead_slots": []
       },
       "2026-04-07": {
         "players_with_games": [
@@ -578,7 +577,8 @@
           "Ozzie Albies",
           "Jordan Walker",
           "Sal Frelick",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [],
         "dead_slots": []
@@ -596,7 +596,8 @@
           "Ozzie Albies",
           "Jordan Walker",
           "Sal Frelick",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [],
         "dead_slots": []
@@ -609,7 +610,8 @@
           "Ezequiel Tovar",
           "Byron Buxton",
           "Lawrence Butler",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [
           "Christian Walker",
@@ -618,9 +620,7 @@
           "Jordan Walker",
           "Sal Frelick"
         ],
-        "dead_slots": [
-          "1B"
-        ]
+        "dead_slots": []
       },
       "2026-04-10": {
         "players_with_games": [
@@ -635,7 +635,8 @@
           "Ozzie Albies",
           "Jordan Walker",
           "Sal Frelick",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [],
         "dead_slots": []
@@ -653,7 +654,8 @@
           "Ozzie Albies",
           "Jordan Walker",
           "Sal Frelick",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [],
         "dead_slots": []
@@ -671,18 +673,13 @@
           "Ozzie Albies",
           "Jordan Walker",
           "Sal Frelick",
-          "Giancarlo Stanton"
+          "Giancarlo Stanton",
+          "Liam Hicks"
         ],
         "players_no_game": [],
         "dead_slots": []
       }
     },
-    "predicted_outcome": {
-      "strong": ["R", "RBI", "AVG"],
-      "toss_up": ["HR", "OPS", "SB", "BB", "ERA", "QS"],
-      "weak": ["IP", "W", "K", "WHIP", "SV+H"],
-      "projected_record": "8-6",
-      "strategy": "反串流：靠打者 5-6 勝 + 保護 ERA/QS 過線。不追 IP/K/W。Bench 比率炸彈。"
-    }
+    "predicted_outcome": null
   }
 }
