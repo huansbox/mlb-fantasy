@@ -234,8 +234,11 @@ def filter_by_savant(snapshot, savant_2026):
             "bbe": savant.get("bbe", 0),
         })
 
+    batters = sum(1 for r in results if r["fa_type"] == "batter")
+    sps = sum(1 for r in results if r["fa_type"] == "sp")
+    rps = sum(1 for r in results if r["fa_type"] == "rp")
     print(f"  Layer 2: {total} FA → {matched} name-matched + {fallback} fallback "
-          f"→ {len(results)} passed", file=sys.stderr)
+          f"→ {len(results)} passed ({batters} bat / {sps} SP / {rps} RP)", file=sys.stderr)
     return results
 
 
