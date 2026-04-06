@@ -4,7 +4,7 @@
     "2026-04-06",
     "2026-04-12"
   ],
-  "generated": "2026-04-06T06:00:10.073258-04:00",
+  "generated": "2026-04-06T09:19:36.356371-04:00",
   "review": {
     "opponent_name": "鍋's Neat Team",
     "categories": [
@@ -118,7 +118,7 @@
         "rank": 0
       },
       {
-        "team": "SpiritLightCounterBack",
+        "team": "ZaYu",
         "wins": 0,
         "losses": 0,
         "rank": 0
@@ -357,7 +357,7 @@
           "positions": [
             "1B"
           ],
-          "role": "starter"
+          "role": "IL"
         }
       ],
       "pitchers": [
@@ -542,167 +542,144 @@
         "confirmed": true
       }
     ],
-    "probable_as_of": "2026-04-06T06:00:10.073203-04:00",
+    "probable_as_of": "2026-04-06T09:19:36.356354-04:00",
     "positional_coverage": {
       "2026-04-06": {
         "players_with_games": [
+          "Liam Hicks",
           "Christian Walker",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
-          "Liam Hicks"
+          "Ozzie Albies"
         ],
         "players_no_game": [
-          "Shea Langeliers",
           "Jazz Chisholm Jr.",
+          "Giancarlo Stanton",
           "Lawrence Butler",
-          "Giancarlo Stanton"
+          "Shea Langeliers"
         ],
         "dead_slots": []
       },
       "2026-04-07": {
         "players_with_games": [
-          "Shea Langeliers",
+          "Liam Hicks",
           "Christian Walker",
-          "Jazz Chisholm Jr.",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Lawrence Butler",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
+          "Jazz Chisholm Jr.",
+          "Ozzie Albies",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [],
         "dead_slots": []
       },
       "2026-04-08": {
         "players_with_games": [
-          "Shea Langeliers",
+          "Liam Hicks",
           "Christian Walker",
-          "Jazz Chisholm Jr.",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Lawrence Butler",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
+          "Jazz Chisholm Jr.",
+          "Ozzie Albies",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [],
         "dead_slots": []
       },
       "2026-04-09": {
         "players_with_games": [
-          "Shea Langeliers",
-          "Jazz Chisholm Jr.",
+          "Liam Hicks",
           "Manny Machado",
           "Ezequiel Tovar",
           "Byron Buxton",
-          "Lawrence Butler",
+          "Jazz Chisholm Jr.",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [
           "Christian Walker",
           "Jose Altuve",
-          "Ozzie Albies",
           "Jordan Walker",
-          "Sal Frelick"
+          "Sal Frelick",
+          "Ozzie Albies"
         ],
         "dead_slots": []
       },
       "2026-04-10": {
         "players_with_games": [
-          "Shea Langeliers",
+          "Liam Hicks",
           "Christian Walker",
-          "Jazz Chisholm Jr.",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Lawrence Butler",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
+          "Jazz Chisholm Jr.",
+          "Ozzie Albies",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [],
         "dead_slots": []
       },
       "2026-04-11": {
         "players_with_games": [
-          "Shea Langeliers",
+          "Liam Hicks",
           "Christian Walker",
-          "Jazz Chisholm Jr.",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Lawrence Butler",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
+          "Jazz Chisholm Jr.",
+          "Ozzie Albies",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [],
         "dead_slots": []
       },
       "2026-04-12": {
         "players_with_games": [
-          "Shea Langeliers",
+          "Liam Hicks",
           "Christian Walker",
-          "Jazz Chisholm Jr.",
+          "Jose Altuve",
           "Manny Machado",
           "Ezequiel Tovar",
-          "Jose Altuve",
-          "Byron Buxton",
-          "Lawrence Butler",
-          "Ozzie Albies",
           "Jordan Walker",
+          "Byron Buxton",
           "Sal Frelick",
+          "Jazz Chisholm Jr.",
+          "Ozzie Albies",
           "Giancarlo Stanton",
-          "Liam Hicks"
+          "Lawrence Butler",
+          "Shea Langeliers"
         ],
         "players_no_game": [],
         "dead_slots": []
       }
     },
-    "predicted_outcome": {
-      "strong": [
-        "R",
-        "RBI",
-        "AVG"
-      ],
-      "toss_up": [
-        "HR",
-        "OPS",
-        "SB",
-        "BB",
-        "ERA",
-        "QS"
-      ],
-      "weak": [
-        "IP",
-        "W",
-        "K",
-        "WHIP",
-        "SV+H"
-      ],
-      "projected_record": "8-6",
-      "strategy": "反串流：靠打者 5-6 勝 + 保護 ERA/QS 過線。不追 IP/K/W。Bench 比率炸彈。"
-    }
+    "predicted_outcome": null
   }
 }
