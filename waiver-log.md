@@ -2,17 +2,9 @@
 
 ## 觀察中
 
-### Grant Holmes (ATL, SP) — 觀察中
-觸發：Bassitt 也 drop 時，或 Liberatore 進 IL → 替補 add
-- 04-06：[waiver-scan] 2026 xERA 3.01 P80 / xwOBA .274 P80 / HH% 26.7% >P90（30 BBE 中等信心）。2025 基底 P40（308 BBE），breakout 候選。ATL 強隊 W 加成。UCL 部分撕裂復健回歸中（未手術），健康需持續追蹤。K/9 偏低（6.55）。
-
 ### Landen Roupp (SF, SP) — 觀察中
 觸發：連 2 場 ERA < 3.00 + 無爆炸 → 穩定性確認後 add
 - 04-06：[waiver-scan] 2026 xERA 2.14 >P90 / xwOBA .231 >P90 / HH% 29.6% >P90（27 BBE 低信心）。K 率菁英（14K/10.2IP）。但 G2 爆炸（4.2IP/5ER），穩定性存疑。2025 IP/GS 4.85 短局型。SF 弱隊。
-
-### Taj Bradley (MIN, SP) — 觀察中
-觸發：HH% 回到 P50 以內（< 40.8%）→ 確認非比率炸彈
-- 04-06：[waiver-scan] 2026 xERA 3.67 P70 / xwOBA .301 P70（27 BBE 低信心）。2025 P55 基底最穩（418 BBE）。但 2026 HH% 51.9% <P25 是比率紅旗。MIN 中上 W 支援。
 
 ### Dominic Canzone (SEA, LF/RF) — platoon 確認，待 BN 空位
 觸發：BN 有空位時撿來當 RHP matchup 武器
@@ -80,6 +72,12 @@
 - 策略確立：只在特定情境精準串流 1-2 次，不常態洗。詳見 CLAUDE.md 串流決策規則。
 
 ## 已結案
+
+### Grant Holmes (ATL, SP) — 被搶（自動偵測）
+- 2026-04-07：Yahoo ownership_type=team，從觀察中移除。
+
+### Taj Bradley (MIN, SP) — 被搶（自動偵測）
+- 2026-04-07：Yahoo ownership_type=team，從觀察中移除。
 
 ### Matthew Liberatore (STL, SP) — ✅ 已加入陣容
 - 04-06：[eval] drop Singer，add Liberatore。2026 Savant xERA 3.69 P70 / xwOBA .302 P65 / HH% 30.8% >P90（39 BBE 候選中最高信心）。兩場都穩（1ER/1ER），零爆炸。STL 開幕戰先發（#1 SP），29 GS/151 IP 工作量保障。K/9 3.27 極低是缺陷但本隊 K 為量的問題非靠單人解決，比率穩定優先。
