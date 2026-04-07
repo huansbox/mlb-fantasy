@@ -1398,9 +1398,57 @@ def save_summary(advice):
     print(f"Summary saved to {SUMMARY_FILE}", file=sys.stderr)
 
 
-def save_github_issue(today_str, data_summary, advice):
-    repo = "huansbox/mlb-fantasy"
-    title = f"[Weekly Scan] {today_str}"
+# ── Two-pass Claude helpers ──
+
+
+def _call_claude(prompt_path, data, timeout=180):
+    """Call claude -p with prompt + data. Returns advice string or raises."""
+    with open(prompt_path, encoding="utf-8") as f:
+        prompt = f.read()
+    full_prompt = f"{prompt}\n\n---\n\n{data}"
+    result = subprocess.run(
+        ["claude", "-p", full_prompt],
+        capture_output=True, text=True, encoding="utf-8", timeout=timeout,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"claude -p failed: {result.stderr[:500]}")
+    return result.stdout.strip()
+
+
+def _notify(env, args, message):
+    """Send Telegram notification (unless --no-send)."""
+    print(message, file=sys.stderr)
+    if not args.no_send:
+        send_telegram(message, env)
+
+
+def _handle_error(step_name, error, env, args):
+    """Handle pipeline error: print, Telegram notify, optionally create error Issue."""
+    msg = f"[FA Scan] {step_name} failed: {error}"
+    print(msg, file=sys.stderr)
+    if not args.no_send:
+        send_telegram(msg, env)
+        try:
+            subprocess.run(
+                ["gh", "issue", "create", "--repo", "huansbox/mlb-fantasy",
+                 "--title", f"[FA Scan Error] {step_name}",
+                 "--body", f"```\n{msg}\n```",
+                 "--label", "fa-scan-error"],
+                capture_output=True, text=True, encoding="utf-8", timeout=30,
+            )
+        except Exception:
+            pass
+
+
+def _publish(today_str, scan_type, advice, raw_data, env, args):
+    """Publish results: Telegram + GitHub Issue."""
+    if args.no_send:
+        print(advice)
+        return
+
+    send_telegram(advice, env)
+
+    title = f"[FA Scan {scan_type}] {today_str}"
     body = f"""## Analysis
 
 {advice}
@@ -1411,140 +1459,364 @@ def save_github_issue(today_str, data_summary, advice):
 <summary>Raw Data</summary>
 
 ```
-{data_summary}
+{raw_data}
 ```
 
 </details>
 """
     try:
-        result = subprocess.run(
-            ["gh", "issue", "create", "--repo", repo,
+        subprocess.run(
+            ["gh", "issue", "create", "--repo", "huansbox/mlb-fantasy",
              "--title", title, "--body", body,
-             "--label", "waiver-scan"],
+             "--label", "fa-scan"],
             capture_output=True, text=True, encoding="utf-8", timeout=30,
         )
-        if result.returncode == 0:
-            print(f"Issue created: {result.stdout.strip()}", file=sys.stderr)
-        else:
-            print(f"GitHub Issue error: {result.stderr}", file=sys.stderr)
     except Exception as e:
-        print(f"GitHub Issue failed: {e}", file=sys.stderr)
+        print(f"GitHub Issue error: {e}", file=sys.stderr)
+
+
+def _fallback_weakest(config, savant_2026, group_type):
+    """Fallback when Pass 1 Claude fails: return bottom N by code sorting."""
+    if group_type == "batter":
+        players = config.get("batters", [])
+        n = 4
+    else:
+        players = [p for p in config.get("pitchers", []) if pitcher_type(p) == "SP"]
+        n = 3
+
+    scored = []
+    for p in players:
+        prior = p.get("prior_stats", {})
+        if group_type == "batter":
+            val = prior.get("xwoba", 0)
+        else:
+            val = prior.get("xera", 99)
+        scored.append((p["name"], val))
+
+    if group_type == "batter":
+        scored.sort(key=lambda x: x[1])  # lowest xwOBA first
+    else:
+        scored.sort(key=lambda x: x[1], reverse=True)  # highest xERA first
+
+    return [name for name, _ in scored[:n]]
+
+
+def _build_pass2_data(group_type, weakest_names, fa_candidates, watch_candidates,
+                      changes, ref_1d, ref_3d, config):
+    """Build data string for Pass 2 Claude prompt."""
+    lines = []
+
+    # Embed evaluation framework
+    framework = _extract_eval_framework()
+    if framework:
+        lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
+
+    # My weakest players
+    label = "打者" if group_type == "batter" else "SP"
+    lines.append(f"--- 我方最弱{label}（Pass 1 篩出）---")
+    all_players = config.get("batters" if group_type == "batter" else "pitchers", [])
+    for name in weakest_names:
+        p = next((x for x in all_players if x["name"] == name), None)
+        if p:
+            prior = p.get("prior_stats", {})
+            lines.append(f"  {name}({p['team']}) — prior: {json.dumps(prior, ensure_ascii=False)}")
+
+    # FA candidates
+    fa_label = f"FA {label}候選"
+    if fa_candidates:
+        lines.append(f"\n--- {fa_label} ({len(fa_candidates)} 人) ---")
+        for p in fa_candidates:
+            if group_type == "batter":
+                lines.append(_format_fa_batter(p))
+            else:
+                lines.append(_format_fa_pitcher(p))
+    else:
+        lines.append(f"\n--- {fa_label}: 無 ---")
+
+    # Watch candidates
+    if watch_candidates:
+        lines.append(f"\n--- waiver-log 觀察中{label} ({len(watch_candidates)} 人) ---")
+        for p in watch_candidates:
+            if group_type == "batter":
+                lines.append(_format_fa_batter(p))
+            else:
+                lines.append(_format_fa_pitcher(p))
+
+    # %owned risers (filtered to this group)
+    group_changes = [c for c in changes
+                     if _classify_fa_type(c.get("position", "")) == group_type
+                     and c.get("d3") is not None and c["d3"] > 0]
+    group_changes.sort(key=lambda x: x["d3"], reverse=True)
+    if group_changes:
+        lines.append(f"\n--- %owned 升幅 ({label}) ---")
+        for c in group_changes[:10]:
+            lines.append(f"  {c['name']:20} 3d:+{c['d3']:>3} {c['pct']:>3}%  {c['position']}")
+
+    # waiver-log
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    if os.path.exists(waiver_log_path):
+        with open(waiver_log_path, encoding="utf-8") as f:
+            lines.append(f"\n--- waiver-log.md ---\n{f.read()}")
+
+    return "\n".join(lines)
+
+
+def _build_rp_data(enriched_rps, my_rps_str, config):
+    """Build data string for RP mode Claude prompt."""
+    lines = []
+
+    framework = _extract_eval_framework()
+    if framework:
+        lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
+
+    lines.append(f"--- 我方 RP ---\n{my_rps_str}\n")
+
+    if enriched_rps:
+        lines.append(f"--- FA RP 候選 ({len(enriched_rps)} 人) ---")
+        for p in enriched_rps:
+            lines.append(_format_fa_pitcher(p))
+    else:
+        lines.append("--- FA RP 候選: 無 ---")
+
+    return "\n".join(lines)
+
+
+# ── Mode implementations ──
+
+
+def _run_snapshot_only(access_token, config, today_str, env):
+    """Save %owned snapshot + cleanup rostered watchlist."""
+    print(f"[FA Scan] Snapshot-only {today_str}...", file=sys.stderr)
+    snapshot = collect_fa_snapshot(access_token, config, queries=SCAN_QUERIES)
+    history = load_fa_history()
+    history[today_str] = {
+        name: {"pct": info["pct"], "team": info["team"], "position": info["position"]}
+        for name, info in snapshot.items()
+    }
+    sorted_dates = sorted(history.keys())
+    if len(sorted_dates) > 14:
+        for old_date in sorted_dates[:-14]:
+            del history[old_date]
+    save_fa_history(history)
+    print(f"  Snapshot saved ({len(snapshot)} players)", file=sys.stderr)
+
+    # Auto-cleanup rostered watchlist
+    cleanup_rostered_watchlist(access_token, config, today_str, env)
+    print("[FA Scan] Snapshot-only done.", file=sys.stderr)
+
+
+def _run_rp_scan(access_token, config, today_str, env, args):
+    """RP scan — weekly mode, single Claude call."""
+    print(f"[FA Scan] RP scan {today_str}...", file=sys.stderr)
+
+    try:
+        # Layer 1: Yahoo RP queries
+        snapshot = collect_fa_snapshot(access_token, config, queries=RP_QUERIES)
+
+        # Add %owned risers (7d for RP)
+        history = load_fa_history()
+        rp_risers = collect_owned_risers(history, today_str, position_filter="rp", top_n=10, days=7)
+        for r in rp_risers:
+            if r["name"] not in snapshot:
+                snapshot[r["name"]] = {"pct": r["pct"], "team": r["team"],
+                                       "position": r["position"], "stats": {}}
+
+        # Layer 2: Savant quality filter
+        savant_2026 = download_savant_csvs(2026)
+        filtered = filter_by_savant(snapshot, savant_2026)
+        rp_candidates = [p for p in filtered if p["fa_type"] == "rp"]
+
+        if not rp_candidates and not args.dry_run:
+            _notify(env, args, "[FA Scan RP] 無 RP 候選通過品質門檻")
+            return
+
+        if args.dry_run:
+            print(f"RP candidates: {len(rp_candidates)}")
+            for p in rp_candidates:
+                print(f"  {p['name']} {p['team']}")
+            return
+
+        # Layer 3: Enrich
+        enriched = enrich_layer3(rp_candidates, savant_2026, config)
+
+        # Build data + call Claude (single pass for RP)
+        my_rps = build_roster_for_pass1(config, savant_2026, player_type="rp")
+        data = _build_rp_data(enriched, my_rps, config)
+
+        prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_rp.txt")
+        advice = _call_claude(prompt_path, data)
+
+        _publish(today_str, "RP", advice, data, env, args)
+
+    except Exception as e:
+        _handle_error("RP scan", e, env, args)
+
+
+def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
+                   changes, ref_1d, ref_3d, today_str, env, args):
+    """Process one group (batter or SP): Pass 1 + Pass 2."""
+    label = "打者" if group_type == "batter" else "SP"
+    try:
+        # Filter to this group
+        fa_candidates = [p for p in enriched if p["fa_type"] == group_type]
+        watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
+
+        # Pass 1: pick weakest from roster
+        print(f"  Pass 1 ({label}): picking weakest...", file=sys.stderr)
+        roster_data = build_roster_for_pass1(config, savant_2026, player_type=group_type)
+        prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_pass1.txt")
+        pass1_result = _call_claude(prompt_path, roster_data)
+
+        # Parse Pass 1 output (JSON)
+        try:
+            # Extract JSON from potential markdown code blocks
+            json_str = pass1_result
+            if "```" in json_str:
+                json_str = json_str.split("```json")[-1].split("```")[0] if "```json" in json_str else json_str.split("```")[1].split("```")[0]
+            pass1_json = json.loads(json_str.strip())
+            weakest_names = [w["name"] for w in pass1_json.get("weakest", [])]
+        except (json.JSONDecodeError, KeyError, IndexError):
+            # Fallback: use code-sorted bottom N
+            print(f"  Pass 1 ({label}): JSON parse failed, using code fallback", file=sys.stderr)
+            weakest_names = _fallback_weakest(config, savant_2026, group_type)
+
+        if not fa_candidates and not watch_candidates:
+            _notify(env, args, f"[FA Scan {label}] 無候選通過品質門檻，waiver-log 無 watch")
+            return
+
+        # Pass 2: compare
+        print(f"  Pass 2 ({label}): comparing...", file=sys.stderr)
+        prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
+        prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
+
+        data = _build_pass2_data(
+            group_type, weakest_names, fa_candidates, watch_candidates,
+            changes, ref_1d, ref_3d, config,
+        )
+        advice = _call_claude(prompt_path, data)
+
+        _publish(today_str, label, advice, data, env, args)
+
+    except Exception as e:
+        _handle_error(f"{label} scan", e, env, args)
+
+
+def _run_daily_scan(access_token, config, today_str, env, args):
+    """Daily scan: Batter + SP with two-pass Claude architecture."""
+    print(f"[FA Scan] Daily scan {today_str}...", file=sys.stderr)
+
+    # ── Shared: Layer 1 Yahoo snapshot + history ──
+    print("  Layer 1: Yahoo FA queries...", file=sys.stderr)
+    snapshot = collect_fa_snapshot(access_token, config, queries=SCAN_QUERIES)
+
+    history = load_fa_history()
+    changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
+    history[today_str] = {
+        name: {"pct": info["pct"], "team": info["team"], "position": info["position"]}
+        for name, info in snapshot.items()
+    }
+    sorted_dates = sorted(history.keys())
+    if len(sorted_dates) > 14:
+        for old_date in sorted_dates[:-14]:
+            del history[old_date]
+    save_fa_history(history)
+
+    # ── Shared: Savant CSVs ──
+    print("  Layer 2: Savant quality filter...", file=sys.stderr)
+    savant_2026 = download_savant_csvs(2026)
+
+    # ── Shared: waiver-log watch players ──
+    watchlist = parse_waiver_log_watchlist()
+    watchlist = _resolve_watch_mlb_ids(watchlist, savant_2026)
+
+    # Remove watch players from snapshot to avoid duplication
+    watch_names = {w["name"] for w in watchlist}
+    snapshot_no_watch = {k: v for k, v in snapshot.items() if k not in watch_names}
+
+    # ── Layer 2: filter ──
+    filtered = filter_by_savant(snapshot_no_watch, savant_2026)
+
+    # Add %owned risers (3d) that aren't already in filtered or watch
+    existing_names = {p["name"] for p in filtered} | watch_names
+    for pt, top_n in [("batter", 20), ("sp", 20)]:
+        risers = collect_owned_risers(history, today_str, position_filter=pt, top_n=top_n, days=3)
+        for r in risers:
+            if r["name"] not in existing_names:
+                snapshot_no_watch[r["name"]] = {
+                    "pct": r["pct"], "team": r["team"],
+                    "position": r["position"], "stats": {},
+                }
+                extra = filter_by_savant({r["name"]: snapshot_no_watch[r["name"]]}, savant_2026)
+                filtered.extend(extra)
+                existing_names.add(r["name"])
+
+    if args.dry_run:
+        print(f"\n=== Layer 2 Results ({len(filtered)} passed) ===")
+        for p in filtered:
+            s = p.get("savant_2026") or {}
+            print(f"  {p['name']:22} {p['team']:5} {p['fa_type']:6}")
+        print(f"\nWatch list: {len(watchlist)} players")
+        return
+
+    # ── Layer 3: Enrich FA candidates ──
+    print("  Layer 3: Enriching FA candidates...", file=sys.stderr)
+    enriched = enrich_layer3(filtered, savant_2026, config)
+
+    # Enrich watch players (Layer 3 only)
+    print("  Layer 3: Enriching watch players...", file=sys.stderr)
+    watch_enriched = enrich_watch_players(watchlist, savant_2026, config)
+
+    # Attach %owned changes
+    changes_by_name = {c["name"]: c for c in changes}
+    for p in enriched + watch_enriched:
+        c = changes_by_name.get(p["name"], {})
+        p["d1"] = c.get("d1")
+        p["d3"] = c.get("d3")
+
+    # ── Process Batter ──
+    _process_group(
+        "batter", config, savant_2026, enriched, watch_enriched,
+        changes, ref_1d, ref_3d, today_str, env, args,
+    )
+
+    # ── Process SP ──
+    _process_group(
+        "sp", config, savant_2026, enriched, watch_enriched,
+        changes, ref_1d, ref_3d, today_str, env, args,
+    )
 
 
 # ── Main ──
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Weekly Deep Scan with Statcast")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Layer 1+2 only, print filtered results")
-    parser.add_argument("--no-send", action="store_true",
-                        help="Full pipeline but skip Telegram + GitHub Issue")
+    parser = argparse.ArgumentParser(description="FA Scan — unified FA market analysis")
+    parser.add_argument("--rp", action="store_true", help="RP scan mode (weekly, Monday)")
+    parser.add_argument("--snapshot-only", action="store_true", help="Only save %owned snapshot")
+    parser.add_argument("--cleanup", action="store_true", help="Clean rostered watchlist players")
+    parser.add_argument("--dry-run", action="store_true", help="Layer 1+2 only, skip Claude")
+    parser.add_argument("--no-send", action="store_true", help="Skip Telegram + GitHub Issue")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
     args = parser.parse_args()
 
     env = load_env()
+    access_token = refresh_token(env)
+    config = load_config()
+    today_str = args.date or datetime.now(TPE).strftime("%Y-%m-%d")
 
-    try:
-        access_token = refresh_token(env)
-        config = load_config()
-        today_str = args.date or datetime.now(TPE).strftime("%Y-%m-%d")
+    if args.snapshot_only:
+        _run_snapshot_only(access_token, config, today_str, env)
+        return
 
-        print(f"[Weekly Scan] {today_str}...", file=sys.stderr)
+    if args.cleanup:
+        cleanup_rostered_watchlist(access_token, config, today_str, env)
+        return
 
-        # ── Layer 1: Yahoo FA snapshot ──
-        print("  Layer 1: Yahoo FA queries...", file=sys.stderr)
-        snapshot = collect_fa_snapshot(access_token, config, queries=SCAN_QUERIES)
+    if args.rp:
+        _run_rp_scan(access_token, config, today_str, env, args)
+        return
 
-        history = load_fa_history()
-        changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
-        history[today_str] = {
-            name: {"pct": info["pct"], "team": info["team"], "position": info["position"]}
-            for name, info in snapshot.items()
-        }
-        sorted_dates = sorted(history.keys())
-        if len(sorted_dates) > 14:
-            for old_date in sorted_dates[:-14]:
-                del history[old_date]
-        save_fa_history(history)
-
-        # ── Layer 2: Savant 2026 quality filter ──
-        print("  Layer 2: Savant quality filter...", file=sys.stderr)
-        savant_2026 = download_savant_csvs(2026)
-        filtered = filter_by_savant(snapshot, savant_2026)
-
-        if args.dry_run:
-            print(f"\n=== Layer 2 Results ({len(filtered)} passed) ===\n")
-            for p in filtered:
-                s = p.get("savant_2026") or {}
-                xw = f"{s['xwoba']:.3f}" if s.get("xwoba") is not None else "—"
-                xe = f"{s['xera']:.2f}" if s.get("xera") is not None else "—"
-                print(f"  {p['name']:22} {p['team']:5} {p['fa_type']:6} "
-                      f"BBE={p['bbe']:>3}  xwOBA={xw:>6}  xERA={xe:>5}")
-            print(f"\n{build_roster_summary(config, savant_2026)}")
-            return
-
-        # ── Layer 3: Precise enrichment ──
-        print("  Layer 3: Precise data enrichment...", file=sys.stderr)
-        enriched = enrich_layer3(filtered, savant_2026, config)
-
-        # Attach %owned changes
-        changes_by_name = {c["name"]: c for c in changes}
-        for p in enriched:
-            c = changes_by_name.get(p["name"], {})
-            p["d1"] = c.get("d1")
-            p["d3"] = c.get("d3")
-
-        # Build data for Claude
-        roster_summary = build_roster_summary(config, savant_2026)
-        data_summary = build_weekly_data(
-            today_str, enriched, changes, ref_1d, ref_3d, roster_summary, config
-        )
-
-        # Call Claude
-        prompt_path = os.path.join(SCRIPT_DIR, "prompt_weekly_scan.txt")
-        with open(prompt_path, encoding="utf-8") as f:
-            prompt = f.read()
-        full_prompt = f"{prompt}\n\n---\n\n{data_summary}"
-        result = subprocess.run(
-            ["claude", "-p", full_prompt],
-            capture_output=True, text=True, encoding="utf-8", timeout=180,
-        )
-        if result.returncode != 0:
-            print(f"claude -p error: {result.stderr}", file=sys.stderr)
-            print("\n--- Raw data ---")
-            print(data_summary)
-            return
-        advice = result.stdout.strip()
-        print(advice)
-
-        save_summary(advice)
-
-        # Weekly review reminder
-        try:
-            from weekly_review import load_config as wr_load_config, get_fantasy_week
-            wr_config = wr_load_config()
-            today_et = datetime.now(ZoneInfo("America/New_York")).date()
-            _, _, wn = get_fantasy_week(today_et, wr_config)
-            advice += f"\n\n---\n Week {wn} 覆盤資料已備好，開 session 跑 /weekly-review"
-        except Exception as e:
-            print(f"Weekly review reminder failed (skipping): {e}", file=sys.stderr)
-
-        if args.no_send:
-            return
-
-        save_github_issue(today_str, data_summary, advice)
-
-        print("Sending to Telegram...", file=sys.stderr)
-        ok = send_telegram(advice, env)
-        print("Sent." if ok else "Failed.", file=sys.stderr)
-
-    except Exception as e:
-        print(f"Weekly Scan error: {e}", file=sys.stderr)
-        try:
-            send_telegram(f"Weekly Scan failed: {e}", env)
-        except Exception:
-            pass
+    _run_daily_scan(access_token, config, today_str, env, args)
 
 
 if __name__ == "__main__":
