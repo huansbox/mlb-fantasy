@@ -26,6 +26,13 @@ from yahoo_query import (
     send_telegram, YAHOO_STAT_MAP,
     pitcher_type,
 )
+from daily_advisor import (
+    fetch_batter_gamelog, fetch_pitcher_gamelog,
+    fetch_savant_statcast, fetch_savant_expected,
+    fetch_savant_for_pitchers,
+    pctile_tag,
+)
+from roster_stats import fetch_batter_full, fetch_pitcher_full
 
 ET = ZoneInfo("America/New_York")
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -443,6 +450,209 @@ def git_push(json_path, week_number, env=None):
         print(f"  {msg}", file=sys.stderr)
         if env:
             send_telegram(msg, env)
+
+
+# ── Roster Performance ──
+
+
+def _aggregate_batter_weekly(gamelog, week_start, week_end):
+    """Aggregate batter game log entries within a date range.
+
+    Returns dict with PA, R, HR, RBI, SB, BB, AVG, OPS or None if no games.
+    """
+    start_str = week_start.isoformat()
+    end_str = week_end.isoformat()
+    games = [g for g in gamelog if start_str <= g["date"] <= end_str]
+    if not games:
+        return None
+
+    pa = sum(g["pa"] for g in games)
+    ab = sum(g["ab"] for g in games)
+    h = sum(g["h"] for g in games)
+    r = sum(g["r"] for g in games)
+    hr = sum(g["hr"] for g in games)
+    rbi = sum(g["rbi"] for g in games)
+    sb = sum(g["sb"] for g in games)
+    bb = sum(g["bb"] for g in games)
+    doubles = sum(g["doubles"] for g in games)
+    triples = sum(g["triples"] for g in games)
+    hbp = sum(g["hbp"] for g in games)
+    sf = sum(g["sf"] for g in games)
+
+    avg = round(h / ab, 3) if ab > 0 else 0
+    # OBP = (H + BB + HBP) / (AB + BB + HBP + SF)
+    obp_denom = ab + bb + hbp + sf
+    obp = (h + bb + hbp) / obp_denom if obp_denom > 0 else 0
+    # SLG = TB / AB, TB = H + 2B + 2*3B + 3*HR
+    tb = h + doubles + 2 * triples + 3 * hr
+    slg = tb / ab if ab > 0 else 0
+    ops = round(obp + slg, 3)
+
+    return {
+        "games": len(games),
+        "pa": pa, "r": r, "hr": hr, "rbi": rbi,
+        "sb": sb, "bb": bb, "avg": avg, "ops": ops,
+    }
+
+
+def _aggregate_pitcher_weekly(gamelog, week_start, week_end):
+    """Aggregate pitcher game log entries within a date range.
+
+    Returns dict with starts, IP, W, K, ERA, WHIP, QS or None if no games.
+    """
+    start_str = week_start.isoformat()
+    end_str = week_end.isoformat()
+    games = [g for g in gamelog if start_str <= g["date"] <= end_str]
+    if not games:
+        return None
+
+    ip = sum(g["ip"] for g in games)
+    er = sum(g["er"] for g in games)
+    k = sum(g["k"] for g in games)
+    w = sum(g["w"] for g in games)
+    h = sum(g["h"] for g in games)
+    bb = sum(g["bb"] for g in games)
+    qs = sum(1 for g in games if g["ip"] >= 6.0 and g["er"] <= 3)
+
+    era = round(er * 9 / ip, 2) if ip > 0 else 0
+    whip = round((h + bb) / ip, 2) if ip > 0 else 0
+    return {
+        "starts": len(games),
+        "ip": round(ip, 1), "w": w, "k": k, "qs": qs,
+        "era": era, "whip": whip,
+    }
+
+
+def compute_roster_performance(config, prev_week_start, prev_week_end, season):
+    """Compute per-player performance for the previous week + season-to-date.
+
+    Returns dict: {"batters": [...], "pitchers": [...]}
+    """
+    batters_cfg = config.get("batters", [])
+    pitchers_cfg = config.get("pitchers", [])
+
+    # Collect all mlb_ids for batch Savant download
+    batter_ids = [b["mlb_id"] for b in batters_cfg if b.get("mlb_id")]
+    pitcher_ids = [p["mlb_id"] for p in pitchers_cfg
+                   if p.get("mlb_id") and pitcher_type(p) == "SP"]
+
+    # Savant batch download (4 CSVs total — 2 batter, 2 pitcher)
+    print("  Fetching Savant CSV for roster...", file=sys.stderr)
+    bat_sc = fetch_savant_statcast(season, batter_ids, player_type="batter")
+    bat_ex = fetch_savant_expected(season, batter_ids, player_type="batter")
+    pit_savant = fetch_savant_for_pitchers(pitcher_ids, season)
+
+    # ── Batters ──
+    batter_results = []
+    for b in batters_cfg:
+        mid = b.get("mlb_id")
+        if not mid:
+            continue
+
+        print(f"    Batter: {b['name']}...", file=sys.stderr)
+        # Weekly game log
+        try:
+            gamelog = fetch_batter_gamelog(mid, season)
+        except Exception as e:
+            print(f"      gamelog error: {e}", file=sys.stderr)
+            gamelog = []
+        weekly = _aggregate_batter_weekly(gamelog, prev_week_start, prev_week_end)
+
+        # Season totals (MLB API)
+        season_mlb = fetch_batter_full(mid, season)
+
+        # Savant data
+        sc = bat_sc.get(mid, {})
+        ex = bat_ex.get(mid, {})
+        xwoba = ex.get("xwoba")
+        hh_pct = sc.get("hh_pct")
+        barrel_pct = sc.get("barrel_pct")
+        bbe = sc.get("bbe", 0)
+        bb_pct = season_mlb.get("bb_pct") if season_mlb else None
+
+        pctiles = {}
+        if xwoba:
+            pctiles["xwoba"] = pctile_tag(xwoba, "xwoba")
+        if bb_pct is not None:
+            pctiles["bb_pct"] = pctile_tag(bb_pct, "bb_pct")
+        if barrel_pct:
+            pctiles["barrel_pct"] = pctile_tag(barrel_pct, "barrel_pct")
+        if hh_pct:
+            pctiles["hh_pct"] = pctile_tag(hh_pct, "hh_pct")
+
+        entry = {
+            "name": b["name"],
+            "team": b["team"],
+            "positions": b.get("positions", []),
+            "selected_pos": b.get("selected_pos", ""),
+            "weekly": weekly,
+            "season": {
+                **(season_mlb or {}),
+                "xwoba": xwoba,
+                "hh_pct": hh_pct,
+                "barrel_pct": barrel_pct,
+                "bbe": bbe,
+            },
+            "pctiles": pctiles,
+        }
+        batter_results.append(entry)
+        time.sleep(0.2)
+
+    # ── SP only (CLAUDE.md: RP 只有 2 人不評估) ──
+    pitcher_results = []
+    for p in pitchers_cfg:
+        mid = p.get("mlb_id")
+        if not mid or pitcher_type(p) != "SP":
+            continue
+
+        print(f"    SP: {p['name']}...", file=sys.stderr)
+        # Weekly game log
+        try:
+            gamelog = fetch_pitcher_gamelog(mid, season)
+        except Exception as e:
+            print(f"      gamelog error: {e}", file=sys.stderr)
+            gamelog = []
+        weekly = _aggregate_pitcher_weekly(gamelog, prev_week_start, prev_week_end)
+
+        # Season totals (MLB API)
+        season_mlb = fetch_pitcher_full(mid, season)
+
+        # Savant data — fetch_savant_for_pitchers returns 0 (not None) as default,
+        # so use `or None` to normalize falsy-zero to None for pctile guard
+        sv = (pit_savant.get(mid) or {}).get("current") or {}
+        xera = sv.get("xera") or None
+        xwoba_a = sv.get("xwoba") or None
+        hh_pct_a = sv.get("hh_pct") or None
+        barrel_pct_a = sv.get("barrel_pct") or None
+        bbe = sv.get("bbe", 0)
+
+        pctiles = {}
+        if xera is not None:
+            pctiles["xera"] = pctile_tag(xera, "xera", "pitcher")
+        if xwoba_a is not None:
+            pctiles["xwoba_allowed"] = pctile_tag(xwoba_a, "xwoba", "pitcher")
+        if hh_pct_a is not None:
+            pctiles["hh_pct_allowed"] = pctile_tag(hh_pct_a, "hh_pct", "pitcher")
+
+        entry = {
+            "name": p["name"],
+            "team": p["team"],
+            "selected_pos": p.get("selected_pos", ""),
+            "weekly": weekly,
+            "season": {
+                **(season_mlb or {}),
+                "xera": xera,
+                "xwoba_allowed": xwoba_a,
+                "hh_pct_allowed": hh_pct_a,
+                "barrel_pct_allowed": barrel_pct_a,
+                "bbe": bbe,
+            },
+            "pctiles": pctiles,
+        }
+        pitcher_results.append(entry)
+        time.sleep(0.2)
+
+    return {"batters": batter_results, "pitchers": pitcher_results}
 
 
 # ── Main ──
