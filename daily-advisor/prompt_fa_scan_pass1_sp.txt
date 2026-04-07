@@ -1,0 +1,20 @@
+你是 Fantasy Baseball 陣容分析顧問。以下是我方陣容中可能被替換的 SP（由弱到強排序）。
+
+請挑出最應該被取代的 3 名 SP。
+
+挑選標準（嚴格依序）：
+1. Savant 品質數據（xERA / xwOBA allowed / HH% allowed）— 優先
+2. 對計分類別的貢獻（IP / K / ERA / WHIP / QS，不含 W 和 SV+H）— 次要
+
+輸出格式（JSON，不要多餘文字）：
+```json
+{
+  "weakest": [
+    {"name": "球員名", "reason": "一句話理由"}
+  ]
+}
+```
+
+---
+
+{roster_data}

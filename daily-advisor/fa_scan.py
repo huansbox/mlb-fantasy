@@ -1808,7 +1808,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         # Pass 1: pick weakest from roster
         print(f"  Pass 1 ({label}): picking weakest...", file=sys.stderr)
         roster_data = build_roster_for_pass1(config, savant_2026, player_type=group_type)
-        prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_pass1.txt")
+        pass1_prompt = f"prompt_fa_scan_pass1_{'batter' if group_type == 'batter' else 'sp'}.txt"
+        prompt_path = os.path.join(SCRIPT_DIR, pass1_prompt)
         pass1_result = _call_claude(prompt_path, roster_data)
 
         # Parse Pass 1 output (JSON)
