@@ -153,7 +153,7 @@ def calc_owned_changes(today_snapshot, history, today_str):
 
 
 def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
-    """Format top risers and fallers with reference date info."""
+    """Format top %owned risers with reference date info."""
     lines = []
 
     # (R11) data window hint
@@ -167,28 +167,16 @@ def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
         header += " | 3d (需累積 3 天以上)"
     lines.append(header)
 
-    with_d1 = [c for c in changes if c["d1"] is not None and c["d1"] != 0]
+    with_d1 = [c for c in changes if c["d1"] is not None and c["d1"] > 0]
 
     risers = sorted(with_d1, key=lambda x: x["d1"], reverse=True)[:top_n]
-    fallers = sorted(with_d1, key=lambda x: x["d1"])[:top_n]
 
     if risers:
         lines.append("\n升幅前 5:")
         lines.append(f"  {'':20} {'24h':>5} {'3d':>5} {'%own':>5}  位置")
         for c in risers:
-            d1 = f"+{c['d1']}" if c["d1"] > 0 else str(c["d1"])
+            d1 = f"+{c['d1']}"
             d3 = f"+{c['d3']}" if c["d3"] and c["d3"] > 0 else (str(c["d3"]) if c["d3"] is not None else "—")
-            wtag = f" [W {c['waiver_date']}]" if c.get("waiver_date") else ""
-            lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}{wtag}")
-
-    if fallers and fallers[0]["d1"] < 0:
-        lines.append("\n降幅前 5:")
-        lines.append(f"  {'':20} {'24h':>5} {'3d':>5} {'%own':>5}  位置")
-        for c in fallers:
-            if c["d1"] >= 0:
-                break
-            d1 = str(c["d1"])
-            d3 = str(c["d3"]) if c["d3"] is not None else "—"
             wtag = f" [W {c['waiver_date']}]" if c.get("waiver_date") else ""
             lines.append(f"  {c['name']:20} {d1:>5} {d3:>5} {c['pct']:>4}%  {c['position']}{wtag}")
 
