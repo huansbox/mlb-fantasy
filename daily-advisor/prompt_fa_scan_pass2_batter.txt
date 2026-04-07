@@ -35,7 +35,7 @@ UPDATE|球員名|本日觀察摘要
 - 判斷為「pass」→ 不輸出
 - 無任何行動 → 輸出空的 ```waiver-log``` 區塊
 
-控制在 2000 字元以內。Telegram Markdown 格式。
+Telegram Markdown 格式。
 
 ---
 
