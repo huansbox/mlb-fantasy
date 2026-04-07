@@ -158,9 +158,9 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 **輔助指標**：
 - Barrel% allowed（確認 HR 被打風險）
 - ERA（計分類別直接影響）
-- |xERA - ERA| 運氣標記（百分位判斷幅度，P70+ = 顯著）：
-  - ERA < xERA（運氣好）→ ERA 預期回升，表現會變差（例：ERA 1.84 / xERA 3.36）
-  - ERA > xERA（運氣差）→ ERA 預期回降，撿便宜訊號（例：ERA 5.00 / xERA 3.50）
+- xERA-ERA 運氣標記（正=運氣好小心，負=運氣差撿便宜，百分位判斷絕對值幅度，P70+ = 顯著）：
+  - +1.52：xERA 3.52 / ERA 2.00 → 運氣好，ERA 預期回升
+  - -1.50：xERA 3.50 / ERA 5.00 → 運氣差，撿便宜訊號
 
 **樣本量加權**：見通用規則「賽季數據加權」。另外上季 < 80 IP → 用預期值區間而非單點估計。
 
@@ -177,7 +177,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 **評估流程**：只有 2 人，不排最弱清單。FA 有無優於目前 2 位 RP → 有就換。
 
 **品質指標**（核心，2 項勝出 = 值得行動）：xERA、xwOBA allowed、HH% allowed（同 SP）
-**輔助**：Barrel% allowed、ERA、|xERA - ERA| 運氣標記（同 SP：ERA < xERA = 運氣好會回升，ERA > xERA = 運氣差可撿便宜）
+**輔助**：Barrel% allowed、ERA、xERA-ERA 運氣標記（同 SP：正=運氣好會回升，負=運氣差可撿便宜）
 **產量**：K/9、IP / Team_G
 **加分項**：SV+H — 品質小輸也值得換（RP 只佔 2 格，比率影響有限；但 SV+H 是獨立類別，多贏 1 類 = 多 1 勝，且多隊 punt SV+H → 門檻低）
 
@@ -201,7 +201,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 
 SP（品質指標：數值越低越好，P90 = 菁英 = 低值）：
 
-| 百分位 | xERA | xwOBA allowed | HH% allowed | Barrel% allowed | \|xERA-ERA\| |
+| 百分位 | xERA | xwOBA allowed | HH% allowed | Barrel% allowed | xERA-ERA |
 |--------|------|---------------|-------------|-----------------|-------------|
 | P25 | 5.62 | .361 | 44.2% | 10.1% | 0.28 |
 | P40 | 4.64 | .332 | 42.2% | 9.1% | 0.43 |
@@ -223,7 +223,7 @@ SP IP/GS 三級分類（分布集中，不適合百分位）：
 
 RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
-| 百分位 | xERA | xwOBA allowed | HH% allowed | Barrel% allowed | K/9 | IP/Team_G | \|xERA-ERA\| |
+| 百分位 | xERA | xwOBA allowed | HH% allowed | Barrel% allowed | K/9 | IP/Team_G | xERA-ERA |
 |--------|------|---------------|-------------|-----------------|-----|-----------|-------------|
 | P25 | 5.62 | .361 | 44.2% | 10.1% | 7.51 | 0.24 | 0.28 |
 | P40 | 4.64 | .332 | 42.2% | 9.1% | 8.24 | 0.29 | 0.43 |

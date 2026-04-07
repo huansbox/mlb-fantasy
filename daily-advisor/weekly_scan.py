@@ -325,12 +325,7 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type,
 
     xera = savant.get("xera") if savant else None
     if xera is not None and xera > 0 and era is not None:
-        diff = abs(xera - era)
-        d["era_diff"] = round(diff, 2)
-        if era < xera:
-            d["era_diff_dir"] = "運氣好↑"
-        elif era > xera:
-            d["era_diff_dir"] = "運氣差↓"
+        d["era_diff"] = round(xera - era, 2)
 
     if fa_type == "sp":
         # IP/GS from game log: only count IP in games where gamesStarted=1
@@ -676,8 +671,9 @@ def _format_fa_pitcher(p):
     if d26.get("era") is not None:
         aux.append(f"ERA {d26['era']:.2f}")
     if d26.get("era_diff") is not None:
-        tag = pctile_tag(d26["era_diff"], "era_diff", pt)
-        aux.append(f"{d26.get('era_diff_dir', '')} {d26['era_diff']:.2f} {tag}".strip())
+        tag = pctile_tag(abs(d26["era_diff"]), "era_diff", pt)
+        sign = "+" if d26["era_diff"] > 0 else ""
+        aux.append(f"運氣 {sign}{d26['era_diff']:.2f} {tag}")
     if aux:
         lines.append(f"    輔助: {' | '.join(aux)}")
 
