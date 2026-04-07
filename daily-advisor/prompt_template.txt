@@ -21,8 +21,11 @@
 3. 週初（Mon-Wed）可冒險，週末（Fri-Sun）優先鎖定領先類別
 
 對方 SP matchup 判斷標準：
-- HH% allowed > P50 (40.8%) 或 Barrel% allowed > P50 (8.5%) = 有利 matchup（容易打出硬接觸）
-- HH% allowed < P60 (39.4%) 且 Barrel% allowed < P60 (7.9%) = 不利 matchup（難打出硬接觸）
+- 數據中的百分位標籤是**投手視角**（P90 = 菁英投手 = 值低）。判斷 matchup 要反轉：
+  - 投手 <P25（差投手）= **打者有利**，投手 >P90（菁英投手）= **打者不利**
+- 具體門檻（看數值，不看百分位標籤）：
+  - HH% allowed > 40.8% 或 Barrel% allowed > 8.5% = 有利 matchup（投手壓不住硬接觸）
+  - HH% allowed < 39.4% 且 Barrel% allowed < 7.9% = 不利 matchup（投手能壓住硬接觸）
 - 兩項都看，Barrel% 更直接影響 HR
 
 輸出格式要求：
