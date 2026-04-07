@@ -37,11 +37,16 @@
 
 4. 計算準確率（correct / total）
 5. 顯示聯盟類別排名（league_category_ranks）
-6. 掃描日報品質（用 `gh issue view {number}` 讀取 daily_reports 中的 issues）：
+6. **球員表現分析**（從 `review.my_roster_performance`）：
+   - 打者：列出當週 PA/R/HR/RBI/SB/BB/AVG/OPS + 開季 xwOBA/BB%/Barrel% 百分位
+   - SP：列出當週 GS/IP/W/K/ERA/WHIP/QS + 開季 xERA/xwOBA allowed 百分位
+   - 標記「撐場者」（當週貢獻突出）和「拖累者」（當週表現遠低於開季水準或空白）
+   - 結合類別勝負：哪些球員直接影響了哪些類別的 W/L
+7. 掃描日報品質（用 `gh issue view {number}` 讀取 daily_reports 中的 issues）：
    - 速報 → 最終報推翻次數及類型
    - 「Lineup 未公布」出現比例
-7. **詢問用戶**：預測偏差的原因（逐項標記或整體說明）
-8. 寫入 `week-reviews.md` 的覆盤區塊
+8. **詢問用戶**：預測偏差的原因（逐項標記或整體說明）
+9. 寫入 `week-reviews.md` 的覆盤區塊
 
 ## Step 3（Phase 2）：預測本週
 
@@ -71,11 +76,26 @@
 6. 寫入 `week-reviews.md` 的預測區塊
 7. Commit JSON + week-reviews.md
 
+## Step 4（FA 行動決策）：整合 Scan 建議
+
+> 若 JSON 中無 `review.scan_summary`（scan 未跑或非本週），跳過此步驟。
+
+1. 讀 `review.scan_summary.analysis`（weekly_scan 的 Claude 分析摘要）
+2. 交叉比對：
+   - Phase 1 發現的拖累者 → 哪個位置需要補強？
+   - Phase 2 預測的弱項類別 → FA 候選能改善哪些？
+   - scan 推薦的候選 → 是否比現有最弱球員更好？
+3. 決策輸出（三選一）：
+   - **立即行動**：候選明確優於拖累者 → 列出 add/drop 建議 + FAAB 出價
+   - **深入評估**：候選有潛力但需確認 → 建議跑 `/player-eval {球員名}`
+   - **繼續觀察**：本週無明確升級 → 不動
+4. 將決策寫入 `week-reviews.md` 的 FA 行動區塊
+
 ## `week-reviews.md` 格式
 
 每週追加一段，格式如下：
 
-```markdown
+~~~markdown
 ## Week {N} vs {對手名}
 
 ### 預測（{日期} 產出）
@@ -94,11 +114,19 @@
 
 準確率：{correct}/{total}（{pct}%）
 
+#### 球員表現
+- 撐場者：{球員} — {原因}
+- 拖累者：{球員} — {原因}
+
 ### 日報品質
 - 速報→最終報推翻：{N} 次（{類型}）
 - Lineup 未公布比例：速報 {N}%
 - Prompt 調整建議：{建議或「無」}
 
+### FA 行動
+- {決策：立即行動/深入評估/繼續觀察}
+- {具體建議或「本週無明確升級」}
+
 ### 學到什麼
 - {insight}
-```
+~~~
