@@ -671,8 +671,9 @@ def _format_fa_pitcher(p):
     if d26.get("era") is not None:
         aux.append(f"ERA {d26['era']:.2f}")
     if d26.get("era_diff") is not None:
-        tag = pctile_tag(d26["era_diff"], "era_diff", pt)
-        aux.append(f"{d26.get('era_diff_dir', '')} {d26['era_diff']:.2f} {tag}".strip())
+        tag = pctile_tag(abs(d26["era_diff"]), "era_diff", pt)
+        sign = "+" if d26["era_diff"] > 0 else ""
+        aux.append(f"運氣 {sign}{d26['era_diff']:.2f} {tag}")
     if aux:
         lines.append(f"    輔助: {' | '.join(aux)}")
 
