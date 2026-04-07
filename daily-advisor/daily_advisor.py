@@ -276,6 +276,36 @@ def fetch_pitcher_gamelog(player_id, season):
             "ip": parse_ip(s["stat"].get("inningsPitched", 0)),
             "er": int(s["stat"].get("earnedRuns", 0)),
             "k": int(s["stat"].get("strikeOuts", 0)),
+            "w": int(s["stat"].get("wins", 0)),
+            "h": int(s["stat"].get("hits", 0)),
+            "bb": int(s["stat"].get("baseOnBalls", 0)),
+        }
+        for s in splits
+    ]
+
+
+def fetch_batter_gamelog(player_id, season):
+    """Fetch batting game log for the season."""
+    data = api_get(
+        f"/people/{player_id}/stats?stats=gameLog&season={season}&group=hitting"
+    )
+    splits = data.get("stats", [{}])[0].get("splits", [])
+    return [
+        {
+            "date": s["date"],
+            "opponent": s.get("opponent", {}).get("name", "?"),
+            "pa": int(s["stat"].get("plateAppearances", 0)),
+            "ab": int(s["stat"].get("atBats", 0)),
+            "r": int(s["stat"].get("runs", 0)),
+            "h": int(s["stat"].get("hits", 0)),
+            "hr": int(s["stat"].get("homeRuns", 0)),
+            "rbi": int(s["stat"].get("rbi", 0)),
+            "sb": int(s["stat"].get("stolenBases", 0)),
+            "bb": int(s["stat"].get("baseOnBalls", 0)),
+            "doubles": int(s["stat"].get("doubles", 0)),
+            "triples": int(s["stat"].get("triples", 0)),
+            "hbp": int(s["stat"].get("hitByPitch", 0)),
+            "sf": int(s["stat"].get("sacrificeFlies", 0)),
         }
         for s in splits
     ]
