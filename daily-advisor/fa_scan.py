@@ -1668,9 +1668,14 @@ def _fallback_weakest(config, savant_2026, group_type):
     return [name for name, _ in scored[:n]]
 
 
-def _build_pass2_data(group_type, weakest_names, fa_candidates, watch_candidates,
-                      changes, ref_1d, ref_3d, config):
-    """Build data string for Pass 2 Claude prompt."""
+def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
+                      watch_candidates, changes, ref_1d, ref_3d, config):
+    """Build data string for Pass 2 Claude prompt.
+
+    Args:
+        pass1_weakest: list of {name, reason} from Pass 1 Claude output
+        savant_2026: Savant CSV data for 2026 Savant lookup
+    """
     lines = []
 
     # Embed evaluation framework
@@ -1678,15 +1683,51 @@ def _build_pass2_data(group_type, weakest_names, fa_candidates, watch_candidates
     if framework:
         lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
 
-    # My weakest players
+    # My weakest players with 2026 Savant + prior + Pass 1 reason
     label = "打者" if group_type == "batter" else "SP"
+    pt = "batter" if group_type == "batter" else "sp"
     lines.append(f"--- 我方最弱{label}（Pass 1 篩出）---")
     all_players = config.get("batters" if group_type == "batter" else "pitchers", [])
-    for name in weakest_names:
+    for w in pass1_weakest:
+        name = w["name"]
+        reason = w.get("reason", "")
         p = next((x for x in all_players if x["name"] == name), None)
-        if p:
-            prior = p.get("prior_stats", {})
-            lines.append(f"  {name}({p['team']}) — prior: {json.dumps(prior, ensure_ascii=False)}")
+        if not p:
+            continue
+
+        parts = [f"  {name}({p['team']})"]
+
+        # 2026 Savant data
+        mlb_id = p.get("mlb_id")
+        if mlb_id:
+            s26 = _extract_savant_by_id(mlb_id, pt, savant_2026)
+            if s26:
+                if group_type == "batter":
+                    if s26.get("xwoba"):
+                        parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba')}")
+                    if s26.get("barrel_pct"):
+                        parts.append(f"Barrel% {s26['barrel_pct']:.1f}% {pctile_tag(s26['barrel_pct'], 'barrel_pct')}")
+                    if s26.get("hh_pct"):
+                        parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct')}")
+                else:
+                    if s26.get("xera"):
+                        parts.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', 'pitcher')}")
+                    if s26.get("xwoba"):
+                        parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'pitcher')}")
+                    if s26.get("hh_pct"):
+                        parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', 'pitcher')}")
+                parts.append(f"BBE {s26.get('bbe', 0)}")
+
+        # Prior year stats
+        prior = p.get("prior_stats", {})
+        if prior:
+            parts.append(f"2025: {json.dumps(prior, ensure_ascii=False)}")
+
+        # Pass 1 reason
+        if reason:
+            parts.append(f"[Pass 1: {reason}]")
+
+        lines.append(" | ".join(parts))
 
     # FA candidates
     fa_label = f"FA {label}候選"
@@ -1841,17 +1882,18 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         pass1_result = _call_claude(prompt_path, roster_data)
 
         # Parse Pass 1 output (JSON)
+        pass1_weakest = []  # list of {name, reason}
         try:
-            # Extract JSON from potential markdown code blocks
             json_str = pass1_result
             if "```" in json_str:
                 json_str = json_str.split("```json")[-1].split("```")[0] if "```json" in json_str else json_str.split("```")[1].split("```")[0]
             pass1_json = json.loads(json_str.strip())
-            weakest_names = [w["name"] for w in pass1_json.get("weakest", [])]
+            pass1_weakest = pass1_json.get("weakest", [])
+            weakest_names = [w["name"] for w in pass1_weakest]
         except (json.JSONDecodeError, KeyError, IndexError):
-            # Fallback: use code-sorted bottom N
             print(f"  Pass 1 ({label}): JSON parse failed, using code fallback", file=sys.stderr)
             weakest_names = _fallback_weakest(config, savant_2026, group_type)
+            pass1_weakest = [{"name": n, "reason": "code fallback"} for n in weakest_names]
 
         if not fa_candidates and not watch_candidates:
             _notify(env, args, f"[FA Scan {label}] 無候選通過品質門檻，waiver-log 無 watch")
@@ -1863,7 +1905,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
 
         data = _build_pass2_data(
-            group_type, weakest_names, fa_candidates, watch_candidates,
+            group_type, pass1_weakest, savant_2026, fa_candidates, watch_candidates,
             changes, ref_1d, ref_3d, config,
         )
         advice = _call_claude(prompt_path, data)
