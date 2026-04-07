@@ -144,6 +144,63 @@ def calc_owned_changes(today_snapshot, history, today_str):
     return changes, ref_1d, ref_3d
 
 
+def collect_owned_risers(history, today_str, position_filter=None, top_n=20, days=3):
+    """Get top %owned risers from fa_history over N days.
+
+    Args:
+        position_filter: 'batter', 'sp', 'rp', or None (all)
+        top_n: max results
+        days: lookback window (default 3d)
+
+    Returns list of {name, team, position, pct, d_rise} sorted by rise desc.
+    """
+    sorted_dates = sorted(history.keys())
+    if today_str not in sorted_dates:
+        return []
+
+    # Find reference date (>= days ago)
+    ref_date = None
+    for d in reversed(sorted_dates):
+        if d < today_str:
+            day_diff = (datetime.strptime(today_str, "%Y-%m-%d")
+                        - datetime.strptime(d, "%Y-%m-%d")).days
+            if day_diff >= days:
+                ref_date = d
+                break
+            if ref_date is None:
+                ref_date = d  # fallback: most recent before today
+
+    if not ref_date:
+        return []
+
+    today_data = history.get(today_str, {})
+    ref_data = history.get(ref_date, {})
+
+    risers = []
+    for name, info in today_data.items():
+        ref = ref_data.get(name)
+        if not ref:
+            continue
+        rise = info["pct"] - ref["pct"]
+        if rise <= 0:
+            continue
+        pos = info.get("position", "")
+        if position_filter:
+            fa_type = _classify_fa_type(pos)
+            if fa_type != position_filter:
+                continue
+        risers.append({
+            "name": name,
+            "team": info.get("team", ""),
+            "position": pos,
+            "pct": info["pct"],
+            "d_rise": rise,
+        })
+
+    risers.sort(key=lambda x: x["d_rise"], reverse=True)
+    return risers[:top_n]
+
+
 def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
     """Format top %owned risers with reference date info."""
     lines = []
@@ -348,13 +405,18 @@ def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
 
 # ── Layer 1: Yahoo FA queries ──
 
-WEEKLY_FA_QUERIES = [
+# Batter + SP queries (default daily mode)
+SCAN_QUERIES = [
     ("B-AR",  "status=A;position=B;sort=AR;count=50"),
+    ("B-BW",  "status=A;position=B;sort=AR;sort_type=biweekly;count=30"),
     ("SP-AR", "status=A;position=SP;sort=AR;count=30"),
-    ("RP-AR", "status=A;position=RP;sort=AR;count=25", "biweekly"),
-    ("B-LW",  "status=A;position=B;sort=AR;sort_type=lastweek;count=30"),
-    ("SP-LW", "status=A;position=SP;sort=AR;sort_type=lastweek;count=20"),
-    ("RP-BW", "status=A;position=RP;sort=AR;sort_type=biweekly;count=25", "biweekly"),
+    ("SP-BW", "status=A;position=SP;sort=AR;sort_type=biweekly;count=30"),
+]
+
+# RP queries (--rp weekly mode only)
+RP_QUERIES = [
+    ("RP-AR", "status=A;position=RP;sort=AR;count=10", "biweekly"),
+    ("RP-BW", "status=A;position=RP;sort=AR;sort_type=biweekly;count=10", "biweekly"),
 ]
 
 # ── Layer 2: Quality thresholds ──
@@ -1222,7 +1284,7 @@ def main():
 
         # ── Layer 1: Yahoo FA snapshot ──
         print("  Layer 1: Yahoo FA queries...", file=sys.stderr)
-        snapshot = collect_fa_snapshot(access_token, config, queries=WEEKLY_FA_QUERIES)
+        snapshot = collect_fa_snapshot(access_token, config, queries=SCAN_QUERIES)
 
         history = load_fa_history()
         changes, ref_1d, ref_3d = calc_owned_changes(snapshot, history, today_str)
