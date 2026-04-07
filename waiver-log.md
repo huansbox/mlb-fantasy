@@ -5,6 +5,7 @@
 ### Landen Roupp (SF, SP) [mlb_id:694738] — 觀察中
 觸發：連 2 場 ERA < 3.00 + 無爆炸 → 穩定性確認後 add
 - 04-06：[waiver-scan] 2026 xERA 2.14 >P90 / xwOBA .231 >P90 / HH% 29.6% >P90（27 BBE 低信心）。K 率菁英（14K/10.2IP）。但 G2 爆炸（4.2IP/5ER），穩定性存疑。2025 IP/GS 4.85 短局型。SF 弱隊。
+- 04-07：xERA 2.10 / xwOBA .231 / HH% 29.6% 三項 >P90 持續，運氣 -2.12 極度不運。27 BBE 低信心。觸發「連2場 ERA<3.00 + 無爆炸」未達成（G2 爆炸），等下場驗證（fa_scan）
 
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
@@ -32,6 +33,18 @@
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
 - 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
+
+### Reynaldo López (ATL, SP) [mlb_id:592694] — 觀察中
+觸發：BBE 達 50 維持 xERA < P70 (3.74) 或 %owned 突破 50% 前搶先行動 → 取代 Bassitt
+- 04-07：2026 xERA 3.59(P70-80) / xwOBA .300(P70-80) / HH% 33.3%(>P90)，33 BBE 中等信心。運氣 +1.95 極度好運。2025 僅 22 BBE 傷病年，2024 全明星驗證品質。ATL 強隊。38% owned 急升中，窗口有限（fa_scan）
+
+### Eduardo Rodriguez (AZ, SP) [mlb_id:593958] — 觀察中
+觸發：BBE 達 50 仍維持 xERA < P80 (3.43) + xwOBA < P80 (.289) → 取代 Bassitt
+- 04-07：2026 xERA 2.29(>P90) / xwOBA .241(>P90) / HH% 25.7%(>P90)，35 BBE 中等信心。IP/GS 6.0 深投型。運氣 +2.29 極度好運。2025 prior P45 平庸（489 BBE）。13% owned 無壓力（fa_scan）
+
+### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
+觸發：BBE 達 60 仍維持 xERA < P80 + HH% 改善至 < P40 (42.2%) → 取代 Bassitt
+- 04-07：2026 xERA 2.54(>P90) / xwOBA .254(>P90) / HH% 40.5%(P50-55)，37 BBE 中等信心。IP/GS 5.8 深投型。運氣 -0.55 接近真實。2025 prior P45 且 HH% 47.3% 為慢性問題。MIA 弱隊（fa_scan）
 
 ## 已結案
 
