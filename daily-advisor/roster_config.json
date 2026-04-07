@@ -19,7 +19,7 @@
         "pa": 523,
         "g": 123
       },
-      "selected_pos": "BN",
+      "selected_pos": "C",
       "status": ""
     },
     {
@@ -246,7 +246,7 @@
         "g": 142
       },
       "selected_pos": "RF",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Giancarlo Stanton",
@@ -291,7 +291,7 @@
         "pa": 390,
         "g": 119
       },
-      "selected_pos": "C",
+      "selected_pos": "BN",
       "status": ""
     }
   ],
@@ -385,29 +385,6 @@
       "status": ""
     },
     {
-      "name": "Robert Garcia",
-      "mlb_id": 676395,
-      "team": "TEX",
-      "positions": [
-        "RP"
-      ],
-      "yahoo_player_key": "469.p.60615",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 3.82,
-        "xwoba_allowed": 0.304,
-        "hh_pct_allowed": 34.3,
-        "barrel_pct_allowed": 7.9,
-        "bbe": 178,
-        "era": 2.95,
-        "k_per_9": 9.56,
-        "ip_per_team_g": 0.4,
-        "ip": 64.0
-      },
-      "selected_pos": "RP",
-      "status": ""
-    },
-    {
       "name": "Garrett Whitlock",
       "mlb_id": 676477,
       "team": "BOS",
@@ -428,28 +405,6 @@
         "ip": 72.0
       },
       "selected_pos": "NA",
-      "status": "NA"
-    },
-    {
-      "name": "Brayan Bello",
-      "mlb_id": 678394,
-      "team": "BOS",
-      "positions": [
-        "SP"
-      ],
-      "yahoo_player_key": "469.p.12330",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.48,
-        "xwoba_allowed": 0.327,
-        "hh_pct_allowed": 39.3,
-        "barrel_pct_allowed": 7.1,
-        "bbe": 504,
-        "era": 3.35,
-        "ip_per_gs": 6.0,
-        "ip": 166.7
-      },
-      "selected_pos": "P",
       "status": ""
     },
     {
@@ -539,6 +494,51 @@
       },
       "selected_pos": "P",
       "status": ""
+    },
+    {
+      "name": "Graham Ashcraft",
+      "mlb_id": 668933,
+      "yahoo_player_key": "469.p.12392",
+      "team": "CIN",
+      "positions": [
+        "RP"
+      ],
+      "selected_pos": "RP",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.46,
+        "xwoba_allowed": 0.29,
+        "hh_pct_allowed": 32.3,
+        "barrel_pct_allowed": 4.1,
+        "bbe": 195,
+        "era": 3.99,
+        "k_per_9": 8.82,
+        "ip_per_team_g": 0.4,
+        "ip": 65.3
+      }
+    },
+    {
+      "name": "Grant Holmes",
+      "mlb_id": 656550,
+      "yahoo_player_key": "469.p.10549",
+      "team": "ATL",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.55,
+        "xwoba_allowed": 0.329,
+        "hh_pct_allowed": 41.9,
+        "barrel_pct_allowed": 10.1,
+        "bbe": 308,
+        "era": 3.99,
+        "ip": 115.0,
+        "ip_per_gs": 5.4
+      }
     }
   ],
   "teams": {
