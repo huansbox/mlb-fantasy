@@ -1840,9 +1840,12 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         )
         advice = _call_claude(prompt_path, data)
 
-        _publish(today_str, label, advice, data, env, args)
+        # Strip waiver-log block for display (keep full version for waiver-log update)
+        advice_display = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL).strip()
 
-        # Auto-update waiver-log
+        _publish(today_str, label, advice_display, data, env, args)
+
+        # Auto-update waiver-log (uses full advice with waiver-log block)
         _update_waiver_log(advice, today_str, env)
 
     except Exception as e:
