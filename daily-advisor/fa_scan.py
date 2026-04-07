@@ -1508,6 +1508,9 @@ def _update_waiver_log(advice, today_str, env=None):
     with open(waiver_log_path, encoding="utf-8") as f:
         content = f.read()
 
+    # Short date format (MM-DD) for consistency with existing entries
+    short_date = today_str[5:]  # "2026-04-07" → "04-07"
+
     modified = False
     for line in block.split("\n"):
         line = line.strip()
@@ -1519,16 +1522,18 @@ def _update_waiver_log(advice, today_str, env=None):
             _, name, team, position, mlb_id, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
             # Check if player already exists in 觀察中
             if name in content:
-                # Treat as UPDATE instead
-                _insert_update_line(content, name, today_str, summary)
-                content = _insert_update_line(content, name, today_str, summary)
+                # Treat as UPDATE instead — but skip 條件 Pass players
+                if _is_condition_pass(content, name):
+                    print(f"  waiver-log: SKIP UPDATE {name} (條件 Pass)", file=sys.stderr)
+                    continue
+                content = _insert_update_line(content, name, short_date, summary)
                 modified = True
                 continue
             # Append new player block to end of 觀察中 section
             new_entry = (
-                f"\n### {name} ({team}, {position}) [mlb_id:{mlb_id}]\n"
+                f"\n### {name} ({team}, {position}) [mlb_id:{mlb_id}] — 觀察中\n"
                 f"觸發：{trigger}\n"
-                f"- {today_str}：{summary}（fa_scan）\n"
+                f"- {short_date}：{summary}（fa_scan）\n"
             )
             # Find insertion point: before ## 已結案 or end of 觀察中
             if "## 已結案" in content:
@@ -1541,7 +1546,11 @@ def _update_waiver_log(advice, today_str, env=None):
 
         elif parts[0] == "UPDATE" and len(parts) >= 3:
             _, name, summary = parts[0], parts[1], "|".join(parts[2:])
-            content = _insert_update_line(content, name, today_str, summary)
+            # Skip 條件 Pass players
+            if _is_condition_pass(content, name):
+                print(f"  waiver-log: SKIP UPDATE {name} (條件 Pass)", file=sys.stderr)
+                continue
+            content = _insert_update_line(content, name, short_date, summary)
             modified = True
             print(f"  waiver-log: UPDATE {name}", file=sys.stderr)
 
@@ -1590,7 +1599,19 @@ def _update_waiver_log(advice, today_str, env=None):
             send_telegram(msg, env)
 
 
-def _insert_update_line(content, player_name, today_str, summary):
+def _is_condition_pass(content, player_name):
+    """Check if a player's section in waiver-log is marked as 條件 Pass."""
+    pattern = re.compile(
+        rf"### {re.escape(player_name)} \([^)]+\)[^\n]*",
+        re.MULTILINE,
+    )
+    match = pattern.search(content)
+    if not match:
+        return False
+    return "條件 Pass" in match.group(0)
+
+
+def _insert_update_line(content, player_name, short_date, summary):
     """Insert a date line under an existing player's section in waiver-log."""
     # Find the player's ### header
     pattern = re.compile(
@@ -1609,8 +1630,12 @@ def _insert_update_line(content, player_name, today_str, summary):
     else:
         insert_pos = len(content)
 
-    new_line = f"- {today_str}：{summary}（fa_scan）\n"
-    content = content[:insert_pos] + new_line + content[insert_pos:]
+    # Ensure exactly one \n before new line (strip trailing blank lines)
+    before = content[:insert_pos].rstrip("\n") + "\n"
+    after = content[insert_pos:]
+
+    new_line = f"- {short_date}：{summary}（fa_scan）\n"
+    content = before + new_line + "\n" + after
     return content
 
 
