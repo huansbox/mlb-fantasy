@@ -1532,8 +1532,8 @@ def _update_waiver_log(advice, today_str, env=None):
             continue
         parts = line.split("|")
 
-        if parts[0] == "NEW" and len(parts) >= 7:
-            _, name, team, position, mlb_id, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
+        if parts[0] == "NEW" and len(parts) >= 6:
+            _, name, team, position, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], "|".join(parts[5:])
             # Check if player already exists in 觀察中
             if name in content:
                 # Treat as UPDATE instead — but skip 條件 Pass players
@@ -1543,9 +1543,12 @@ def _update_waiver_log(advice, today_str, env=None):
                 content = _insert_update_line(content, name, short_date, summary)
                 modified = True
                 continue
+            # Resolve mlb_id via API (don't trust Claude's ID)
+            mlb_id = search_mlb_id(name)
+            mlb_id_tag = f" [mlb_id:{mlb_id}]" if mlb_id else ""
             # Append new player block to end of 觀察中 section
             new_entry = (
-                f"\n### {name} ({team}, {position}) [mlb_id:{mlb_id}] — 觀察中\n"
+                f"\n### {name} ({team}, {position}){mlb_id_tag} — 觀察中\n"
                 f"觸發：{trigger}\n"
                 f"- {short_date}：{summary}（fa_scan）\n"
             )
