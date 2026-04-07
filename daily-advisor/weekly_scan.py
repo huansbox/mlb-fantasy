@@ -325,12 +325,7 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type,
 
     xera = savant.get("xera") if savant else None
     if xera is not None and xera > 0 and era is not None:
-        diff = abs(xera - era)
-        d["era_diff"] = round(diff, 2)
-        if era < xera:
-            d["era_diff_dir"] = "運氣好↑"
-        elif era > xera:
-            d["era_diff_dir"] = "運氣差↓"
+        d["era_diff"] = round(xera - era, 2)
 
     if fa_type == "sp":
         # IP/GS from game log: only count IP in games where gamesStarted=1
