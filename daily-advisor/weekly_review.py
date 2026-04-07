@@ -680,6 +680,7 @@ def main():
     week_start, week_end, week_number = get_fantasy_week(target_date, config)
     league_key = config["league"]["league_key"]
     team_name = config["league"]["team_name"]
+    season = config["league"]["season"]
 
     print(f"[Weekly Review] Week {week_number} ({week_start} ~ {week_end})", file=sys.stderr)
 
@@ -699,10 +700,16 @@ def main():
         print(f"  Fetching daily report metadata...", file=sys.stderr)
         daily_reports = fetch_daily_reports_metadata(prev_week)
 
+        # Previous week date range for game log filtering
+        prev_ws, prev_we, _ = get_fantasy_week(week_start - timedelta(days=1), config)
+        print(f"  Computing roster performance ({prev_ws} ~ {prev_we})...", file=sys.stderr)
+        roster_perf = compute_roster_performance(config, prev_ws, prev_we, season)
+
         review_data = {
             **(my_matchup or {}),
             "league_category_ranks": category_ranks,
             "daily_reports": daily_reports,
+            "my_roster_performance": roster_perf,
         }
     else:
         print("  Week 1 — no previous week to review", file=sys.stderr)
