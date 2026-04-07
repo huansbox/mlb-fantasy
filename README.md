@@ -30,6 +30,7 @@
 - `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
 - `daily-advisor/daily_advisor.py` — 每日速報/最終報產生器（MLB Stats API + Savant + claude -p → Telegram 推送）
+- `daily-advisor/fa_scan.py` — FA 市場分析（每日打者+SP 兩階段 Claude / 週一 RP / %owned 快照）
 
 ## 核心策略
 
@@ -43,12 +44,14 @@
 - `daily-advisor/` 需要 Python 3.10+（零外部依賴）+ Claude Code CLI + Telegram Bot token + Yahoo OAuth token
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron 排程：
-    - **Weekly Review** UTC 10:00 每週一（台灣 18:00）：覆盤資料準備
-    - **Weekly Scan** UTC 11:30 每週一（台灣 19:30）：FA 市場深度掃描
-    - **速報** UTC 14:15（台灣 22:15）：SP 排程 + 對戰分析 + Lineup 確認
+    - **FA Scan** UTC 04:30 每日（台灣 12:30）：打者+SP 兩階段 Claude 分析 + waiver-log 自動寫入
+    - **FA Scan --rp** UTC 04:45 每週一（台灣 12:45）：RP 獨立掃描
+    - **Weekly Review** UTC 05:00 每週一（台灣 13:00）：覆盤資料準備
+    - **Roster Sync** UTC 07:10 每日（台灣 15:10）：Yahoo 陣容同步
+    - **FA Snapshot** UTC 07:15 每日（台灣 15:15）：%owned 快照 + watchlist 清理
+    - **速報** UTC 14:15（台灣 22:15）：SP 排程 + matchup 分析 + Lineup 建議
     - **最終報** UTC 21:00（台灣 05:00）：lineup 確認 + 調整建議
-    - **FA Watch** UTC 23:00（台灣 07:00）：%owned 追蹤 + FA 快報
-  - 報告自動存檔為 GitHub Issue（戰報 label: `week-N`，FA 掃描 label: `waiver-scan`）
+  - 報告自動存檔為 GitHub Issue（戰報 label: `week-N`，FA 掃描 label: `fa-scan`）
   - 更新部署：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && git pull'`
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行
