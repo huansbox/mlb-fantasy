@@ -292,6 +292,11 @@ CLAUDE.md（策略大腦 + 評估框架唯一定義）
   ├─ 被讀取：所有 skill（/player-eval, /waiver-scan, /weekly-review）
   └─ 被更新：策略調整時手動改（唯一來源，skills 引用不複製）
 
+daily_advisor.py（每日戰報）
+  ├─ 速報（TW 22:15）：隔日 lineup 建議 + H2H 態勢 + SP matchup
+  ├─ 最終報（TW 05:00，--morning）：確認 lineup + 比率更新
+  └─ 輸出：Telegram 推送 + GitHub Issue 存檔
+
 fa_scan.py（FA 市場分析唯一入口）
   ├─ 每日：Batter + SP 兩階段 Claude（Pass 1 挑最弱 + Pass 2 比較）
   ├─ 週一：--rp 模式（RP 獨立掃描）
@@ -318,6 +323,7 @@ waiver-log.md（FA 追蹤唯一來源）
 
 | 文件 | 用途 |
 |------|------|
+| `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP / 週一 RP / snapshot-only） |
 | `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據 + Yahoo 格位 + MLB 狀態） |
 | `waiver-log.md` | FA 觀察追蹤（觀察中 / 條件 Pass / 已結案） |
