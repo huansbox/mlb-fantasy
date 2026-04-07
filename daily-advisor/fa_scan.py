@@ -886,25 +886,31 @@ def build_roster_for_pass1(config, savant_2026, player_type="batter"):
 
     Returns formatted string with bottom N players sorted by quality.
     """
-    # Exclude IL/IL+/NA players — they can't be dropped
-    def _is_active(p):
+    # Exclude IL/IL+/NA and can't-cut players — they can't be dropped
+    cant_cut = {n.lower() for n in config.get("league", {}).get("cant_cut", [])}
+
+    def _is_replaceable(p):
         sp = p.get("selected_pos", "")
-        return sp not in ("IL", "IL+", "NA")
+        if sp in ("IL", "IL+", "NA"):
+            return False
+        if p.get("name", "").lower() in cant_cut:
+            return False
+        return True
 
     if player_type == "batter":
-        players = [p for p in config.get("batters", []) if _is_active(p)]
+        players = [p for p in config.get("batters", []) if _is_replaceable(p)]
         hide_top = 5
         sort_key = "xwoba"
         higher_better = True
     elif player_type == "rp":
         players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "RP" and _is_active(p)]
+                   if pitcher_type(p) == "RP" and _is_replaceable(p)]
         hide_top = 0  # show all RP (only 2)
         sort_key = "xera"
         higher_better = False
     else:
         players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "SP" and _is_active(p)]
+                   if pitcher_type(p) == "SP" and _is_replaceable(p)]
         hide_top = 3
         sort_key = "xera"
         higher_better = False

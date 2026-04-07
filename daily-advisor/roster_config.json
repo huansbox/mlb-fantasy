@@ -581,6 +581,7 @@
     "season": 2026,
     "league_key": "469.l.105457",
     "team_name": "99 940",
-    "faab_remaining": 100
+    "faab_remaining": 100,
+    "cant_cut": ["Tarik Skubal", "Jazz Chisholm Jr."]
   }
 }
