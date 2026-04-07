@@ -325,6 +325,7 @@ waiver-log.md（FA 追蹤唯一來源）
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
+| `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 
 ## 待辦
 
