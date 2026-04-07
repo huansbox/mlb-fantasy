@@ -233,11 +233,13 @@ def format_change_rankings(changes, ref_1d, ref_3d, top_n=5):
 
 # ── Waiver-log parsing ──
 
-_WAIVER_PLAYER_RE = re.compile(r"^### (.+?) \((\w{2,3}), (.+?)\)")
+_WAIVER_PLAYER_RE = re.compile(
+    r"### (.+?) \((\w{2,3}),\s*(.+?)(?:\)\s*\[mlb_id:(\d+)\]|\))"
+)
 
 
 def parse_waiver_log_watchlist():
-    """Parse waiver-log.md '觀察中' section for player names + team + position."""
+    """Parse waiver-log.md '觀察中' section for player names + team + position + mlb_id."""
     waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
     if not os.path.exists(waiver_log_path):
         return []
@@ -256,12 +258,94 @@ def parse_waiver_log_watchlist():
                 continue
             m = _WAIVER_PLAYER_RE.match(line)
             if m:
-                players.append({
+                entry = {
                     "name": m.group(1).strip(),
                     "team": m.group(2),
                     "position": m.group(3).split(")")[0].strip(),
-                })
+                }
+                if m.group(4):
+                    entry["mlb_id"] = int(m.group(4))
+                players.append(entry)
     return players
+
+
+def _resolve_watch_mlb_ids(watchlist, savant_csvs):
+    """Resolve mlb_id for watchlist players that don't have one.
+
+    Uses Savant CSV name matching first, then MLB API search as fallback.
+    """
+    for w in watchlist:
+        if w.get("mlb_id"):
+            continue
+        # Try Savant CSV name match
+        name_norm = _normalize(w["name"])
+        for csv_key in ("batter_sc", "batter_ex", "pitcher_sc", "pitcher_ex"):
+            name_idx, id_idx = savant_csvs.get(csv_key, ({}, {}))
+            if name_norm in name_idx:
+                w["mlb_id"] = name_idx[name_norm]
+                break
+        if not w.get("mlb_id"):
+            # Fallback: MLB API search
+            w["mlb_id"] = search_mlb_id(w["name"])
+    return [w for w in watchlist if w.get("mlb_id")]
+
+
+# Module-level cache for Savant CSVs to avoid duplicate downloads
+_savant_csv_cache = {}
+
+
+def enrich_watch_players(watchlist, savant_2026, config):
+    """Enrich waiver-log watch players — skip Layer 1-2, direct to Layer 3.
+
+    Returns list in same format as enrich_layer3 output.
+    """
+    if not watchlist:
+        return []
+
+    standings = _fetch_team_games()
+    enriched = []
+
+    # Cache 2025 Savant CSVs at module level
+    if 2025 not in _savant_csv_cache:
+        _savant_csv_cache[2025] = download_savant_csvs(2025)
+    savant_2025_csvs = _savant_csv_cache[2025]
+
+    for w in watchlist:
+        mlb_id = w["mlb_id"]
+        fa_type = _classify_fa_type(w["position"])
+        group = "hitting" if fa_type == "batter" else "pitching"
+
+        p = {
+            "name": w["name"],
+            "team": w["team"],
+            "position": w["position"],
+            "mlb_id": mlb_id,
+            "fa_type": fa_type,
+            "pct": w.get("pct", 0),
+            "source": "watch",
+        }
+
+        # Layer 3 enrichment (same logic as enrich_layer3)
+        p["savant_2026"] = _extract_savant_by_id(mlb_id, fa_type, savant_2026)
+        p["mlb_2026"] = fetch_mlb_season_stats(mlb_id, 2026, group)
+
+        # 2025 prior (cached)
+        p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025_csvs)
+        p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+
+        # Derived metrics
+        s26 = p.get("savant_2026")
+        p["derived_2026"] = (
+            _compute_derived_batter(p["mlb_2026"], standings, w["team"], 2026)
+            if fa_type == "batter" else
+            _compute_derived_pitcher(s26, p["mlb_2026"], standings, w["team"], 2026, fa_type,
+                                     mlb_id=mlb_id)
+        )
+
+        enriched.append(p)
+        time.sleep(0.2)
+
+    return enriched
 
 
 # ── Waiver-log auto-cleanup ──
