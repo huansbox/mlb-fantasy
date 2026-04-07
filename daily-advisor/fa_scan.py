@@ -342,6 +342,9 @@ def enrich_watch_players(watchlist, savant_2026, config):
                                      mlb_id=mlb_id)
         )
 
+        # Top-level bbe for _format_fa_batter/_format_fa_pitcher
+        p["bbe"] = s26.get("bbe", 0) if s26 else 0
+
         enriched.append(p)
         time.sleep(0.2)
 
