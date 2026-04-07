@@ -9,6 +9,7 @@
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
+- 04-07：2026 品質持續強勢（xwOBA .457 / Barrel% 17.6%，BBE 17），BN 仍無空位，條件未達（fa_scan）
 
 ### Parker Messick (CLE, SP) [mlb_id:800048] — 已在陣容，開季驗證
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
@@ -19,6 +20,18 @@
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
 - 03-29：[waiver-scan] 42% owned。前 #1 pick，健康時 .290/.850+/20+ HR。但連 4 年進 IL，3B 有 Machado 不需升級，BN 全滿。
 - 03-30：[waiver-scan] .222/1.253/2HR — 火燙但條件未達（BN 仍無空位），維持 Pass。
+
+### Dillon Dingler (DET, C) [mlb_id:694649] — 觀察中
+觸發：BBE 達 40 + xwOBA 仍 >P70 (.321) → 評估是否升級 Langeliers
+- 04-07：2026 xwOBA .468 / BB% 10.0% / Barrel% 29.4%（BBE 17 低信心）。2025 xwOBA .351 >P90（326 BBE 高信心）品質確認，但 2025 BB% 4.9% <P25。C 位非急需但長線有升級潛力。26% owned ⬆+4（fa_scan）
+
+### Francisco Alvarez (NYM, C) [mlb_id:682626] — 觀察中
+觸發：BBE 達 35 + xwOBA 仍 >P70 → 行動（或 Dingler 先達標則結案）
+- 04-07：2026 xwOBA .502 / Barrel% 29.4% >P90 / BB% 6.9% P25-40（BBE 17）。2025 兩項核心 >P70（173 BBE）。34% owned ⬆+4，窗口較短（fa_scan）
+
+### Garrett Mitchell (MIL, CF,RF) [mlb_id:669016] — 觀察中
+觸發：BBE 達 30 + 核心指標 2/3 仍 >P60 → 行動替代 Butler/Buxton
+- 04-07：2026 三項核心全高（xwOBA .384 / BB% 12.5% / Barrel% 13.3%），BBE 15 極低信心。2025 品質低（.288 xwOBA），breakout 候選待驗證。14% owned ⬆+12（fa_scan）
 
 ## 已結案
 
