@@ -1462,18 +1462,18 @@ def _handle_error(step_name, error, env, args):
             pass
 
 
-def _publish(today_str, scan_type, advice, raw_data, env, args):
-    """Publish results: Telegram + GitHub Issue."""
+def _publish(today_str, scan_type, advice_telegram, advice_issue, raw_data, env, args):
+    """Publish results: Telegram (compact) + GitHub Issue (full analysis)."""
     if args.no_send:
-        print(advice)
+        print(advice_telegram)
         return
 
-    send_telegram(advice, env)
+    send_telegram(advice_telegram, env)
 
     title = f"[FA Scan {scan_type}] {today_str}"
     body = f"""## Analysis
 
-{advice}
+{advice_issue}
 
 ---
 
@@ -1870,7 +1870,7 @@ def _run_rp_scan(access_token, config, today_str, env, args):
         prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_rp.txt")
         advice = _call_claude(prompt_path, data)
 
-        _publish(today_str, "RP", advice, data, env, args)
+        _publish(today_str, "RP", advice, advice, data, env, args)
 
     except Exception as e:
         _handle_error("RP scan", e, env, args)
@@ -1921,8 +1921,16 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         )
         advice = _call_claude(prompt_path, data)
 
-        # Strip waiver-log block for display (keep full version for waiver-log update)
-        advice_display = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL).strip()
+        # Telegram: strip waiver-log + pass section + delimiter markers
+        advice_display = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL)
+        advice_display = re.sub(r"--- PASS ---.*?--- END_PASS ---", "", advice_display, flags=re.DOTALL)
+        advice_display = re.sub(r"--- (?:ACTION|END_ACTION) ---", "", advice_display)
+        advice_display = advice_display.strip()
+
+        # Issue: strip waiver-log + delimiter markers, keep pass section
+        advice_issue = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL)
+        advice_issue = re.sub(r"--- (?:ACTION|END_ACTION|PASS|END_PASS) ---", "", advice_issue)
+        advice_issue = advice_issue.strip()
 
         # Combine Pass 1 + Pass 2 raw data for Issue archive
         full_raw = (
@@ -1930,7 +1938,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             f"=== Pass 1 Output ({label}) ===\n{pass1_result}\n\n"
             f"=== Pass 2 Data ({label}) ===\n{data}"
         )
-        _publish(today_str, label, advice_display, full_raw, env, args)
+        _publish(today_str, label, advice_display, advice_issue, full_raw, env, args)
 
         # Auto-update waiver-log (uses full advice with waiver-log block)
         _update_waiver_log(advice, today_str, env)
