@@ -1918,7 +1918,13 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         # Strip waiver-log block for display (keep full version for waiver-log update)
         advice_display = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL).strip()
 
-        _publish(today_str, label, advice_display, data, env, args)
+        # Combine Pass 1 + Pass 2 raw data for Issue archive
+        full_raw = (
+            f"=== Pass 1 Input ({label}) ===\n{roster_data}\n\n"
+            f"=== Pass 1 Output ({label}) ===\n{pass1_result}\n\n"
+            f"=== Pass 2 Data ({label}) ===\n{data}"
+        )
+        _publish(today_str, label, advice_display, full_raw, env, args)
 
         # Auto-update waiver-log (uses full advice with waiver-log block)
         _update_waiver_log(advice, today_str, env)
