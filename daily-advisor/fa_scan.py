@@ -282,7 +282,10 @@ def _resolve_watch_mlb_ids(watchlist, savant_csvs):
         for csv_key in ("batter_sc", "batter_ex", "pitcher_sc", "pitcher_ex"):
             name_idx, id_idx = savant_csvs.get(csv_key, ({}, {}))
             if name_norm in name_idx:
-                w["mlb_id"] = name_idx[name_norm]
+                row = name_idx[name_norm]
+                id_col = _find_id_column(row)
+                if id_col and row.get(id_col, "").strip():
+                    w["mlb_id"] = int(row[id_col])
                 break
         if not w.get("mlb_id"):
             # Fallback: MLB API search
@@ -305,10 +308,7 @@ def enrich_watch_players(watchlist, savant_2026, config):
     standings = _fetch_team_games()
     enriched = []
 
-    # Cache 2025 Savant CSVs at module level
-    if 2025 not in _savant_csv_cache:
-        _savant_csv_cache[2025] = download_savant_csvs(2025)
-    savant_2025_csvs = _savant_csv_cache[2025]
+    savant_2025_csvs = download_savant_csvs(2025)  # cached by download_savant_csvs
 
     for w in watchlist:
         mlb_id = w["mlb_id"]
@@ -522,7 +522,9 @@ SP_THRESHOLDS = [
 
 
 def download_savant_csvs(year):
-    """Download 4 Savant CSVs for a year. Returns dict of (name_idx, id_idx)."""
+    """Download 4 Savant CSVs for a year. Returns dict of (name_idx, id_idx). Cached."""
+    if year in _savant_csv_cache:
+        return _savant_csv_cache[year]
     csvs = {}
     for lb, p_type, key in [
         ("statcast", "batter", "batter_sc"),
@@ -538,6 +540,7 @@ def download_savant_csvs(year):
         except Exception as e:
             print(f"  Savant {key} {year} failed: {e}", file=sys.stderr)
             csvs[key] = ({}, {})
+    _savant_csv_cache[year] = csvs
     return csvs
 
 
@@ -1401,11 +1404,16 @@ def save_summary(advice):
 # ── Two-pass Claude helpers ──
 
 
-def _call_claude(prompt_path, data, timeout=180):
+def _call_claude(prompt_path, data, timeout=300):
     """Call claude -p with prompt + data. Returns advice string or raises."""
     with open(prompt_path, encoding="utf-8") as f:
         prompt = f.read()
-    full_prompt = f"{prompt}\n\n---\n\n{data}"
+    if "{data}" in prompt:
+        full_prompt = prompt.replace("{data}", data)
+    elif "{roster_data}" in prompt:
+        full_prompt = prompt.replace("{roster_data}", data)
+    else:
+        full_prompt = f"{prompt}\n\n---\n\n{data}"
     result = subprocess.run(
         ["claude", "-p", full_prompt],
         capture_output=True, text=True, encoding="utf-8", timeout=timeout,
@@ -1552,11 +1560,16 @@ def _build_pass2_data(group_type, weakest_names, fa_candidates, watch_candidates
         for c in group_changes[:10]:
             lines.append(f"  {c['name']:20} 3d:+{c['d3']:>3} {c['pct']:>3}%  {c['position']}")
 
-    # waiver-log
+    # waiver-log (觀察中 section only — 已結案太長會 timeout)
     waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
     if os.path.exists(waiver_log_path):
         with open(waiver_log_path, encoding="utf-8") as f:
-            lines.append(f"\n--- waiver-log.md ---\n{f.read()}")
+            wl_content = f.read()
+        if "## 觀察中" in wl_content:
+            section = wl_content.split("## 觀察中")[1]
+            if "## 已結案" in section:
+                section = section.split("## 已結案")[0]
+            lines.append(f"\n--- waiver-log 觀察中 ---\n## 觀察中{section}")
 
     return "\n".join(lines)
 
