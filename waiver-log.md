@@ -6,6 +6,7 @@
 觸發：連 2 場 ERA < 3.00 + 無爆炸 → 穩定性確認後 add
 - 04-06：[waiver-scan] 2026 xERA 2.14 >P90 / xwOBA .231 >P90 / HH% 29.6% >P90（27 BBE 低信心）。K 率菁英（14K/10.2IP）。但 G2 爆炸（4.2IP/5ER），穩定性存疑。2025 IP/GS 4.85 短局型。SF 弱隊。
 
+- 2026-04-07：BBE 0 本輪無法評估，0% owned 無急迫。維持觸發條件：連 2 場 ERA<3.00 + 無爆炸（fa_scan）
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:664735] — platoon 確認，待 BN 空位
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
@@ -37,6 +38,18 @@
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669016]
 觸發：BBE≥40 且 xwOBA>P70(.321) → breakout 確認，重新評估
 - 2026-04-07：Prior .288 xwOBA P40 偏弱。2026 全面跳升但 BBE 15 極低信心。3d +11 市場最熱但品質不足。CF/RF 可當 Buxton backup（fa_scan）
+
+### Reynaldo López (ATL, SP) [mlb_id:656302]
+觸發：BBE≥50 且 xERA 維持 <P60(4.04) → drop Bassitt；owned 突破 40% 需提前決策
+- 2026-04-07：3/3 勝 Bassitt（xERA 3.59 P70-80 / xwOBA .300 P70-80 / HH% 33.3% >P90），BBE 33 中等信心。2024 全明星復出，ATL 強隊 W 加成。運氣 +1.95 ERA 會回升但 Savant 品質本身優於 Bassitt。35% owned +5 急升（fa_scan）
+
+### Eduardo Rodriguez (AZ, SP) [mlb_id:593958]
+觸發：BBE≥50 且 xERA 維持 <P70(3.74) → 重新評估 drop Bassitt；owned 突破 25% 需提前決策
+- 2026-04-07：3/3 勝 Bassitt（xERA 2.29 / xwOBA .241 / HH% 25.7% 全 >P90），BBE 35 中等信心。2025 prior 平庸（P45-50），跳升幅度大屬 breakout 候選。IP/GS 6.0 深投型。運氣 +2.29 ERA 0.00 不可持續。13% owned 穩定（fa_scan）
+
+### Janson Junk (MIA, SP) [mlb_id:676083]
+觸發：BBE≥50 且 2/3 核心指標維持優於 Bassitt → 重新評估
+- 2026-04-07：2/3 勝 Bassitt（xERA 2.54 >P90 / xwOBA .254 >P90 / HH% 40.5% P50 小輸）。BBE 37 本輪最高信心。運氣 -0.55 唯一負值 = 品質最可信，ERA 3.09 接近真實。IP/GS 5.8 深投型。MIA 弱隊 W 打折。6% owned 無壓力（fa_scan）
 
 ## 已結案
 
