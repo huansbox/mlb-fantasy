@@ -329,34 +329,6 @@ waiver-log.md（FA 追蹤唯一來源）
 
 ## 待辦
 
-### ~~fa_watch Statcast 升級~~ ✅ 完成（2026-04-03）
-
-fa_watch 從 Yahoo-only 日報升級為窄追 ~10 人的 Statcast 監控。候選從 fa_history + waiver-log 產生（不廣撈），複用 weekly_scan 的 Savant pipeline。`enrich_layer3` 加 `savant_prior` 開關（預設 True），之後 2026 樣本夠時 fa_watch + weekly_scan 一起關。
-
-### ~~Prompt / Skills 對齊~~ ✅ 完成（2026-04-03）
-
-- [x] `prompt_fa_watch.txt`：隨 fa_watch 升級完整改寫
-- [x] `.claude/commands/` skills：已驗證全部正確引用 CLAUDE.md
-- [x] `prompt_template.txt`：修正對手 SP 指標（移除 HR9/BB9，Savant 優先）
-- [x] `prompt_template_morning.txt`：已驗證無問題
-- [x] `roster_stats.py`：BB% 加百分位標記
-- [x] `weekly_review.py`：已驗證無衝突
-
-### ~~評估流程優化~~ ✅ 完成（2026-04-06）
-
-> 來源：Week 2 SP drop/add 實戰，完整紀錄見 `daily-advisor/roster_stats_manual_20260406.md`
-> Branch: `refactor/eval-pipeline-optimization`
-
-- [x] SOP: waiver-scan Step 1 加 `roster_stats.py` 雙年數據 + `yahoo_query.py scoreboard` 類別排名
-- [x] SOP: player-eval Step 1 加球員狀態驗證 + 當季數據要求 + WebSearch 年份提醒
-- [x] Bug: VPS git push 403 — 根因是 divergence 非 auth；已加 rebase-abort + Telegram 通知
-- [x] Bug: `yahoo_query.py` savant type detection — 查兩邊 CSV 比較 BBE 取高的
-- [x] Bug: falsy-zero 全掃（`daily_advisor.py` / `weekly_scan.py` / `yahoo_query.py` / `roster_stats.py`）
-- [x] Feature: `yahoo_query.py scoreboard [--pitching|--batting]` — 全聯盟 12 隊類別排名
-- [x] Feature: `yahoo_query.py player` 加 MLB API roster status 交叉驗證
-
-### 待辦
-
 - [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - [ ] **roster_sync --init 不 backfill 新欄位**：當沒有 add/drop 也沒有 key/stats 缺失時，`run_init` 提前 return，不走 `update_config()`，導致 `selected_pos`/`status` 等新欄位不會被寫入。日常 cron 有異動時正常 backfill，僅手動 `--init` 無異動時觸發
