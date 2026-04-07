@@ -294,7 +294,27 @@ def _compute_derived_batter(mlb_stats, team_games, team, year):
     return d
 
 
-def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type):
+def _ip_per_gs_from_gamelog(mlb_id, season):
+    """Calculate IP/GS using only games where gamesStarted=1 (game log based).
+
+    Returns float or None if no starts found or API error.
+    """
+    try:
+        stats = mlb_api_get(
+            f"/people/{mlb_id}/stats?stats=gameLog&season={season}&group=pitching"
+        )
+        splits = stats.get("stats", [{}])[0].get("splits", [])
+        starts = [s for s in splits if int(s["stat"].get("gamesStarted", 0)) == 1]
+        if not starts:
+            return None
+        total_ip = sum(_parse_ip(s["stat"].get("inningsPitched", "0")) for s in starts)
+        return round(total_ip / len(starts), 1)
+    except Exception:
+        return None
+
+
+def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type,
+                             mlb_id=None):
     """Compute ERA, IP/GS, K/9, IP/TG, |xERA-ERA| for SP or RP."""
     if not mlb_stats:
         return {}
@@ -313,8 +333,13 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type)
             d["era_diff_dir"] = "運氣差↓"
 
     if fa_type == "sp":
-        gs = int(mlb_stats.get("gamesStarted", 0))
-        d["ip_per_gs"] = round(ip / gs, 1) if gs > 0 else None
+        # IP/GS from game log: only count IP in games where gamesStarted=1
+        ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, year) if mlb_id else None
+        if ip_per_gs is None:
+            # Fallback: season totals (inaccurate for swingmen)
+            gs = int(mlb_stats.get("gamesStarted", 0))
+            ip_per_gs = round(ip / gs, 1) if gs > 0 else None
+        d["ip_per_gs"] = ip_per_gs
     else:
         k = int(mlb_stats.get("strikeOuts", 0))
         d["k_per_9"] = round(k * 9 / ip, 2) if ip > 0 else None
@@ -367,13 +392,15 @@ def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
         p["derived_2026"] = (
             _compute_derived_batter(p["mlb_2026"], standings, team, 2026)
             if fa_type == "batter" else
-            _compute_derived_pitcher(s26, p["mlb_2026"], standings, team, 2026, fa_type)
+            _compute_derived_pitcher(s26, p["mlb_2026"], standings, team, 2026, fa_type,
+                                     mlb_id=mlb_id)
         )
         if savant_prior:
             p["derived_2025"] = (
                 _compute_derived_batter(p["mlb_2025"], standings, team, 2025)
                 if fa_type == "batter" else
-                _compute_derived_pitcher(s25, p["mlb_2025"], standings, team, 2025, fa_type)
+                _compute_derived_pitcher(s25, p["mlb_2025"], standings, team, 2025, fa_type,
+                                         mlb_id=mlb_id)
             )
         else:
             p["derived_2025"] = {}

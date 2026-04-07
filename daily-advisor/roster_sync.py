@@ -391,6 +391,25 @@ def build_prior_stats_batter(mlb_id, savant=None):
     return result
 
 
+def _ip_per_gs_from_gamelog(mlb_id, season):
+    """Calculate IP/GS using only games where gamesStarted=1 (game log based).
+
+    Returns float or None if no starts found or API error.
+    """
+    try:
+        stats = mlb_api_get(
+            f"/people/{mlb_id}/stats?stats=gameLog&season={season}&group=pitching"
+        )
+        splits = stats.get("stats", [{}])[0].get("splits", [])
+        starts = [s for s in splits if int(s["stat"].get("gamesStarted", 0)) == 1]
+        if not starts:
+            return None
+        total_ip = sum(_parse_ip(s["stat"].get("inningsPitched", "0")) for s in starts)
+        return round(total_ip / len(starts), 1)
+    except Exception:
+        return None
+
+
 def build_prior_stats_sp(mlb_id, savant=None):
     """Build prior_stats dict for an SP using 2025 data."""
     if savant is None:
@@ -410,10 +429,15 @@ def build_prior_stats_sp(mlb_id, savant=None):
     if mlb_stats:
         era = mlb_stats.get("era", "0")
         ip = _parse_ip(mlb_stats.get("inningsPitched", "0"))
-        gs = int(mlb_stats.get("gamesStarted", 0))
         result["era"] = float(era) if era != "—" else 0
-        result["ip_per_gs"] = round(ip / gs, 1) if gs > 0 else 0
         result["ip"] = round(ip, 1)
+        # IP/GS from game log: only count IP in games where gamesStarted=1
+        ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, 2025)
+        if ip_per_gs is not None:
+            result["ip_per_gs"] = ip_per_gs
+        else:
+            gs = int(mlb_stats.get("gamesStarted", 0))
+            result["ip_per_gs"] = round(ip / gs, 1) if gs > 0 else 0
     return result
 
 

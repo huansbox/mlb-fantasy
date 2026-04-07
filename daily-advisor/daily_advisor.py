@@ -279,6 +279,7 @@ def fetch_pitcher_gamelog(player_id, season):
             "w": int(s["stat"].get("wins", 0)),
             "h": int(s["stat"].get("hits", 0)),
             "bb": int(s["stat"].get("baseOnBalls", 0)),
+            "gs": int(s["stat"].get("gamesStarted", 0)),
         }
         for s in splits
     ]
