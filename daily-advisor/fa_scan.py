@@ -869,6 +869,92 @@ def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
     return enriched
 
 
+# ── Roster data for Pass 1 ──
+
+
+def build_roster_for_pass1(config, savant_2026, player_type="batter"):
+    """Build roster data string for Pass 1 (Claude picks weakest players).
+
+    Args:
+        player_type: "batter", "sp", or "rp"
+
+    Returns formatted string with bottom N players sorted by quality.
+    """
+    if player_type == "batter":
+        players = config.get("batters", [])
+        hide_top = 5
+        sort_key = "xwoba"
+        higher_better = True
+    elif player_type == "rp":
+        players = [p for p in config.get("pitchers", [])
+                   if pitcher_type(p) == "RP"]
+        hide_top = 0  # show all RP (only 2)
+        sort_key = "xera"
+        higher_better = False
+    else:
+        players = [p for p in config.get("pitchers", [])
+                   if pitcher_type(p) == "SP"]
+        hide_top = 3
+        sort_key = "xera"
+        higher_better = False
+
+    # Get Savant data for sorting
+    scored = []
+    for p in players:
+        mlb_id = p.get("mlb_id")
+        if not mlb_id:
+            continue
+        savant = _extract_savant_by_id(mlb_id, player_type if player_type == "batter" else "sp", savant_2026)
+        val = savant.get(sort_key) if savant else None
+        # Fallback to prior year
+        if val is None or val == 0:
+            prior = p.get("prior_stats", {})
+            val = prior.get(sort_key, prior.get("xwoba", prior.get("xera")))
+        scored.append({"player": p, "savant": savant, "sort_val": val})
+
+    # Sort: batter by xwOBA asc (worst first), SP/RP by xERA desc (worst first)
+    scored.sort(key=lambda x: x["sort_val"] or (0 if higher_better else 999),
+                reverse=(not higher_better))
+
+    # Hide top N (strongest)
+    shown = scored[:-hide_top] if hide_top and len(scored) > hide_top else scored
+
+    # Format output
+    pt = "pitcher" if player_type != "batter" else "batter"
+    lines = []
+    for item in shown:
+        p = item["player"]
+        s = item["savant"] or {}
+        name = p["name"]
+        team = p["team"]
+        pos = "/".join(p.get("positions", [])) if player_type == "batter" else player_type.upper()
+
+        parts = [f"{name}({team}) {pos}"]
+
+        if player_type == "batter":
+            if s.get("xwoba"):
+                parts.append(f"xwOBA {s['xwoba']:.3f} {pctile_tag(s['xwoba'], 'xwoba')}")
+            if s.get("barrel_pct"):
+                parts.append(f"Barrel% {s['barrel_pct']:.1f}% {pctile_tag(s['barrel_pct'], 'barrel_pct')}")
+            if s.get("hh_pct"):
+                parts.append(f"HH% {s['hh_pct']:.1f}% {pctile_tag(s['hh_pct'], 'hh_pct')}")
+            parts.append(f"BBE {s.get('bbe', 0)}")
+        else:
+            if s.get("xera"):
+                parts.append(f"xERA {s['xera']:.2f} {pctile_tag(s['xera'], 'xera', 'pitcher')}")
+            if s.get("xwoba"):
+                parts.append(f"xwOBA {s['xwoba']:.3f} {pctile_tag(s['xwoba'], 'xwoba', 'pitcher')}")
+            if s.get("hh_pct"):
+                parts.append(f"HH% {s['hh_pct']:.1f}% {pctile_tag(s['hh_pct'], 'hh_pct', 'pitcher')}")
+            parts.append(f"BBE {s.get('bbe', 0)}")
+
+        lines.append("  " + " | ".join(parts))
+
+    label = {"batter": "打者", "sp": "SP", "rp": "RP"}[player_type]
+    header = f"[{label}] 以下為可能被替換的球員（由弱到強）："
+    return header + "\n" + "\n".join(lines)
+
+
 # ── Roster summary ──
 
 
