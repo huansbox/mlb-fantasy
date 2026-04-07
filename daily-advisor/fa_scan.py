@@ -1483,6 +1483,137 @@ def _publish(today_str, scan_type, advice, raw_data, env, args):
         print(f"GitHub Issue error: {e}", file=sys.stderr)
 
 
+def _update_waiver_log(advice, today_str, env=None):
+    """Parse waiver-log update block from Claude output, write to waiver-log.md.
+
+    Expects ```waiver-log ... ``` block in advice with lines:
+      NEW|name|team|position|mlb_id|trigger|summary
+      UPDATE|name|summary
+    """
+    # Extract waiver-log block
+    if "```waiver-log" not in advice:
+        return
+    try:
+        block = advice.split("```waiver-log")[1].split("```")[0].strip()
+    except IndexError:
+        return
+    if not block:
+        print("  waiver-log: empty block (no actions)", file=sys.stderr)
+        return
+
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    if not os.path.exists(waiver_log_path):
+        return
+
+    with open(waiver_log_path, encoding="utf-8") as f:
+        content = f.read()
+
+    modified = False
+    for line in block.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split("|")
+
+        if parts[0] == "NEW" and len(parts) >= 7:
+            _, name, team, position, mlb_id, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
+            # Check if player already exists in 觀察中
+            if name in content:
+                # Treat as UPDATE instead
+                _insert_update_line(content, name, today_str, summary)
+                content = _insert_update_line(content, name, today_str, summary)
+                modified = True
+                continue
+            # Append new player block to end of 觀察中 section
+            new_entry = (
+                f"\n### {name} ({team}, {position}) [mlb_id:{mlb_id}]\n"
+                f"觸發：{trigger}\n"
+                f"- {today_str}：{summary}（fa_scan）\n"
+            )
+            # Find insertion point: before ## 已結案 or end of 觀察中
+            if "## 已結案" in content:
+                pos = content.index("## 已結案")
+                content = content[:pos] + new_entry + "\n" + content[pos:]
+            else:
+                content += new_entry
+            modified = True
+            print(f"  waiver-log: NEW {name}", file=sys.stderr)
+
+        elif parts[0] == "UPDATE" and len(parts) >= 3:
+            _, name, summary = parts[0], parts[1], "|".join(parts[2:])
+            content = _insert_update_line(content, name, today_str, summary)
+            modified = True
+            print(f"  waiver-log: UPDATE {name}", file=sys.stderr)
+
+    if not modified:
+        return
+
+    # Clean up excessive blank lines
+    content = re.sub(r"\n{3,}", "\n\n", content)
+
+    with open(waiver_log_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    # Git commit + push
+    repo_root = os.path.join(SCRIPT_DIR, "..")
+    try:
+        subprocess.run(["git", "add", "waiver-log.md"],
+                       cwd=repo_root, check=True, timeout=10)
+        subprocess.run(
+            ["git", "commit", "-m",
+             f"chore(waiver-log): fa_scan auto-update {today_str}"],
+            cwd=repo_root, check=True, timeout=10)
+    except subprocess.CalledProcessError as e:
+        print(f"  waiver-log git commit failed: {e}", file=sys.stderr)
+        return
+
+    try:
+        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
+                       cwd=repo_root, check=True, timeout=30)
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
+                       capture_output=True, timeout=10)
+        msg = "[fa_scan] waiver-log git rebase failed — skipping push."
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
+        return
+
+    try:
+        subprocess.run(["git", "push", "origin", "master"],
+                       cwd=repo_root, check=True, timeout=30)
+        print("  waiver-log: git push OK", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        msg = "[fa_scan] waiver-log git push failed."
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
+
+
+def _insert_update_line(content, player_name, today_str, summary):
+    """Insert a date line under an existing player's section in waiver-log."""
+    # Find the player's ### header
+    pattern = re.compile(
+        rf"### {re.escape(player_name)} \([^)]+\)[^\n]*\n",
+        re.MULTILINE,
+    )
+    match = pattern.search(content)
+    if not match:
+        return content
+
+    # Find the next ### or ## after this player
+    rest = content[match.end():]
+    next_header = re.search(r"^###? ", rest, re.MULTILINE)
+    if next_header:
+        insert_pos = match.end() + next_header.start()
+    else:
+        insert_pos = len(content)
+
+    new_line = f"- {today_str}：{summary}（fa_scan）\n"
+    content = content[:insert_pos] + new_line + content[insert_pos:]
+    return content
+
+
 def _fallback_weakest(config, savant_2026, group_type):
     """Fallback when Pass 1 Claude fails: return bottom N by code sorting."""
     if group_type == "batter":
@@ -1709,6 +1840,9 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         advice = _call_claude(prompt_path, data)
 
         _publish(today_str, label, advice, data, env, args)
+
+        # Auto-update waiver-log
+        _update_waiver_log(advice, today_str, env)
 
     except Exception as e:
         _handle_error(f"{label} scan", e, env, args)
