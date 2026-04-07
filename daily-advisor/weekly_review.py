@@ -769,6 +769,17 @@ def main():
             "daily_reports": daily_reports,
             "my_roster_performance": roster_perf,
         }
+
+        # ── Scan summary (if weekly_scan ran this week) ──
+        print(f"  Checking for weekly scan summary...", file=sys.stderr)
+        scan_summary = fetch_scan_summary(week_start)
+        if scan_summary:
+            print(f"  Found scan issue #{scan_summary['issue_number']} ({scan_summary['issue_date']})",
+                  file=sys.stderr)
+            review_data["scan_summary"] = scan_summary
+        else:
+            print(f"  No scan summary for this week", file=sys.stderr)
+
     else:
         print("  Week 1 — no previous week to review", file=sys.stderr)
 
