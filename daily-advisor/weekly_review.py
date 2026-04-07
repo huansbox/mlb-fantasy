@@ -3,7 +3,7 @@
 Usage:
     python weekly_review.py --prepare [--dry-run] [--date YYYY-MM-DD]
 
-Cron: 每週一 TW 18:00 (UTC 10:00)，在 Weekly Scan 之前執行。
+Cron: 每週一 TW 13:00 (UTC 05:00)，在 Weekly Scan 之後執行。
 輸出: daily-advisor/weekly-data/week-{N}.json
 """
 
