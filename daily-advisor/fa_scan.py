@@ -886,20 +886,25 @@ def build_roster_for_pass1(config, savant_2026, player_type="batter"):
 
     Returns formatted string with bottom N players sorted by quality.
     """
+    # Exclude IL/IL+/NA players — they can't be dropped
+    def _is_active(p):
+        sp = p.get("selected_pos", "")
+        return sp not in ("IL", "IL+", "NA")
+
     if player_type == "batter":
-        players = config.get("batters", [])
+        players = [p for p in config.get("batters", []) if _is_active(p)]
         hide_top = 5
         sort_key = "xwoba"
         higher_better = True
     elif player_type == "rp":
         players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "RP"]
+                   if pitcher_type(p) == "RP" and _is_active(p)]
         hide_top = 0  # show all RP (only 2)
         sort_key = "xera"
         higher_better = False
     else:
         players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "SP"]
+                   if pitcher_type(p) == "SP" and _is_active(p)]
         hide_top = 3
         sort_key = "xera"
         higher_better = False
