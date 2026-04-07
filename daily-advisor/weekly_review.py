@@ -655,6 +655,64 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
     return {"batters": batter_results, "pitchers": pitcher_results}
 
 
+# ── Scan Summary ──
+
+
+def fetch_scan_summary(week_start):
+    """Fetch the latest weekly_scan GitHub Issue if it's from this week.
+
+    Returns dict with issue_number, issue_url, analysis text, or None.
+    """
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "list",
+             "--repo", "huansbox/mlb-fantasy",
+             "--label", "waiver-scan",
+             "--state", "all",
+             "--json", "number,title,body,url,createdAt",
+             "--limit", "1"],
+            capture_output=True, text=True, encoding="utf-8", timeout=30,
+        )
+        if result.returncode != 0:
+            print(f"  gh issue list (waiver-scan) failed: {result.stderr}", file=sys.stderr)
+            return None
+
+        issues = json.loads(result.stdout)
+        if not issues:
+            return None
+
+        issue = issues[0]
+        # Check if issue was created within this week (on or after week_start)
+        created = issue["createdAt"][:10]  # "2026-04-07T..." -> "2026-04-07"
+        if created < week_start.isoformat():
+            print(f"  Latest scan issue ({created}) is before this week ({week_start}), skipping",
+                  file=sys.stderr)
+            return None
+
+        # Extract analysis section from issue body
+        body = issue.get("body", "")
+        analysis = ""
+        if "## Analysis" in body:
+            parts = body.split("## Analysis", 1)
+            if len(parts) > 1:
+                # Take text between "## Analysis" and the next "---"
+                remainder = parts[1]
+                if "\n---\n" in remainder:
+                    analysis = remainder.split("\n---\n", 1)[0].strip()
+                else:
+                    analysis = remainder.strip()
+
+        return {
+            "issue_number": issue["number"],
+            "issue_url": issue.get("url", ""),
+            "issue_date": created,
+            "analysis": analysis,
+        }
+    except Exception as e:
+        print(f"  fetch_scan_summary error: {e}", file=sys.stderr)
+        return None
+
+
 # ── Main ──
 
 
