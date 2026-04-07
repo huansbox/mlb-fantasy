@@ -60,8 +60,13 @@ def collect_fa_snapshot(access_token, config, queries=None):
     league_key = config["league"]["league_key"]
     snapshot = {}
 
-    for label, filters in queries:
-        path = f"/league/{league_key}/players;{filters};out=stats,percent_owned,ownership"
+    for entry in queries:
+        label, filters = entry[0], entry[1]
+        stats_type = entry[2] if len(entry) > 2 else None
+        if stats_type:
+            path = f"/league/{league_key}/players;{filters};out=percent_owned,ownership/stats;type={stats_type}"
+        else:
+            path = f"/league/{league_key}/players;{filters};out=stats,percent_owned,ownership"
         try:
             data = api_get(path, access_token)
             league_data = data["fantasy_content"]["league"]

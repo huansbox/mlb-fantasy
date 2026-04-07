@@ -41,8 +41,14 @@ GET /league/{league_key}/players;status=A;position={pos};sort=AR;count=25;start=
 - `status`: **`A`（所有可用，推薦預設）**/ `FA`（純自由球員）/ `W`（waiver 中）/ `T`（已被選）
 - `position`: `C`, `1B`, `2B`, `SS`, `LF`, `CF`, `RF`, `SP`, `RP`, `B`（全打者）, `P`（全投手）
 - `sort`: `AR`（actual rank）/ `OR`（overall rank）/ stat_id
-- `sort_type`: `season` / `lastweek` / `lastmonth` / `date`
+- `sort_type`: `season` / `lastweek` / `biweekly` / `lastmonth` / `date`
 - `out` sub-resources: `stats`, `percent_owned`, `ownership`
+  - `out=stats` → 永遠回傳 **season** stats，`sort_type` 只影響排序
+  - 要拿特定時段的 stats → 改用 `/stats;type={period}` sub-resource：
+    ```
+    /league/{key}/players;{filters};out=percent_owned,ownership/stats;type=biweekly
+    ```
+    可用 period：`season` / `lastweek` / `biweekly` / `lastmonth`
 - `ownership` 回傳 waiver 清除日期：`{"waiver_date": "2026-04-01", "ownership_type": "waivers"}`
 
 **其他可查的資源**

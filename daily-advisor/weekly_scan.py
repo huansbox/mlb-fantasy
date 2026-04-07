@@ -35,10 +35,10 @@ FULL_SEASON_GAMES = 162
 WEEKLY_FA_QUERIES = [
     ("B-AR",  "status=A;position=B;sort=AR;count=50"),
     ("SP-AR", "status=A;position=SP;sort=AR;count=30"),
-    ("RP-AR", "status=A;position=RP;sort=AR;count=20"),
+    ("RP-AR", "status=A;position=RP;sort=AR;count=25", "biweekly"),
     ("B-LW",  "status=A;position=B;sort=AR;sort_type=lastweek;count=30"),
     ("SP-LW", "status=A;position=SP;sort=AR;sort_type=lastweek;count=20"),
-    ("RP-LW", "status=A;position=RP;sort=AR;sort_type=lastweek;count=10"),
+    ("RP-BW", "status=A;position=RP;sort=AR;sort_type=biweekly;count=25", "biweekly"),
 ]
 
 # ── Layer 2: Quality thresholds ──
@@ -53,11 +53,7 @@ SP_THRESHOLDS = [
     ("xwoba", 0.332, False),      # P40 (xwOBA allowed)
     ("hh_pct", 42.2, False),      # P40
 ]
-RP_THRESHOLDS = [
-    ("xera", 4.33, False),        # P50
-    ("xwoba", 0.322, False),      # P50
-    ("hh_pct", 40.8, False),      # P50
-]
+# RP: filtered by biweekly SV+H >= 2 + optional xERA < P50 (4.33) in filter_by_savant
 
 
 # ── Savant CSV utilities ──
@@ -195,11 +191,34 @@ def filter_by_savant(snapshot, savant_2026):
                 if savant:
                     fallback += 1
             if savant is None:
-                continue  # No Savant data at all → skip
+                if fa_type != "rp":
+                    continue  # Batters/SP need Savant; RP can pass without
         else:
             matched += 1
 
-        # Build metrics (0 → None: _extract_savant_row defaults missing to 0)
+        # ── RP: SV+H-driven filter (independent path) ──
+        if fa_type == "rp":
+            svh = int(info.get("stats", {}).get("SV+H", 0) or 0)
+            if svh < 2:
+                continue  # biweekly SV+H < 2 → skip
+            # Auxiliary: if 2026 Savant exists and xERA > P50, skip
+            if savant and savant.get("xera") and savant["xera"] > 4.33:
+                continue
+            results.append({
+                "name": name,
+                "team": info["team"],
+                "position": info["position"],
+                "pct": info["pct"],
+                "stats": info.get("stats", {}),
+                "waiver_date": info.get("waiver_date", ""),
+                "fa_type": fa_type,
+                "savant_2026": savant,  # may be None
+                "mlb_id": mlb_id,
+                "bbe": savant.get("bbe", 0) if savant else 0,
+            })
+            continue
+
+        # ── Batters / SP: Statcast quality filter (existing logic) ──
         metrics = {
             "xwoba": savant.get("xwoba") or None,
             "hh_pct": savant.get("hh_pct") or None,
@@ -214,8 +233,7 @@ def filter_by_savant(snapshot, savant_2026):
 
         thresholds = (
             BATTER_THRESHOLDS if fa_type == "batter"
-            else SP_THRESHOLDS if fa_type == "sp"
-            else RP_THRESHOLDS
+            else SP_THRESHOLDS
         )
 
         if _check_thresholds(metrics, thresholds) < 2:
