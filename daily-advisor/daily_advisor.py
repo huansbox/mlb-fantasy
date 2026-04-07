@@ -1165,13 +1165,41 @@ def analyze(config, target_date, env=None, morning=False):
     else:
         lines.append("  (無)")
 
+    # ── Pre-fetch Yahoo scoreboard (needed for IP + H2H sections) ──
+    sb = None
+    if env:
+        try:
+            sb = fetch_yahoo_scoreboard(config, env)
+        except Exception as e:
+            print(f"Yahoo scoreboard fetch failed: {e}", file=sys.stderr)
+
     # ── Section 4: Weekly IP ──
     _, _, week_number = get_fantasy_week(target_date, config)
     min_ip = config["league"]["min_ip"]
     lines.append(f"\n本週 IP 進度（Week {week_number}）：")
-    total_ip, ip_entries = calc_weekly_ip(config, target_date, pitchers)
+
+    # Use Yahoo scoreboard IP (includes dropped players' contributions)
+    yahoo_ip = None
+    if sb:
+        for cat in sb.get("categories", []):
+            if cat["name"] == "IP":
+                try:
+                    yahoo_ip = float(cat["mine"])
+                except (ValueError, TypeError):
+                    pass
+                break
+
+    if yahoo_ip is not None:
+        total_ip = yahoo_ip
+    else:
+        # Fallback: calc from game log (may miss dropped players)
+        total_ip, _ = calc_weekly_ip(config, target_date, pitchers)
+
+    # Always show per-pitcher breakdown for context
+    _, ip_entries = calc_weekly_ip(config, target_date, pitchers)
     if ip_entries:
         lines.extend(ip_entries)
+
     if week_number == 1:
         lines.append(f"  合計: {total_ip:.1f} IP（Week 1 無最低局數限制）")
     else:
@@ -1183,28 +1211,21 @@ def analyze(config, target_date, env=None, morning=False):
             lines.append("  已達標")
 
     # ── Section 5: H2H Scoreboard ──
-    sb = None
-    if env:
-        try:
-            sb = fetch_yahoo_scoreboard(config, env)
-            if sb:
-                lines.append(f"\n=== 本週 H2H 對戰態勢 ===")
-                lines.append(f"對手：{sb['opponent']}")
-                lines.append(f"目前比分：{sb['wins']}W-{sb['losses']}L-{sb['draws']}D（需 8+ 贏）\n")
-                lines.append(f"  {'類別':>6}  {'我方':>8}  {'對手':>8}  狀態")
-                for cat in sb["categories"]:
-                    if cat["result"] == "W":
-                        tag = "✅ 贏"
-                    elif cat["result"] == "L":
-                        tag = "❌ 輸"
-                    else:
-                        tag = "➖ 平"
-                    # Mark punt categories
-                    if cat["name"] in ("SB", "SV+H"):
-                        tag += "（punt）"
-                    lines.append(f"  {cat['name']:>6}  {cat['mine']:>8}  {cat['opp']:>8}  {tag}")
-        except Exception as e:
-            print(f"Yahoo API error (skipping scoreboard): {e}", file=sys.stderr)
+    if sb:
+        lines.append(f"\n=== 本週 H2H 對戰態勢 ===")
+        lines.append(f"對手：{sb['opponent']}")
+        lines.append(f"目前比分：{sb['wins']}W-{sb['losses']}L-{sb['draws']}D（需 8+ 贏）\n")
+        lines.append(f"  {'類別':>6}  {'我方':>8}  {'對手':>8}  狀態")
+        for cat in sb["categories"]:
+            if cat["result"] == "W":
+                tag = "✅ 贏"
+            elif cat["result"] == "L":
+                tag = "❌ 輸"
+            else:
+                tag = "➖ 平"
+            if cat["name"] in ("SB", "SV+H"):
+                tag += "（punt）"
+            lines.append(f"  {cat['name']:>6}  {cat['mine']:>8}  {cat['opp']:>8}  {tag}")
 
     # ── Section 6: My SP schedule (rest of week) ──
     _, week_end, _ = get_fantasy_week(target_date, config)

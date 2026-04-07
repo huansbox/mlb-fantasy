@@ -340,6 +340,7 @@ waiver-log.md（FA 追蹤唯一來源）
 - [ ] **roster_sync --init 不 backfill 新欄位**：當沒有 add/drop 也沒有 key/stats 缺失時，`run_init` 提前 return，不走 `update_config()`，導致 `selected_pos`/`status` 等新欄位不會被寫入。日常 cron 有異動時正常 backfill，僅手動 `--init` 無異動時觸發
 - [ ] **IL/NA 排除邏輯共用化**：目前 `weekly_review.py`、`fa_scan.py`（build_roster_for_pass1）、`daily_advisor.py`（config fallback）各自實作 IL/NA 過濾。應抽成共用函式（如 `yahoo_query.py` 的 `is_active(player)`），統一判斷邏輯，減少漏改風險
 - [ ] **fa_scan Layer 2 拉高門檻**：考慮加 BBE 最低門檻（如 BBE ≥ 15）刷掉極端噪音
+- [ ] **被 drop 球員的週累計問題**：`calc_weekly_ip` 用現有陣容遍歷 game log，被 drop 的球員貢獻被遺漏。速報 IP 已改用 Yahoo scoreboard 值。檢查其他地方是否有類似問題（weekly_review 等）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] 交易策略：有需要時再建
