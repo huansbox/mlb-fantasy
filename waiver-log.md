@@ -34,9 +34,10 @@
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
 - 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
 
-### Reynaldo López (ATL, SP) [mlb_id:592694] — 觀察中
+### Reynaldo López (ATL, SP) [mlb_id:625643] — 觀察中
 觸發：BBE 達 50 維持 xERA < P70 (3.74) 或 %owned 突破 50% 前搶先行動 → 取代 Bassitt
 - 04-07：2026 xERA 3.59(P70-80) / xwOBA .300(P70-80) / HH% 33.3%(>P90)，33 BBE 中等信心。運氣 +1.95 極度好運。2025 僅 22 BBE 傷病年，2024 全明星驗證品質。ATL 強隊。38% owned 急升中，窗口有限（fa_scan）
+- 04-07：[eval] vs Bassitt，核心 3 指標 3/3 全勝（P70-80 vs <P25）。即使 ERA 回升到 xERA 3.59 仍遠勝。2024 全明星實績。結論：**立即取代 Bassitt**，FAAB $8-12
 
 ### Eduardo Rodriguez (AZ, SP) [mlb_id:593958] — 觀察中
 觸發：BBE 達 50 仍維持 xERA < P80 (3.43) + xwOBA < P80 (.289) → 取代 Bassitt
