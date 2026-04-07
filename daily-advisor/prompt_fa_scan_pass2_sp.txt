@@ -9,7 +9,7 @@
 評估規則依數據中嵌入的「評估框架」，不偏離。
 
 任務：
-1. FA 候選 + 觀察中 SP vs 我方最弱 SP，逐人比較核心 3 指標（xERA / xwOBA allowed / HH% allowed），2 項勝出 = 值得行動
+1. FA 候選 + 觀察中 SP vs 我方最弱 3 人，逐人比較核心 3 指標（xERA / xwOBA allowed / HH% allowed），2 項勝出 = 值得行動
 2. 考慮 IP/GS 產量（深投型 > 短局型）和 xERA-ERA 運氣標記（正=運氣好小心，負=撿便宜）
 3. 觀察中 SP：檢查 waiver-log 觸發條件是否接近達成
 
