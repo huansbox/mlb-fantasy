@@ -1,4 +1,14 @@
-"""Daily FA Watch — %owned tracking + Statcast quality monitoring."""
+"""Daily FA Watch — %owned tracking + Statcast quality monitoring.
+
+DEPRECATED: Use fa_scan.py instead. This file will be removed in Batch 3.
+"""
+
+import warnings
+warnings.warn(
+    "fa_watch.py is deprecated. Use fa_scan.py instead. "
+    "This file will be removed in Batch 3.",
+    DeprecationWarning, stacklevel=1,
+)
 
 import argparse
 import json

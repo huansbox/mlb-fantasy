@@ -667,14 +667,14 @@ def fetch_scan_summary(week_start):
         result = subprocess.run(
             ["gh", "issue", "list",
              "--repo", "huansbox/mlb-fantasy",
-             "--label", "waiver-scan",
+             "--label", "fa-scan",
              "--state", "all",
              "--json", "number,title,body,url,createdAt",
              "--limit", "1"],
             capture_output=True, text=True, encoding="utf-8", timeout=30,
         )
         if result.returncode != 0:
-            print(f"  gh issue list (waiver-scan) failed: {result.stderr}", file=sys.stderr)
+            print(f"  gh issue list (fa-scan) failed: {result.stderr}", file=sys.stderr)
             return None
 
         issues = json.loads(result.stdout)
