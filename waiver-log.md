@@ -12,6 +12,7 @@
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
 - 04-07：xwOBA .457(>P90) / Barrel% 17.6%(>P90) on 17 BBE，2025 prior 確認品質。BN 仍無空位，0% owned 無壓力，維持觀察（fa_scan）
+- 04-08：xwOBA .457/Barrel% 17.6% 持續>P90（17 BBE），BN 無空位，0% owned 安全（fa_scan）
 
 ### Parker Messick (CLE, SP) [mlb_id:800048] — 已在陣容，開季驗證
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
@@ -26,14 +27,17 @@
 ### Josh Bell (MIN, 1B) [mlb_id:605137] — 觀察中
 觸發：BBE 達 30 仍維持 xwOBA > P70 + Barrel% > P60 → 取代 Butler
 - 04-07：2026 xwOBA .333(P80-90) / BB% 17.9%(>P90) / Barrel% 10.5%(P70-80)，19 BBE 低信心。2025 prior 全面 P80+（.359/.107/.120，383 BBE）品質確認。1B only 位置彈性差（fa_scan）
+- 04-08：BBE 19，三項品質持續（.333/16.3%/10.5%），0% owned（fa_scan）
 
 ### Francisco Alvarez (NYM, C) [mlb_id:682626] — 觀察中
 觸發：BBE 達 25 且 xwOBA > P80 + Barrel% > P70 → 取代 Butler
 - 04-07：2026 xwOBA .502(>P90) / Barrel% 29.4%(>P90) 但 BB% 6.9%(P25-40)。2025 prior P70-80（.326/.097/.121，173 BBE）。34% owned 快速上升，窗口有限（fa_scan）
+- 04-08：BBE 17，xwOBA .502/Barrel% 29.4% 持續>P90，%owned 35% 三日+3 加速。距觸發 BBE 25 約 2-3 場（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
 - 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
+- 04-08：本次 BBE 0（數據延遲），%owned 26% 三日+3 上升，等數據更新（fa_scan）
 
 ### Eduardo Rodriguez (AZ, SP) [mlb_id:593958] — 觀察中
 觸發：BBE 達 50 仍維持 xERA < P80 (3.43) + xwOBA < P80 (.289) → 取代 Bassitt
@@ -44,6 +48,10 @@
 觸發：BBE 達 60 仍維持 xERA < P80 + HH% 改善至 < P40 (42.2%) → 取代 Bassitt
 - 04-07：2026 xERA 2.54(>P90) / xwOBA .254(>P90) / HH% 40.5%(P50-55)，37 BBE 中等信心。IP/GS 5.8 深投型。運氣 -0.55 接近真實。2025 prior P45 且 HH% 47.3% 為慢性問題。MIA 弱隊（fa_scan）
 - 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）
+
+### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
+觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
+- 04-08：三項>P90（.384/12.5%/13.3%）BBE 15 低信心，2025 prior P25-40 弱，%owned 15% 三日+11 急升（fa_scan）
 
 ## 已結案
 
