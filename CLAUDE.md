@@ -332,6 +332,7 @@ waiver-log.md（FA 追蹤唯一來源）
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
+| `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 
 ## 待辦
 
@@ -343,4 +344,4 @@ waiver-log.md（FA 追蹤唯一來源）
 - [ ] **被 drop 球員的週累計問題**：`calc_weekly_ip` 用現有陣容遍歷 game log，被 drop 的球員貢獻被遺漏。速報 IP 已改用 Yahoo scoreboard 值。檢查其他地方是否有類似問題（weekly_review 等）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
-- [ ] 交易策略：有需要時再建
+- [ ] **交易掃描工具**：類似 fa_scan 的聯盟交易機會掃描。掃描 12 隊 roster 的守位深度 + 7-cat 傳統數據，找出「我方過剩 vs 對方過剩」的 win-win 交易對象。工具基礎已建好：`daily-advisor/_trade_lookup.py`（聯盟 roster 查詢 + 守位覆蓋 + 球員 7-cat 比較）
