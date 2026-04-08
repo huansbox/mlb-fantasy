@@ -225,30 +225,6 @@
       "status": ""
     },
     {
-      "name": "Sal Frelick",
-      "mlb_id": 686217,
-      "team": "MIL",
-      "positions": [
-        "LF",
-        "CF",
-        "RF"
-      ],
-      "yahoo_player_key": "469.p.12476",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.299,
-        "barrel_pct": 3.1,
-        "hh_pct": 27.4,
-        "bb_pct": 7.9,
-        "ops": 0.756,
-        "pa_per_team_g": 3.67,
-        "pa": 594,
-        "g": 142
-      },
-      "selected_pos": "RF",
-      "status": ""
-    },
-    {
       "name": "Giancarlo Stanton",
       "mlb_id": 519317,
       "team": "NYY",
@@ -268,7 +244,7 @@
         "pa": 281,
         "g": 77
       },
-      "selected_pos": "BN",
+      "selected_pos": "RF",
       "status": ""
     },
     {
@@ -404,7 +380,7 @@
         "ip_per_team_g": 0.44,
         "ip": 72.0
       },
-      "selected_pos": "NA",
+      "selected_pos": "RP",
       "status": ""
     },
     {
@@ -427,28 +403,6 @@
         "ip": 39.7
       },
       "selected_pos": "P",
-      "status": ""
-    },
-    {
-      "name": "Chris Bassitt",
-      "mlb_id": 605135,
-      "team": "BAL",
-      "positions": [
-        "SP"
-      ],
-      "yahoo_player_key": "469.p.9799",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.16,
-        "xwoba_allowed": 0.316,
-        "hh_pct_allowed": 36.6,
-        "barrel_pct_allowed": 8.5,
-        "bbe": 505,
-        "era": 3.96,
-        "ip_per_gs": 5.5,
-        "ip": 170.3
-      },
-      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -539,6 +493,28 @@
         "ip": 115.0,
         "ip_per_gs": 5.4
       }
+    },
+    {
+      "name": "Reynaldo López",
+      "mlb_id": 625643,
+      "yahoo_player_key": "469.p.10152",
+      "team": "ATL",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 10.73,
+        "xwoba_allowed": 0.465,
+        "hh_pct_allowed": 50.0,
+        "barrel_pct_allowed": 4.5,
+        "bbe": 22,
+        "era": 5.4,
+        "ip": 5.0,
+        "ip_per_gs": 5.0
+      }
     }
   ],
   "teams": {
@@ -582,6 +558,9 @@
     "league_key": "469.l.105457",
     "team_name": "99 940",
     "faab_remaining": 100,
-    "cant_cut": ["Tarik Skubal", "Jazz Chisholm Jr."]
+    "cant_cut": [
+      "Tarik Skubal",
+      "Jazz Chisholm Jr."
+    ]
   }
 }
