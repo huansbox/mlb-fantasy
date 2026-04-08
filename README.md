@@ -31,6 +31,7 @@
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
 - `daily-advisor/daily_advisor.py` — 每日速報/最終報產生器（MLB Stats API + Savant + claude -p → Telegram 推送）
 - `daily-advisor/fa_scan.py` — FA 市場分析（每日打者+SP 兩階段 Claude / 週一 RP / %owned 快照）
+- `daily-advisor/_trade_lookup.py` — 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較）
 
 ## 核心策略
 
