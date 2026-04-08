@@ -1418,7 +1418,7 @@ def save_summary(advice):
 # ── Two-pass Claude helpers ──
 
 
-def _call_claude(prompt_path, data, timeout=300):
+def _call_claude(prompt_path, data, timeout=600, retries=1):
     """Call claude -p with prompt + data. Returns advice string or raises."""
     with open(prompt_path, encoding="utf-8") as f:
         prompt = f.read()
@@ -1428,13 +1428,22 @@ def _call_claude(prompt_path, data, timeout=300):
         full_prompt = prompt.replace("{roster_data}", data)
     else:
         full_prompt = f"{prompt}\n\n---\n\n{data}"
-    result = subprocess.run(
-        ["claude", "-p", full_prompt],
-        capture_output=True, text=True, encoding="utf-8", timeout=timeout,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"claude -p failed: {result.stderr[:500]}")
-    return result.stdout.strip()
+    last_err = None
+    for attempt in range(1 + retries):
+        try:
+            result = subprocess.run(
+                ["claude", "-p", full_prompt],
+                capture_output=True, text=True, encoding="utf-8", timeout=timeout,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(f"claude -p failed: {result.stderr[:500]}")
+            return result.stdout.strip()
+        except (subprocess.TimeoutExpired, RuntimeError) as e:
+            last_err = e
+            if attempt < retries:
+                print(f"  claude -p attempt {attempt+1} failed ({type(e).__name__}), retrying...",
+                      file=sys.stderr)
+    raise last_err
 
 
 def _notify(env, args, message):
@@ -1446,15 +1455,21 @@ def _notify(env, args, message):
 
 def _handle_error(step_name, error, env, args):
     """Handle pipeline error: print, Telegram notify, optionally create error Issue."""
-    msg = f"[FA Scan] {step_name} failed: {error}"
-    print(msg, file=sys.stderr)
+    full_msg = f"[FA Scan] {step_name} failed: {error}"
+    print(full_msg, file=sys.stderr)
     if not args.no_send:
-        send_telegram(msg, env)
+        # Telegram: concise message (TimeoutExpired str() contains the full prompt)
+        err_type = type(error).__name__
+        if isinstance(error, subprocess.TimeoutExpired):
+            tg_msg = f"[FA Scan] {step_name} failed: claude -p timed out after {error.timeout}s (with retry)"
+        else:
+            tg_msg = f"[FA Scan] {step_name} failed: {err_type}: {str(error)[:200]}"
+        send_telegram(tg_msg, env)
         try:
             subprocess.run(
                 ["gh", "issue", "create", "--repo", "huansbox/mlb-fantasy",
                  "--title", f"[FA Scan Error] {step_name}",
-                 "--body", f"```\n{msg}\n```",
+                 "--body", f"```\n{full_msg[:3000]}\n```",
                  "--label", "fa-scan-error"],
                 capture_output=True, text=True, encoding="utf-8", timeout=30,
             )
