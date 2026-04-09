@@ -1993,6 +1993,23 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     watchlist = parse_waiver_log_watchlist()
     watchlist = _resolve_watch_mlb_ids(watchlist, savant_2026)
 
+    # Filter out watchlist players already rostered (no longer FA)
+    league_key = config["league"]["league_key"]
+    still_fa = []
+    print(f"  Ownership check: {len(watchlist)} watch players...", file=sys.stderr)
+    for w in watchlist:
+        try:
+            ownership = _check_player_ownership(w["name"], league_key, access_token)
+            if ownership == "team":
+                print(f"  Watch skip (rostered): {w['name']}", file=sys.stderr)
+            else:
+                still_fa.append(w)
+        except Exception as e:
+            print(f"  Ownership check failed for {w['name']}: {e}", file=sys.stderr)
+            still_fa.append(w)  # keep on error to avoid false removal
+        time.sleep(0.5)
+    watchlist = still_fa
+
     # Remove watch players from snapshot to avoid duplication
     watch_names = {w["name"] for w in watchlist}
     snapshot_no_watch = {k: v for k, v in snapshot.items() if k not in watch_names}

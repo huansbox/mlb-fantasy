@@ -991,6 +991,7 @@ def analyze(config, target_date, env=None, morning=False):
             print(f"Yahoo roster fetch failed, using config: {e}", file=sys.stderr)
 
     games = fetch_schedule(date_str)
+    # target_date = today in ET; games on this date may be in progress
     games_in_progress = [g for g in games if g.get("game_state") == "Live"]
 
     # Build set of teams playing
@@ -1073,8 +1074,13 @@ def analyze(config, target_date, env=None, morning=False):
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
 
-    # Calculate bench requirement: batters with games - 10 starting slots
-    batters_with_games = sum(1 for b in batters if b["team"] in teams_playing)
+    # Calculate bench requirement: active batters with games - 10 starting slots
+    _inactive = {"IL", "IL+", "NA"}
+    batters_with_games = sum(
+        1 for b in batters
+        if b["team"] in teams_playing
+        and b.get("selected_pos", b.get("role", "")) not in _inactive
+    )
     batter_bn_needed = max(0, batters_with_games - 10)
     lines.append(f"今日 {batters_with_games} 名打者有比賽，最多需 {batter_bn_needed} 人板凳\n")
 
@@ -1431,6 +1437,10 @@ def main():
     if args.date:
         target_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
+        # target_date = ET 的「今天」。
+        # 速報 TW 22:15 = ET 10:15 → 比賽還沒開始，用來預覽今日 matchup
+        # 最終報 TW 05:00 = ET 17:00（前一天）→ 比賽可能進行中，用來確認結果
+        # 兩者的 target_date 都是「ET 當天」，不是「明天」。
         target_date = datetime.now(ET).date()
 
     mode_label = "最終報" if args.morning else "速報"
