@@ -90,7 +90,8 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 由自動化腳本從 `roster_config.json` + 即時數據動態計算（見 `fa_scan.py` 輸出）。
 包含位置深度（零替補位置）和球員表現急迫性。
 
-> FA 觀察追蹤見 `waiver-log.md`（觀察中 / 觸發條件 / 已結案）。
+> FA 觀察 + 隊上球員追蹤見 `waiver-log.md`（觀察中 / 隊上觀察 / 已結案）。
+> 「隊上觀察」記錄數據看不出的脈絡：傷勢追蹤、角色變化、限局跡象等。
 
 ## 球員評估框架
 
@@ -310,10 +311,10 @@ roster_config.json（陣容唯一來源）
   ├─ 被讀取：daily_advisor.py / fa_scan.py / roster_stats.py / weekly_review.py
   └─ 被更新：roster_sync.py（cron TW 15:10，偵測 add/drop + 更新狀態 → auto sync + git push）
 
-waiver-log.md（FA 追蹤唯一來源）
-  ├─ 觀察中 / 條件 Pass / 已結案
+waiver-log.md（球員追蹤唯一來源）
+  ├─ 觀察中（FA）/ 隊上觀察（自家球員非數據脈絡）/ 已結案
   ├─ 被讀取：fa_scan.py / skills
-  └─ 被更新：/player-eval / /waiver-scan skill
+  └─ 被更新：/player-eval / /waiver-scan skill / 傷病事件時手動
 
 資料流：MLB Stats API + Yahoo Fantasy API + Baseball Savant CSV
   → Python 腳本組裝 → claude -p 分析 → Telegram 推送 + GitHub Issue 存檔
@@ -326,7 +327,7 @@ waiver-log.md（FA 追蹤唯一來源）
 | `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP / 週一 RP / snapshot-only） |
 | `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據 + Yahoo 格位 + MLB 狀態） |
-| `waiver-log.md` | FA 觀察追蹤（觀察中 / 條件 Pass / 已結案） |
+| `waiver-log.md` | 球員追蹤（FA 觀察中 / 隊上觀察 / 已結案） |
 | `week-reviews.md` | 累積式週覆盤記錄 |
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |

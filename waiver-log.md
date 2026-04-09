@@ -15,11 +15,6 @@
 - 04-07：xwOBA .457(>P90) / Barrel% 17.6%(>P90) on 17 BBE，2025 prior 確認品質。BN 仍無空位，0% owned 無壓力，維持觀察（fa_scan）
 - 04-08：xwOBA .457/Barrel% 17.6% 持續>P90（17 BBE），BN 無空位，0% owned 安全（fa_scan）
 
-### Parker Messick (CLE, SP) [mlb_id:800048] — 已在陣容，開季驗證
-觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
-- 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
-- 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
-
 ### Royce Lewis (MIN, 3B) [mlb_id:668904] — 條件 Pass
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
 - 03-29：[waiver-scan] 42% owned。前 #1 pick，健康時 .290/.850+/20+ HR。但連 4 年進 IL，3B 有 Machado 不需升級，BN 全滿。
@@ -55,6 +50,18 @@
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
 - 04-08：三項>P90（.384/12.5%/13.3%）BBE 15 低信心，2025 prior P25-40 弱，%owned 15% 三日+11 急升（fa_scan）
+
+## 隊上觀察
+
+### Cole Ragans (KC, SP) [mlb_id:666142] — DTD
+狀況：4/8 vs CLE 被 J.Ramírez 平飛球擊中左手拇指，0.2 IP 退場。X 光無結構性損傷，診斷左拇指挫傷。
+追蹤：下週 vs DET 先發前 KC 要確認 grip 正常 → 正常先發則結案；進 IL 或跳過先發 → 評估是否串流補 IP
+- 04-09：DTD。本人表態樂觀（「有點僵硬，應該沒問題」），預計下週先發。
+
+### Parker Messick (CLE, SP) [mlb_id:800048] — 開季驗證
+觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
+- 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
+- 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
 
 ## 已結案
 
