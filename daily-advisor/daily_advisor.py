@@ -259,6 +259,7 @@ def fetch_schedule(date_str):
                 "game_time": g.get("gameDate", ""),
                 "venue_name": venue.get("name", ""),
                 "venue_id": venue.get("id"),
+                "game_state": g.get("status", {}).get("abstractGameState", ""),
             })
     return games
 
@@ -990,6 +991,7 @@ def analyze(config, target_date, env=None, morning=False):
             print(f"Yahoo roster fetch failed, using config: {e}", file=sys.stderr)
 
     games = fetch_schedule(date_str)
+    games_in_progress = [g for g in games if g.get("game_state") == "Live"]
 
     # Build set of teams playing
     teams_playing = set()
@@ -1070,6 +1072,12 @@ def analyze(config, target_date, env=None, morning=False):
 
     # ── Section 1: Batters ──
     lines = [f"=== {date_str} ({weekday}) ===\n"]
+
+    # Calculate bench requirement: batters with games - 10 starting slots
+    batters_with_games = sum(1 for b in batters if b["team"] in teams_playing)
+    batter_bn_needed = max(0, batters_with_games - 10)
+    lines.append(f"今日 {batters_with_games} 名打者有比賽，最多需 {batter_bn_needed} 人板凳\n")
+
     lines.append("我的打者：")
     for b in batters:
         pos = "/".join(b["positions"])
@@ -1200,6 +1208,12 @@ def analyze(config, target_date, env=None, morning=False):
     if ip_entries:
         lines.extend(ip_entries)
 
+    if games_in_progress:
+        live_teams = []
+        for g in games_in_progress:
+            live_teams.append(f"{team_abbr(g['away_team'], season)}@{team_abbr(g['home_team'], season)}")
+        lines.append(f"  ⚠️ 比賽進行中（{', '.join(live_teams)}），以上數據非最終，IP/比率仍會變動")
+
     if week_number == 1:
         lines.append(f"  合計: {total_ip:.1f} IP（Week 1 無最低局數限制）")
     else:
@@ -1226,6 +1240,8 @@ def analyze(config, target_date, env=None, morning=False):
             if cat["name"] in ("SB", "SV+H"):
                 tag += "（punt）"
             lines.append(f"  {cat['name']:>6}  {cat['mine']:>8}  {cat['opp']:>8}  {tag}")
+        if games_in_progress:
+            lines.append(f"  ⚠️ 比賽進行中，以上數據非最終")
 
     # ── Section 6: My SP schedule (rest of week) ──
     _, week_end, _ = get_fantasy_week(target_date, config)

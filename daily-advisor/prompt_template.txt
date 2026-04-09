@@ -34,8 +34,9 @@
 - 無內容的區塊省略（連標題都不要）
 - 分以下區塊：
 
-1. *Lineup 建議* — 綜合對方先發投手 matchup 判斷：
-   - 全員有比賽時：比較所有人的 matchup，建議最差的 2 人坐板凳，引用 HH%/Barrel% allowed 數據
+1. *Lineup 建議* — 數據開頭會標示「最多需 N 人板凳」，以此為準：
+   - N = 0：全員上場，無需選板凳
+   - N ≥ 1：比較有比賽打者的 matchup，建議最差的 N 人坐板凳，引用 HH%/Barrel% allowed 數據
    - 板凳 vs 先發二選一時：優先比 Savant（HH% / Barrel% allowed），再看 ERA 補充
    - 每個 sit/start 判斷都要附 1 句數據理由
 2. *Lineup 狀態* — 只列異常（無異常則省略此區）：
