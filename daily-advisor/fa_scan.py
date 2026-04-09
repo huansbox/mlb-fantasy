@@ -26,7 +26,7 @@ from yahoo_query import (
     refresh_token, load_env, load_config, api_get,
     YAHOO_STAT_MAP, extract_player_info, parse_player_stats,
     send_telegram, _normalize, _search_players,
-    pitcher_type, calc_position_depth,
+    pitcher_type, calc_position_depth, is_active,
 )
 
 TPE = ZoneInfo("Asia/Taipei")
@@ -895,8 +895,7 @@ def build_roster_for_pass1(config, savant_2026, player_type="batter"):
     cant_cut = {n.lower() for n in config.get("league", {}).get("cant_cut", [])}
 
     def _is_replaceable(p):
-        sp = p.get("selected_pos", "")
-        if sp in ("IL", "IL+", "NA"):
+        if not is_active(p):
             return False
         if p.get("name", "").lower() in cant_cut:
             return False

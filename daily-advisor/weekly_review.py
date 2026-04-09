@@ -24,7 +24,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get as yahoo_api_get,
     send_telegram, YAHOO_STAT_MAP,
-    pitcher_type,
+    pitcher_type, is_active, INACTIVE_SLOTS,
 )
 from daily_advisor import (
     fetch_batter_gamelog, fetch_pitcher_gamelog,
@@ -284,7 +284,7 @@ def _parse_roster_players(roster_data):
         if not name or not display_pos:
             continue
 
-        if selected_pos in ("IL", "IL+", "NA"):
+        if selected_pos in INACTIVE_SLOTS:
             role = "IL"
         elif selected_pos == "BN":
             role = "bench"
@@ -317,9 +317,9 @@ def fetch_sp_schedules(my_roster, opp_roster, week_start, week_end):
     Returns: (my_sp_schedule, opp_sp_schedule)
     """
     my_sps = {p["name"]: p["team"] for p in my_roster.get("pitchers", [])
-              if p.get("type") == "SP" and p.get("role") != "IL"}
+              if p.get("type") == "SP" and is_active(p)}
     opp_sps = {p["name"]: p["team"] for p in opp_roster.get("pitchers", [])
-               if p.get("type") == "SP" and p.get("role") != "IL"}
+               if p.get("type") == "SP" and is_active(p)}
     all_sp_names = set(my_sps.keys()) | set(opp_sps.keys())
 
     my_schedule = []
@@ -363,7 +363,7 @@ def compute_positional_coverage(my_roster, config, week_start, week_end):
 
     Uses Yahoo API roster (my_roster) for active batters, config for team ID map.
     """
-    batters = [b for b in my_roster.get("batters", []) if b.get("role") != "IL"]
+    batters = [b for b in my_roster.get("batters", []) if is_active(b)]
     team_id_map = config.get("teams", {})
     # Reverse map: mlb_team_id → config abbreviation
     id_to_abbr = {v: k for k, v in team_id_map.items()}

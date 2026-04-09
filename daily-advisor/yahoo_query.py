@@ -112,6 +112,23 @@ def pitcher_type(player):
     return None
 
 
+# Yahoo slot codes that mean "not in active lineup pool"
+INACTIVE_SLOTS = ("IL", "IL+", "NA")
+
+
+def is_active(player):
+    """Return True if player is active (not on IL/IL+/NA).
+
+    Checks both 'role' (set during roster parsing) and 'selected_pos'
+    (Yahoo raw position) to handle all data sources consistently.
+    """
+    if player.get("role") == "IL":
+        return False
+    if player.get("selected_pos", "") in INACTIVE_SLOTS:
+        return False
+    return True
+
+
 def calc_position_depth(config):
     """Calculate position coverage from config.
 
