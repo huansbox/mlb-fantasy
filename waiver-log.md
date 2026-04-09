@@ -2,14 +2,6 @@
 
 ## 觀察中
 
-### Landen Roupp (SF, SP) [mlb_id:694738] — 觀察中
-觸發：連 2 場 ERA < 3.00 + 無爆炸 → 穩定性確認後 add
-- 04-06：[waiver-scan] 2026 xERA 2.14 >P90 / xwOBA .231 >P90 / HH% 29.6% >P90（27 BBE 低信心）。K 率菁英（14K/10.2IP）。但 G2 爆炸（4.2IP/5ER），穩定性存疑。2025 IP/GS 4.85 短局型。SF 弱隊。
-- 04-07：xERA 2.10 / xwOBA .231 / HH% 29.6% 三項 >P90 持續，運氣 -2.12 極度不運。27 BBE 低信心。觸發「連2場 ERA<3.00 + 無爆炸」未達成（G2 爆炸），等下場驗證（fa_scan）
-- 04-08：數據持平（xERA 2.10/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）
-- 04-08：數據持平（xERA 2.10/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）
-- 04-09：數據持平（xERA 2.09/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）
-
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
@@ -39,7 +31,6 @@
 - 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
 - 04-08：本次 BBE 0（數據延遲），%owned 26% 三日+3 上升，等數據更新（fa_scan）
 - 04-09：BBE 0 無新數據，%owned 26% 持續升，等數據更新（fa_scan）
-
 
 ### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
 觸發：BBE 達 50 仍維持 xERA < P70 (3.74) + xwOBA < P70 (.301) → 取代 Liberatore
@@ -84,6 +75,9 @@
 - 04-09：[eval] vs Liberatore，結論：繼續觀察。理由：2/3 勝出 + 買低信號，但短局型（IP/GS 5.1）+ 2025 僅 22.2 IP prior 信心低
 
 ## 已結案
+
+### Landen Roupp (SF, SP) — 被搶（自動偵測）
+- 2026-04-09：Yahoo ownership_type=team，從觀察中移除。
 
 ### Eduardo Rodriguez (AZ, SP) — 被撿走
 - 04-09：Yahoo 確認 16% owned，已被其他隊撿走。觸發條件接近達成（BBE 35/50，三項>P90），未及時行動
