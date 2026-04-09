@@ -8,6 +8,7 @@
 - 04-07：xERA 2.10 / xwOBA .231 / HH% 29.6% 三項 >P90 持續，運氣 -2.12 極度不運。27 BBE 低信心。觸發「連2場 ERA<3.00 + 無爆炸」未達成（G2 爆炸），等下場驗證（fa_scan）
 - 04-08：數據持平（xERA 2.10/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）
 - 04-08：數據持平（xERA 2.10/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）（fa_scan）
+- 04-09：數據持平（xERA 2.09/xwOBA .231/HH% 29.6% 三項>P90），27 BBE。觸發「連2場ERA<3.00」未達成，等下場驗證（fa_scan）（fa_scan）
 
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
@@ -44,12 +45,14 @@
 - 04-07：2026 xERA 2.29(>P90) / xwOBA .241(>P90) / HH% 25.7%(>P90)，35 BBE 中等信心。IP/GS 6.0 深投型。運氣 +2.29 極度好運。2025 prior P45 平庸（489 BBE）。13% owned 無壓力（fa_scan）
 - 04-08：BBE 35 中等信心，三項>P90 持續，IP/GS 6.0 深投型。%owned +3 加速中，距 BBE 50 觸發約 2 場先發（fa_scan）
 - 04-08：BBE 35 中等信心，三項>P90 持續，IP/GS 6.0 深投型。%owned +3 加速中，距 BBE 50 觸發約 2 場先發（fa_scan）（fa_scan）
+- 04-09：BBE 35 中等信心，三項>P90 持續（2.27/.241/25.7%），IP/GS 6.0 深投型。品質條件已達，僅差 BBE 量（35/50），約 2 場先發（fa_scan）（fa_scan）
 
 ### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
 觸發：BBE 達 60 仍維持 xERA < P80 + HH% 改善至 < P40 (42.2%) → 取代 Bassitt
 - 04-07：2026 xERA 2.54(>P90) / xwOBA .254(>P90) / HH% 40.5%(P50-55)，37 BBE 中等信心。IP/GS 5.8 深投型。運氣 -0.55 接近真實。2025 prior P45 且 HH% 47.3% 為慢性問題。MIA 弱隊（fa_scan）
 - 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）
 - 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）（fa_scan）
+- 04-09：BBE 37，xERA 2.52/xwOBA .254 >P90 + HH% 40.5%(<42.2%) 條件已達，僅差 BBE 量（37/60），約 3-4 場先發（fa_scan）（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -79,6 +82,14 @@
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
 - 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
 - 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
+
+### Joe Boyle (TB, SP,RP) [mlb_id:671212] — 觀察中
+觸發：BBE 達 50 且 xERA 維持 <P70 (3.74) + xwOBA <P70 (.301) → 取代 Liberatore
+- 04-09：xERA 3.26(P80-90)/xwOBA .288(P80-90) 但 HH% 43.3%(<P25) 慢性差。BBE 30 中等信心。運氣 -1.91 極度不運（撿便宜信號）。2025 prior P60（xERA 4.04/HH% 46.0%，137 BBE）。IP/GS 5.2 短局型。19% owned（fa_scan）
+
+### DL Hall (MIL, SP,RP) [mlb_id:669084] — 觀察中
+觸發：確認連 2 場 SP 先發 + BBE 達 30 品質維持 → 取代 Liberatore
+- 04-09：xERA 3.36(P80-90)/xwOBA .292(P70-80)/HH% 28.6%(>P90)，BBE 14 極低信心。2025 prior P70-80+（3.56/.294/28.8%，111 BBE）品質確認。運氣 +3.36（ERA 0.00）。角色待定（SP/RP），1% owned（fa_scan）
 
 ## 已結案
 
