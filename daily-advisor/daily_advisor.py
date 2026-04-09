@@ -43,6 +43,23 @@ RP_PCTILES = {
     "era_diff":   [(25,0.28),(40,0.43),(45,0.52),(50,0.57),(55,0.63),(60,0.72),(70,0.88),(80,1.06),(90,1.24)],
 }
 
+# Yahoo slot codes that mean "not in active lineup pool"
+# Mirror of yahoo_query.INACTIVE_SLOTS — kept here to avoid circular import.
+INACTIVE_SLOTS = ("IL", "IL+", "NA")
+
+
+def is_active(player):
+    """Return True if player is active (not on IL/IL+/NA).
+
+    Mirrors yahoo_query.is_active — kept here to avoid circular import.
+    Checks both 'role' (set during roster parsing) and 'selected_pos'.
+    """
+    if player.get("role") == "IL":
+        return False
+    if player.get("selected_pos", "") in INACTIVE_SLOTS:
+        return False
+    return True
+
 
 def pctile_tag(value, metric, player_type="batter"):
     """Return percentile range tag like '(P70-80)' or '(>P90)'."""
@@ -108,13 +125,13 @@ def load_config():
     for b in config.get("batters", []):
         if "role" not in b:
             sp = b.get("selected_pos", "")
-            b["role"] = "IL" if sp in ("IL", "IL+") else ("bench" if sp == "BN" else "starter")
+            b["role"] = "IL" if sp in ("IL", "IL+", "NA") else ("bench" if sp == "BN" else "starter")
         if "positions" not in b:
             b["positions"] = []
     for p in config.get("pitchers", []):
         if "role" not in p:
             sp = p.get("selected_pos", "")
-            p["role"] = "IL" if sp in ("IL", "IL+") else ("bench" if sp == "BN" else "starter")
+            p["role"] = "IL" if sp in ("IL", "IL+", "NA") else ("bench" if sp == "BN" else "starter")
         if "type" not in p:
             positions = p.get("positions", [])
             p["type"] = "SP" if "SP" in positions else ("RP" if "RP" in positions else "SP")
@@ -818,7 +835,7 @@ def fetch_yahoo_roster(team_key, access_token, mlb_id_map):
             continue
 
         # Determine role from selected position
-        if selected_pos == "IL" or selected_pos == "IL+":
+        if selected_pos in ("IL", "IL+", "NA"):
             role = "IL"
         elif selected_pos == "BN":
             role = "bench"
@@ -929,8 +946,7 @@ def calc_weekly_ip(config, target_date, pitchers_list=None):
     week_start, week_end, _ = get_fantasy_week(target_date, config)
     season = config["league"]["season"]
     src = pitchers_list if pitchers_list else config["pitchers"]
-    # Note: config fallback sets all roles to "starter" (no IL info); Yahoo API path is accurate
-    active_pitchers = [p for p in src if p.get("role") != "IL"]
+    active_pitchers = [p for p in src if is_active(p)]
 
     entries = []
     total_ip = 0.0
@@ -1075,11 +1091,9 @@ def analyze(config, target_date, env=None, morning=False):
     lines = [f"=== {date_str} ({weekday}) ===\n"]
 
     # Calculate bench requirement: active batters with games - 10 starting slots
-    _inactive = {"IL", "IL+", "NA"}
     batters_with_games = sum(
         1 for b in batters
-        if b["team"] in teams_playing
-        and b.get("selected_pos", b.get("role", "")) not in _inactive
+        if b["team"] in teams_playing and is_active(b)
     )
     batter_bn_needed = max(0, batters_with_games - 10)
     lines.append(f"今日 {batters_with_games} 名打者有比賽，最多需 {batter_bn_needed} 人板凳\n")
