@@ -699,6 +699,11 @@ def filter_by_savant(snapshot, savant_2026):
             if yahoo_bb and savant_pa and int(savant_pa) > 0:
                 metrics["bb_pct"] = int(yahoo_bb) / int(savant_pa) * 100
 
+        # BBE minimum: filter pure noise (BBE < 15 = 1-3 game samples).
+        # Watch list players bypass this via direct enrichment.
+        if (savant.get("bbe") or 0) < 15:
+            continue
+
         thresholds = (
             BATTER_THRESHOLDS if fa_type == "batter"
             else SP_THRESHOLDS
@@ -1665,6 +1670,11 @@ def _insert_update_line(content, player_name, short_date, summary):
     # Ensure exactly one \n before new line (strip trailing blank lines)
     before = content[:insert_pos].rstrip("\n") + "\n"
     after = content[insert_pos:]
+
+    # Strip trailing （fa_scan） if Claude already included it in summary
+    summary = summary.rstrip()
+    while summary.endswith("（fa_scan）"):
+        summary = summary[:-len("（fa_scan）")].rstrip()
 
     new_line = f"- {short_date}：{summary}（fa_scan）\n"
     content = before + new_line + "\n" + after
