@@ -40,19 +40,14 @@
 - 04-08：本次 BBE 0（數據延遲），%owned 26% 三日+3 上升，等數據更新（fa_scan）
 - 04-09：BBE 0 無新數據，%owned 26% 持續升，等數據更新（fa_scan）
 
-### Eduardo Rodriguez (AZ, SP) [mlb_id:593958] — 觀察中
-觸發：BBE 達 50 仍維持 xERA < P80 (3.43) + xwOBA < P80 (.289) → 取代 Bassitt
-- 04-07：2026 xERA 2.29(>P90) / xwOBA .241(>P90) / HH% 25.7%(>P90)，35 BBE 中等信心。IP/GS 6.0 深投型。運氣 +2.29 極度好運。2025 prior P45 平庸（489 BBE）。13% owned 無壓力（fa_scan）
-- 04-08：BBE 35 中等信心，三項>P90 持續，IP/GS 6.0 深投型。%owned +3 加速中，距 BBE 50 觸發約 2 場先發（fa_scan）
-- 04-08：BBE 35 中等信心，三項>P90 持續，IP/GS 6.0 深投型。%owned +3 加速中，距 BBE 50 觸發約 2 場先發（fa_scan）（fa_scan）
-- 04-09：BBE 35 中等信心，三項>P90 持續（2.27/.241/25.7%），IP/GS 6.0 深投型。品質條件已達，僅差 BBE 量（35/50），約 2 場先發（fa_scan）（fa_scan）
 
 ### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
-觸發：BBE 達 60 仍維持 xERA < P80 + HH% 改善至 < P40 (42.2%) → 取代 Bassitt
+觸發：BBE 達 50 仍維持 xERA < P70 (3.74) + xwOBA < P70 (.301) → 取代 Liberatore
 - 04-07：2026 xERA 2.54(>P90) / xwOBA .254(>P90) / HH% 40.5%(P50-55)，37 BBE 中等信心。IP/GS 5.8 深投型。運氣 -0.55 接近真實。2025 prior P45 且 HH% 47.3% 為慢性問題。MIA 弱隊（fa_scan）
 - 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）
 - 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）（fa_scan）
 - 04-09：BBE 37，xERA 2.52/xwOBA .254 >P90 + HH% 40.5%(<42.2%) 條件已達，僅差 BBE 量（37/60），約 3-4 場先發（fa_scan）（fa_scan）
+- 04-09：[eval] vs Liberatore，結論：繼續觀察，觸發降至 BBE 50。理由：2/3 勝出 + 深投型（IP/GS 5.8）+ 運氣真實（-0.57），是最穩健的替代品
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -86,12 +81,15 @@
 ### Joe Boyle (TB, SP,RP) [mlb_id:671212] — 觀察中
 觸發：BBE 達 50 且 xERA 維持 <P70 (3.74) + xwOBA <P70 (.301) → 取代 Liberatore
 - 04-09：xERA 3.26(P80-90)/xwOBA .288(P80-90) 但 HH% 43.3%(<P25) 慢性差。BBE 30 中等信心。運氣 -1.91 極度不運（撿便宜信號）。2025 prior P60（xERA 4.04/HH% 46.0%，137 BBE）。IP/GS 5.2 短局型。19% owned（fa_scan）
-
-### DL Hall (MIL, SP,RP) [mlb_id:669084] — 觀察中
-觸發：確認連 2 場 SP 先發 + BBE 達 30 品質維持 → 取代 Liberatore
-- 04-09：xERA 3.36(P80-90)/xwOBA .292(P70-80)/HH% 28.6%(>P90)，BBE 14 極低信心。2025 prior P70-80+（3.56/.294/28.8%，111 BBE）品質確認。運氣 +3.36（ERA 0.00）。角色待定（SP/RP），1% owned（fa_scan）
+- 04-09：[eval] vs Liberatore，結論：繼續觀察。理由：2/3 勝出 + 買低信號，但短局型（IP/GS 5.1）+ 2025 僅 22.2 IP prior 信心低
 
 ## 已結案
+
+### Eduardo Rodriguez (AZ, SP) — 被撿走
+- 04-09：Yahoo 確認 16% owned，已被其他隊撿走。觸發條件接近達成（BBE 35/50，三項>P90），未及時行動
+
+### DL Hall (MIL, SP,RP) — Pass（確認 RP）
+- 04-09：[eval] vs Liberatore，結論：Pass。2026 GS=0（5G 全 relief），2025 也僅 3 GS/20G。品質 3/3 勝出 + prior 確認，但無法填 SP 格位
 
 ### Reynaldo López (ATL, SP) — 被搶（自動偵測）
 - 2026-04-08：Yahoo ownership_type=team，從觀察中移除。
