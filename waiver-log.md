@@ -8,6 +8,7 @@
 - 04-07：xwOBA .457(>P90) / Barrel% 17.6%(>P90) on 17 BBE，2025 prior 確認品質。BN 仍無空位，0% owned 無壓力，維持觀察（fa_scan）
 - 04-08：xwOBA .457/Barrel% 17.6% 持續>P90（17 BBE），BN 無空位，0% owned 安全（fa_scan）
 - 04-09：BBE 21，xwOBA .428/Barrel% 14.3% 隨樣本增加略回歸但仍>P90。BN 無空位，0% owned（fa_scan）
+- 04-10：BBE 21，xwOBA .429/Barrel% 14.3% >P90 持續，BB% 3.7% <P25。BN 無空位，0% owned（fa_scan）
 
 ### Royce Lewis (MIN, 3B) [mlb_id:668904] — 條件 Pass
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
@@ -19,18 +20,21 @@
 - 04-07：2026 xwOBA .333(P80-90) / BB% 17.9%(>P90) / Barrel% 10.5%(P70-80)，19 BBE 低信心。2025 prior 全面 P80+（.359/.107/.120，383 BBE）品質確認。1B only 位置彈性差（fa_scan）
 - 04-08：BBE 19，三項品質持續（.333/16.3%/10.5%），0% owned（fa_scan）
 - 04-09：BBE 22，xwOBA .338(P80-90)/BB% 17.0%(>P90)/Barrel% 9.1%(P60-70) 三項穩定在觸發門檻內。0% owned 安全（fa_scan）
+- 04-10：BBE 24，xwOBA .353(>P90)/BB% 15.7%(>P90)/Barrel% 8.3%(P50-55)。Barrel% 略低於觸發 P60 門檻，距 BBE 30 約 2-3 場（fa_scan）
 
 ### Francisco Alvarez (NYM, C) [mlb_id:682626] — 觀察中
 觸發：BBE 達 25 且 xwOBA > P80 + Barrel% > P70 → 取代 Butler
 - 04-07：2026 xwOBA .502(>P90) / Barrel% 29.4%(>P90) 但 BB% 6.9%(P25-40)。2025 prior P70-80（.326/.097/.121，173 BBE）。34% owned 快速上升，窗口有限（fa_scan）
 - 04-08：BBE 17，xwOBA .502/Barrel% 29.4% 持續>P90，%owned 35% 三日+3 加速。距觸發 BBE 25 約 2-3 場（fa_scan）
 - 04-09：BBE 20，xwOBA .472/BB% 10.8%/Barrel% 25.0% 持續>P90，%owned 36% 三日+3。距 BBE 25 觸發約 2-3 場，窗口收窄（fa_scan）
+- 04-10：BBE 23→觸發 25 僅差 1-2 場！xwOBA .460/Barrel% 21.7% 遠超門檻，%owned 36% 三日+3 加速。最緊急觀察對象（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
 - 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
 - 04-08：本次 BBE 0（數據延遲），%owned 26% 三日+3 上升，等數據更新（fa_scan）
 - 04-09：BBE 0 無新數據，%owned 26% 持續升，等數據更新（fa_scan）
+- 04-10：BBE 0 無新數據，%owned 26%，等數據更新（fa_scan）
 
 ### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
 觸發：BBE 達 50 仍維持 xERA < P70 (3.74) + xwOBA < P70 (.301) → 取代 Liberatore
@@ -44,18 +48,22 @@
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
 - 04-08：三項>P90（.384/12.5%/13.3%）BBE 15 低信心，2025 prior P25-40 弱，%owned 15% 三日+11 急升（fa_scan）
 - 04-09：BBE 15 不變，三項>P90 持續。%owned 17% 三日+9 急升，2025 prior P25-40 弱（fa_scan）
+- 04-10：BBE 16 不變，三項>P90 持續，%owned 17% 三日+3 升。距觸發 BBE 30 仍遠（fa_scan）
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：BBE 達 30 且 2 項核心維持 >P70 → vs Buxton/Albies
 - 04-09：xwOBA .328(P70-80) / BB% 8.6%(P55) / Barrel% 17.6%(>P90)，BBE 17 低信心。2025 prior 強力確認（.447/13.0%/20.8%，48 BBE）。25% owned（fa_scan）
+- 04-10：BBE 20，xwOBA .316/BB% 8.3%/Barrel% 15.0%。2025 prior 強力確認。距觸發 BBE 30 約 3-4 場（fa_scan）
 
 ### Miguel Vargas (CWS, 1B,3B) [mlb_id:678246] — 觀察中
 觸發：BBE 達 35 且 BB% 維持 >P80 + xwOBA >P60 → vs Albies/Butler
 - 04-09：xwOBA .324(P70-80) / BB% 14.3%(>P90) / Barrel% 7.4%(P45-50)，BBE 27。2025 prior 確認（.319/9.8%/9.3%，407 BBE）。38% owned +9 升幅（fa_scan）
+- 04-10：BBE 29→觸發 35 差 2-3 場，BB% 15.1%(>P90)/xwOBA .325(P70-80) 品質條件已達。%owned 38% 持續升（fa_scan）
 
 ### Richie Palacios (TB, 2B,LF) [mlb_id:680700] — 觀察中
 觸發：BBE 達 30 且 xwOBA >P80 + BB% >P70 → vs Buxton
 - 04-09：xwOBA .455(>P90) / BB% 18.2%(>P90) / Barrel% 14.3%(>P90)，BBE 14 極低信心。2025 prior xwOBA .360(P90)/BB% 10.4%(P80) 確認，但 Barrel% 5.9% 未確認。0% owned（fa_scan）
+- 04-10：BBE 14，三項>P90 持續但樣本極小。2025 xwOBA/BB% 確認但 Barrel% 5.9% 未確認。0% owned（fa_scan）
 
 ### Joey Cantillo (CLE, SP) [mlb_id:676282] — 強烈推薦（待 Yahoo FAAB）
 觸發：Yahoo 確認為 FA → 立刻 FAAB claim drop Liberatore
@@ -81,6 +89,10 @@
 觸發：BBE 達 50 且 xERA 維持 <P70 (3.74) + xwOBA <P70 (.301) → 取代 Liberatore
 - 04-09：xERA 3.26(P80-90)/xwOBA .288(P80-90) 但 HH% 43.3%(<P25) 慢性差。BBE 30 中等信心。運氣 -1.91 極度不運（撿便宜信號）。2025 prior P60（xERA 4.04/HH% 46.0%，137 BBE）。IP/GS 5.2 短局型。19% owned（fa_scan）
 - 04-09：[eval] vs Liberatore，結論：繼續觀察。理由：2/3 勝出 + 買低信號，但短局型（IP/GS 5.1）+ 2025 僅 22.2 IP prior 信心低
+
+### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
+觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Albies
+- 04-10：xwOBA .299(P50)/BB% 13.3%(>P90)/Barrel% 7.4%(P45-50)，BBE 27。2025 prior 219 BBE 確認 BB% 結構優勢（11.7%）。7% owned 無壓力（fa_scan）（fa_scan）
 
 ## 已結案
 
