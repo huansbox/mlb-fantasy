@@ -372,4 +372,4 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：類似 fa_scan 的聯盟交易機會掃描。掃描 12 隊 roster 的守位深度 + 7-cat 傳統數據，找出「我方過剩 vs 對方過剩」的 win-win 交易對象。工具基礎已建好：`daily-advisor/_trade_lookup.py`（聯盟 roster 查詢 + 守位覆蓋 + 球員 7-cat 比較）
-- [ ] **追蹤 Carlos Rodón IL 狀況**（992330 潛在 Albies 1:1 買低目標）：確認 IL 類型 + 預計回歸時間，判斷折價窗口是否存在。詳見 `league-scouting.md` 992330 交易候選區段
+- [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
