@@ -57,3 +57,39 @@
 | Brenton Doyle | BUMMER | 74% | W 3/31 | CF 條件 Pass：AVG 拖比率 + 速度型 |
 | Noelvi Marte | BUMMER | 71% | W 3/31 | 3B/RF 位置重疊，Pass |
 | Dylan Crews | 99 APO | — | NA (FA) | NA stash 首選候選 |
+
+## 交易候選調查
+
+### 992330（Formosa Chiang）— 2026-04-10
+
+**Roster 結構**：
+- 打者 12：C / 1B / 2B(薄) / 3B / SS(4 人過剩) / LF(3) / CF(3) / RF(4) — SS 與 OF 嚴重過剩，**2B 是他們最薄的守位**（Muncy 兼職 + Giménez）
+- SP 10 + RP 1：Skenes / Alcantara / Pivetta / Rodón(IL?) / Ray / Kirby / Soriano / Soroka / Cecconi / Painter + Williams(RP)
+- 核心：Harper / Alvarez / Tatis / Contreras / Skenes / Pivetta / Rodón
+
+**GM 交易心態（2026 加權後）**：
+- **熱鎖**（絕不放）：Alvarez(1.183 OPS) / DeLauter(5HR/12G breakout) / Contreras(.838 + 8BB) / Tatis(franchise) / Harper / Muncy / Pivetta / Ray / Kirby / Soriano(0.45 ERA) / Alcantara(0.74 ERA buy-low 窗已關)
+- **GM 最想丟**（2026 冷手 + 陣容過剩）：Michael Harris II(.543 OPS) / Jeremy Peña(SS 過剩) / Ramón Laureano(回歸) / Slade Cecconi(5.23 ERA)
+- **溫度中性**：Colson Montgomery(冷開但新秀 upside) / Carlos Rodón(無 2026 數據疑 IL)
+
+**我方框架匹配**（batter 重 BB / SP 重 IP+K）：
+- **想要但拿不到**：Max Muncy(BB 菁英 + 2B 對位) / Pivetta / Rodón(IP+K 雙王) / Alcantara / Ray
+- **GM 願放但我方拒收（BB 陷阱）**：Harris II(BB% 2.6%) / Peña(BB% 6.5%) / Laureano(BB% 6.2%) / Giménez(降級)
+
+**可行的 1:1 路徑**：
+
+1. **Albies ↔ Colson Montgomery**（3B/SS）
+   - 對方：冷開 .195/.679 12G，2025 71G .840 OPS / 21HR / 25BB power breakout
+   - 定位：upside 賭注（穩定產量換 power + 守位彈性），BB 邊際不升級但不降
+   - 觸發：若 Montgomery 冷手延續到 ~4/20 → GM 信心動搖，試探成功率上升
+   - 風險：新秀變動性大；若 Albies 持續熱化，可能賣在低點
+
+2. **Albies ↔ Carlos Rodón**（SP）
+   - 對方：2025 195.1 IP / 203K / 3.09 ERA / 18W 菁英；2026 無數據疑 IL
+   - 定位：框架完美匹配（IP+K 雙王），IL 不確定性創造折價窗口
+   - 觸發：需先確認 IL 類型 + 預計回歸時間
+   - 風險：買到真的壞掉的肩/肘
+
+**不可行（需加碼才成立）**：Muncy / Alcantara / Ray / Harper / Contreras
+
+**避開清單**：Harris II / Peña / Laureano / Giménez / Cecconi — GM 最想丟的人全部 BB 或品質不合框架，1:1 都是降級
