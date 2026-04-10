@@ -66,14 +66,6 @@
 - 04-09：xwOBA .455(>P90) / BB% 18.2%(>P90) / Barrel% 14.3%(>P90)，BBE 14 極低信心。2025 prior xwOBA .360(P90)/BB% 10.4%(P80) 確認，但 Barrel% 5.9% 未確認。0% owned（fa_scan）
 - 04-10：BBE 14，三項>P90 持續但樣本極小。2025 xwOBA/BB% 確認但 Barrel% 5.9% 未確認。0% owned（fa_scan）
 
-### Joey Cantillo (CLE, SP) [mlb_id:676282] — 強烈推薦（待 Yahoo FAAB）
-觸發：Yahoo 確認為 FA → 立刻 FAAB claim drop Liberatore
-- 04-10：[eval] vs 隊上最弱 3 SP（Liberatore/Ragans/Nola），結論：撿，取代 Liberatore。當季三項全 >P90（xERA 2.41/xwOBA .248/HH% 27.3%，BBE 33 中等信心），運氣 |0.04| 真實表現。Liberatore 運氣 +2.23 是賣高訊號 + BBE 56 高信心確認真差。Cantillo 2025 prior P70-80（251 BBE）+ CLE 強隊 W 支援 + out of options 鎖定輪值。比觀察中 Boyle(2/3)/Junk(等 BBE) 都強。風險：IP/GS 4.9 短局 + 2025 純 SP 67 IP 小樣本。FantasyPros ~18% rostered
-
-### Trent Grisham (NYY, CF) [mlb_id:663757] — 強烈推薦（待 Yahoo FA 確認）
-觸發：Yahoo 確認為 FA → 立刻 FAAB claim drop Butler
-- 04-09：[eval] vs Butler，結論：撿。3/3 核心指標壓倒性勝出 — 2025 prior xwOBA .370(>P90)/BB% 14.1%(>P90)/Barrel% 14.2%(>P90)（358 BBE 高信心），2026 當季 xwOBA .394/BB% 20.9%/Barrel% 14.3% 全 >P90（28 BBE）雙重確認。NYY 每日 leadoff CF（$22M QO），2025 career-year 34 HR，左 hamstring 已康復。直接解決隊上 BB% 結構性偏低（Tovar/Chisholm 拖累）。Butler 在最弱 5 人且目前 BN + 術後 Barrel% 4.8% 暴跌，drop 成本最低。FantasyPros 33.5% rostered 風險中等
-
 ## 隊上觀察
 
 ### Cole Ragans (KC, SP) [mlb_id:666142] — DTD
@@ -109,6 +101,12 @@
 - 04-10：xERA 3.70(P70-80)/xwOBA .305(P60-70)/HH% 33.3%(>P90)，BBE 33。2025 P40-45 breakout 候選。4% owned（fa_scan）
 
 ## 已結案
+
+### Joey Cantillo (CLE, SP) — 被搶（自動偵測）
+- 2026-04-10：Yahoo ownership_type=team，從觀察中移除。
+
+### Trent Grisham (NYY, CF) — 被搶（自動偵測）
+- 2026-04-10：Yahoo ownership_type=team，從觀察中移除。
 
 ### David Hamilton (BOS, 2B/SS) [mlb_id:666152] — Pass
 - 04-09：[eval] vs Tovar，結論：不換。2025 prior 全線 <P25（xwOBA .260/HH% 27.8%/Barrel% 6.0%，133 BBE），2026 xwOBA .391(>P90) 但 HH% 33.3%(<P25) 是 BABIP 噪音非 breakout。打擊品質全面輸 Tovar，SS 資格帳面有但 BOS 實際打 2B + platoon（只對 RHP 先發），速度是唯一優勢但聯賽軟 punt SB
