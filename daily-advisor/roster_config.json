@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "Util",
+      "selected_pos": "2B",
       "status": ""
     },
     {
@@ -131,7 +131,7 @@
         "pa": 654,
         "g": 155
       },
-      "selected_pos": "2B",
+      "selected_pos": "LF",
       "status": ""
     },
     {
@@ -157,29 +157,6 @@
       "status": ""
     },
     {
-      "name": "Lawrence Butler",
-      "mlb_id": 671732,
-      "team": "ATH",
-      "positions": [
-        "CF",
-        "RF"
-      ],
-      "yahoo_player_key": "469.p.12719",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.304,
-        "barrel_pct": 9.2,
-        "hh_pct": 44.4,
-        "bb_pct": 9.4,
-        "ops": 0.71,
-        "pa_per_team_g": 3.89,
-        "pa": 630,
-        "g": 152
-      },
-      "selected_pos": "BN",
-      "status": ""
-    },
-    {
       "name": "Ozzie Albies",
       "mlb_id": 645277,
       "team": "ATL",
@@ -198,7 +175,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "Util",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -221,7 +198,7 @@
         "pa": 396,
         "g": 111
       },
-      "selected_pos": "LF",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -267,8 +244,30 @@
         "pa": 390,
         "g": 119
       },
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": ""
+    },
+    {
+      "name": "Trent Grisham",
+      "mlb_id": 663757,
+      "yahoo_player_key": "469.p.10522",
+      "team": "NYY",
+      "positions": [
+        "CF"
+      ],
+      "selected_pos": "Util",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.37,
+        "barrel_pct": 14.2,
+        "hh_pct": 46.4,
+        "bb_pct": 14.1,
+        "ops": 0.812,
+        "pa_per_team_g": 3.59,
+        "pa": 581,
+        "g": 143
+      }
     }
   ],
   "pitchers": [
@@ -336,7 +335,7 @@
         "ip": 61.7
       },
       "selected_pos": "SP",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Aaron Nola",
@@ -428,28 +427,6 @@
       "status": "IL15"
     },
     {
-      "name": "Matthew Liberatore",
-      "mlb_id": 669461,
-      "yahoo_player_key": "469.p.11397",
-      "team": "STL",
-      "positions": [
-        "SP"
-      ],
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.9,
-        "xwoba_allowed": 0.34,
-        "hh_pct_allowed": 41.1,
-        "barrel_pct_allowed": 10.6,
-        "bbe": 482,
-        "era": 4.21,
-        "ip_per_gs": 5.2,
-        "ip": 151.7
-      },
-      "selected_pos": "P",
-      "status": ""
-    },
-    {
       "name": "Graham Ashcraft",
       "mlb_id": 668933,
       "yahoo_player_key": "469.p.12392",
@@ -503,7 +480,7 @@
         "SP"
       ],
       "selected_pos": "BN",
-      "status": "",
+      "status": "SUSP",
       "prior_stats": {
         "season": 2025,
         "xera": 10.73,
@@ -514,6 +491,29 @@
         "era": 5.4,
         "ip": 5.0,
         "ip_per_gs": 5.0
+      }
+    },
+    {
+      "name": "Joey Cantillo",
+      "mlb_id": 676282,
+      "yahoo_player_key": "469.p.11823",
+      "team": "CLE",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.71,
+        "xwoba_allowed": 0.3,
+        "hh_pct_allowed": 41.8,
+        "barrel_pct_allowed": 7.2,
+        "bbe": 251,
+        "era": 3.21,
+        "ip": 95.3,
+        "ip_per_gs": 5.2
       }
     }
   ],
