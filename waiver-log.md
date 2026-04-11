@@ -16,14 +16,6 @@
 - 03-29：[waiver-scan] 42% owned。前 #1 pick，健康時 .290/.850+/20+ HR。但連 4 年進 IL，3B 有 Machado 不需升級，BN 全滿。
 - 03-30：[waiver-scan] .222/1.253/2HR — 火燙但條件未達（BN 仍無空位），維持 Pass。
 
-### Josh Bell (MIN, 1B) [mlb_id:605137] — 觀察中
-觸發：BBE 達 30 仍維持 xwOBA > P70 + Barrel% > P60 → 取代 Butler
-- 04-07：2026 xwOBA .333(P80-90) / BB% 17.9%(>P90) / Barrel% 10.5%(P70-80)，19 BBE 低信心。2025 prior 全面 P80+（.359/.107/.120，383 BBE）品質確認。1B only 位置彈性差（fa_scan）
-- 04-08：BBE 19，三項品質持續（.333/16.3%/10.5%），0% owned（fa_scan）
-- 04-09：BBE 22，xwOBA .338(P80-90)/BB% 17.0%(>P90)/Barrel% 9.1%(P60-70) 三項穩定在觸發門檻內。0% owned 安全（fa_scan）
-- 04-10：BBE 24，xwOBA .353(>P90)/BB% 15.7%(>P90)/Barrel% 8.3%(P50-55)。Barrel% 略低於觸發 P60 門檻，距 BBE 30 約 2-3 場（fa_scan）
-- 04-11：BBE 28，xwOBA .386(>P90)/BB% 14.5%(>P90) 壓倒性，Barrel% 10.7%(P70-80) 回升。Butler 已 drop，比較錨更新為 Albies。%owned 21% 三日+13 急升（fa_scan）
-
 ### Francisco Alvarez (NYM, C) [mlb_id:682626] — 觀察中
 觸發：BBE 達 25 且 xwOBA > P80 + Barrel% > P70 → 取代 Butler
 - 04-07：2026 xwOBA .502(>P90) / Barrel% 29.4%(>P90) 但 BB% 6.9%(P25-40)。2025 prior P70-80（.326/.097/.121，173 BBE）。34% owned 快速上升，窗口有限（fa_scan）
@@ -39,16 +31,6 @@
 - 04-09：BBE 0 無新數據，%owned 26% 持續升，等數據更新（fa_scan）
 - 04-10：BBE 0 無新數據，%owned 26%，等數據更新（fa_scan）
 - 04-11：BBE 0 連續無新數據，%owned 27% 三日+1。需確認大聯盟狀態（fa_scan）
-
-### Janson Junk (MIA, SP) [mlb_id:676083] — 觀察中
-觸發：BBE 達 50 仍維持 xERA < P70 (3.74) + xwOBA < P70 (.301) → 取代 Liberatore
-- 04-07：2026 xERA 2.54(>P90) / xwOBA .254(>P90) / HH% 40.5%(P50-55)，37 BBE 中等信心。IP/GS 5.8 深投型。運氣 -0.55 接近真實。2025 prior P45 且 HH% 47.3% 為慢性問題。MIA 弱隊（fa_scan）
-- 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）
-- 04-08：BBE 37，xERA/xwOBA 維持>P90，HH% 40.5%(P50-55) 離觸發門檻 42.2% 仍無明確改善（fa_scan）
-- 04-09：BBE 37，xERA 2.52/xwOBA .254 >P90 + HH% 40.5%(<42.2%) 條件已達，僅差 BBE 量（37/60），約 3-4 場先發（fa_scan）
-- 04-09：[eval] vs Liberatore，結論：繼續觀察，觸發降至 BBE 50。理由：2/3 勝出 + 深投型（IP/GS 5.8）+ 運氣真實（-0.57），是最穩健的替代品
-- 04-10：BBE 37/50，xERA 2.53/xwOBA .254 >P90 持續，IP/GS 5.8。品質已達觸發門檻，純等 BBE 量。約 3-4 場先發（fa_scan）
-- 04-11：BBE 37/50，xERA 2.53/xwOBA .254 >P90 持續。⚠️ Liberatore 已 drop，比較錨更新為 Nola（3/3 勝出 + 深投型 IP/GS 5.8）。1% owned（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -116,6 +98,12 @@
 - 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
 
 ## 已結案
+
+### Josh Bell (MIN, 1B) — 被搶（自動偵測）
+- 2026-04-11：Yahoo ownership_type=team，從觀察中移除。
+
+### Janson Junk (MIA, SP) — 被搶（自動偵測）
+- 2026-04-11：Yahoo ownership_type=team，從觀察中移除。
 
 ### Joey Cantillo (CLE, SP) — 被搶（自動偵測）
 - 2026-04-10：Yahoo ownership_type=team，從觀察中移除。
