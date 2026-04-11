@@ -348,6 +348,21 @@ waiver-log.md（球員追蹤唯一來源）
   → Python 腳本組裝 → claude -p 分析 → Telegram 推送 + GitHub Issue 存檔
 ```
 
+### 執行環境
+
+- **所有腳本跑在 VPS**（`/opt/mlb-fantasy`），cron 自動排程 + 手動觸發皆在 VPS。本機只做開發與 git push
+- **Yahoo API token 只存在 VPS**（`daily-advisor/yahoo_token.json`），本機無 — `yahoo_query.py` 本機直接跑會報 `Yahoo token not found`
+- **本機取即時數據（scoreboard / matchup / 異動紀錄）**：
+  ```bash
+  ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 yahoo_query.py <cmd>"
+  ```
+- **本機取歷史數據（daily report / fa_scan 存檔）**：
+  ```bash
+  gh issue view <N> -R huansbox/mlb-fantasy
+  ```
+- ⚠️ **不要 scp Yahoo token 回本機** — yahoo_query.py 會自動 refresh token，雙邊不同步會讓 VPS 原本 token 失效，cron 全斷
+- VPS 連線資訊見 `~/.claude/projects/-Users-linshuhuan-mywork-mlb-fantasy/memory/reference_vps.md`
+
 ### 檔案索引
 
 | 文件 | 用途 |
