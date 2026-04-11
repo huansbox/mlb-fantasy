@@ -48,6 +48,7 @@
 - 04-09：BBE 37，xERA 2.52/xwOBA .254 >P90 + HH% 40.5%(<42.2%) 條件已達，僅差 BBE 量（37/60），約 3-4 場先發（fa_scan）
 - 04-09：[eval] vs Liberatore，結論：繼續觀察，觸發降至 BBE 50。理由：2/3 勝出 + 深投型（IP/GS 5.8）+ 運氣真實（-0.57），是最穩健的替代品
 - 04-10：BBE 37/50，xERA 2.53/xwOBA .254 >P90 持續，IP/GS 5.8。品質已達觸發門檻，純等 BBE 量。約 3-4 場先發（fa_scan）
+- 04-11：BBE 37/50，xERA 2.53/xwOBA .254 >P90 持續。⚠️ Liberatore 已 drop，比較錨更新為 Nola（3/3 勝出 + 深投型 IP/GS 5.8）。1% owned（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -92,6 +93,7 @@
 - 04-09：[eval] vs Liberatore，結論：繼續觀察。理由：2/3 勝出 + 買低信號，但短局型（IP/GS 5.1）+ 2025 僅 22.2 IP prior 信心低
 - 04-10：⚠️ 品質大幅回歸：BBE 44 時 xERA 4.36(P45-50)/xwOBA .329(P40-45)，雙雙跌破觸發門檻（3.74/.301）。Breakout 信號消退，建議降級或結案（fa_scan）
 - 04-11：⚠️ 結案建議：BBE 44 時 xERA 4.36(P45-50)/xwOBA .329(P40-45) 大幅回歸，雙雙跌破觸發門檻。Breakout 信號消退（fa_scan）
+- 04-11：⚠️ 結案：BBE 44 品質全面回歸（xERA 4.27/xwOBA .329 ≈ P45），Liberatore 已 drop 比較錨失效，不再是升級選項（fa_scan）
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Albies
@@ -101,14 +103,17 @@
 ### Reid Detmers (LAA, SP,RP) [mlb_id:672282] — 觀察中
 觸發：Cantillo 不可得 → 立即取代 Liberatore；或 BBE 達 60 仍 >P90 → 評估 vs Nola
 - 04-10：xERA 2.55/xwOBA .255 >P90（BBE 44），2025 P70-80 雙年確認。買低 -2.05。IP/GS 5.2 短局。30% owned 有壓力（fa_scan）
+- 04-11：BBE 44，xERA 2.49/xwOBA .255 >P90 持續，運氣 -2.11 買低。28% 三日-2（fa_scan）
 
 ### Sean Burke (CWS, SP,RP) [mlb_id:680732] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-10：xERA 3.25/xwOBA .287 P80-90（BBE 43），2025 P25-40 breakout 候選。運氣 -0.35 真實。7% +3（fa_scan）
+- 04-11：BBE 43，xERA 3.17/xwOBA .287 P80-90，HH% 41.9%(P40-45)。2025 breakout 待驗。6% -1/+1（fa_scan）
 
 ### Colin Rea (CHC, SP,RP) [mlb_id:607067] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
 - 04-10：xERA 3.70(P70-80)/xwOBA .305(P60-70)/HH% 33.3%(>P90)，BBE 33。2025 P40-45 breakout 候選。4% owned（fa_scan）
+- 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
 
 ## 已結案
 
