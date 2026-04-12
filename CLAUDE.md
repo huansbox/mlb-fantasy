@@ -37,7 +37,8 @@
 
 - **Punt SV+H**：不為 SV+H 多拿 RP（維持 2 位），但現有 RP 有 SV+H 是加分
 - **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
-- **SP 重裝**：9 SP 深度，40 IP 門檻輕鬆過
+- **SP 重裝**：10 SP 深度（含 Kelly IL 歸隊中 + López SUSP），40 IP 門檻輕鬆過
+- **BN 配置**：1 打者（Albies/Jazz 輪替）+ 2 SP（López SUSP + 機動）。打者深度換投手產量（2026-04-12 確立，Week 2-3 IP 倒數第 3 驅動）
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
 - **BB 結構性偏低**（2026-04-09 觀察，Week 1-3 排 5th/10th/8th）：OPS 穩定前 2-4 但 BB 中後段，Tovar/Chisholm BB% 極低拉低整隊。同等條件優先高 BB% 打者
 - **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
@@ -83,7 +84,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 - **上場時效**：claim（TW 15:00 前）→ 當日 TW 15:00 處理 → 當晚設 Daily-Tomorrow lineup → 隔天上場（前置 1 天）
 - **被 drop 球員**：1 天 waiver period
 - **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
-- **FAAB 餘額**：$100（2026-04-02 更新，異動後手動更新此數字）
+- **FAAB 餘額**：$100（2026-04-12 更新，Detmers $0 取得）
 - **每週上限**：6 次 add（add/drop 一組算 1 次）
 
 ### 陣容風險
@@ -377,6 +378,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
+| `daily-advisor/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 
 ## 待辦
 
@@ -386,5 +388,6 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **被 drop 球員的週累計問題**：`calc_weekly_ip` 用現有陣容遍歷 game log，被 drop 的球員貢獻被遺漏。速報 IP 已改用 Yahoo scoreboard 值。檢查其他地方是否有類似問題（weekly_review 等）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
-- [ ] **交易掃描工具**：類似 fa_scan 的聯盟交易機會掃描。掃描 12 隊 roster 的守位深度 + 7-cat 傳統數據，找出「我方過剩 vs 對方過剩」的 win-win 交易對象。工具基礎已建好：`daily-advisor/_trade_lookup.py`（聯盟 roster 查詢 + 守位覆蓋 + 球員 7-cat 比較）
+- [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
+- [ ] **Albies 交易 deadline**（Week 5 ~04-20）：9/11 隊 wRC+ 排 ≤8，優先試探 SerBowNee(#4) / 鍋's Neat(#5) / SUMMER(#5)。未成交 → 重新評估 drop
 - [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
