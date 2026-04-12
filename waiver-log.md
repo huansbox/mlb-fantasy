@@ -93,16 +93,19 @@
 觸發：Cantillo 不可得 → 立即取代 Liberatore；或 BBE 達 60 仍 >P90 → 評估 vs Nola
 - 04-10：xERA 2.55/xwOBA .255 >P90（BBE 44），2025 P70-80 雙年確認。買低 -2.05。IP/GS 5.2 短局。30% owned 有壓力（fa_scan）
 - 04-11：BBE 44，xERA 2.49/xwOBA .255 >P90 持續，運氣 -2.11 買低。28% 三日-2（fa_scan）
+- 04-12：BBE 44，xERA 2.47/xwOBA .255 >P90 持續，運氣 -2.13 買低。Liberatore 已 drop，比較錨更新為 Nola。距 BBE 60 觸發差 3-4 場。27% owned（fa_scan）
 
 ### Sean Burke (CWS, SP,RP) [mlb_id:680732] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-10：xERA 3.25/xwOBA .287 P80-90（BBE 43），2025 P25-40 breakout 候選。運氣 -0.35 真實。7% +3（fa_scan）
 - 04-11：BBE 43，xERA 3.17/xwOBA .287 P80-90，HH% 41.9%(P40-45)。2025 breakout 待驗。6% -1/+1（fa_scan）
+- 04-12：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% -1（fa_scan）
 
 ### Colin Rea (CHC, SP,RP) [mlb_id:607067] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
 - 04-10：xERA 3.70(P70-80)/xwOBA .305(P60-70)/HH% 33.3%(>P90)，BBE 33。2025 P40-45 breakout 候選。4% owned（fa_scan）
 - 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
+- 04-12：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
 
 ### Jake Bauers (MIL, 1B,LF,RF) [mlb_id:641343] — 觀察中
 觸發：BBE 達 50 且維持 xwOBA >P70 + Barrel% >P70 → vs Buxton/Albies
@@ -115,6 +118,14 @@
 ### Evan Carter (TEX, LF,CF,RF) [mlb_id:694497] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
 - 04-12：xwOBA .346(P80-90)/BB% 14.9%(>P90)/Barrel% 7.4%(P45) BBE 27。BB% breakout 候選，2025 8.6%→14.9% 跳升待驗。5% owned（fa_scan）
+
+### Steven Matz (TB, SP,RP) [mlb_id:571927] — 觀察中
+觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
+- 04-12：xERA 3.27(P80-90)/xwOBA .292(P70-80) BBE 40，2025 雙年確認（3.38/.287，237 BBE）。HH% 42.5% 唯一弱項。運氣 -0.67 買低，IP/GS 5.3。7% owned（fa_scan）
+
+### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
+觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
+- 04-12：xERA 1.90/xwOBA .223 >P90（BBE 31），2025 P40-45 breakout 候選。運氣 -1.37 買低。2% owned 無壓力（fa_scan）
 
 ## 已結案
 
