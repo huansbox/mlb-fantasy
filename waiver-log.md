@@ -2,6 +2,10 @@
 
 ## 觀察中
 
+### Dansby Swanson (CHC, SS) [mlb_id:621020] — 觀察中
+觸發：Albies 交易成功（空出打者格位）→ 立即 add 取代 Tovar；或 76% owned 急升 → 提前行動
+- 04-12：[eval] vs Tovar。核心 3 Swanson 2:1 勝出（BB% 15.8% >P90 vs 1.6% <P25 鴻溝 + Barrel% >P90）。2025 全季 159G/24HR/20SB/77RBI(428 BBE P80-90) 遠優於 Tovar 95G/9HR/5SB。.149 AVG 是 BABIP 噪音（HH% 63% >P90）。直接解決 BB 結構性弱。BBE 27 低信心但 2025 背書。76% owned 窗口有限
+
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
@@ -75,25 +79,14 @@
 - 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
 - 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
 
-### Joe Boyle (TB, SP,RP) [mlb_id:671212] — 觀察中
-觸發：BBE 達 50 且 xERA 維持 <P70 (3.74) + xwOBA <P70 (.301) → 取代 Liberatore
-- 04-09：xERA 3.26(P80-90)/xwOBA .288(P80-90) 但 HH% 43.3%(<P25) 慢性差。BBE 30 中等信心。運氣 -1.91 極度不運（撿便宜信號）。2025 prior P60（xERA 4.04/HH% 46.0%，137 BBE）。IP/GS 5.2 短局型。19% owned（fa_scan）
-- 04-09：[eval] vs Liberatore，結論：繼續觀察。理由：2/3 勝出 + 買低信號，但短局型（IP/GS 5.1）+ 2025 僅 22.2 IP prior 信心低
-- 04-10：⚠️ 品質大幅回歸：BBE 44 時 xERA 4.36(P45-50)/xwOBA .329(P40-45)，雙雙跌破觸發門檻（3.74/.301）。Breakout 信號消退，建議降級或結案（fa_scan）
-- 04-11：⚠️ 結案建議：BBE 44 時 xERA 4.36(P45-50)/xwOBA .329(P40-45) 大幅回歸，雙雙跌破觸發門檻。Breakout 信號消退（fa_scan）
-- 04-11：⚠️ 結案：BBE 44 品質全面回歸（xERA 4.27/xwOBA .329 ≈ P45），Liberatore 已 drop 比較錨失效，不再是升級選項（fa_scan）
+### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 交易中（deadline Week 5）
+- 04-12：[eval] drop 優先序比較 vs Hicks。Savant 0/3 雙年確認弱，但 wRC+ 112 + 94% owned → 在 9/11 對手隊排 ≤8th，有交易價值。決定保留 Albies 繼續 shop，先 drop Hicks。BN 輪替：Albies / Jazz 擇一坐。若 Week 5（~04-20）未成交 → 重新評估 drop
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
-觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Albies
+觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Buxton（比較錨更新：Albies 改為交易中，Buxton wRC+ 60 是打者端最弱 active）
 - 04-10：xwOBA .299(P50)/BB% 13.3%(>P90)/Barrel% 7.4%(P45-50)，BBE 27。2025 prior 219 BBE 確認 BB% 結構優勢（11.7%）。7% owned 無壓力（fa_scan）（fa_scan）
 - 04-11：BBE 27，BB% 13.3%(>P90) 結構確認，xwOBA .299(P50) 邊界穩定。7% owned（fa_scan）
 - 04-12：BBE 27，BB% 14.3%(>P90) 穩定，xwOBA .299(P50)。距觸發 BBE 40 差 5-6 場，7% owned（fa_scan）
-
-### Reid Detmers (LAA, SP,RP) [mlb_id:672282] — 觀察中
-觸發：Cantillo 不可得 → 立即取代 Liberatore；或 BBE 達 60 仍 >P90 → 評估 vs Nola
-- 04-10：xERA 2.55/xwOBA .255 >P90（BBE 44），2025 P70-80 雙年確認。買低 -2.05。IP/GS 5.2 短局。30% owned 有壓力（fa_scan）
-- 04-11：BBE 44，xERA 2.49/xwOBA .255 >P90 持續，運氣 -2.11 買低。28% 三日-2（fa_scan）
-- 04-12：BBE 44，xERA 2.47/xwOBA .255 >P90 持續，運氣 -2.13 買低。Liberatore 已 drop，比較錨更新為 Nola。距 BBE 60 觸發差 3-4 場。27% owned（fa_scan）
 
 ### Sean Burke (CWS, SP,RP) [mlb_id:680732] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -128,6 +121,15 @@
 - 04-12：xERA 1.90/xwOBA .223 >P90（BBE 31），2025 P40-45 breakout 候選。運氣 -1.37 買低。2% owned 無壓力（fa_scan）
 
 ## 已結案
+
+### Reid Detmers (LAA, SP,RP) — ✅ 已加入陣容
+- 04-12：add Detmers / drop Hicks。xERA 2.47(>P90) buy-low，Woodruff vs Detmers eval 後確認 Detmers 品質更好+免費取得。$0 FAAB
+
+### Liam Hicks (MIA, C/1B) — dropped
+- 04-12：drop 讓位給 Detmers。近 9 場 .185/0HR/1RBI 走低（前 5 場 .467 全 BABIP 噪音），HH% 兩年 <P25
+
+### Joe Boyle (TB, SP,RP) — 結案（品質回歸）
+- 04-11：BBE 44 品質全面回歸（xERA 4.27/xwOBA .329 ≈ P45），跌破觸發門檻
 
 ### Josh Bell (MIN, 1B) — 被搶（自動偵測）
 - 2026-04-11：Yahoo ownership_type=team，從觀察中移除。
