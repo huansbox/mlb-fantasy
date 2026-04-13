@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "2B",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -131,7 +131,7 @@
         "pa": 654,
         "g": 155
       },
-      "selected_pos": "LF",
+      "selected_pos": "2B",
       "status": ""
     },
     {
@@ -175,7 +175,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -198,7 +198,7 @@
         "pa": 396,
         "g": 111
       },
-      "selected_pos": "BN",
+      "selected_pos": "LF",
       "status": ""
     },
     {
@@ -222,29 +222,6 @@
         "g": 77
       },
       "selected_pos": "RF",
-      "status": ""
-    },
-    {
-      "name": "Liam Hicks",
-      "mlb_id": 689414,
-      "yahoo_player_key": "469.p.63648",
-      "team": "MIA",
-      "positions": [
-        "C",
-        "1B"
-      ],
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.315,
-        "barrel_pct": 3.5,
-        "hh_pct": 27.7,
-        "bb_pct": 11.0,
-        "ops": 0.692,
-        "pa_per_team_g": 2.41,
-        "pa": 390,
-        "g": 119
-      },
-      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -335,7 +312,7 @@
         "ip": 61.7
       },
       "selected_pos": "SP",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Aaron Nola",
@@ -514,6 +491,29 @@
         "era": 3.21,
         "ip": 95.3,
         "ip_per_gs": 5.2
+      }
+    },
+    {
+      "name": "Reid Detmers",
+      "mlb_id": 672282,
+      "yahoo_player_key": "469.p.11926",
+      "team": "LAA",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.61,
+        "xwoba_allowed": 0.296,
+        "hh_pct_allowed": 42.8,
+        "barrel_pct_allowed": 8.2,
+        "bbe": 159,
+        "era": 3.96,
+        "ip": 63.7,
+        "ip_per_gs": 0
       }
     }
   ],
