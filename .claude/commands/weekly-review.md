@@ -74,24 +74,17 @@
 - VPS 上跑：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && python3 daily-advisor/weekly_review.py --prepare'`
 - 或本地即時拉取：`python daily-advisor/weekly_review.py --prepare --dry-run > daily-advisor/weekly-data/week-{N}.json`
 
-**已知 prepare 缺陷**（待 CLAUDE.md 待辦修復）：
-- `my_roster_performance.pitchers` 可能只覆蓋 9 個 SP，缺 RP（Whitlock/Ashcraft）和新 add 的 SP（Detmers）→ 需手動用 `yahoo_query.py savant {name} --year 2026` 補
-- `scan_summary.analysis` 只存第一段 → 完整候選清單用 `gh issue view {issue_number} -R huansbox/mlb-fantasy` 拉
+## Step 2：讀 2 週合併排名（自 JSON）
 
-## Step 2：取近 2 週聯賽合併排名
+`review.two_week_ranks` 由 prepare 時 `fetch_two_week_merge` 自動產生，包含：
 
-使用 `_merge_weeks.py` 取得 Week N-1 + N-2 的 14 類別合併數據和各隊排名。
+- `weeks`: `[N-2, N-1]` 兩週週次
+- `merged`: `{team_name: {14 cat: val}}` 12 隊合併數據
+- `my_ranks`: `{cat: my_rank}` 我方 14 類別排名
 
-```bash
-scp daily-advisor/_merge_weeks.py root@107.175.30.172:/opt/mlb-fantasy/daily-advisor/_merge_weeks.py
-ssh root@107.175.30.172 'export PATH=/root/.local/bin:$PATH && cd /opt/mlb-fantasy/daily-advisor && python3 _merge_weeks.py'
-```
+> **開季第 2 週例外**：week < 3 時 `two_week_ranks` 欄位不存在（prepare 自動跳過），只能用 Week 1 單週數據，註明信心低。
 
-腳本目前 hardcode 抓 Week 2+3，每週要改參數（待 CLAUDE.md 待辦：自動化 + 整合進 prepare）。
-
-> **開季第 2 週例外**：只能用 Week 1 單週數據，註明信心低。
-
-把這份排名表存起來，**Phase 1A 歸因 / Phase 2A 對手摘要 / Phase 2B 預測**都會引用。
+這份排名表驅動 **Phase 1A 歸因 / Phase 2A 對手摘要 / Phase 2B 預測**。
 
 ## Phase 0：策略現況載入（5 min）
 
@@ -328,7 +321,7 @@ ssh root@107.175.30.172 'export PATH=/root/.local/bin:$PATH && cd /opt/mlb-fanta
 
 | Phase | 時間 | 內容 |
 |-------|------|------|
-| Step 1+2 資料準備 | 5 min | 讀 JSON、跑 _merge_weeks.py |
+| Step 1+2 資料準備 | 3 min | 讀 JSON（含 `review.two_week_ranks`） |
 | Phase 0 策略載入 | 5 min | CLAUDE.md 現況 |
 | Phase 1A 戰績歸因 | 5 min | 14 類別 + 簡短分類 |
 | Phase 1B 球員狀態 | 15-20 min | **核心**，含 news check |

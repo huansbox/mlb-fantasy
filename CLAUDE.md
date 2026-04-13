@@ -416,40 +416,20 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
 - [ ] **Albies 交易 deadline**（Week 5 ~04-20）：9/11 隊 wRC+ 排 ≤8，優先試探 SerBowNee(#4) / 鍋's Neat(#5) / SUMMER(#5)。未成交 → 重新評估 drop
 - [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
-- [ ] **weekly_review.py prepare 完整性**（2026-04-13 Week 4 review 實戰發現，3 個獨立修法）
-
-  **Bug A — RP 被故意 skip**：
-  - 檔案：`daily-advisor/weekly_review.py`
-  - 函數：`compute_roster_performance()` line 526
-  - 問題：line 602 註解 `# ── SP only (CLAUDE.md: RP 只有 2 人不評估) ──` + line 605 `if not mid or pitcher_type(p) != "SP": continue` 故意 filter 掉 RP
-  - 為什麼：原本設計 RP 只有 2 人不深評估，但今天做球員回顧時需要 RP 的 weekly + season + Statcast 數據（Whitlock/Ashcraft 都缺）→ 必須手動 query yahoo_query.py
-  - 修法：移除 RP filter，但 RP 走簡化分支（不需 IP/GS 計算，只取 K/ERA/WHIP/Statcast）；或加 `if pitcher_type(p) == "RP":` 走 `_aggregate_pitcher_weekly` 但不算 QS
-  - 驗證：跑 `weekly_review.py --prepare` → JSON `review.my_roster_performance.pitchers` 應該有 12 個（含 Whitlock/Ashcraft + 新 add 球員），不是 9 個
-  - 同步更新：`fetch_savant_for_pitchers` line 543 的 `pitcher_ids` filter 也要移除 SP-only 限制
-
-  **Bug B — scan_summary 只存第一段**：
-  - 檔案：`daily-advisor/weekly_review.py`
-  - 函數：`fetch_scan_summary()` line 661
-  - 問題：line 696 `analysis = remainder.split("\n---\n", 1)[0].strip()` 只取「## Analysis」到第一個 `---` 之間，但 RP scan issue 結構是「我方現況 ---  FA 候選 --- 結論 --- <details>」，只存第一段就停
-  - 修法：改成取整個 `## Analysis` 之後到 `<details>` 之前或 EOF 全段。實作：`if "<details>" in remainder: analysis = remainder.split("<details>", 1)[0].strip(); else: analysis = remainder.strip()`
-  - 驗證：JSON `review.scan_summary.analysis` 應該包含「我方 RP 現況 + FA 逐人 vs 比較 + 結論表格」三段完整
-  - 既有 hack：weekly-review skill 目前要求 `gh issue view {issue_number}` 拉完整內容，修好後可移除這步
-
-  **缺項 C — 沒有 2 週合併排名自動拉**：
-  - 檔案：`daily-advisor/weekly_review.py`（新增函數）
-  - 現狀：`_merge_weeks.py` 是獨立 script，每週要 `scp` 到 VPS 手動跑（且 hardcode Week 2+3）
-  - 修法：新增 `fetch_two_week_merge(league_key, token, current_week)` 函數，邏輯抄自 `_merge_weeks.py`：抓 `current_week-1` 和 `current_week-2` 的 scoreboard，合併 14 類別（counting 加總、AVG/OPS 按 AB 加權、ERA/WHIP 按 IP 加權），存進 `review.two_week_ranks`
-  - 整合：`main()` line 770 `review_data` 加上 `"two_week_ranks": fetch_two_week_merge(...)`
-  - 副作用：`_merge_weeks.py` 可以下架（或留作獨立 CLI）
-  - weekly-review skill Step 2 之後可改為「從 JSON 讀」，不用手動跑
+- [ ] **fetch_pitcher_full 對 0 場 IL 歸隊 SP 失敗**（2026-04-13 weekly_review smoke test 發現）
+  - 症狀：`gamelog error: list index out of range` + `Pitcher stats error (518876): list index out of range`（Merrill Kelly）
+  - 觸發：Kelly 04-13 IL 歸隊當日 season 0 場，空 gamelog / 空 season stats 的 list index 存取缺 guard
+  - 檔案：`daily-advisor/daily_advisor.py` 的 `fetch_pitcher_gamelog` 或 `daily-advisor/roster_stats.py` 的 `fetch_pitcher_full`
+  - 影響：weekly_review 對該 SP 的 `season` 欄位是 None，pctile 計算跳過；其他 12 人處理正常，非 blocker
+  - 修法：兩函數空 data 提前 return `None`/`{}`，避免 `stats[0]` 類存取
+  - 驗證：Kelly 實際先發後重跑 prepare，JSON 應正常填入 season stats
 
 - [ ] **Yahoo 查詢工具集中**（2026-04-13 識別）
-  - 待移動的檔案（都在 `daily-advisor/`）：`_merge_weeks.py` / `_trade_batter_rank.py` / `_trade_lookup.py`
-  - 目標：新建 `daily-advisor/_tools/` 目錄，把這 3 個檔案移進去
-  - 注意 import：3 個檔案都用 `sys.path.insert(0, ".")` 然後 `from yahoo_query import ...`，移動後 path 從 `daily-advisor/_tools/` 看 `yahoo_query.py` 在 `..`，要改成 `sys.path.insert(0, "..")` 或更乾淨的 `from pathlib import Path; sys.path.insert(0, str(Path(__file__).parent.parent))`
+  - 待移動的檔案（都在 `daily-advisor/`）：`_trade_batter_rank.py` / `_trade_lookup.py`（`_merge_weeks.py` 已移除 — 功能併入 `weekly_review.py::fetch_two_week_merge`）
+  - 目標：新建 `daily-advisor/_tools/` 目錄，把這 2 個檔案移進去
+  - 注意 import：兩個檔案都用 `sys.path.insert(0, ".")` 然後 `from yahoo_query import ...`，移動後 path 從 `daily-advisor/_tools/` 看 `yahoo_query.py` 在 `..`，要改成 `sys.path.insert(0, "..")` 或更乾淨的 `from pathlib import Path; sys.path.insert(0, str(Path(__file__).parent.parent))`
   - 連動更新：
-    - `CLAUDE.md` 檔案索引（line 405-406 的 `_trade_lookup.py` / `_trade_batter_rank.py` 路徑）
+    - `CLAUDE.md` 檔案索引的 `_trade_lookup.py` / `_trade_batter_rank.py` 路徑
     - `daily-advisor/yahoo-api-reference.md` 加 toolbox 索引 section
-    - `.claude/commands/weekly-review.md` Step 2 的 `scp daily-advisor/_merge_weeks.py ...` 和 `python3 _merge_weeks.py` 路徑
-  - 不影響 cron（這 3 個都是 ad-hoc 手動工具，不在 `/etc/cron.d/daily-advisor`）
-  - 驗證：在 VPS 跑 `python3 daily-advisor/_tools/_merge_weeks.py` 無 import error，輸出和原本一致
+  - 不影響 cron（兩個都是 ad-hoc 手動工具，不在 `/etc/cron.d/daily-advisor`）
+  - 驗證：在 VPS 跑 `python3 daily-advisor/_tools/_trade_batter_rank.py` 無 import error
