@@ -73,12 +73,21 @@ def find_my_team_key(league_key, token):
     raise RuntimeError("Could not find my team key")
 
 
-def fetch_full_roster(team_key, token):
+def fetch_full_roster(team_key, token, date=None):
     """Fetch roster from Yahoo API, return list of player dicts.
+
+    Yahoo's default /team/{key}/roster endpoint returns a stale snapshot
+    (often the previous day's lineup), which causes us to miss new adds.
+    Always pass an explicit date so we get the active roster for that day.
+    Defaults to today in ET when not specified.
 
     Each dict: {name, yahoo_player_key, team, positions, selected_pos, status}
     """
-    data = yahoo_api_get(f"/team/{team_key}/roster", token)
+    if date is None:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        date = datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
+    data = yahoo_api_get(f"/team/{team_key}/roster;date={date}", token)
     players_data = data["fantasy_content"]["team"][1]["roster"]["0"]["players"]
 
     players = []
