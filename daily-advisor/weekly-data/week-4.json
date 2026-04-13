@@ -1320,6 +1320,30 @@
         "dead_slots": []
       }
     },
-    "predicted_outcome": null
+    "predicted_outcome": {
+      "strong": [
+        "R",
+        "HR",
+        "RBI",
+        "SB",
+        "AVG",
+        "OPS",
+        "QS"
+      ],
+      "toss_up": [
+        "ERA",
+        "WHIP",
+        "W",
+        "SV+H"
+      ],
+      "weak": [
+        "BB",
+        "IP",
+        "K"
+      ],
+      "projected_record": "9W-5L (median), 7-7~10-4 range",
+      "strategy": "正常打，保護 ERA/WHIP，HR/SB 別漏打，Ragans 先 news check",
+      "basis": "Week 2+3 rolling merge"
+    }
   }
 }
