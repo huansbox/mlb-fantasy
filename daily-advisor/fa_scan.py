@@ -1587,8 +1587,13 @@ def _update_waiver_log(advice, today_str, env=None):
                 f"觸發：{trigger}\n"
                 f"- {short_date}：{summary}（fa_scan）\n"
             )
-            # Find insertion point: before ## 已結案 or end of 觀察中
-            if "## 已結案" in content:
+            # Insert new FA at the END of 觀察中 section, which means BEFORE
+            # the next section header. Try ## 隊上觀察 first (FA goes in 觀察中,
+            # not in 隊上觀察); fall back to ## 已結案; finally append.
+            if "## 隊上觀察" in content:
+                pos = content.index("## 隊上觀察")
+                content = content[:pos] + new_entry + "\n" + content[pos:]
+            elif "## 已結案" in content:
                 pos = content.index("## 已結案")
                 content = content[:pos] + new_entry + "\n" + content[pos:]
             else:

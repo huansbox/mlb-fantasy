@@ -562,12 +562,38 @@ def update_config(config, yahoo_roster, diff, savant_data=None):
 # ── Task 8: Git + Telegram ──
 
 
+def sync_repo_before_edit(env=None):
+    """Pull --rebase origin master before editing roster_config.json.
+
+    Mirrors fa_scan._sync_waiver_log_before_edit. Called at the start of
+    main() so we read a fresh roster_config.json and the subsequent
+    commit is a clean fast-forward — no post-commit rebase race.
+    Returns True on success; False if pull fails (caller should abort).
+    """
+    try:
+        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
+                       cwd=REPO_ROOT, check=True, timeout=30)
+        return True
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
+                       capture_output=True, timeout=10)
+        msg = ("[roster_sync] pre-edit pull --rebase failed — "
+               "skipping sync. Needs manual fix.")
+        print(msg, file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
+        return False
+
+
 def git_commit_and_push(added_names, dropped_names, env=None):
-    """Git add, commit, pull --rebase, and push roster_config.json."""
+    """Git add, commit, and push roster_config.json.
+
+    No rebase here — sync_repo_before_edit() runs at main() start so
+    the working copy is already on top of origin/master.
+    """
     parts = [f"+{n}" for n in added_names] + [f"-{n}" for n in dropped_names]
     msg = f"roster: {', '.join(parts)}"
 
-    # Step 1: commit (clean working tree so rebase can work)
     try:
         subprocess.run(
             ["git", "add", "daily-advisor/roster_config.json"],
@@ -581,22 +607,6 @@ def git_commit_and_push(added_names, dropped_names, env=None):
         print(f"Git commit failed: {e}", file=sys.stderr)
         return False
 
-    # Step 2: pull --rebase to get on top of remote
-    try:
-        subprocess.run(
-            ["git", "pull", "--rebase", "origin", "master"],
-            cwd=REPO_ROOT, check=True, timeout=30,
-        )
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
-                       capture_output=True, timeout=10)
-        alert = "[roster_sync] git pull --rebase failed — skipping push. Needs manual fix."
-        print(alert, file=sys.stderr)
-        if env:
-            send_telegram(alert, env)
-        return False
-
-    # Step 3: push (should be fast-forward after rebase)
     try:
         subprocess.run(
             ["git", "push", "origin", "master"],
@@ -772,6 +782,12 @@ def main():
     args = parser.parse_args()
 
     env = load_env()
+
+    # Pre-edit sync: pull latest from origin so we read fresh state
+    # and the post-edit commit is a clean fast-forward.
+    if not args.dry_run and not sync_repo_before_edit(env):
+        sys.exit(1)
+
     token = refresh_token(env)
     config = load_config()
     league_key = config["league"]["league_key"]
