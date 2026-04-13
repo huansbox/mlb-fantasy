@@ -63,10 +63,10 @@
 
 **Whitlock 軟 cut**（啟動 2026-04-13）
 - 觸發：xERA 6.31 <P25 vs 2025 P80，雙年衝突
-- 行動：每天排 BN 不上場（用 Detmers SP/RP 雙資格佔 RP slot），等 Kelly 04-13~15 歸隊 drop
+- 行動：每天排 BN 不上場（用 Detmers SP/RP 雙資格佔 RP slot），等 Kelly 歸隊 drop
 - 預期：不浪費 acquisition 額度，自然替換
-- 驗證：04-15 完成 drop
-- 狀態：執行中
+- 驗證：Kelly Yahoo IL 狀態清除當天完成 drop
+- 狀態：執行中（2026-04-14 news check 確認 Kelly 04-14 vs BAL season debut = probable pitcher；Yahoo 仍 IL15 待更新；drop 時機 = Kelly Yahoo 狀態清 IL，預估 04-14 賽後 / 04-15 早上。Kelly 延後 >48h → fallback 改走 Soto add FAAB $2）
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
