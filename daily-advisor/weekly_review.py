@@ -177,6 +177,135 @@ def compute_category_ranks(all_teams, team_name="99 940"):
     return ranks
 
 
+# ── Two-Week Rolling Merge ──
+
+
+def _ip_float(val):
+    """Convert Yahoo IP string like '12.2' (12 + 2/3 innings) to decimal float."""
+    try:
+        s = str(val)
+        parts = s.split(".")
+        return int(parts[0]) + (int(parts[1]) / 3 if len(parts) > 1 else 0)
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def _fetch_week_raw_stats(league_key, access_token, week):
+    """Fetch scoreboard for a week, preserving raw stat strings (incl. H/AB).
+
+    fetch_league_scoreboard coerces everything to float so it loses H/AB.
+    This helper keeps raw strings for weighted merge math.
+    """
+    sb = yahoo_api_get(f"/league/{league_key}/scoreboard;week={week}", access_token)
+    matchups = sb["fantasy_content"]["league"][1]["scoreboard"]["0"]["matchups"]
+    teams = {}
+    for k, v in matchups.items():
+        if k == "count":
+            continue
+        for tidx in ("0", "1"):
+            tinfo = v["matchup"]["0"]["teams"][tidx]["team"][0]
+            tstats = v["matchup"]["0"]["teams"][tidx]["team"][1]["team_stats"]["stats"]
+            name = "?"
+            for item in tinfo:
+                if isinstance(item, dict) and "name" in item:
+                    name = item["name"]
+                    break
+            row = {}
+            for s in tstats:
+                sid = s["stat"]["stat_id"]
+                val = s["stat"]["value"]
+                if sid in YAHOO_STAT_MAP:
+                    cat, _ = YAHOO_STAT_MAP[sid]
+                    row[cat] = val
+            teams[name] = row
+    return teams
+
+
+def _merge_two_week_stats(w_a, w_b):
+    """Merge two weekly stat dicts (raw strings) into combined 14-cat totals.
+
+    Counting stats summed; AVG recomputed from H/AB; OPS weighted by AB;
+    ERA/WHIP weighted by IP.
+    """
+    def f(k, w):
+        try:
+            return float(w.get(k, 0) or 0)
+        except (ValueError, TypeError):
+            return 0.0
+
+    def hab(w):
+        s = w.get("H/AB", "0/0")
+        try:
+            h, ab = str(s).split("/")
+            return int(h), int(ab)
+        except (ValueError, AttributeError):
+            return 0, 0
+
+    ha, aba = hab(w_a)
+    hb, abb = hab(w_b)
+    h_total, ab_total = ha + hb, aba + abb
+    avg = h_total / ab_total if ab_total else 0
+    ops = (f("OPS", w_a) * aba + f("OPS", w_b) * abb) / ab_total if ab_total else 0
+
+    ipa = _ip_float(w_a.get("IP", 0))
+    ipb = _ip_float(w_b.get("IP", 0))
+    ip_total = ipa + ipb
+    era = (f("ERA", w_a) * ipa + f("ERA", w_b) * ipb) / ip_total if ip_total else 0
+    whip = (f("WHIP", w_a) * ipa + f("WHIP", w_b) * ipb) / ip_total if ip_total else 0
+
+    return {
+        "R": int(f("R", w_a) + f("R", w_b)),
+        "HR": int(f("HR", w_a) + f("HR", w_b)),
+        "RBI": int(f("RBI", w_a) + f("RBI", w_b)),
+        "SB": int(f("SB", w_a) + f("SB", w_b)),
+        "BB": int(f("BB", w_a) + f("BB", w_b)),
+        "AVG": round(avg, 3),
+        "OPS": round(ops, 3),
+        "IP": round(ip_total, 1),
+        "W": int(f("W", w_a) + f("W", w_b)),
+        "K": int(f("K", w_a) + f("K", w_b)),
+        "ERA": round(era, 2),
+        "WHIP": round(whip, 2),
+        "QS": int(f("QS", w_a) + f("QS", w_b)),
+        "SV+H": int(f("SV+H", w_a) + f("SV+H", w_b)),
+    }
+
+
+def fetch_two_week_merge(league_key, access_token, current_week, team_name="99 940"):
+    """Merge the two most recently completed weeks (current_week-2, current_week-1).
+
+    Returns None if fewer than 2 completed weeks are available.
+    Output shape: {"weeks": [w-2, w-1], "merged": {team: {cat: val}}, "my_ranks": {cat: rank}}
+    """
+    if current_week < 3:
+        return None
+
+    w_prev2 = current_week - 2
+    w_prev1 = current_week - 1
+    stats_a = _fetch_week_raw_stats(league_key, access_token, w_prev2)
+    stats_b = _fetch_week_raw_stats(league_key, access_token, w_prev1)
+
+    all_names = set(stats_a.keys()) | set(stats_b.keys())
+    merged = {
+        name: _merge_two_week_stats(stats_a.get(name, {}), stats_b.get(name, {}))
+        for name in all_names
+    }
+
+    my_ranks = {}
+    for cat in CATEGORY_ORDER:
+        values = [(n, m.get(cat, 0)) for n, m in merged.items()]
+        values.sort(key=lambda x: x[1], reverse=(cat not in LOWER_IS_BETTER))
+        for rank_idx, (n, _) in enumerate(values, 1):
+            if n == team_name:
+                my_ranks[cat] = rank_idx
+                break
+
+    return {
+        "weeks": [w_prev2, w_prev1],
+        "merged": merged,
+        "my_ranks": my_ranks,
+    }
+
 
 def fetch_daily_reports_metadata(week_number):
     """Fetch GitHub Issue metadata for daily reports of a given week."""
@@ -533,8 +662,7 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
 
     # Collect all mlb_ids for batch Savant download
     batter_ids = [b["mlb_id"] for b in batters_cfg if b.get("mlb_id")]
-    pitcher_ids = [p["mlb_id"] for p in pitchers_cfg
-                   if p.get("mlb_id") and pitcher_type(p) == "SP"]
+    pitcher_ids = [p["mlb_id"] for p in pitchers_cfg if p.get("mlb_id")]
 
     # Savant batch download (4 CSVs total — 2 batter, 2 pitcher)
     print("  Fetching Savant CSV for roster...", file=sys.stderr)
@@ -598,14 +726,15 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
         batter_results.append(entry)
         time.sleep(0.2)
 
-    # ── SP only (CLAUDE.md: RP 只有 2 人不評估) ──
+    # ── Pitchers (SP + RP) ──
     pitcher_results = []
     for p in pitchers_cfg:
         mid = p.get("mlb_id")
-        if not mid or pitcher_type(p) != "SP":
+        if not mid:
             continue
 
-        print(f"    SP: {p['name']}...", file=sys.stderr)
+        ptype = pitcher_type(p)
+        print(f"    {ptype}: {p['name']}...", file=sys.stderr)
         # Weekly game log
         try:
             gamelog = fetch_pitcher_gamelog(mid, season)
@@ -637,6 +766,7 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
         entry = {
             "name": p["name"],
             "team": p["team"],
+            "type": ptype,
             "selected_pos": p.get("selected_pos", ""),
             "weekly": weekly,
             "season": {
@@ -695,10 +825,12 @@ def fetch_scan_summary(week_start):
         if "## Analysis" in body:
             parts = body.split("## Analysis", 1)
             if len(parts) > 1:
-                # Take text between "## Analysis" and the next "---"
+                # Take everything after "## Analysis" until <details> (raw data block) or EOF.
+                # Multi-section scans (RP: 我方現況 --- FA 候選 --- 結論) contain "---" dividers
+                # inside the analysis, so we must NOT split on "---".
                 remainder = parts[1]
-                if "\n---\n" in remainder:
-                    analysis = remainder.split("\n---\n", 1)[0].strip()
+                if "<details>" in remainder:
+                    analysis = remainder.split("<details>", 1)[0].strip()
                 else:
                     analysis = remainder.strip()
 
@@ -769,6 +901,14 @@ def main():
             "daily_reports": daily_reports,
             "my_roster_performance": roster_perf,
         }
+
+        # ── Two-week rolling merge (skip before Week 3 — need 2 completed weeks) ──
+        two_week = fetch_two_week_merge(league_key, access_token, week_number, team_name)
+        if two_week:
+            print(f"  Fetched 2-week merge (weeks {two_week['weeks']})", file=sys.stderr)
+            review_data["two_week_ranks"] = two_week
+        else:
+            print(f"  Skipping 2-week merge (week {week_number} < 3)", file=sys.stderr)
 
         # ── Scan summary (if weekly_scan ran this week) ──
         print(f"  Checking for weekly scan summary...", file=sys.stderr)
