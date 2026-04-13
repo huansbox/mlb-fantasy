@@ -101,12 +101,14 @@
 - 04-10：xERA 3.25/xwOBA .287 P80-90（BBE 43），2025 P25-40 breakout 候選。運氣 -0.35 真實。7% +3（fa_scan）
 - 04-11：BBE 43，xERA 3.17/xwOBA .287 P80-90，HH% 41.9%(P40-45)。2025 breakout 待驗。6% -1/+1（fa_scan）
 - 04-12：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% -1（fa_scan）
+- 04-13：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% owned（fa_scan）
 
 ### Colin Rea (CHC, SP,RP) [mlb_id:607067] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
 - 04-10：xERA 3.70(P70-80)/xwOBA .305(P60-70)/HH% 33.3%(>P90)，BBE 33。2025 P40-45 breakout 候選。4% owned（fa_scan）
 - 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
 - 04-12：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
+- 04-13：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
 
 ### Jake Bauers (MIL, 1B,LF,RF) [mlb_id:641343] — 觀察中
 觸發：BBE 達 50 且維持 xwOBA >P70 + Barrel% >P70 → vs Buxton/Albies
@@ -125,10 +127,12 @@
 ### Steven Matz (TB, SP,RP) [mlb_id:571927] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-12：xERA 3.27(P80-90)/xwOBA .292(P70-80) BBE 40，2025 雙年確認（3.38/.287，237 BBE）。HH% 42.5% 唯一弱項。運氣 -0.67 買低，IP/GS 5.3。7% owned（fa_scan）
+- 04-13：BBE 40，xERA 3.27/xwOBA .292 P80-90/P70-80 穩定，HH% 42.5% 唯一弱項。距觸發 BBE 60 差 4-5 場，9% owned（fa_scan）
 
 ### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-12：xERA 1.90/xwOBA .223 >P90（BBE 31），2025 P40-45 breakout 候選。運氣 -1.37 買低。2% owned 無壓力（fa_scan）
+- 04-13：BBE 31，xERA 1.90/xwOBA .223 >P90 持續。2025 P40-45 breakout 未確認，距觸發 BBE 50 差 4-5 場。2% owned（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
@@ -137,6 +141,10 @@
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 觀察中
 觸發：BBE 達 40 且 Barrel% 維持 >P70 + xwOBA >P80 → vs Buxton/Albies
 - 04-13：xwOBA .365(>P90)/BB% 15.2%(>P90)/Barrel% 14.3%(>P90) BBE 28。2025 xwOBA/BB% 確認（P70+），Barrel% 6.3% 未確認。11% owned +2（fa_scan）（fa_scan）
+
+### Erick Fedde (CWS, SP,RP) [mlb_id:607200] — 觀察中
+觸發：BBE 達 70 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
+- 04-13：xERA 3.01/xwOBA .281 P80-90（BBE 47），2025 極差（5.41/.355）breakout 候選需大量驗證。CWS 弱隊，1% owned（fa_scan）
 
 ## 已結案
 
