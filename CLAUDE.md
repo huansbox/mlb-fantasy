@@ -414,7 +414,6 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
-- [ ] **Albies 交易 deadline**（Week 5 ~04-20）：9/11 隊 wRC+ 排 ≤8，優先試探 SerBowNee(#4) / 鍋's Neat(#5) / SUMMER(#5)。未成交 → 重新評估 drop
 - [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
 - [ ] **fetch_pitcher_full 對 0 場 IL 歸隊 SP 失敗**（2026-04-13 weekly_review smoke test 發現）
   - 症狀：`gamelog error: list index out of range` + `Pitcher stats error (518876): list index out of range`（Merrill Kelly）

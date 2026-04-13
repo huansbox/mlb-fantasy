@@ -143,8 +143,9 @@
 - 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
 - 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
 
-### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 交易中（deadline Week 5）
+### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 隊上觀察（暫不交易/不 drop）
 - 04-12：[eval] drop 優先序比較 vs Hicks。Savant 0/3 雙年確認弱，但 wRC+ 112 + 94% owned → 在 9/11 對手隊排 ≤8th，有交易價值。決定保留 Albies 繼續 shop，先 drop Hicks。BN 輪替：Albies / Jazz 擇一坐。若 Week 5（~04-20）未成交 → 重新評估 drop
+- 04-13：暫停交易試探，維持 batter 11 人配置不變動。觀察數據回歸/role 變化再議，不再設 deadline
 
 ### Jazz Chisholm Jr. (NYY, 2B/3B) [mlb_id:665862] — 開季 slump（無傷）
 狀況：14G/60PA .150/.477 OPS, 0HR/0RBI/2SB/2BB（Week 3 數據）。2026 xwOBA .202 / BB% 5.0% / Barrel% 5.7% 全 <P25-P40，2025 (.346/10.9%/15.0% >P80) 全面下修。news check 無傷勢，本人解釋天氣冷影響。04-12 vs Rays 9 局擾跑失誤被坐板凳。
