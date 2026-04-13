@@ -286,7 +286,10 @@ def fetch_pitcher_gamelog(player_id, season):
     data = api_get(
         f"/people/{player_id}/stats?stats=gameLog&season={season}&group=pitching"
     )
-    splits = data.get("stats", [{}])[0].get("splits", [])
+    # MLB API returns {"stats": []} (not {"stats": [{"splits": []}]}) when a
+    # player has no games yet — e.g. IL returnees mid-week. `get(..., [{}])`
+    # only handles missing key; `or [{}]` also handles empty-list case.
+    splits = (data.get("stats") or [{}])[0].get("splits", [])
     return [
         {
             "date": s["date"],
@@ -308,7 +311,7 @@ def fetch_batter_gamelog(player_id, season):
     data = api_get(
         f"/people/{player_id}/stats?stats=gameLog&season={season}&group=hitting"
     )
-    splits = data.get("stats", [{}])[0].get("splits", [])
+    splits = (data.get("stats") or [{}])[0].get("splits", [])
     return [
         {
             "date": s["date"],
@@ -636,7 +639,7 @@ def fetch_team_hitting(team_id, season):
     data = api_get(
         f"/teams/{team_id}/stats?stats=season&season={season}&group=hitting"
     )
-    splits = data.get("stats", [{}])[0].get("splits", [])
+    splits = (data.get("stats") or [{}])[0].get("splits", [])
     if not splits:
         return None
     s = splits[0]["stat"]

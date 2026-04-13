@@ -34,7 +34,7 @@ def fetch_batter_full(player_id, season):
         data = api_get(
             f"/people/{player_id}/stats?stats=season&season={season}&group=hitting"
         )
-        splits = data.get("stats", [{}])[0].get("splits", [])
+        splits = (data.get("stats") or [{}])[0].get("splits", [])
         if not splits:
             return None
         s = splits[0]["stat"]
@@ -60,7 +60,7 @@ def fetch_pitcher_full(player_id, season):
         data = api_get(
             f"/people/{player_id}/stats?stats=season&season={season}&group=pitching"
         )
-        splits = data.get("stats", [{}])[0].get("splits", [])
+        splits = (data.get("stats") or [{}])[0].get("splits", [])
         if not splits:
             return None
         s = splits[0]["stat"]

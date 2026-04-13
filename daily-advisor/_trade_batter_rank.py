@@ -52,7 +52,7 @@ def fetch_wrc_plus(mlb_id, season=2026):
         url = (f"https://statsapi.mlb.com/api/v1/people/{mlb_id}/stats"
                f"?stats=sabermetrics&season={season}&group=hitting")
         d = mlb_get(url)
-        splits = d.get("stats", [{}])[0].get("splits", [])
+        splits = (d.get("stats") or [{}])[0].get("splits", [])
         if splits:
             val = splits[0]["stat"].get("wRcPlus")
             return round(val, 1) if val is not None else None

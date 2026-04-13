@@ -788,7 +788,7 @@ def _ip_per_gs_from_gamelog(mlb_id, season):
         stats = mlb_api_get(
             f"/people/{mlb_id}/stats?stats=gameLog&season={season}&group=pitching"
         )
-        splits = stats.get("stats", [{}])[0].get("splits", [])
+        splits = (stats.get("stats") or [{}])[0].get("splits", [])
         starts = [s for s in splits if int(s["stat"].get("gamesStarted", 0)) == 1]
         if not starts:
             return None
