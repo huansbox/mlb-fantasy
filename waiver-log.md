@@ -89,6 +89,21 @@
 ### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 交易中（deadline Week 5）
 - 04-12：[eval] drop 優先序比較 vs Hicks。Savant 0/3 雙年確認弱，但 wRC+ 112 + 94% owned → 在 9/11 對手隊排 ≤8th，有交易價值。決定保留 Albies 繼續 shop，先 drop Hicks。BN 輪替：Albies / Jazz 擇一坐。若 Week 5（~04-20）未成交 → 重新評估 drop
 
+### Jazz Chisholm Jr. (NYY, 2B/3B) [mlb_id:665862] — 開季 slump（無傷）
+狀況：14G/60PA .150/.477 OPS, 0HR/0RBI/2SB/2BB（Week 3 數據）。2026 xwOBA .202 / BB% 5.0% / Barrel% 5.7% 全 <P25-P40，2025 (.346/10.9%/15.0% >P80) 全面下修。news check 無傷勢，本人解釋天氣冷影響。04-12 vs Rays 9 局擾跑失誤被坐板凳。
+追蹤：4 月東岸冷天可能持續 1-2 週，5 月暖再評估。心態風險：怪天氣 + 失誤可能惡性循環。BN 輪替 Albies / Jazz 二擇一坐。2025 雙年 baseline 真強 → 不 cut。
+- 04-13：[news check] 無傷勢，純 slump + 心態問題（fa_scan）
+
+### Byron Buxton (MIN, CF) [mlb_id:621439] — HBP 復出後慢熱
+狀況：04-03 被 Rays Kelly 91.6 mph 觸身擊中右前臂，X 光無骨折，右前臂挫傷。04-04 缺賽 1 場，04-05 復出 DH。14G/62PA .240 OPS .531, 0HR, BB:K 1:9（近 7G）。xwOBA .253 從 2025 .350 (>P90) 跌到 <P25，但 Barrel% 10.3% 仍 P70-80。
+追蹤：HBP 已過無 IL 風險，慢熱回升期。2025 baseline 全 >P90 真強，不 cut。觀察是否新傷或第二次 HBP（Buxton HBP 史較多）。
+- 04-13：[news check] HBP 已過正常出賽，慢熱中（fa_scan）
+
+### Giancarlo Stanton (NYY, RF/Util) [mlb_id:519317] — 慢性 tennis elbow 管理中
+狀況：兩肘 chronic tennis elbow，2025 拖到 6/16 才開季。2026 春訓 03-03 起，球隊「會排很多 off day 管理 elbow」。14G/55PA .764 OPS（Week 3 .118/.368 OPS 低點）。**HH% 從 2025 55.2% (>P90) 跌到 33.3% (<P25)** — 硬接觸品質退化可能與 elbow 相關。
+追蹤：HH% 是 elbow 健康代理指標，回到 50%+ 表示恢復。Off day 限制可能拖累 PA 累積。打者 cut 序列：Albies (雙年弱) → Tovar (BB 死硬傷, SS 守位保護) → 之後才輪到 Stanton（HH 退化但 xwOBA 仍 P80, Barrel% P70-80），**目前不到結構性弱門檻**。
+- 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
+
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Buxton（比較錨更新：Albies 改為交易中，Buxton wRC+ 60 是打者端最弱 active）
 - 04-10：xwOBA .299(P50)/BB% 13.3%(>P90)/Barrel% 7.4%(P45-50)，BBE 27。2025 prior 219 BBE 確認 BB% 結構優勢（11.7%）。7% owned 無壓力（fa_scan）（fa_scan）
