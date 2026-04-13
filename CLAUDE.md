@@ -43,6 +43,31 @@
 - **BB 結構性偏低**（2026-04-09 觀察，Week 1-3 排 5th/10th/8th）：OPS 穩定前 2-4 但 BB 中後段，Tovar/Chisholm BB% 極低拉低整隊。同等條件優先高 BB% 打者
 - **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
 
+### 進行中補強行動
+
+> 每週 weekly-review Phase 1C 更新狀態。已驗證/失敗 2 週後移除（git log 留痕）。新項目觸發即加入。
+
+**BB 結構性補強**（啟動 2026-04-09）
+- 觸發：Week 1-3 BB 排 5/10/8，2 週合併 #10 vs RALLY MONKEY #1
+- 行動：04-09 add Grisham（BB% 22.4% >P90，雙年確認菁英）
+- 預期：Grisham 入隊後 BB 排名 → #7+
+- 驗證：Week 4 BB 排名 vs Week 3
+- 狀態：Grisham Week 3 首週 slump（OPS .312），Week 4 是真偽驗證週
+
+**IP 結構性補強**（啟動 2026-04-12）
+- 觸發：Week 2-3 IP 倒數第 3，2 週合併 #10
+- 行動：BN 改 1 bat + 2 SP（04-12 add Detmers / drop Hicks）
+- 預期：偶數週 IP 從 53.2 → 60+（雖 Skubal/Sale 各 1 GS 拖低）
+- 驗證：Week 4 IP 排名 vs Week 3
+- 狀態：執行中
+
+**Whitlock 軟 cut**（啟動 2026-04-13）
+- 觸發：xERA 6.31 <P25 vs 2025 P80，雙年衝突
+- 行動：每天排 BN 不上場（用 Detmers SP/RP 雙資格佔 RP slot），等 Kelly 04-13~15 歸隊 drop
+- 預期：不浪費 acquisition 額度，自然替換
+- 驗證：04-15 完成 drop
+- 狀態：執行中
+
 ### 串流 SP 決策規則（2026-03-30 確立）
 
 | 情境 | 做法 |
@@ -391,3 +416,5 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
 - [ ] **Albies 交易 deadline**（Week 5 ~04-20）：9/11 隊 wRC+ 排 ≤8，優先試探 SerBowNee(#4) / 鍋's Neat(#5) / SUMMER(#5)。未成交 → 重新評估 drop
 - [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
+- [ ] **weekly_review.py prepare 完整性**（今日 Week 4 review 發現）：(1) `my_roster_performance.pitchers` 只取 9 個，缺 RP（Whitlock/Ashcraft）與新 add 的 SP（Detmers）— 應該完整覆蓋 12 投手；(2) `scan_summary.analysis` 只存「我方 RP 現況」段，缺 FA 候選清單 — 應存完整 issue body 或加 issue URL；(3) 應自動拉近 2 週聯賽合併排名（取代手動跑 `_merge_weeks.py`）並存 JSON
+- [ ] **Yahoo 查詢工具集中**：`_merge_weeks.py` / `_trade_batter_rank.py` / `_trade_lookup.py` 等 ad-hoc tool 散落 `daily-advisor/`，應集中到 `daily-advisor/_tools/` 並在 `yahoo-api-reference.md` 加 toolbox 索引
