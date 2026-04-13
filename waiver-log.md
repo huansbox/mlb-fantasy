@@ -137,6 +137,17 @@
 狀況：4/8 vs CLE 被 J.Ramírez 平飛球擊中左手拇指，0.2 IP 退場。X 光無結構性損傷，診斷左拇指挫傷。
 追蹤：下週 vs DET 先發前 KC 要確認 grip 正常 → 正常先發則結案；進 IL 或跳過先發 → 評估是否串流補 IP
 - 04-09：DTD。本人表態樂觀（「有點僵硬，應該沒問題」），預計下週先發。
+- 04-13：[news check] MLB API 確認 04-14 vs DET probable pitcher（對 Framber Valdez）。ESPN/RotoWire/MLB.com 一致報導「tentatively on track」，需通過 bullpen session 最終確認。hold 不串流，今晚速報前 double-check 有無負面新聞
+
+### Merrill Kelly (AZ, SP) [mlb_id:518876] — IL15 → 04-14 歸隊
+狀況：春訓後期背神經緊張開季 IL15。2 個 rehab start 通過（04-03 Triple-A Reno 5 IP shutout 72 pitches + 04-09 延長春訓 6 IP 83 pitches）。
+追蹤：Yahoo IL15 狀態待更新（通常 IL return 當天或賽後清）。連動 Whitlock 軟 cut 執行時程。
+- 04-13：[news check] 04-14 vs BAL season debut 多家 + MLB API 確認為 probable pitcher。Yahoo 仍顯示 IL15。drop Whitlock 時機 = Kelly Yahoo 狀態更新時（預估 04-14 賽後 / 04-15 早上）
+
+### Garrett Whitlock (BOS, RP) [mlb_id:676477] — 軟 cut 執行中
+狀況：2026 xERA 6.31/xwOBA .390 雙項 <P25（HH% 30.8% >P90 為唯一亮點，BBE 13 低信心）。2025 亦中後段，雙年結構性弱確認。
+追蹤：軟 cut 策略（2026-04-13 啟動）避免浪費 acquisition — 每天排 BN 不上場 + Detmers SP/RP 雙資格佔 RP slot，等 Kelly 04-14 歸隊 Yahoo 狀態清 IL 後 drop，由 Kelly 進 SP slot 完成替換。若 Kelly 延後 >48h → 改走 Soto add 方案（RP scan #58 首選 FAAB $2）。
+- 04-13：[news check] 軟 cut 第一步 — 今晚設 04-14 lineup 時從 RP 移至 BN 不上場。Drop 時機 = Kelly Yahoo 狀態更新
 
 ### Parker Messick (CLE, SP) [mlb_id:800048] — 開季驗證
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
