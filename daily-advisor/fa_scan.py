@@ -380,12 +380,40 @@ def _check_player_ownership(name, league_key, access_token):
     return None
 
 
+def _sync_waiver_log_before_edit(repo_root, env=None):
+    """Pull --rebase origin master before editing waiver-log.md.
+
+    Called at the start of any function that edits waiver-log.md, so the
+    working copy is already up-to-date before we read and write. This
+    prevents the post-commit rebase conflicts that previously occurred
+    when local edits (e.g. manual pushes) diverged from VPS cron state.
+    Returns True on success; False if pull fails (caller should skip).
+    """
+    try:
+        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
+                       cwd=repo_root, check=True, timeout=30)
+        return True
+    except subprocess.CalledProcessError:
+        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
+                       capture_output=True, timeout=10)
+        msg = ("[fa_scan] pre-edit pull --rebase failed — "
+               "skipping waiver-log update. Needs manual fix.")
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
+        return False
+
+
 def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
     """Check watchlist players' FA status, auto-move rostered ones to 已結案.
 
     Runs during --snapshot-only (TW 15:15). Modifies waiver-log.md + git commit.
     Only checks active watchlist (not 條件 Pass — those track "被 drop 回 FA").
     """
+    repo_root = os.path.join(SCRIPT_DIR, "..")
+    if not _sync_waiver_log_before_edit(repo_root, env):
+        return
+
     watchlist = parse_waiver_log_watchlist()
     if not watchlist:
         return
@@ -447,8 +475,6 @@ def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
     print(f"  Watchlist cleanup: moved {len(rostered)} to 已結案 ({names})",
           file=sys.stderr)
 
-    repo_root = os.path.join(SCRIPT_DIR, "..")
-
     try:
         subprocess.run(
             ["git", "add", "waiver-log.md"],
@@ -461,20 +487,6 @@ def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
         )
     except subprocess.CalledProcessError as e:
         print(f"  Git commit failed: {e}", file=sys.stderr)
-        return
-
-    try:
-        subprocess.run(
-            ["git", "pull", "--rebase", "origin", "master"],
-            cwd=repo_root, check=True, timeout=30,
-        )
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
-                       capture_output=True, timeout=10)
-        alert = "[fa_scan] git pull --rebase failed — skipping push. Needs manual fix."
-        print(f"  {alert}", file=sys.stderr)
-        if env:
-            send_telegram(alert, env)
         return
 
     try:
@@ -1538,6 +1550,10 @@ def _update_waiver_log(advice, today_str, env=None):
     if not os.path.exists(waiver_log_path):
         return
 
+    repo_root = os.path.join(SCRIPT_DIR, "..")
+    if not _sync_waiver_log_before_edit(repo_root, env):
+        return
+
     with open(waiver_log_path, encoding="utf-8") as f:
         content = f.read()
 
@@ -1599,8 +1615,7 @@ def _update_waiver_log(advice, today_str, env=None):
     with open(waiver_log_path, "w", encoding="utf-8") as f:
         f.write(content)
 
-    # Git commit + push
-    repo_root = os.path.join(SCRIPT_DIR, "..")
+    # Git commit + push (pre-edit sync already done above)
     try:
         subprocess.run(["git", "add", "waiver-log.md"],
                        cwd=repo_root, check=True, timeout=10)
@@ -1610,18 +1625,6 @@ def _update_waiver_log(advice, today_str, env=None):
             cwd=repo_root, check=True, timeout=10)
     except subprocess.CalledProcessError as e:
         print(f"  waiver-log git commit failed: {e}", file=sys.stderr)
-        return
-
-    try:
-        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
-                       cwd=repo_root, check=True, timeout=30)
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
-                       capture_output=True, timeout=10)
-        msg = "[fa_scan] waiver-log git rebase failed — skipping push."
-        print(f"  {msg}", file=sys.stderr)
-        if env:
-            send_telegram(msg, env)
         return
 
     try:
