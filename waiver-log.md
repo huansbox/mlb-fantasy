@@ -98,20 +98,6 @@
 - 04-13：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% owned（fa_scan）
 - 04-14：BBE 43（觸發 60），xERA 3.18/xwOBA .287 P80-90 穩定，距觸發差 4-5 場。0% owned（fa_scan）
 
-### Colin Rea (CHC, SP,RP) [mlb_id:607067] — 觀察中
-觸發：BBE 達 50 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
-- 04-10：xERA 3.70(P70-80)/xwOBA .305(P60-70)/HH% 33.3%(>P90)，BBE 33。2025 P40-45 breakout 候選。4% owned（fa_scan）
-- 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
-- 04-12：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
-- 04-13：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
-- 04-14：BBE 33（觸發 50），xERA 3.59/xwOBA .305/HH% 33.3% 穩定。距觸發差 3-4 場，4% owned（fa_scan）
-
-### Jake Bauers (MIL, 1B,LF,RF) [mlb_id:641343] — 觀察中
-觸發：BBE 達 50 且維持 xwOBA >P70 + Barrel% >P70 → vs Buxton/Albies
-- 04-12：xwOBA .346(P80-90)/BB% 8.7%(P60)/Barrel% 13.3%(P80-90) BBE 30。2025 雙年確認菁英（.356/14.7%/13.6% 125 BBE）。7% owned 無壓力（fa_scan）
-- 04-13：BBE 32, xwOBA .346(P80)/Barrel% 12.5%(P80) 雙年確認穩定。距觸發 BBE 50 差 4-5 場，7% owned（fa_scan）
-- 04-14：BBE 32, xwOBA .346(P80)/Barrel% 12.5%(P80) 雙年確認穩定。距觸發 BBE 50 差 4-5 場，7% owned（fa_scan）
-
 ### Brady House (WSH, 3B) [mlb_id:691781] — 觀察中
 觸發：BBE 達 50 且 2 項核心維持 >P70 → vs Albies
 - 04-12：xwOBA .329(P70-80)/BB% 8.9%(P60)/Barrel% 12.5%(P80-90) BBE 32。2025 prior 弱（.284/2.9%/4.3%），breakout 候選待驗。11% owned（fa_scan）
@@ -122,12 +108,6 @@
 - 04-12：xwOBA .346(P80-90)/BB% 14.9%(>P90)/Barrel% 7.4%(P45) BBE 27。BB% breakout 候選，2025 8.6%→14.9% 跳升待驗。5% owned（fa_scan）
 - 04-13：BBE 28, BB% 17.3%(>P90)/xwOBA .347(P80)。距觸發 BBE 40 差 5-6 場，5% owned（fa_scan）
 - 04-14：BBE 31, BB% 17.5%(>P90)/xwOBA .376(>P90) 持續。距觸發 BBE 40 差 4-5 場，5% owned（fa_scan）
-
-### Steven Matz (TB, SP,RP) [mlb_id:571927] — 觀察中
-觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
-- 04-12：xERA 3.27(P80-90)/xwOBA .292(P70-80) BBE 40，2025 雙年確認（3.38/.287，237 BBE）。HH% 42.5% 唯一弱項。運氣 -0.67 買低，IP/GS 5.3。7% owned（fa_scan）
-- 04-13：BBE 40，xERA 3.27/xwOBA .292 P80-90/P70-80 穩定，HH% 42.5% 唯一弱項。距觸發 BBE 60 差 4-5 場，9% owned（fa_scan）
-- 04-14：BBE 40（觸發 60），xERA 3.27/xwOBA .292 P80-90 + 雙年確認穩定。距觸發差 4-5 場，9% owned（fa_scan）
 
 ### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -217,6 +197,15 @@
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 
 ## 已結案
+
+### Colin Rea (CHC, SP,RP) — 被搶（自動偵測）
+- 2026-04-14：Yahoo ownership_type=team，從觀察中移除。
+
+### Jake Bauers (MIL, 1B,LF,RF) — 被搶（自動偵測）
+- 2026-04-14：Yahoo ownership_type=team，從觀察中移除。
+
+### Steven Matz (TB, SP,RP) — 被搶（自動偵測）
+- 2026-04-14：Yahoo ownership_type=team，從觀察中移除。
 
 ### Reid Detmers (LAA, SP,RP) — ✅ 已加入陣容
 - 04-12：add Detmers / drop Hicks。xERA 2.47(>P90) buy-low，Woodruff vs Detmers eval 後確認 Detmers 品質更好+免費取得。$0 FAAB
