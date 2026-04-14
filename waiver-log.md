@@ -96,6 +96,7 @@
 - 04-11：BBE 43，xERA 3.17/xwOBA .287 P80-90，HH% 41.9%(P40-45)。2025 breakout 待驗。6% -1/+1（fa_scan）
 - 04-12：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% -1（fa_scan）
 - 04-13：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% owned（fa_scan）
+- 04-14：BBE 43（觸發 60），xERA 3.18/xwOBA .287 P80-90 穩定，距觸發差 4-5 場。0% owned（fa_scan）
 
 ### Colin Rea (CHC, SP,RP) [mlb_id:607067] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
@@ -103,6 +104,7 @@
 - 04-11：BBE 33，xERA 3.61/xwOBA .305/HH% 33.3% 持續穩定。4% owned 無壓力（fa_scan）
 - 04-12：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
 - 04-13：BBE 33，xERA 3.59/xwOBA .305/HH% 33.3% 持續穩定。距觸發 BBE 50 差 3-4 場。4% owned（fa_scan）
+- 04-14：BBE 33（觸發 50），xERA 3.59/xwOBA .305/HH% 33.3% 穩定。距觸發差 3-4 場，4% owned（fa_scan）
 
 ### Jake Bauers (MIL, 1B,LF,RF) [mlb_id:641343] — 觀察中
 觸發：BBE 達 50 且維持 xwOBA >P70 + Barrel% >P70 → vs Buxton/Albies
@@ -125,11 +127,13 @@
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-12：xERA 3.27(P80-90)/xwOBA .292(P70-80) BBE 40，2025 雙年確認（3.38/.287，237 BBE）。HH% 42.5% 唯一弱項。運氣 -0.67 買低，IP/GS 5.3。7% owned（fa_scan）
 - 04-13：BBE 40，xERA 3.27/xwOBA .292 P80-90/P70-80 穩定，HH% 42.5% 唯一弱項。距觸發 BBE 60 差 4-5 場，9% owned（fa_scan）
+- 04-14：BBE 40（觸發 60），xERA 3.27/xwOBA .292 P80-90 + 雙年確認穩定。距觸發差 4-5 場，9% owned（fa_scan）
 
 ### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-12：xERA 1.90/xwOBA .223 >P90（BBE 31），2025 P40-45 breakout 候選。運氣 -1.37 買低。2% owned 無壓力（fa_scan）
 - 04-13：BBE 31，xERA 1.90/xwOBA .223 >P90 持續。2025 P40-45 breakout 未確認，距觸發 BBE 50 差 4-5 場。2% owned（fa_scan）
+- 04-14：BBE 31（觸發 50），xERA 1.90/xwOBA .222 >P90 持續，運氣 -1.37 買低。距觸發差 4-5 場，0% owned（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
@@ -144,6 +148,7 @@
 ### Erick Fedde (CWS, SP,RP) [mlb_id:607200] — 觀察中
 觸發：BBE 達 70 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-13：xERA 3.01/xwOBA .281 P80-90（BBE 47），2025 極差（5.41/.355）breakout 候選需大量驗證。CWS 弱隊，1% owned（fa_scan）
+- 04-14：BBE 47（觸發 70），xERA 3.04/xwOBA .281 P80-90 穩定。距觸發差 5-6 場，0% owned（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
@@ -152,6 +157,22 @@
 ### Moisés Ballesteros (CHC, C) [mlb_id:694208] — 觀察中
 觸發：BBE 達 35 且 Barrel% 維持 >P70 + xwOBA >P80
 - 04-14：xwOBA .357(>P90)/Barrel% 19.2%(>P90) BBE 26。2025 xwOBA .339 確認但 Barrel% 6.7%→19.2% 跳升待驗。7% owned（fa_scan）（fa_scan）
+
+### Cade Povich (BAL, SP) [mlb_id:700249] — 觀察中
+觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.303 維持 → vs Nola
+- 04-14：3/3 勝 Nola（xERA 3.57/xwOBA .303/HH% 39.5%）BBE 38，IP/GS 6.7 深投型 + BAL 強隊。2025 極差 breakout 未確認，運氣 +1.38 >P90（fa_scan）
+
+### Tyler Wells (BAL, SP,RP) [mlb_id:669330] — 觀察中
+觸發：BBE 達 50 且 xERA <4.04 + HH% <36.4% 維持 → vs Nola
+- 04-14：3/3 勝 Nola（xERA 3.86/xwOBA .314/HH% 29.6% >P90）BBE 27，2025 P70-80 雙年確認。BAL 強隊，運氣 +0.14 幾乎零（fa_scan）
+
+### Brent Suter (LAA, SP,RP) [mlb_id:608718] — 觀察中
+觸發：BBE 達 50 且 xERA <3.50 + xwOBA <.289 維持 + 確認為固定先發 → vs Nola
+- 04-14：3/3 勝 Nola 全 >P90（xERA 2.78/xwOBA .269/HH% 25.0%）BBE 32。2025 P55-60 中等 breakout，需確認輪值角色穩定性（fa_scan）
+
+### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
+觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
+- 04-14：3/3 勝 Nola（xERA 3.80/xwOBA .312/HH% 30.2% >P90）BBE 43，ATL 強隊。但 2025 極差（5.37/.354）breakout 未確認，IP/GS 5.0 短局（fa_scan）
 
 ## 隊上觀察
 
@@ -211,6 +232,7 @@
 
 ### Janson Junk (MIA, SP) — 被搶（自動偵測）
 - 2026-04-11：Yahoo ownership_type=team，從觀察中移除。
+- 04-14：2/3 勝 Nola（xERA 3.20/xwOBA .288 P80-90）BBE 52 全場最高信心，運氣 -1.12 買低。2025 P40-45 中等改善可信度較高。MIA 弱隊扣 W（fa_scan）
 
 ### Joey Cantillo (CLE, SP) — 被搶（自動偵測）
 - 2026-04-10：Yahoo ownership_type=team，從觀察中移除。
