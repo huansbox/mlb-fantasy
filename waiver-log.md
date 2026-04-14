@@ -5,6 +5,7 @@
 ### Dansby Swanson (CHC, SS) [mlb_id:621020] — 觀察中
 觸發：Albies 交易成功（空出打者格位）→ 立即 add 取代 Tovar；或 76% owned 急升 → 提前行動
 - 04-12：[eval] vs Tovar。核心 3 Swanson 2:1 勝出（BB% 15.8% >P90 vs 1.6% <P25 鴻溝 + Barrel% >P90）。2025 全季 159G/24HR/20SB/77RBI(428 BBE P80-90) 遠優於 Tovar 95G/9HR/5SB。.149 AVG 是 BABIP 噪音（HH% 63% >P90）。直接解決 BB 結構性弱。BBE 27 低信心但 2025 背書。76% owned 窗口有限
+- 04-14：BBE 33, xwOBA .344(P80)/BB% 18.5%(>P90)/Barrel% 15.2%(>P90) 穩定。0% owned 安全，等 Albies 處理（fa_scan）
 
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
@@ -16,6 +17,7 @@
 - 04-11：BBE 21，xwOBA .429/Barrel% 14.3% >P90 持續，BB% 6.5% <P25。BN 無空位，0% owned（fa_scan）
 - 04-12：BBE 23，xwOBA .409/Barrel% 17.4% >P90 持續。Butler drop 後 BN 可能有空位，待確認。0% owned（fa_scan）
 - 04-13：BBE 25, xwOBA .423/Barrel% 16.0% >P90 持續。Butler drop 後 BN 可能有空位，觸發條件接近。0% owned（fa_scan）
+- 04-14：BBE 27, xwOBA .397/Barrel% 14.8% >P90 持續。BN 若因 Albies 騰出→次優先。0% owned（fa_scan）
 
 ### Royce Lewis (MIN, 3B) [mlb_id:668904] — 條件 Pass
 重評條件：BN 有空位（傷兵或 drop）+ 連 2 週健康出賽
@@ -31,6 +33,7 @@
 - 04-11：BBE 23，xwOBA .440/BB% 11.4%/Barrel% 23.1% 持續遠超門檻。Butler 已 drop，比較錨更新為 Albies。%owned 37% 三日+3（fa_scan）
 - 04-12：⚠️ 觸發達成！BBE 27>25, xwOBA .444>P80, Barrel% 22.2%>P70。vs Albies 3/3 全勝。37% owned 三日+3，建議立即 FAAB claim（fa_scan）
 - 04-13：⚠️ 觸發確認！BBE 31>25, xwOBA .479>P80, Barrel% 25.8%>P70。vs Albies 3/3 全勝。40% owned 三日+3，建議立即 FAAB claim（fa_scan）
+- 04-14：⚠️ 觸發確認第 2 天！BBE 31>25, xwOBA .479>P80, Barrel% 25.8%>P70。vs Albies 3/3 全勝。40% owned 三日+6，建議立即 FAAB claim（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
@@ -40,6 +43,7 @@
 - 04-10：BBE 0 無新數據，%owned 26%，等數據更新（fa_scan）
 - 04-11：BBE 0 連續無新數據，%owned 27% 三日+1。需確認大聯盟狀態（fa_scan）
 - 04-13：BBE 0 連續無數據，需確認大聯盟狀態。29% owned 三日+3（fa_scan）
+- 04-14：BBE 0 連續無數據，需確認大聯盟狀態。31% owned 三日+4（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -49,6 +53,7 @@
 - 04-11：BBE 16，三項>P90 持續，%owned 18% 三日+3。距觸發 BBE 30 仍遠（fa_scan）
 - 04-12：BBE 17，三項>P90 持續（.411/.195/.235）。距觸發 BBE 30 仍遠，0% owned（fa_scan）
 - 04-13：BBE 17, 三項>P90 持續（.400/.178/.235）。距觸發 BBE 30 仍遠，0% owned（fa_scan）
+- 04-14：BBE 19, 三項>P90 持續（.387/.178/.211）。距觸發 BBE 30 仍遠，0% owned（fa_scan）
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：BBE 達 30 且 2 項核心維持 >P70 → vs Buxton/Albies
@@ -57,6 +62,7 @@
 - 04-11：BBE 20，xwOBA .308(P60-70)/Barrel% 15.0%(>P90)。xwOBA 略降但 Barrel 穩。%owned 27% 三日+6（fa_scan）
 - 04-12：BBE 22，xwOBA .336(P80-90)/Barrel% 18.2%(>P90)。%owned 30% 三日+5 升速加快，距觸發 BBE 30 差 3-4 場（fa_scan）
 - 04-13：BBE 23, xwOBA .313/Barrel% 17.4%>P90。⚠️ %owned 34% 三日+8 急升！距觸發 BBE 30 差 3-4 場，窗口快速收窄（fa_scan）
+- 04-14：BBE 27, xwOBA .323/Barrel% 18.5%>P90。⚠️ %owned 34% 三日+8 全場最快！距觸發 BBE 30 差 1-2 場（fa_scan）
 
 ### Miguel Vargas (CWS, 1B,3B) [mlb_id:678246] — 觀察中
 觸發：BBE 達 35 且 BB% 維持 >P80 + xwOBA >P60 → vs Albies/Butler
@@ -65,6 +71,7 @@
 - 04-11：BBE 32 中等信心，BB% 15.8%/xwOBA .321 品質條件已達觸發門檻。距 BBE 35 觸發差 1-2 場。%owned 38%（fa_scan）
 - 04-12：⚠️ 觸發達成！BBE 35=門檻, BB% 15.8%>P80, xwOBA .323>P60。vs Albies 3/3 全勝，雙年確認。38% owned（fa_scan）
 - 04-13：⚠️ 觸發確認！BBE 35=門檻, BB% 14.5%>P80, xwOBA .323>P60。vs Albies 3/3 全勝。Alvarez 備案。38% owned（fa_scan）
+- 04-14：⚠️ 觸發確認。BBE 37, BB% 14.5%>P80, xwOBA .310>P60。Alvarez 優先→降為備案。38% owned（fa_scan）
 
 ### Richie Palacios (TB, 2B,LF) [mlb_id:680700] — 觀察中
 觸發：BBE 達 30 且 xwOBA >P80 + BB% >P70 → vs Buxton
@@ -73,6 +80,7 @@
 - 04-11：BBE 14，三項>P90 持續但樣本極小。0% owned（fa_scan）
 - 04-12：BBE 14，三項>P90 持續但樣本極小。距觸發 BBE 30 極遠，0% owned（fa_scan）
 - 04-13：BBE 14, 三項>P90 持續但樣本極小。距觸發 BBE 30 極遠，0% owned（fa_scan）
+- 04-14：BBE 16, 三項>P90 持續但樣本極小。距觸發 BBE 30 極遠，0% owned（fa_scan）
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P45 → vs Buxton（比較錨更新：Albies 改為交易中，Buxton wRC+ 60 是打者端最弱 active）
@@ -80,6 +88,7 @@
 - 04-11：BBE 27，BB% 13.3%(>P90) 結構確認，xwOBA .299(P50) 邊界穩定。7% owned（fa_scan）
 - 04-12：BBE 27，BB% 14.3%(>P90) 穩定，xwOBA .299(P50)。距觸發 BBE 40 差 5-6 場，7% owned（fa_scan）
 - 04-13：BBE 28, BB% 13.2%(>P90)/xwOBA .292(P40-45)。距觸發 BBE 40 差 5-6 場，7% owned（fa_scan）
+- 04-14：BBE 30, BB% 12.3%(>P90)/xwOBA .277(P25-40) 跌破 P45 門檻邊緣。距觸發 BBE 40 差 5 場，7% owned（fa_scan）
 
 ### Sean Burke (CWS, SP,RP) [mlb_id:680732] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -99,15 +108,18 @@
 觸發：BBE 達 50 且維持 xwOBA >P70 + Barrel% >P70 → vs Buxton/Albies
 - 04-12：xwOBA .346(P80-90)/BB% 8.7%(P60)/Barrel% 13.3%(P80-90) BBE 30。2025 雙年確認菁英（.356/14.7%/13.6% 125 BBE）。7% owned 無壓力（fa_scan）
 - 04-13：BBE 32, xwOBA .346(P80)/Barrel% 12.5%(P80) 雙年確認穩定。距觸發 BBE 50 差 4-5 場，7% owned（fa_scan）
+- 04-14：BBE 32, xwOBA .346(P80)/Barrel% 12.5%(P80) 雙年確認穩定。距觸發 BBE 50 差 4-5 場，7% owned（fa_scan）
 
 ### Brady House (WSH, 3B) [mlb_id:691781] — 觀察中
 觸發：BBE 達 50 且 2 項核心維持 >P70 → vs Albies
 - 04-12：xwOBA .329(P70-80)/BB% 8.9%(P60)/Barrel% 12.5%(P80-90) BBE 32。2025 prior 弱（.284/2.9%/4.3%），breakout 候選待驗。11% owned（fa_scan）
+- 04-14：BBE 38, xwOBA .309(P60)/Barrel% 10.5%(P70)。2025 prior 弱 breakout 待驗。距觸發 BBE 50 遠，11% owned（fa_scan）
 
 ### Evan Carter (TEX, LF,CF,RF) [mlb_id:694497] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
 - 04-12：xwOBA .346(P80-90)/BB% 14.9%(>P90)/Barrel% 7.4%(P45) BBE 27。BB% breakout 候選，2025 8.6%→14.9% 跳升待驗。5% owned（fa_scan）
 - 04-13：BBE 28, BB% 17.3%(>P90)/xwOBA .347(P80)。距觸發 BBE 40 差 5-6 場，5% owned（fa_scan）
+- 04-14：BBE 31, BB% 17.5%(>P90)/xwOBA .376(>P90) 持續。距觸發 BBE 40 差 4-5 場，5% owned（fa_scan）
 
 ### Steven Matz (TB, SP,RP) [mlb_id:571927] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -122,14 +134,24 @@
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
 - 04-13：xwOBA .373(>P90)/BB% 10.3%(P70)/Barrel% 13.0%(P80) BBE 23。2025 雙年確認（.329/10.6%/12.2%，123 BBE）。COL 主場加成。3% owned（fa_scan）（fa_scan）
+- 04-14：BBE 26, xwOBA .355(>P90)/BB% 10.3%(P70)/Barrel% 11.5%(P70) 雙年確認。距觸發 BBE 35 差 3-4 場，3% owned（fa_scan）
 
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 觀察中
 觸發：BBE 達 40 且 Barrel% 維持 >P70 + xwOBA >P80 → vs Buxton/Albies
 - 04-13：xwOBA .365(>P90)/BB% 15.2%(>P90)/Barrel% 14.3%(>P90) BBE 28。2025 xwOBA/BB% 確認（P70+），Barrel% 6.3% 未確認。11% owned +2（fa_scan）（fa_scan）
+- 04-14：BBE 28, xwOBA .365(>P90)/BB% 15.7%(>P90)/Barrel% 14.3%(>P90)。2025 Barrel% 6.3% 未確認。距觸發 BBE 40 遠，11% owned（fa_scan）
 
 ### Erick Fedde (CWS, SP,RP) [mlb_id:607200] — 觀察中
 觸發：BBE 達 70 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
 - 04-13：xERA 3.01/xwOBA .281 P80-90（BBE 47），2025 極差（5.41/.355）breakout 候選需大量驗證。CWS 弱隊，1% owned（fa_scan）
+
+### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
+觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
+- 04-14：xwOBA .298(P50)/BB% 12.3%(>P90)/Barrel% 14.3%(>P90) BBE 28。2025 Barrel 確認但 BB% 3.9%→12.3% breakout 待驗。56% owned（fa_scan）（fa_scan）
+
+### Moisés Ballesteros (CHC, C) [mlb_id:694208] — 觀察中
+觸發：BBE 達 35 且 Barrel% 維持 >P70 + xwOBA >P80
+- 04-14：xwOBA .357(>P90)/Barrel% 19.2%(>P90) BBE 26。2025 xwOBA .339 確認但 Barrel% 6.7%→19.2% 跳升待驗。7% owned（fa_scan）（fa_scan）
 
 ## 隊上觀察
 
