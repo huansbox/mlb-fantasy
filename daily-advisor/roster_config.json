@@ -337,29 +337,6 @@
       "status": ""
     },
     {
-      "name": "Garrett Whitlock",
-      "mlb_id": 676477,
-      "team": "BOS",
-      "positions": [
-        "RP"
-      ],
-      "yahoo_player_key": "469.p.11358",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 2.8,
-        "xwoba_allowed": 0.262,
-        "hh_pct_allowed": 36.4,
-        "barrel_pct_allowed": 8.7,
-        "bbe": 173,
-        "era": 2.25,
-        "k_per_9": 11.38,
-        "ip_per_team_g": 0.44,
-        "ip": 72.0
-      },
-      "selected_pos": "RP",
-      "status": ""
-    },
-    {
       "name": "Parker Messick",
       "mlb_id": 800048,
       "team": "CLE",
@@ -400,8 +377,8 @@
         "ip_per_gs": 5.8,
         "ip": 184.0
       },
-      "selected_pos": "IL",
-      "status": "IL15"
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Graham Ashcraft",
@@ -457,7 +434,7 @@
         "SP"
       ],
       "selected_pos": "BN",
-      "status": "SUSP",
+      "status": "",
       "prior_stats": {
         "season": 2025,
         "xera": 10.73,
@@ -502,7 +479,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
