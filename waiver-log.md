@@ -99,15 +99,6 @@
 - 04-14：BBE 30, BB% 12.3%(>P90)/xwOBA .277(P25-40) 跌破 P45 門檻邊緣。距觸發 BBE 40 差 5 場，7% owned（fa_scan）
 - 04-15：BBE 30, xwOBA .277 跌至 P25-40 破 P45 門檻邊緣，BB% 12.3%>P90 仍在。趨勢向下，下次 xwOBA<P40→移除（fa_scan）
 
-### Sean Burke (CWS, SP,RP) [mlb_id:680732] — 觀察中
-觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
-- 04-10：xERA 3.25/xwOBA .287 P80-90（BBE 43），2025 P25-40 breakout 候選。運氣 -0.35 真實。7% +3（fa_scan）
-- 04-11：BBE 43，xERA 3.17/xwOBA .287 P80-90，HH% 41.9%(P40-45)。2025 breakout 待驗。6% -1/+1（fa_scan）
-- 04-12：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% -1（fa_scan）
-- 04-13：BBE 43，xERA 3.15/xwOBA .287 P80-90 穩定，HH% 41.9%(P40-45)。距觸發 BBE 60 差 4-5 場。6% owned（fa_scan）
-- 04-14：BBE 43（觸發 60），xERA 3.18/xwOBA .287 P80-90 穩定，距觸發差 4-5 場。0% owned（fa_scan）
-- 04-15：BBE 43（觸發 60），xERA 3.18/xwOBA .287 P80-90 穩定。距觸發差 4-5 場，0% owned（fa_scan）
-
 ### Brady House (WSH, 3B) [mlb_id:691781] — 觀察中
 觸發：BBE 達 50 且 2 項核心維持 >P70 → vs Albies
 - 04-12：xwOBA .329(P70-80)/BB% 8.9%(P60)/Barrel% 12.5%(P80-90) BBE 32。2025 prior 弱（.284/2.9%/4.3%），breakout 候選待驗。11% owned（fa_scan）
@@ -223,6 +214,9 @@
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 
 ## 已結案
+
+### Sean Burke (CWS, SP,RP) — 被搶（自動偵測）
+- 2026-04-15：Yahoo ownership_type=team，從觀察中移除。
 
 ### Colin Rea (CHC, SP,RP) — 被搶（自動偵測）
 - 2026-04-14：Yahoo ownership_type=team，從觀察中移除。
