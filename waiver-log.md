@@ -2,12 +2,6 @@
 
 ## 觀察中
 
-### Dansby Swanson (CHC, SS) [mlb_id:621020] — 觀察中
-觸發：Albies 交易成功（空出打者格位）→ 立即 add 取代 Tovar；或 76% owned 急升 → 提前行動
-- 04-12：[eval] vs Tovar。核心 3 Swanson 2:1 勝出（BB% 15.8% >P90 vs 1.6% <P25 鴻溝 + Barrel% >P90）。2025 全季 159G/24HR/20SB/77RBI(428 BBE P80-90) 遠優於 Tovar 95G/9HR/5SB。.149 AVG 是 BABIP 噪音（HH% 63% >P90）。直接解決 BB 結構性弱。BBE 27 低信心但 2025 背書。76% owned 窗口有限
-- 04-14：BBE 33, xwOBA .344(P80)/BB% 18.5%(>P90)/Barrel% 15.2%(>P90) 穩定。0% owned 安全，等 Albies 處理（fa_scan）
-- 04-15：BBE 35 中等信心，xwOBA .339/BB% 20%/Barrel% 14.3% 三項菁英穩定。0% owned 安全，等 Albies 處理（fa_scan）
-
 ### Dominic Canzone (SEA, LF/RF) [mlb_id:686527] — 觀察中
 觸發：BN 有空位時撿來當 RHP matchup 武器
 - 04-01：[eval] 2025 Savant 三項全 >P90：xwOBA .376 / HH% 49.7% / Barrel% 14.4%（187 BBE）。確認為硬 platoon（只打 RHP）。目前 BN 無空位，13% owned 不會被搶。
@@ -247,6 +241,9 @@
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 
 ## 已結案
+
+### Dansby Swanson (CHC, SS) — 被搶（自動偵測）
+- 2026-04-16：Yahoo ownership_type=team，從觀察中移除。
 
 ### Sean Burke (CWS, SP,RP) — 被搶（自動偵測）
 - 2026-04-15：Yahoo ownership_type=team，從觀察中移除。
