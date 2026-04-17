@@ -2,11 +2,18 @@
 
 以下是我方陣容中可能被替換的 SP（由弱到強排序）。
 
-請挑出最應該被取代的 3 名 SP。
+請挑出品質最弱的 3 名 SP，作為後續 Pass 2 的 FA 比較錨點。
+
+⚠️ 這是**比較錨點清單**，不是 cut 決策清單。cut 需要雙年雙確認 + 角色脈絡，由 Pass 2 處理。
 
 挑選標準（嚴格依序）：
 1. Savant 品質數據（xERA / xwOBA allowed / HH% allowed）— 優先
 2. 對計分類別的貢獻（IP / K / ERA / WHIP / QS）— 次要
+
+reason 嚴格規則：
+- 只能引用核心 3 品質指標（xERA / xwOBA allowed / HH% allowed）+ BBE 樣本量
+- 禁止提及：角色脈絡、傷病、IL 狀態、運氣標記、2025 prior、陣容需求、IP/GS 產量
+- 一句話，不得複合判斷
 
 輸出格式（JSON，不要多餘文字）：
 ```json
