@@ -944,30 +944,6 @@ def get_fantasy_week(target_date, config):
     return monday, sunday, week_number
 
 
-def calc_weekly_ip(config, target_date, pitchers_list=None):
-    """Calculate total IP for the fantasy week containing target_date."""
-    week_start, week_end, _ = get_fantasy_week(target_date, config)
-    season = config["league"]["season"]
-    src = pitchers_list if pitchers_list else config["pitchers"]
-    active_pitchers = [p for p in src if is_active(p)]
-
-    entries = []
-    total_ip = 0.0
-    for p in active_pitchers:
-        try:
-            logs = fetch_pitcher_gamelog(p["mlb_id"], season)
-        except Exception:
-            continue
-        for log in logs:
-            log_date = datetime.strptime(log["date"], "%Y-%m-%d").date()
-            if week_start <= log_date <= week_end:
-                total_ip += log["ip"]
-                entries.append(
-                    f"  {p['name']}: {log['ip']:.1f} IP ({log['date']} vs {team_abbr(log['opponent'])})"
-                )
-    return total_ip, entries
-
-
 def analyze(config, target_date, env=None, morning=False):
     """Build the full data summary for claude -p."""
     season = config["league"]["season"]
@@ -1010,8 +986,6 @@ def analyze(config, target_date, env=None, morning=False):
             print(f"Yahoo roster fetch failed, using config: {e}", file=sys.stderr)
 
     games = fetch_schedule(date_str)
-    # target_date = today in ET; games on this date may be in progress
-    games_in_progress = [g for g in games if g.get("game_state") == "Live"]
 
     # Build set of teams playing
     teams_playing = set()
@@ -1196,7 +1170,7 @@ def analyze(config, target_date, env=None, morning=False):
     else:
         lines.append("  (無)")
 
-    # ── Pre-fetch Yahoo scoreboard (needed for IP + H2H sections) ──
+    # ── Pre-fetch Yahoo scoreboard (needed for opponent_key in SP schedule) ──
     sb = None
     if env:
         try:
@@ -1204,69 +1178,7 @@ def analyze(config, target_date, env=None, morning=False):
         except Exception as e:
             print(f"Yahoo scoreboard fetch failed: {e}", file=sys.stderr)
 
-    # ── Section 4: Weekly IP ──
-    _, _, week_number = get_fantasy_week(target_date, config)
-    min_ip = config["league"]["min_ip"]
-    lines.append(f"\n本週 IP 進度（Week {week_number}）：")
-
-    # Use Yahoo scoreboard IP (includes dropped players' contributions)
-    yahoo_ip = None
-    if sb:
-        for cat in sb.get("categories", []):
-            if cat["name"] == "IP":
-                try:
-                    yahoo_ip = float(cat["mine"])
-                except (ValueError, TypeError):
-                    pass
-                break
-
-    if yahoo_ip is not None:
-        total_ip = yahoo_ip
-    else:
-        # Fallback: calc from game log (may miss dropped players)
-        total_ip, _ = calc_weekly_ip(config, target_date, pitchers)
-
-    # Always show per-pitcher breakdown for context
-    _, ip_entries = calc_weekly_ip(config, target_date, pitchers)
-    if ip_entries:
-        lines.extend(ip_entries)
-
-    if games_in_progress:
-        live_teams = []
-        for g in games_in_progress:
-            live_teams.append(f"{team_abbr(g['away_team'], season)}@{team_abbr(g['home_team'], season)}")
-        lines.append(f"  ⚠️ 比賽進行中（{', '.join(live_teams)}），以上數據非最終，IP/比率仍會變動")
-
-    if week_number == 1:
-        lines.append(f"  合計: {total_ip:.1f} IP（Week 1 無最低局數限制）")
-    else:
-        lines.append(f"  合計: {total_ip:.1f} / {min_ip} IP")
-        remaining = min_ip - total_ip
-        if remaining > 0:
-            lines.append(f"  還需: {remaining:.1f} IP")
-        else:
-            lines.append("  已達標")
-
-    # ── Section 5: H2H Scoreboard ──
-    if sb:
-        lines.append(f"\n=== 本週 H2H 對戰態勢 ===")
-        lines.append(f"對手：{sb['opponent']}")
-        lines.append(f"目前比分：{sb['wins']}W-{sb['losses']}L-{sb['draws']}D（需 8+ 贏）\n")
-        lines.append(f"  {'類別':>6}  {'我方':>8}  {'對手':>8}  狀態")
-        for cat in sb["categories"]:
-            if cat["result"] == "W":
-                tag = "✅ 贏"
-            elif cat["result"] == "L":
-                tag = "❌ 輸"
-            else:
-                tag = "➖ 平"
-            if cat["name"] in ("SB", "SV+H"):
-                tag += "（punt）"
-            lines.append(f"  {cat['name']:>6}  {cat['mine']:>8}  {cat['opp']:>8}  {tag}")
-        if games_in_progress:
-            lines.append(f"  ⚠️ 比賽進行中，以上數據非最終")
-
-    # ── Section 6: My SP schedule (rest of week) ──
+    # ── Section 4: My SP schedule (rest of week) ──
     _, week_end, _ = get_fantasy_week(target_date, config)
     schedule_cache = {date_str: games}
     lines.append("\n本週剩餘我方 SP 排程：")
@@ -1291,7 +1203,7 @@ def analyze(config, target_date, env=None, morning=False):
             lines.append(f"  {cur_str} ({cur_wd}): (無)")
         current += timedelta(days=1)
 
-    # ── Section 7: Opponent SP schedule (rest of week) ──
+    # ── Section 5: Opponent SP schedule (rest of week) ──
     if env and sb and sb.get("opponent_key"):
         try:
             access_token = yahoo_refresh_token(env)
@@ -1306,7 +1218,7 @@ def analyze(config, target_date, env=None, morning=False):
         except Exception as e:
             print(f"Opponent SP schedule error (skipping): {e}", file=sys.stderr)
 
-    # ── Section 8: Lineup confirmation ──
+    # ── Section 6: Lineup confirmation ──
     try:
         team_lineups = fetch_lineups(date_str, season)
     except Exception as e:
@@ -1372,7 +1284,7 @@ def analyze(config, target_date, env=None, morning=False):
         lines.append("\n板凳球員 Lineup 狀態：")
         lines.extend(bench_lines)
 
-    # ── Section 9: Evening advice (morning mode only) ──
+    # ── Section 7: Evening advice (morning mode only) ──
     if morning:
         _, _, wk = get_fantasy_week(target_date, config)
         evening_advice = fetch_evening_advice(target_date, wk)
