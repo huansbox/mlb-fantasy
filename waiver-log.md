@@ -133,6 +133,7 @@
 - 04-14：BBE 31（觸發 50），xERA 1.90/xwOBA .222 >P90 持續，運氣 -1.37 買低。距觸發差 4-5 場，0% owned（fa_scan）
 - 04-15：BBE 31（觸發 50），xERA 1.92/xwOBA .222 >P90 持續，運氣 -1.35 買低。距觸發差 4-5 場，0% owned（fa_scan）
 - 04-16：BBE 31→50 差 4-5 場，xERA 1.89/xwOBA .221 >P90 持續，運氣 -1.57 買低訊號強。0% owned（fa_scan）
+- 04-17：BBE 38→50 差 3-4 場，xERA 2.70/xwOBA .264 >P90 持續，品質遠超門檻等 BBE。0% owned（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
@@ -156,6 +157,7 @@
 - 04-14：BBE 47（觸發 70），xERA 3.04/xwOBA .281 P80-90 穩定。距觸發差 5-6 場，0% owned（fa_scan）
 - 04-15：BBE 47（觸發 70），xERA 3.08/xwOBA .281 P80-90 穩定。距觸發差 5-6 場，0% owned（fa_scan）
 - 04-16：BBE 47→70 差 5-6 場，xERA 3.06/xwOBA .281 P80-90 穩定。0% owned（fa_scan）
+- 04-17：BBE 47→70 差 5-6 場，xERA 3.08/xwOBA .281 P80-90 穩定。0% owned（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
@@ -176,29 +178,34 @@
 - 04-14：3/3 勝 Nola（xERA 3.57/xwOBA .303/HH% 39.5%）BBE 38，IP/GS 6.7 深投型 + BAL 強隊。2025 極差 breakout 未確認，運氣 +1.38 >P90（fa_scan）
 - 04-15：BBE 38（觸發 60），xERA 3.61/xwOBA .303 P60-70，IP/GS 6.7 深投型。運氣 +1.42 >P90 注意。0% owned（fa_scan）
 - 04-16：BBE 38→60 差 5-6 場，xERA 3.62/xwOBA .304/HH% 39.5% 3/3 勝 Nola，IP/GS 6.7 深投型加分。0% owned（fa_scan）
+- 04-17：BBE 38→60 差 5-6 場，xERA 3.61/xwOBA .303 P60-70，IP/GS 6.7 深投型。0% owned（fa_scan）
 
 ### Tyler Wells (BAL, SP,RP) [mlb_id:669330] — 觀察中
 觸發：BBE 達 50 且 xERA <4.04 + HH% <36.4% 維持 → vs Nola
 - 04-14：3/3 勝 Nola（xERA 3.86/xwOBA .314/HH% 29.6% >P90）BBE 27，2025 P70-80 雙年確認。BAL 強隊，運氣 +0.14 幾乎零（fa_scan）
 - 04-15：BBE 27（觸發 50），xERA 3.91/HH% 29.6% >P90，2025 P70-80 雙年確認。BAL 強隊。距觸發差 5-6 場，0% owned（fa_scan）
 - 04-16：BBE 27→50 差 5-6 場，xERA 3.91/HH% 29.6% 3/3 勝 Nola，2025 P70-80 雙年確認。0% owned（fa_scan）
+- 04-17：⚠️ 品質崩盤：xERA 5.56(P25-40)/xwOBA .367(<P25)，觸發條件 xERA<4.04 已不達標。下次仍 >4.50 → 移除（fa_scan）
 
 ### Brent Suter (LAA, SP,RP) [mlb_id:608718] — 觀察中
 觸發：BBE 達 50 且 xERA <3.50 + xwOBA <.289 維持 + 確認為固定先發 → vs Nola
 - 04-14：3/3 勝 Nola 全 >P90（xERA 2.78/xwOBA .269/HH% 25.0%）BBE 32。2025 P55-60 中等 breakout，需確認輪值角色穩定性（fa_scan）
 - 04-15：BBE 32（觸發 50），xERA 2.81/xwOBA .269/HH% 25.0% 三項>P90。需確認固定先發角色。距觸發差 4-5 場，0% owned（fa_scan）
 - 04-16：BBE 32→50 差 4-5 場，xERA 2.82/xwOBA .270/HH% 25.0% 三項>P90，需確認固定先發。0% owned（fa_scan）
+- 04-17：BBE 32→50 差 4-5 場，xERA 2.83/xwOBA .270/HH% 25.0% 三項>P90 持續。IP/GS 2.0 極短局硬傷。0% owned（fa_scan）
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
 - 04-14：3/3 勝 Nola（xERA 3.80/xwOBA .312/HH% 30.2% >P90）BBE 43，ATL 強隊。但 2025 極差（5.37/.354）breakout 未確認，IP/GS 5.0 短局（fa_scan）
 - 04-15：BBE 43（觸發 60），xERA 3.85/HH% 30.2% >P90，2025 極差 breakout 未確認。IP/GS 5.0 短局。距觸發差 4-5 場，0% owned（fa_scan）
 - 04-16：BBE 43→60 差 4-5 場，xERA 3.83/HH% 30.2% 3/3 勝 Nola，IP/GS 5.0 短局，2025 極差 breakout 未確認。0% owned（fa_scan）
+- 04-17：BBE 43→60 差 4-5 場，xERA 3.84/HH% 30.2% 品質達標邊緣，2025 極差 breakout 未確認。0% owned（fa_scan）
 
 ### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
 - 04-15：xERA 3.67/xwOBA .305/HH% 33.3% 3/3 勝 Nola（BBE 36 中等），2025 極差（5.41/.355）breakout 未確認。IP/GS 4.2 短局 QS 打折，運氣 -1.30 買低。SD 強隊。2% owned（fa_scan）
 - 04-16：BBE 36→50 差 4-5 場，xERA 3.64/xwOBA .305/HH% 33.3% 3/3 勝 Nola，IP/GS 4.2 未達 5.0 回升條件。2% owned（fa_scan）
+- 04-17：BBE 36→50 差 4-5 場，xERA 3.66 品質達標但 IP/GS 4.4 未達 5.0 回升條件。0% owned（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：BBE 達 45 且 2 項核心維持 >P70 → vs Albies（Alvarez 備案）
@@ -218,6 +225,18 @@
 ### Austin Martin (MIN, 2B,LF,CF) [mlb_id:668885] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies（Alvarez 備案）
 - 04-17：xwOBA .392(>P90)/BB% 23.1%(>P90) 雙年確認菁英（2025 .345/12.2%），Barrel% 6.7%(P40-45) 低 power。BBE 30 中等信心，1% owned 安全（fa_scan）
+
+### Chad Patrick (MIL, SP) [mlb_id:694477] — 觀察中
+觸發：連 2 場先發 ERA 回升後 xERA 仍 <3.50 + xwOBA <.301，BBE 達 80 → 取代 Nola
+- 04-17：xERA 3.08/xwOBA .281 P80-90 雙年確認，BBE 59 高信心。2/3 勝 Nola。運氣 +2.13 >P90（ERA 0.95 預期回升）。IP/GS 5.3，MIL 強隊。19% owned（fa_scan）
+
+### J.T. Ginn (ATH, SP) [mlb_id:669372] — 觀察中
+觸發：BBE 達 70 且 xERA <3.74 + IP/GS 回升至 5.0+ → 取代 Nola
+- 04-17：xERA 3.10/xwOBA .282/HH% 28.9% 3/3 勝 Nola，BBE 45 中等。2025 P70 雙年確認。IP/GS 4.7 短局 + ATH 弱隊拖產量。1% owned（fa_scan）
+
+### Ben Brown (CHC, SP,RP) [mlb_id:676962] — 觀察中
+觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → 取代 Nola
+- 04-17：xERA 2.90/xwOBA .273/HH% 34.2% 3/3 勝 Nola，BBE 38 中等。2025 P40-45 breakout 未確認。運氣 -0.17 中性。1% owned（fa_scan）
 
 ## 隊上觀察
 
