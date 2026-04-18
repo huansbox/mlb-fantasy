@@ -35,6 +35,7 @@
 - 04-15：⚠️ 觸發確認第 3 天！BBE 34>25, xwOBA .470>P80, Barrel% 23.5%>P70。44% owned 三日+7 急升，窗口快速關閉。建議立即 FAAB claim 取代 Albies（fa_scan）
 - 04-16：⚠️ 觸發確認第 4 天！BBE 36>25, xwOBA .465>P80, Barrel% 22.2>P70。vs Albies 3/3 全勝。44% owned 三日+7 急升窗口快速關閉，建議立即 FAAB claim 取代 Albies（fa_scan）
 - 04-17：⚠️ 觸發確認第 4 天！BBE 37>25, xwOBA .459>P80, Barrel% 21.6%>P70。vs Albies 3/3 全勝。44% owned 三日+7 急升窗口快速關閉，建議立即 FAAB claim 取代 Albies（fa_scan）
+- 04-18：⚠️ 觸發確認第 6 天。BBE 37, xwOBA .459/BB% 12.7/Barrel% 21.6 全>P90 vs Albies 3/3。44% owned 急升窗口快速關閉，建議立即 FAAB claim（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
@@ -73,6 +74,7 @@
 - 04-15：BBE 27→30 差 1-2 場。xwOBA .323/Barrel% 18.5%>P90 穩定。⚠️ 36% owned 三日+6 全場最快！Alvarez 備案首選（fa_scan）
 - 04-16：BBE 27→30 差 1-2 場，xwOBA .312/Barrel% 16.7>P90。⚠️ 36% owned 三日+6 全場最快！Alvarez 成功後降級為備案（fa_scan）
 - 04-17：BBE 32→觸發 30 已達成但 xwOBA .296(P45-50) 未達「2 項核心>P70」門檻（僅 Barrel% 達標），觸發半達成維持觀察。0% owned（fa_scan）
+- 04-18：⚠️ xwOBA .282(P25-40) 持續惡化，BBE 37>30 但僅 Barrel% 1/3 達 P70，觸發半達成（fa_scan）
 
 ### Miguel Vargas (CWS, 1B,3B) [mlb_id:678246] — 觀察中
 觸發：BBE 達 35 且 BB% 維持 >P80 + xwOBA >P60 → vs Albies/Butler
@@ -108,6 +110,7 @@
 - 04-15：BBE 30, xwOBA .277 跌至 P25-40 破 P45 門檻邊緣，BB% 12.3%>P90 仍在。趨勢向下，下次 xwOBA<P40→移除（fa_scan）
 - 04-16：BBE 30（觸發 40），xwOBA .268 跌至 P25-40 破 P45 門檻。趨勢向下，下次 xwOBA<P40→移除（fa_scan）
 - 04-17：⚠️ 移除條件達成：xwOBA .255 < P40(.286)。BB% 11.3>P80 仍在但品質面崩盤。結案（fa_scan）
+- 04-18：結案：xwOBA .255 跌破 P25（<P40 門檻），品質惡化確認移除（fa_scan）
 
 ### Brady House (WSH, 3B) [mlb_id:691781] — 觀察中
 觸發：BBE 達 50 且 2 項核心維持 >P70 → vs Albies
@@ -125,6 +128,7 @@
 - 04-15：BBE 33→40 差 4-5 場，BB% 17.5%>P90/xwOBA .376>P90 持續上修。7% owned 安全（fa_scan）
 - 04-16：BBE 33→40 差 4-5 場，BB% 17.7>P90/xwOBA .365>P90 持續上修。0% owned（fa_scan）
 - 04-17：BBE 36→40 差 2-3 場，BB% 16.9>P90/xwOBA .367>P90 持續上修。0% owned（fa_scan）
+- 04-18：✅ BBE 39→40 觸發僅差 1！BB% 15.9/xwOBA .360 >P90 持續穩定。0% owned 安全（fa_scan）
 
 ### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -186,6 +190,7 @@
 - 04-15：BBE 27（觸發 50），xERA 3.91/HH% 29.6% >P90，2025 P70-80 雙年確認。BAL 強隊。距觸發差 5-6 場，0% owned（fa_scan）
 - 04-16：BBE 27→50 差 5-6 場，xERA 3.91/HH% 29.6% 3/3 勝 Nola，2025 P70-80 雙年確認。0% owned（fa_scan）
 - 04-17：⚠️ 品質崩盤：xERA 5.56(P25-40)/xwOBA .367(<P25)，觸發條件 xERA<4.04 已不達標。下次仍 >4.50 → 移除（fa_scan）
+- 04-18：⚠️ xERA 5.56(P25-40) 品質崩盤，觸發條件 xERA<4.04 不達標。下次仍>4.50→移除（fa_scan）
 
 ### Brent Suter (LAA, SP,RP) [mlb_id:608718] — 觀察中
 觸發：BBE 達 50 且 xERA <3.50 + xwOBA <.289 維持 + 確認為固定先發 → vs Nola
@@ -216,6 +221,7 @@
 觸發：BBE 達 50 且 xwOBA 維持 >P70 + BB% 回升 >P40 → vs Albies
 - 04-16：xwOBA .443(>P90)/BB% 4.4(<P25)/Barrel% 9.1(P60-70) BBE 33 中等。2025 全低（.306/6.7/4.2，166 BBE）breakout 候選未確認。vs Albies 2:1（BB 輸）。7% owned 三日+5（fa_scan）（fa_scan）
 - 04-17：BBE 37→50 差 5-6 場，xwOBA .421(>P90) 但 BB% 4.4(<P25) 結構問題（2025 同低 6.7%）。vs Albies 2:1。7% owned 三日+5（fa_scan）
+- 04-18：❌ %owned 9% 三日+5。BB% 4.0<P25 雙年確認（2025 6.7%），升級有限（fa_scan）
 
 ### Trevor Larnach (MIN, LF,RF) [mlb_id:663616] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
