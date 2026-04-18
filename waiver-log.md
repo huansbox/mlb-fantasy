@@ -228,10 +228,6 @@
 - 04-16：xwOBA .407/BB% 21.1/Barrel% 12.5 全>P80-P90 BBE 24 低信心。2025 P55-60（.315/9.3/7.2，387 BBE）。BB% 跳升 9.3→21.1 breakout 待驗。1% owned（fa_scan）（fa_scan）
 - 04-17：BBE 24→40 遠，xwOBA .408/BB% 21.1/Barrel% 12.5 全>P80 但低信心。BB% 9.3→21.1 breakout 待驗。1% owned（fa_scan）
 
-### Austin Martin (MIN, 2B,LF,CF) [mlb_id:668885] — 觀察中
-觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies（Alvarez 備案）
-- 04-17：xwOBA .392(>P90)/BB% 23.1%(>P90) 雙年確認菁英（2025 .345/12.2%），Barrel% 6.7%(P40-45) 低 power。BBE 30 中等信心，1% owned 安全（fa_scan）
-
 ### Chad Patrick (MIL, SP) [mlb_id:694477] — 觀察中
 觸發：連 2 場先發 ERA 回升後 xERA 仍 <3.50 + xwOBA <.301，BBE 達 80 → 取代 Nola
 - 04-17：xERA 3.08/xwOBA .281 P80-90 雙年確認，BBE 59 高信心。2/3 勝 Nola。運氣 +2.13 >P90（ERA 0.95 預期回升）。IP/GS 5.3，MIL 強隊。19% owned（fa_scan）
@@ -287,6 +283,9 @@
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 
 ## 已結案
+
+### Austin Martin (MIN, 2B,LF,CF) — 被搶（自動偵測）
+- 2026-04-18：Yahoo ownership_type=team，從觀察中移除。
 
 ### Dansby Swanson (CHC, SS) — 被搶（自動偵測）
 - 2026-04-16：Yahoo ownership_type=team，從觀察中移除。
