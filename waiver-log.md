@@ -151,6 +151,7 @@
 - 04-16：BBE 31→50 差 4-5 場，xERA 1.89/xwOBA .221 >P90 持續，運氣 -1.57 買低訊號強。0% owned（fa_scan）
 - 04-17：BBE 38→50 差 3-4 場，xERA 2.70/xwOBA .264 >P90 持續，品質遠超門檻等 BBE。0% owned（fa_scan）
 - 04-19：BBE 38→50 差 3-4 場，xERA 2.67/xwOBA .264 >P90 穩定遠超門檻（fa_scan）
+- 04-20：BBE 38→50 差 3-4 場，xERA 2.67/xwOBA .264 >P90 穩定遠超門檻。IP/GS 2.0 短局硬傷待確認角色（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
@@ -178,6 +179,7 @@
 - 04-16：BBE 47→70 差 5-6 場，xERA 3.06/xwOBA .281 P80-90 穩定。0% owned（fa_scan）
 - 04-17：BBE 47→70 差 5-6 場，xERA 3.08/xwOBA .281 P80-90 穩定。0% owned（fa_scan）
 - 04-19：BBE 47→70 差 5-6 場，xERA 3.03/xwOBA .281 P80-90 穩定。%owned 4% 三日+3（fa_scan）
+- 04-20：✅ BBE 60 距觸發 70 差 10，即將觸發。xERA 3.03/xwOBA .281 P80-90 穩定，%owned 4% 三日+3 升（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
@@ -203,6 +205,7 @@
 - 04-16：BBE 38→60 差 5-6 場，xERA 3.62/xwOBA .304/HH% 39.5% 3/3 勝 Nola，IP/GS 6.7 深投型加分。0% owned（fa_scan）
 - 04-17：BBE 38→60 差 5-6 場，xERA 3.61/xwOBA .303 P60-70，IP/GS 6.7 深投型。0% owned（fa_scan）
 - 04-19：BBE 38→60 差 5-6 場，xERA 3.56/xwOBA .303 P60-70 穩定（fa_scan）
+- 04-20：BBE 38→60 差 5-6 場，xERA 3.56/xwOBA .303 P60-70 穩定，IP/GS 6.7 深投型加分（fa_scan）
 
 ### Tyler Wells (BAL, SP,RP) [mlb_id:669330] — 觀察中
 觸發：BBE 達 50 且 xERA <4.04 + HH% <36.4% 維持 → vs Nola
@@ -220,6 +223,7 @@
 - 04-16：BBE 32→50 差 4-5 場，xERA 2.82/xwOBA .270/HH% 25.0% 三項>P90，需確認固定先發。0% owned（fa_scan）
 - 04-17：BBE 32→50 差 4-5 場，xERA 2.83/xwOBA .270/HH% 25.0% 三項>P90 持續。IP/GS 2.0 極短局硬傷。0% owned（fa_scan）
 - 04-19：⚠️ 品質惡化：xERA 2.83→3.46、xwOBA .270→.299 超過觸發門檻 .289，趨勢向下（fa_scan）
+- 04-20：⚠️ 品質惡化：xERA 2.83→3.46、xwOBA .270→.299 超觸發門檻 .289，趨勢向下（fa_scan）
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
@@ -228,6 +232,7 @@
 - 04-16：BBE 43→60 差 4-5 場，xERA 3.83/HH% 30.2% 3/3 勝 Nola，IP/GS 5.0 短局，2025 極差 breakout 未確認。0% owned（fa_scan）
 - 04-17：BBE 43→60 差 4-5 場，xERA 3.84/HH% 30.2% 品質達標邊緣，2025 極差 breakout 未確認。0% owned（fa_scan）
 - 04-19：⚠️ 品質惡化：xERA 3.84→4.12 超觸發 3.74、HH% 30.2→39.3% 超觸發 36.4%，兩項同時失守（fa_scan）
+- 04-20：⚠️ 品質崩盤：xERA 4.12 超觸發 3.74 + HH% 39.3% 超觸發 36.4% 兩項同時失守，建議結案移除（fa_scan）
 
 ### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
@@ -235,6 +240,7 @@
 - 04-16：BBE 36→50 差 4-5 場，xERA 3.64/xwOBA .305/HH% 33.3% 3/3 勝 Nola，IP/GS 4.2 未達 5.0 回升條件。2% owned（fa_scan）
 - 04-17：BBE 36→50 差 4-5 場，xERA 3.66 品質達標但 IP/GS 4.4 未達 5.0 回升條件。0% owned（fa_scan）
 - 04-19：⚠️ 品質惡化：xERA 3.66→3.95 超過觸發 3.74，IP/GS 4.4 仍未回升至 5.0（fa_scan）
+- 04-20：⚠️ 品質惡化：xERA 3.95 超觸發 3.74，IP/GS 4.4 仍未回升。觸發邊緣惡化中（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：BBE 達 45 且 2 項核心維持 >P70 → vs Albies（Alvarez 備案）
@@ -259,16 +265,19 @@
 觸發：連 2 場先發 ERA 回升後 xERA 仍 <3.50 + xwOBA <.301，BBE 達 80 → 取代 Nola
 - 04-17：xERA 3.08/xwOBA .281 P80-90 雙年確認，BBE 59 高信心。2/3 勝 Nola。運氣 +2.13 >P90（ERA 0.95 預期回升）。IP/GS 5.3，MIL 強隊。19% owned（fa_scan）
 - 04-19：BBE 59→80 差 5-6 場，xERA 3.03/xwOBA .281 P80-90 穩定，運氣 +2.08 >P90 注意（fa_scan）
+- 04-20：BBE 59→80 差 5-6 場，xERA 3.03/xwOBA .281 P80-90 穩定，運氣 +2.08 >P90 注意（fa_scan）
 
 ### J.T. Ginn (ATH, SP) [mlb_id:669372] — 觀察中
 觸發：BBE 達 70 且 xERA <3.74 + IP/GS 回升至 5.0+ → 取代 Nola
 - 04-17：xERA 3.10/xwOBA .282/HH% 28.9% 3/3 勝 Nola，BBE 45 中等。2025 P70 雙年確認。IP/GS 4.7 短局 + ATH 弱隊拖產量。1% owned（fa_scan）
 - 04-19：BBE 45→70 差 5-6 場，xERA 3.06/xwOBA .282 P80-90 穩定（fa_scan）
+- 04-20：BBE 45→70 差 5-6 場，xERA 3.06/xwOBA .282 P80-90 穩定（fa_scan）
 
 ### Ben Brown (CHC, SP,RP) [mlb_id:676962] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → 取代 Nola
 - 04-17：xERA 2.90/xwOBA .273/HH% 34.2% 3/3 勝 Nola，BBE 38 中等。2025 P40-45 breakout 未確認。運氣 -0.17 中性。1% owned（fa_scan）
 - 04-19：BBE 38→60 差 5-6 場，xERA 2.86/xwOBA .273 >P90 穩定（fa_scan）
+- 04-20：BBE 46→60 差 3-4 場，xERA 2.97/xwOBA .278 >P90 穩定。%owned 4% 三日+3 升（fa_scan）
 
 ### Carlos Correa (HOU, 3B,SS) [mlb_id:621043] — 觀察中
 觸發：立即行動
@@ -278,6 +287,10 @@
 ### Max Muncy (ATH, 2B,3B,SS) [mlb_id:571970] — 觀察中
 觸發：立即行動
 - 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
+
+### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
+觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
+- 04-20：xERA 1.39/xwOBA .188/HH% 22.2% 三項>P90（BBE 18 極低信心），2025 Sum 26 雙年確認，運氣 -1.50 買低訊號。2% owned 無壓力（fa_scan）
 
 ## 隊上觀察
 
