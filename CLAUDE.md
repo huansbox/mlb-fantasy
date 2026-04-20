@@ -455,6 +455,10 @@ waiver-log.md（球員追蹤唯一來源）
 
 ## 待辦
 
+- [ ] **fa_scan SP 池濾掉純 RP（Pass 1 階段）**：Yahoo eligibility「SP,RP」但 2026 GS=0 的球員會被誤收進 SP 候選（Winn/Alexander/Brazobán/Myers/Ben Brown/Scholtens/Dreyer/Teng/Senzatela/Dollander 等）。短局 RP 面對少量打者時 xERA/xwOBA 天然膨脹，與 SP 6 IP vs 25 打者指標不可比，造成 Pass 2 分析偏差
+  - 修法：Layer 1 篩 SP 時加 filter `2026 GS > 0`，或更嚴格 `GS/G ≥ 0.5`
+  - 目前 Pass 2 data 是靠「缺『產量: IP/GS』行」隱含標示 RP，訊號太隱晦易讀錯
+  - 驗證：fix 後 04-20 fa_scan #85 FA SP 候選應從 17 → ~9 人（真 SP only）
 - [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - [ ] **roster_sync --init 不 backfill 新欄位**：當沒有 add/drop 也沒有 key/stats 缺失時，`run_init` 提前 return，不走 `update_config()`，導致 `selected_pos`/`status` 等新欄位不會被寫入。日常 cron 有異動時正常 backfill，僅手動 `--init` 無異動時觸發
