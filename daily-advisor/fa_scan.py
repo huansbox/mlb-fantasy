@@ -1372,6 +1372,24 @@ def _extract_eval_framework():
         return ""
 
 
+def _load_savant_rolling():
+    """Load savant_rolling.json if exists, else return empty dict.
+
+    Returns:
+        dict[str, dict] — {player_id_str: {name, xwoba, hh_pct, barrel_pct, bbe, pa}}
+    """
+    path = os.path.join(SCRIPT_DIR, "savant_rolling.json")
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("players", {})
+    except Exception as e:
+        print(f"Failed to load savant_rolling.json: {e}", file=sys.stderr)
+        return {}
+
+
 def build_weekly_data(today_str, enriched, changes, ref_1d, ref_3d,
                       roster_summary, config):
     """Build comprehensive data summary for claude -p."""
@@ -1736,6 +1754,10 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
     pt = "batter" if group_type == "batter" else "sp"
     lines.append(f"--- 我方最弱{label}（Pass 1 篩出）---")
     all_players = config.get("batters" if group_type == "batter" else "pitchers", [])
+
+    # 14d rolling data (batter only, loaded once)
+    rolling = _load_savant_rolling() if group_type == "batter" else {}
+
     for w in pass1_weakest:
         name = w["name"]
         reason = w.get("reason", "")
@@ -1773,6 +1795,23 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
                     if s26.get("hh_pct"):
                         parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', 'pitcher')}")
                 parts.append(f"BBE {s26.get('bbe', 0)}")
+
+        # 14d rolling data — only if batter + BBE ≥ 25
+        if group_type == "batter":
+            mlb_id_str = str(p.get("mlb_id", ""))
+            r14 = rolling.get(mlb_id_str) if mlb_id_str else None
+            if r14 and r14.get("bbe", 0) >= 25:
+                s26 = _extract_savant_by_id(p.get("mlb_id"), pt, savant_2026) if p.get("mlb_id") else None
+                s26_xwoba = s26.get("xwoba") if s26 else None
+                r14_xwoba = r14.get("xwoba")
+                delta_str = ""
+                if s26_xwoba and r14_xwoba:
+                    delta = r14_xwoba - s26_xwoba
+                    delta_str = f" Δ{delta:+.3f}"
+                parts.append(
+                    f"14d: xwOBA {r14_xwoba:.3f}{delta_str} | "
+                    f"HH% {r14.get('hh_pct', 0):.1f}% | BBE {r14.get('bbe', 0)}"
+                )
 
         # Prior year stats
         prior = p.get("prior_stats", {})

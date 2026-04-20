@@ -89,6 +89,57 @@ def pctile_tag(value, metric, player_type="batter"):
         if pct == matched and i + 1 < len(bp):
             return f"(P{matched}-{bp[i+1][0]})"
     return f"(P{matched})"
+
+
+def compute_recency_flags(r14, season_savant, bbe_gate=25):
+    """Compute recency flags for Section 1 third line.
+
+    Args:
+        r14: dict | None — 14d rolling data with xwoba/hh_pct/bbe
+        season_savant: dict | None — season Savant with xwoba/hh_pct
+        bbe_gate: int — 低於此 BBE 不輸出旗標（噪音太大）
+
+    Returns:
+        dict | None — {flag, delta_xwoba, line} or None if no signal
+    """
+    if not r14 or r14.get("bbe", 0) < bbe_gate:
+        return None
+
+    season_xwoba = season_savant.get("xwoba") if season_savant else None
+    r14_xwoba = r14.get("xwoba")
+    if not (season_xwoba and r14_xwoba):
+        return None
+
+    delta = r14_xwoba - season_xwoba
+
+    # Flag classification per CLAUDE.md 打者評估 14d 規則
+    if delta >= 0.050:
+        flag = "🔥強回升"
+    elif delta >= 0.035:
+        flag = "🔥弱回升"
+    elif delta <= -0.050:
+        flag = "❄️強下滑"
+    elif delta <= -0.035:
+        flag = "❄️弱下滑"
+    else:
+        flag = "持平"
+
+    # HH% warning (per CLAUDE.md: 14d HH% - season ≤ -10pp)
+    season_hh = season_savant.get("hh_pct") if season_savant else None
+    r14_hh = r14.get("hh_pct")
+    hh_warning = ""
+    if season_hh and r14_hh is not None:
+        hh_delta = r14_hh - season_hh
+        if hh_delta <= -10:
+            hh_warning = f" | ⚠️ HH%下修 {hh_delta:+.1f}pp"
+
+    line = (
+        f"14d: {flag} xwOBA {r14_xwoba:.3f} Δ{delta:+.3f} | "
+        f"HH% {r14_hh:.1f}% | BBE {r14['bbe']}{hh_warning}"
+    )
+    return {"flag": flag, "delta_xwoba": delta, "line": line}
+
+
 MLB_API = "https://statsapi.mlb.com/api/v1"
 YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
@@ -1055,6 +1106,16 @@ def analyze(config, target_date, env=None, morning=False):
     roster_ids = [b["mlb_id"] for b in batters if b.get("mlb_id")]
     savant_cache = fetch_savant_for_roster(roster_ids, season)
 
+    # 14d rolling savant (for Section 1 recency flags)
+    rolling_path = os.path.join(SCRIPT_DIR, "savant_rolling.json")
+    rolling_14d = {}
+    if os.path.exists(rolling_path):
+        try:
+            with open(rolling_path, encoding="utf-8") as f:
+                rolling_14d = json.load(f).get("players", {})
+        except Exception as e:
+            print(f"Failed to load savant_rolling.json: {e}", file=sys.stderr)
+
     # ── Pre-fetch Savant Statcast data (pitchers: my SP + opponent SP) ──
     all_pitcher_ids = [p["mlb_id"] for p in pitchers if p.get("mlb_id")]
     opp_sp_ids = [
@@ -1110,6 +1171,13 @@ def analyze(config, target_date, env=None, morning=False):
             savant_line = format_savant_stats(savant_cache.get(mlb_id))
             if savant_line:
                 lines.append(f"    Statcast: {savant_line}")
+
+            # 14d recency flags (third line, only if signal)
+            r14 = rolling_14d.get(str(mlb_id)) if mlb_id else None
+            season_s = savant_cache.get(mlb_id)
+            recency = compute_recency_flags(r14, season_s)
+            if recency:
+                lines.append(f"    {recency['line']}")
 
     # ── Section 2: SP starts ──
     lines.append("\n我的 SP 明日先發：")
