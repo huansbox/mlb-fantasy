@@ -31,7 +31,7 @@ from yahoo_query import (
 
 TPE = ZoneInfo("Asia/Taipei")
 
-from daily_advisor import pctile_tag
+from daily_advisor import pctile_tag, BATTER_PCTILES
 from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
@@ -520,11 +520,11 @@ RP_QUERIES = [
 
 # ── Layer 2: Quality thresholds ──
 
-BATTER_THRESHOLDS = [
-    ("xwoba", 0.286, True),       # P40
-    ("bb_pct", 7.0, True),        # P40
-    ("barrel_pct", 6.5, True),    # P40
-]
+# Batter: Sum scoring (3 metrics × percentile → 1-10 each, total 3-30)
+# Threshold ≥21 ≈ avg P55+, aligns with Pass 2 「Sum 差 ≥3」 win rule against
+# weakest 4 (Albies 9 / Tovar 16 → FA need ≥12/19 to upgrade; ≥21 ensures both)
+BATTER_SUM_THRESHOLD = 21
+
 SP_THRESHOLDS = [
     ("xera", 4.64, False),        # P40
     ("xwoba", 0.332, False),      # P40 (xwOBA allowed)
@@ -637,7 +637,7 @@ def _classify_fa_type(position_str):
 
 
 def _check_thresholds(metrics, thresholds):
-    """Count how many of 3 threshold conditions pass."""
+    """Count how many of 3 threshold conditions pass (used for SP/RP)."""
     passed = 0
     for metric, threshold, higher_better in thresholds:
         val = metrics.get(metric)
@@ -646,6 +646,41 @@ def _check_thresholds(metrics, thresholds):
         if (higher_better and val >= threshold) or (not higher_better and val <= threshold):
             passed += 1
     return passed
+
+
+def _metric_to_score(value, metric):
+    """Convert metric value to 1-10 score per CLAUDE.md Sum 打分表.
+
+    >P90=10, P80-90=9, P70-80=8, P60-70=7, P50-60=6, P40-50=5, P25-40=3, <P25=1
+    Returns 0 if value is None (unknown — Sum 不算分).
+    """
+    if value is None:
+        return 0
+    bp = BATTER_PCTILES.get(metric)
+    if not bp:
+        return 0
+    higher_better = bp[-1][1] > bp[0][1]
+    matched_pct = 0
+    for pct, thresh in bp:
+        if (higher_better and value >= thresh) or (not higher_better and value <= thresh):
+            matched_pct = pct
+    if matched_pct >= 90: return 10
+    if matched_pct >= 80: return 9
+    if matched_pct >= 70: return 8
+    if matched_pct >= 60: return 7
+    if matched_pct >= 50: return 6
+    if matched_pct >= 40: return 5
+    if matched_pct >= 25: return 3
+    return 1
+
+
+def _calc_batter_sum(metrics):
+    """3-metric Sum (xwOBA + BB% + Barrel%) per CLAUDE.md Step 1 規則."""
+    return (
+        _metric_to_score(metrics.get("xwoba"), "xwoba")
+        + _metric_to_score(metrics.get("bb_pct"), "bb_pct")
+        + _metric_to_score(metrics.get("barrel_pct"), "barrel_pct")
+    )
 
 
 def filter_by_savant(snapshot, savant_2026):
@@ -716,13 +751,13 @@ def filter_by_savant(snapshot, savant_2026):
         if (savant.get("bbe") or 0) < 15:
             continue
 
-        thresholds = (
-            BATTER_THRESHOLDS if fa_type == "batter"
-            else SP_THRESHOLDS
-        )
-
-        if _check_thresholds(metrics, thresholds) < 2:
-            continue  # Doesn't meet 2026 quality threshold
+        # Quality filter — batter uses Sum scoring, SP keeps 2-of-3 P40
+        if fa_type == "batter":
+            if _calc_batter_sum(metrics) < BATTER_SUM_THRESHOLD:
+                continue
+        else:  # sp
+            if _check_thresholds(metrics, SP_THRESHOLDS) < 2:
+                continue
 
         results.append({
             "name": name,
@@ -741,7 +776,8 @@ def filter_by_savant(snapshot, savant_2026):
     sps = sum(1 for r in results if r["fa_type"] == "sp")
     rps = sum(1 for r in results if r["fa_type"] == "rp")
     print(f"  Layer 2: {total} FA → {matched} name-matched + {fallback} fallback "
-          f"→ {len(results)} passed ({batters} bat / {sps} SP / {rps} RP)", file=sys.stderr)
+          f"→ {len(results)} passed ({batters} bat Sum≥{BATTER_SUM_THRESHOLD} / "
+          f"{sps} SP P40×2 / {rps} RP)", file=sys.stderr)
     return results
 
 
