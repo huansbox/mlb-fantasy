@@ -174,3 +174,47 @@ def fetch_savant_rolling(player_ids, end_date, window_days=14):
         if metrics:
             result[pid] = metrics
     return result
+
+
+def main():
+    with open(ROSTER_PATH, encoding="utf-8") as f:
+        config = json.load(f)
+
+    # Active batters only (exclude IL/NA)
+    INACTIVE = ("IL", "IL+", "NA")
+    batters = [
+        b for b in config.get("batters", [])
+        if b.get("selected_pos", "") not in INACTIVE and b.get("mlb_id")
+    ]
+    player_ids = [int(b["mlb_id"]) for b in batters]
+    id_to_name = {int(b["mlb_id"]): b["name"] for b in batters}
+
+    end_date = date.today().strftime("%Y-%m-%d")
+    data = fetch_savant_rolling(player_ids, end_date, window_days=14)
+
+    # Add player names to output
+    players_out = {
+        str(pid): {"name": id_to_name.get(pid, "?"), **stats}
+        for pid, stats in data.items()
+    }
+
+    start_date = (date.today() - timedelta(days=14)).strftime("%Y-%m-%d")
+    tz_tpe = timezone(timedelta(hours=8))
+    output = {
+        "generated_at": datetime.now(tz_tpe).isoformat(timespec="seconds"),
+        "window_days": 14,
+        "date_range": [start_date, end_date],
+        "players": players_out,
+    }
+
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+
+    print(
+        f"Wrote {OUTPUT_PATH}: {len(players_out)}/{len(player_ids)} players with data",
+        file=sys.stderr,
+    )
+
+
+if __name__ == "__main__":
+    main()
