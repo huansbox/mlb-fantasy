@@ -224,3 +224,134 @@
 4. **IP 不強求**：偶數週 Skubal/Sale 各 1 GS，達 40 IP 下限即可
 5. **Kelly 04-13~15 歸隊**：進 active SP slot，增加 IP/K 產出
 6. **FA 本週跳過**：Grisham/Detmers 驗證週
+
+### 覆盤（2026-04-20 回顧）
+
+**戰績：11W - 3L — 超預測 2 勝（預測 9-5，實際 11-3），三項補強全驗證**
+
+#### 預測對照 + 歸因
+
+| 類別 | 預測 | 實際 | ✓/✗ | mine | opp | 歸因 |
+|------|------|------|------|------|-----|------|
+| R | W | W | ✓ | 42 | 35 | 我#2 結構優勢 |
+| HR | W | W | ✓ | 12 | 10 | 我#2 vs 對#12 |
+| RBI | W | L | ✗ | 27 | 34 | 打者同步 slump（Walker/Machado/Stanton）|
+| SB | W | W | ✓ | 4 | 2 | |
+| BB | L | W | ✗ | 32 | 30 | **Grisham 補強驗證成功**（3 HR/10 RBI/BB% 18.5%）|
+| AVG | W | L | ✗ | .221 | .235 | 整隊 slump |
+| OPS | W | L | ✗ | .719 | .741 | 同 AVG |
+| IP | L | W | ✗ | 71.2 | 62.0 | **IP 補強驗證成功**（偶數週 71.2 超預期）|
+| W | Toss | W | ✓ | 4 | 3 | 險勝 |
+| K | L | W | ✗ | 73 | 46 | SP 深度爆發（Messick/Skubal/Detmers/Cantillo 雙位數 K）|
+| ERA | Toss | W | ✓ | 3.52 | 6.53 | 對手單週爆炸 |
+| WHIP | Toss | W | ✓ | 1.19 | 1.48 | 同上 |
+| QS | W | W | ✓ | 6 | 3 | |
+| SV+H | Toss | W | ✓ | 3 | 0 | Ashcraft |
+
+準確率：9/14（64%）— 主要被「自己低估」：BB/IP/K 三項補強實際超預期
+
+#### 聯盟類別排名（Week 4）
+
+| 強 #1-5 | 中 #6-8 | 弱 #9-12 |
+|---------|---------|---------|
+| BB #2, R #3, HR #3, ERA #3, K #4, WHIP #4, QS #4 | SB #6, SV+H #6, W #7 | OPS #9, RBI #10, AVG #12 |
+
+IP #5 — 補強後單週跳到聯賽第 5（Week 3 為 #11）
+
+#### 我方球員狀態（核心）
+
+**撐場者**：
+- **Buxton**（CF）：.346 / 3 HR / 8 R / OPS 1.085 — Slump hold 驗證（14d🔥 +0.072）
+- **Langeliers**（C）：.346 / OPS 1.007 / 6 BB — 開季 xwOBA >P90 匹配
+- **Grisham**（Util）：3 HR / 10 RBI / OPS .971 — **BB 補強核心**
+- **Albies**（Util）：OPS .846 — 輕微超水準
+- **Skubal / Sale / Messick / Detmers / Cantillo / Holmes**：6 位 SP 組合 4.56 ERA 下的聯賽 #3 ERA
+
+**拖累者分類**：
+- **slump 觀察**（hold，雙年強）：C.Walker / Machado / Tovar / Stanton — 單週低迷、4 人同步，非結構性
+- **Slump hold 例外**：Chisholm — 已在 BN 輪替，持續月度評估
+- **結構性弱（雙年一致）**：**Ragans** — 本季 xERA 5.18（P25-40）+ ERA 6.00 + 2025 xERA 2.67（>P90）雙年分歧但 2026 明顯退步，10.3 IP 貢獻 0 W
+
+#### 策略行動驗證
+
+| 項目 | 結果 | 狀態 |
+|------|------|------|
+| **BB 補強（Grisham）** | Week 4 單週 BB #2 / 2 週合併 #4 ⬆️（從 #10） | ✅ 驗證成功 |
+| **IP 補強（BN 改革 + Detmers）** | Week 4 單週 IP #5 / 2 週合併 #8 ⬆️（從 #10） | ✅ 驗證成功 |
+| **Whitlock 軟 cut** | Whitlock 已 drop，Kelly 在 BN | ✅ 完成 |
+
+#### 歸因分類（簡短）
+
+- **我方結構強**（無需補強）：HR/R/BB/SV+H
+- **對稱 slump**：RBI/AVG/OPS — 4 位打者同步低迷
+- **對手單週衰退**（不可控）：ERA/WHIP/K 對手遠低於 2 週水準
+
+### 學到什麼
+
+- **補強週不必同時出手**：Grisham（BB）+ Detmers（IP）+ Whitlock cut（軟）三項分開行動，Week 4 同週驗證全中，證明「觸發即行動」比「觀望」好
+- **奇數週 SP 爆發可期**：Week 4 是偶數週（Skubal/Sale 各 1 GS）仍打出 K 73 / IP 71.2，奇數週預期更強 — Week 5 即奇數週
+- **打者集體 slump 可能是節奏現象**：Walker/Machado/Stanton/Chisholm 同時低迷，4 人 xwOBA 都 P60+，非結構性，等自然回歸
+- **Ragans 明確結構退化**：雙年分歧但 2026 實際數據支持退化，不是 slump — 是 Week 5 的條件性 drop 候選
+
+---
+
+## Week 5 vs 992330
+
+### 預測（2026-04-20 產出，Week 3+4 合併基礎）
+
+**對手 992330 2 週合併**：
+- 強 #1-5：**AVG #1, WHIP #1, W #1, OPS #2, K #2, IP #3, QS #3, SB #4, ERA #4, HR #5, RBI #5**
+- 中 #6-8：R #6, BB #7
+- 弱 #9-12：SV+H #10 (punt)
+
+**我方 99 940 2 週合併**：
+- 強 #1-5：HR #2, R #3, BB #4 ⬆️, ERA #5, QS #5, SV+H #5
+- 中 #6-8：W #6, K #6, WHIP #7, IP #8 ⬆️, SB #8
+- 弱 #9-12：OPS #9, RBI #10, AVG #10
+
+**特別說明**：Week 5 為奇數週，Skubal/Sale 各 2 GS = **4 GS 王牌**，K/QS/W 信心可升級
+
+| 類別 | 預測 | 信心 | 我方 | 對手 | 理由 |
+|------|------|------|------|------|------|
+| R | W | 中 | #3 | #6 | 我方領先 3 位 |
+| HR | W | 高 | #2 | #5 | 結構性優勢 |
+| RBI | L | 中 | #10 | #5 | 對手強 vs 我方弱 |
+| SB | L | 中 | #8 | #4 | 對手輕微優勢 |
+| BB | W | 中 | #4 | #7 | Grisham/Machado 高 BB% |
+| AVG | L | 高 | #10 | #1 | 結構性劣勢 |
+| OPS | L | 高 | #9 | #2 | 同 AVG |
+| IP | L | 高 | #8 | #3 | 對手囤 SP |
+| W | L | 高 | #6 | #1 | 對手 #1 |
+| K | Toss-偏 L | 中 | #6 | #2 | 奇數週 Skubal/Sale 4 GS 縮小差距 |
+| ERA | Toss | 中 | #5 | #4 | 近戰（Sale/Skubal/Messick/Detmers 壓陣）|
+| WHIP | L | 高 | #7 | #1 | 對手極強 |
+| QS | Toss | 中 | #5 | #3 | 奇數週王牌 4 QS 可爭取 |
+| SV+H | W | 高 | #5 | #10 | punt 對手 |
+
+**整體預測：4W - 7L - 3Toss**
+- 底線 4W-10L / 中位 5-6W / 上限 7W-7L
+- strategy: 保 4 贏（HR/BB/R/SV+H）+ 拚 3 Toss（ERA/QS/K 奇數週加持）
+- basis: Week 3+4 rolling merge
+
+#### 下週行動清單
+
+**(a) Lineup 調整**：
+- 04-23 C/1B dead slots（Langeliers/C.Walker/Altuve/J.Walker 四人休兵）— 考慮 Chisholm 上 UTIL
+- Skubal/Sale 各 2 GS 確保 active
+- Ragans 若續爆則 BN，讓 Kelly / López 替補
+
+**(b) FA 候選**：
+- 本週優先低（補強已完成）
+- **Juan Morillo (AZ, RP)**：fa_scan 首選，xERA 2.05 / xwOBA .231 / SV+H 4，運氣中性最真實。觸發：BBE ≥ 40 且仍勝 Ashcraft → FAAB $2 換 Ashcraft
+
+**(c) 觀察項目**：
+- **Ragans**：Week 5 兩次先發表現 — 條件性 drop 觸發
+- **Walker/Machado/Stanton**：單週 slump 是否延續（預期回歸）
+- **Chisholm**：月底前未回升升級 drop
+- **Morillo/Garcia/Soto**：RP FA 候選
+
+**(d) 條件性 drop 候選**：
+- **Ragans**：Week 5 仍 xERA >5.00 + ERA >6.00 → drop，可 add RP（Morillo）或 SP FA
+
+**(e) 啟動新補強項目**：無。三項補強全驗證後 CLAUDE.md「進行中補強行動」section 可清空。
+

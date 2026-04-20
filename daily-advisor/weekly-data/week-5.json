@@ -1581,6 +1581,30 @@
         "dead_slots": []
       }
     },
-    "predicted_outcome": null
+    "predicted_outcome": {
+      "strong": [
+        "HR",
+        "BB",
+        "R",
+        "SV+H"
+      ],
+      "toss_up": [
+        "ERA",
+        "QS",
+        "K"
+      ],
+      "weak": [
+        "RBI",
+        "SB",
+        "AVG",
+        "OPS",
+        "IP",
+        "W",
+        "WHIP"
+      ],
+      "projected_record": "4W-7L-3Toss (median 5-6W), 4-10 ~ 7-7 range",
+      "strategy": "保 4 贏（HR/BB/R/SV+H）+ 拚 3 Toss（ERA/QS/K 奇數週 Skubal/Sale 4 GS 加持）",
+      "basis": "Week 3+4 rolling merge; Week 5 odd week"
+    }
   }
 }

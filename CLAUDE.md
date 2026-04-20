@@ -47,26 +47,17 @@
 
 > 每週 weekly-review Phase 1C 更新狀態。已驗證/失敗 2 週後移除（git log 留痕）。新項目觸發即加入。
 
-**BB 結構性補強**（啟動 2026-04-09）
-- 觸發：Week 1-3 BB 排 5/10/8，2 週合併 #10 vs RALLY MONKEY #1
-- 行動：04-09 add Grisham（BB% 22.4% >P90，雙年確認菁英）
-- 預期：Grisham 入隊後 BB 排名 → #7+
-- 驗證：Week 4 BB 排名 vs Week 3
-- 狀態：Grisham Week 3 首週 slump（OPS .312），Week 4 是真偽驗證週
+**Ragans 結構性退化觀察**（啟動 2026-04-20）
+- 觸發：2026 xERA 5.18（P25-40）+ ERA 6.00 + 2025 xERA 2.67（>P90）雙年分歧，2026 明顯退步；Week 4 10.3 IP 貢獻 0 W
+- 行動：Week 5 兩次先發密切觀察，續爛則 drop
+- 驗證：Week 5 後 xERA 是否回落 < 4.50
+- 觸發 drop：Week 5 仍 xERA >5.00 + ERA >6.00 → drop，candidate: RP Morillo（$2 FAAB）或 SP FA
+- 狀態：觀察中
 
-**IP 結構性補強**（啟動 2026-04-12）
-- 觸發：Week 2-3 IP 倒數第 3，2 週合併 #10
-- 行動：BN 改 1 bat + 2 SP（04-12 add Detmers / drop Hicks）
-- 預期：偶數週 IP 從 53.2 → 60+（雖 Skubal/Sale 各 1 GS 拖低）
-- 驗證：Week 4 IP 排名 vs Week 3
-- 狀態：執行中
-
-**Whitlock 軟 cut**（啟動 2026-04-13）
-- 觸發：xERA 6.31 <P25 vs 2025 P80，雙年衝突
-- 行動：每天排 BN 不上場（用 Detmers SP/RP 雙資格佔 RP slot），等 Kelly 歸隊 drop
-- 預期：不浪費 acquisition 額度，自然替換
-- 驗證：Kelly Yahoo IL 狀態清除當天完成 drop
-- 狀態：執行中（2026-04-14 news check 確認 Kelly 04-14 vs BAL season debut = probable pitcher；Yahoo 仍 IL15 待更新；drop 時機 = Kelly Yahoo 狀態清 IL，預估 04-14 賽後 / 04-15 早上。Kelly 延後 >48h → fallback 改走 Soto add FAAB $2）
+> **已驗證（2 週後清理）**：
+> - BB 結構性補強（Grisham，04-09）✅ Week 4 BB 單週 #2 / 2 週合併 #4 ⬆️
+> - IP 結構性補強（BN 改 1bat+2SP + Detmers，04-12）✅ Week 4 IP 單週 #5 / 2 週合併 #8 ⬆️
+> - Whitlock 軟 cut（04-13）✅ 已 drop，Kelly 在 BN
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
