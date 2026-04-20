@@ -36,7 +36,9 @@ Step 1-3（CLAUDE.md 規則重寫 + fa_scan Pass 1/2 prompt 改版）已在 comm
 | 函式 | 簽名 | 檔案 | 呼叫者 |
 |------|------|------|--------|
 | `fetch_savant_rolling` | `(player_ids: list[int], end_date: str, window_days: int = 14) -> dict[int, dict]` | savant_rolling.py | main |
-| `_merge_csv` | `(url: str, id_set: set[str], result: dict[int, dict], kind: str) -> None` | savant_rolling.py | fetch_savant_rolling |
+| `_fetch_player_pitches` | `(mlb_id: int, start_date: str, end_date: str) -> list[dict]` | savant_rolling.py | fetch_savant_rolling |
+| `_aggregate_pitches` | `(rows: list[dict]) -> dict` | savant_rolling.py | fetch_savant_rolling |
+| `_safe_float` | `(val) -> float \| None` | savant_rolling.py | _aggregate_pitches |
 | `main` | `() -> None` | savant_rolling.py | CLI entry |
 | `_load_savant_rolling` | `() -> dict[str, dict]` | fa_scan.py | `_build_pass2_data` |
 | `compute_recency_flags` | `(r14: dict \| None, season_savant: dict \| None, bbe_gate: int = 25) -> dict \| None` | daily_advisor.py | `build_advisor_report` Section 1 |
@@ -50,18 +52,19 @@ Step 1-3（CLAUDE.md 規則重寫 + fa_scan Pass 1/2 prompt 改版）已在 comm
   "window_days": 14,
   "date_range": ["2026-04-07", "2026-04-20"],
   "players": {
-    "665487": {
+    "621439": {
       "name": "Byron Buxton",
       "xwoba": 0.384,
       "barrel_pct": 16.2,
       "hh_pct": 48.3,
-      "bbe": 42
+      "bbe": 42,
+      "pa": 54
     }
   }
 }
 ```
 
-**指標集**：xwOBA / Barrel% / HH% / BBE
+**指標集**：xwOBA / Barrel% / HH% / BBE / PA（PA 為新增，從 statcast_search/csv 聚合時順手算，供下游 debug）
 
 **為何不含 BB% 與 K%**（架構決策）：
 - BB% 需從 MLB Stats API gameLog 另抓（Savant CSV 無此欄位），實作成本高；且 14d 規則中 Sum 計算用全季 Sum，不需要 14d BB%
@@ -72,66 +75,67 @@ Step 1-3（CLAUDE.md 規則重寫 + fa_scan Pass 1/2 prompt 改版）已在 comm
 
 ---
 
-### Task 1: 調研 Savant leaderboard 日期範圍參數
+### Task 1: API endpoint 選擇（已由 Architect 驗證，無需執行）
 
-**Risk:** **High** — 若 Savant leaderboard 不支援 date range，整個架構需改用 MLB Stats API gameLog 聚合（另外設計的 plan）
+**Status:** ✅ Resolved 2026-04-20 by Architect
 
-**Files:** 無（純調研）
+**背景**：原計畫測試 `leaderboard/statcast` + `leaderboard/expected_statistics` 的 `game_date_gt` / `game_date_lt` 參數。Builder 前次 run（2026-04-20 早先）確認**兩 endpoint 完全忽略日期參數**（單日範圍返回與全季相同 CSV bytes），不可行。
 
-- [ ] **Step 1: 測試 statcast endpoint date range 參數**
+**新方案（來自上次 session 2026-04-18 實測紀錄 + 本次 curl 重驗）**：改用 `statcast_search/csv` endpoint。
 
-Run:
-```bash
-curl -s -o /tmp/savant_14d_test.csv \
-  "https://baseballsavant.mlb.com/leaderboard/statcast?type=batter&year=2026&game_date_gt=2026-04-07&game_date_lt=2026-04-20&min=1&csv=true"
-wc -l /tmp/savant_14d_test.csv
-head -1 /tmp/savant_14d_test.csv
-```
+- URL：`https://baseballsavant.mlb.com/statcast_search/csv`
+- **支援** `game_date_gt` / `game_date_lt` 日期過濾
+- 返回 **pitch-level raw CSV**（每球員一次 HTTP，需本地聚合為 PA/BBE/xwOBA/HH%/Barrel%）
+- Buxton (621439) 2026-04-04 ~ 04-17 測試：176 行 CSV（175 pitches + header），欄位完整
+- 必要欄位位置：`game_date` (欄 2), `events` (欄 9), `launch_speed` (欄 53), `estimated_woba_using_speedangle` (欄 69), `launch_speed_angle` (欄 74), `at_bat_number` (欄 75)
 
-Expected: CSV 正常回傳（非空，第一行是 header 含 `player_id`, `attempts`, `ev95percent`, `brl_percent`）。
+**Builder 動作**：跳過此 Task，直接進 Task 2（已按新 endpoint + 聚合邏輯重寫）。
 
-- [ ] **Step 2: 比較含/不含 date params 的結果差異**
+**原 Step 1-4（leaderboard 測試）不再執行，保留記錄以免未來重蹈覆轍**：
 
-Run:
-```bash
-curl -s -o /tmp/savant_full.csv \
-  "https://baseballsavant.mlb.com/leaderboard/statcast?type=batter&year=2026&min=1&csv=true"
-# Buxton mlb_id = 621439 — 比對 attempts (BBE) 數字
-grep ",621439," /tmp/savant_14d_test.csv
-grep ",621439," /tmp/savant_full.csv
-```
-
-Expected: 14d 版本的 attempts < 全季 attempts（證明 date filter 生效）。若兩版相同 → date params 無效。
-
-- [ ] **Step 3: 測試 expected_statistics endpoint**
-
-Run:
-```bash
-curl -s -o /tmp/savant_exp_14d.csv \
-  "https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=batter&year=2026&game_date_gt=2026-04-07&game_date_lt=2026-04-20&min=1&csv=true"
-grep ",621439," /tmp/savant_exp_14d.csv
-head -1 /tmp/savant_exp_14d.csv
-```
-
-Expected: CSV 回傳，Buxton 那行有 `est_woba` 欄位值（可能和全季不同）。
-
-- [ ] **Step 4: 記錄結論**
-
-若 Step 1-3 全通過：直接進 Task 2，無需修改 plan。
-
-若任一步失敗：**STOP** — 回報 Architect，以下為 fallback 腦海備案（不由 Builder 執行）：
-  - 改用 MLB Stats API `statsapi.mlb.com/api/v1/people/{id}/stats?stats=gameLog&group=hitting&season=2026`
-  - 自行聚合 14 天窗口（需處理 PA/BB/HR 等 counting stats）
-  - xwOBA 則需另從 Savant 單球員 batted ball CSV 推算，架構複雜度大增
+- ~~Step 1-4：leaderboard endpoint date range 調研~~ — **已證實不可行**，跳過
 
 ---
 
-### Task 2: savant_rolling.py — `fetch_savant_rolling` 函式
+### Task 2: savant_rolling.py — fetch 與聚合計算（statcast_search/csv）
 
 **Files:**
 - Create: `daily-advisor/savant_rolling.py`
 
-- [ ] **Step 1: 建立 savant_rolling.py skeleton + fetch function**
+**Architecture Change**：由於 leaderboard endpoints 不支援日期過濾，改用 `statcast_search/csv` 的 pitch-level raw data，本地聚合為 PA/BBE/xwOBA/HH%/Barrel%。每球員一次 HTTP request（11 人 ≈ 11 requests / ~30 秒）。
+
+#### 關鍵常數與計算邏輯
+
+**CSV `events` 欄位分類**（用於分辨 BBE / BB / HBP / K）：
+
+- **BBE_EVENTS**（算 BBE count）：
+  `single, double, triple, home_run, field_out, force_out, grounded_into_double_play, double_play, triple_play, fielders_choice, fielders_choice_out, field_error, sac_fly, sac_fly_double_play, sac_bunt`
+- **BB_EVENTS**：`walk`
+- **HBP_EVENTS**：`hit_by_pitch`
+- **（排除）**：`strikeout, strikeout_double_play`（算 PA 但不算 BBE 且 xwOBA 分子為 0）
+
+**PA 識別**：unique `(game_date, at_bat_number)` tuple
+
+**xwOBA 完整公式**（必須匹配 Baseball Savant season xwOBA 尺度）：
+```
+sum_xwoba_on_bbe = Σ estimated_woba_using_speedangle (for rows where events ∈ BBE_EVENTS)
+xwOBA = (0.69 × BB_count + 0.72 × HBP_count + sum_xwoba_on_bbe) / PA
+```
+
+**HH% / Barrel% on BBE**：
+```
+HH%     = count(launch_speed ≥ 95  AND events ∈ BBE_EVENTS) / BBE × 100
+Barrel% = count(launch_speed_angle == 6 AND events ∈ BBE_EVENTS) / BBE × 100
+```
+
+**🚨 三大踩坑預警**（上次 session 2026-04-18 實測踩過）：
+- **v1 坑**：`if launch_speed is not None` 算 BBE → foul ball 也有 launch_speed，會被誤計。正確做法：先過濾 `events ∈ BBE_EVENTS`
+- **v2 坑**：只對 BBE 行平均 `estimated_woba_using_speedangle` 當 xwOBA → 那是 `xwOBA_on_contact` 尺度，跟 season xwOBA（含 BB/HBP/K 權重）不可比。必須套完整公式 `(0.69×BB + 0.72×HBP + Σ) / PA`
+- **v3 坑**：CSV 空值 `""` / `"null"` / `"-"` / `" "` 多樣，parse 要 try/except ValueError
+
+#### 實作
+
+- [ ] **Step 1: 建立 savant_rolling.py（import + 常數 + fetch）**
 
 Create `daily-advisor/savant_rolling.py`:
 
@@ -139,7 +143,10 @@ Create `daily-advisor/savant_rolling.py`:
 #!/usr/bin/env python3
 """Fetch rolling-window Savant data for given players.
 
-Run daily via cron (TW 12:00). Writes savant_rolling.json in same dir.
+Uses Baseball Savant statcast_search/csv endpoint (pitch-level raw data,
+aggregated locally to PA/BBE/xwOBA/HH%/Barrel% metrics).
+
+Runs daily via cron (TW 12:00). Writes savant_rolling.json in same dir.
 Window: last N calendar days ending on today (default 14d).
 """
 
@@ -148,6 +155,7 @@ import io
 import json
 import os
 import sys
+import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
 
@@ -155,9 +163,138 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROSTER_PATH = os.path.join(SCRIPT_DIR, "roster_config.json")
 OUTPUT_PATH = os.path.join(SCRIPT_DIR, "savant_rolling.json")
 
+# CSV events classification
+BBE_EVENTS = frozenset({
+    "single", "double", "triple", "home_run",
+    "field_out", "force_out", "grounded_into_double_play",
+    "double_play", "triple_play",
+    "fielders_choice", "fielders_choice_out", "field_error",
+    "sac_fly", "sac_fly_double_play", "sac_bunt",
+})
+BB_EVENTS = frozenset({"walk"})
+HBP_EVENTS = frozenset({"hit_by_pitch"})
+
+# xwOBA weights (MLB standard, matches Baseball Savant season xwOBA)
+XWOBA_BB_WEIGHT = 0.69
+XWOBA_HBP_WEIGHT = 0.72
+
+
+def _fetch_player_pitches(mlb_id, start_date, end_date):
+    """Fetch pitch-level CSV for one player.
+
+    Args:
+        mlb_id: int — MLB player ID
+        start_date: str "YYYY-MM-DD" (inclusive)
+        end_date: str "YYYY-MM-DD" (inclusive)
+
+    Returns:
+        list of CSV row dicts (empty on error)
+    """
+    year = end_date[:4]
+    params = {
+        "all": "true",
+        "hfSea": f"{year}|",
+        "player_type": "batter",
+        "batters_lookup[]": str(mlb_id),
+        "game_date_gt": start_date,
+        "game_date_lt": end_date,
+        "min_pitches": "0",
+        "min_results": "0",
+        "min_pas": "0",
+        "type": "details",
+    }
+    url = "https://baseballsavant.mlb.com/statcast_search/csv?" + urllib.parse.urlencode(params)
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp = urllib.request.urlopen(req, timeout=30)
+        text = resp.read().decode("utf-8-sig")
+        return list(csv.DictReader(io.StringIO(text)))
+    except Exception as e:
+        print(f"Fetch failed for player {mlb_id}: {e}", file=sys.stderr)
+        return []
+
+
+def _safe_float(val):
+    """Parse float from CSV cell, handling common empty markers."""
+    if val is None:
+        return None
+    s = str(val).strip()
+    if s in ("", "null", "-", "—"):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _aggregate_pitches(rows):
+    """Aggregate pitch-level rows into player metrics.
+
+    Args:
+        rows: list[dict] — CSV rows from _fetch_player_pitches
+
+    Returns:
+        dict — {xwoba, barrel_pct, hh_pct, bbe, pa} or {} if no usable data
+    """
+    if not rows:
+        return {}
+
+    pa_set = set()
+    bbe_count = 0
+    bb_count = 0
+    hbp_count = 0
+    sum_xwoba_on_bbe = 0.0
+    hh_count = 0
+    barrel_count = 0
+
+    for row in rows:
+        gd = (row.get("game_date") or "").strip()
+        abn = (row.get("at_bat_number") or "").strip()
+        if gd and abn:
+            pa_set.add((gd, abn))
+
+        event = (row.get("events") or "").strip()
+        if not event:
+            continue  # Mid-PA pitch, skip
+
+        if event in BB_EVENTS:
+            bb_count += 1
+        elif event in HBP_EVENTS:
+            hbp_count += 1
+        elif event in BBE_EVENTS:
+            bbe_count += 1
+            xw = _safe_float(row.get("estimated_woba_using_speedangle"))
+            if xw is not None:
+                sum_xwoba_on_bbe += xw
+            ls = _safe_float(row.get("launch_speed"))
+            if ls is not None and ls >= 95:
+                hh_count += 1
+            lsa = _safe_float(row.get("launch_speed_angle"))
+            if lsa is not None and int(lsa) == 6:
+                barrel_count += 1
+        # else: strikeout or other — counted in PA only
+
+    pa = len(pa_set)
+    if pa == 0 or bbe_count == 0:
+        return {}
+
+    xwoba = (
+        XWOBA_BB_WEIGHT * bb_count
+        + XWOBA_HBP_WEIGHT * hbp_count
+        + sum_xwoba_on_bbe
+    ) / pa
+
+    return {
+        "xwoba": round(xwoba, 3),
+        "barrel_pct": round(barrel_count / bbe_count * 100, 1),
+        "hh_pct": round(hh_count / bbe_count * 100, 1),
+        "bbe": bbe_count,
+        "pa": pa,
+    }
+
 
 def fetch_savant_rolling(player_ids, end_date, window_days=14):
-    """Fetch rolling Savant data for window [end_date - window_days, end_date].
+    """Fetch rolling Savant data for given players.
 
     Args:
         player_ids: list[int] — MLB player IDs
@@ -165,68 +302,23 @@ def fetch_savant_rolling(player_ids, end_date, window_days=14):
         window_days: int — lookback window (default 14)
 
     Returns:
-        dict[int, dict] — {player_id: {xwoba, barrel_pct, hh_pct, bbe}}
+        dict[int, dict] — {player_id: {xwoba, barrel_pct, hh_pct, bbe, pa}}
         Players with no data in window are omitted.
     """
     end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
     start_dt = end_dt - timedelta(days=window_days)
     start_str = start_dt.strftime("%Y-%m-%d")
 
-    result: dict[int, dict] = {pid: {} for pid in player_ids}
-    id_set = {str(pid) for pid in player_ids}
-
-    # statcast endpoint: HH%, Barrel%, BBE
-    sc_url = (
-        f"https://baseballsavant.mlb.com/leaderboard/statcast"
-        f"?type=batter&year={end_dt.year}"
-        f"&game_date_gt={start_str}&game_date_lt={end_date}"
-        f"&min=1&csv=true"
-    )
-    _merge_csv(sc_url, id_set, result, kind="statcast")
-
-    # expected_statistics endpoint: xwOBA
-    ex_url = (
-        f"https://baseballsavant.mlb.com/leaderboard/expected_statistics"
-        f"?type=batter&year={end_dt.year}"
-        f"&game_date_gt={start_str}&game_date_lt={end_date}"
-        f"&min=1&csv=true"
-    )
-    _merge_csv(ex_url, id_set, result, kind="expected")
-
-    # Drop players with no data in window
-    return {pid: data for pid, data in result.items() if data}
-
-
-def _merge_csv(url, id_set, result, kind):
-    """Fetch CSV and merge relevant fields into result dict.
-
-    Args:
-        url: str — Savant leaderboard URL
-        id_set: set[str] — player_id strings to filter
-        result: dict[int, dict] — mutated in-place
-        kind: str — "statcast" or "expected"
-    """
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        resp = urllib.request.urlopen(req, timeout=30)
-        text = resp.read().decode("utf-8-sig")
-        reader = csv.DictReader(io.StringIO(text))
-        for row in reader:
-            pid_str = row.get("player_id", "").strip()
-            if pid_str not in id_set:
-                continue
-            pid = int(pid_str)
-            if kind == "statcast":
-                result[pid]["hh_pct"] = float(row.get("ev95percent", 0) or 0)
-                result[pid]["barrel_pct"] = float(row.get("brl_percent", 0) or 0)
-                result[pid]["bbe"] = int(row.get("attempts", 0) or 0)
-            elif kind == "expected":
-                result[pid]["xwoba"] = float(row.get("est_woba", 0) or 0)
-    except Exception as e:
-        print(f"Savant {kind} fetch failed: {e}", file=sys.stderr)
+    result = {}
+    for pid in player_ids:
+        rows = _fetch_player_pitches(pid, start_str, end_date)
+        metrics = _aggregate_pitches(rows)
+        if metrics:
+            result[pid] = metrics
+    return result
 ```
 
-- [ ] **Step 2: 手動測試 fetch function**
+- [ ] **Step 2: 對齊驗證（復現上次 session 2026-04-18 Buxton 數字）**
 
 Run:
 ```bash
@@ -234,19 +326,41 @@ cd daily-advisor/
 python3 -c "
 from savant_rolling import fetch_savant_rolling
 import json
-# Byron Buxton 621439, Manny Machado 592518, Trent Grisham 663754
-result = fetch_savant_rolling([621439, 592518, 663754], '2026-04-20')
-print(json.dumps(result, indent=2, default=str))
+# Buxton 621439, 複用上次 session 窗口 2026-04-04 ~ 2026-04-17
+# window_days=13 使 end_date 2026-04-17 對應 start 2026-04-04
+result = fetch_savant_rolling([621439], '2026-04-17', window_days=13)
+print(json.dumps(result, indent=2))
 "
 ```
 
-Expected: 每位主力 player 有 xwoba / hh_pct / barrel_pct / bbe 四欄位值。若某球員受傷或最近未上場，可能整個球員 dict 被 drop（result 不包含）。
+**Expected（對照上次 session 記錄）**：
+- Buxton 14d xwOBA **≈ 0.384**（上次紀錄值，season 0.315 Δ +0.069）
+- BBE **介於 26-40**（v1 修正後範圍；若 60+ 代表 foul 誤算）
+- PA 約 50-60
+- 若 xwOBA **顯著 > 0.500** → v2 坑未修（xwOBA_on_contact 尺度），檢查 XWOBA_* 常數與公式
 
-- [ ] **Step 3: Commit**
+**決策節點**：此 Step 必須通過才能繼續。若 xwOBA 與預期偏差 > ±0.050 → **STOP**，回報 Architect 檢查計算邏輯。
+
+- [ ] **Step 3: 多球員煙霧測試**
+
+Run:
+```bash
+python3 -c "
+from savant_rolling import fetch_savant_rolling
+import json
+# 3 主力，用當前日期
+result = fetch_savant_rolling([621439, 592518, 645277], '2026-04-20')
+print(json.dumps(result, indent=2))
+"
+```
+
+Expected: 3 位都有 xwoba / barrel_pct / hh_pct / bbe / pa 五欄位。PA 合理（主力 45-60）。執行時間 <15 秒（3 × 5 秒 HTTP timeout 內）。
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add daily-advisor/savant_rolling.py
-git commit -m "feat(savant-rolling): add 14d rolling fetch function"
+git commit -m "feat(savant-rolling): add pitch-level aggregate for 14d rolling"
 ```
 
 ---
@@ -682,8 +796,10 @@ Expected: Pass 2 Claude 輸出的「我方最弱打者」urgency 分數包含 14
 
 | 風險 | 機率 | 緩解 |
 |------|------|------|
-| Savant leaderboard 不支援 date range | 低 | Task 1 先驗證；fail 則 STOP 並走 MLB Stats API gameLog fallback（另一 plan）|
-| 14d 資料抓取失敗 | 中 | `_merge_csv` 內 try/except + print stderr；fa_scan/daily_advisor 讀檔也 fallback 到空 dict |
+| ~~Savant leaderboard 不支援 date range~~ | ✅ Resolved | 改用 `statcast_search/csv`，Architect 已驗證 |
+| 聚合邏輯 bug（v1/v2/v3 踩坑重現） | 中 | Task 2 Step 2 必跑 Buxton 對齊驗證（xwOBA ≈ 0.384 + BBE 26-40）|
+| `statcast_search/csv` rate limit | 低 | 11 球員串行 HTTP ~30 秒，不衝突 Savant UI 使用模式 |
+| 14d 資料抓取失敗（單球員超時） | 中 | `_fetch_player_pitches` 內 try/except + print stderr；該球員 drop，其餘照常 |
 | savant_rolling.json 不小心被 commit | 中 | Task 3 優先加 .gitignore |
 | cron 時間與既有排程衝突 | 低 | TW 12:00 目前無其他排程，緩衝充足 |
 | BBE gate 讓太多球員無 14d 行輸出 | 中 | 若主力（PA/TG ≥3.0）BBE <25 代表資料異常，而非 gate 過嚴；驗證階段觀察比例 |
@@ -692,6 +808,7 @@ Expected: Pass 2 Claude 輸出的「我方最弱打者」urgency 分數包含 14
 
 ## Known Limitations（驗證期觀察，不在本 plan 修）
 
-- BB% 缺：14d 不包含 BB%，Pass 2 prompt 的「14d 近況 Δ」僅看 xwOBA，不看 BB%（規則本身已如此設計）
+- BB% 缺：14d 不包含 BB%（雖然 `statcast_search/csv` 的 walk 事件有記錄，但聚合為 BB% 需另算 `bb_count / pa`，本 plan 暫未輸出此欄；Pass 2 prompt 的「14d 近況 Δ」僅看 xwOBA，規則本身已如此設計）
 - 14d 場次不均：14 曆日對不同球員代表不同場次數（主力 ~12 場 / 輪替 ~6-8 場），樣本量用 BBE gate 統一
-- Savant 日期邊界：若 Savant leaderboard 的日期過濾有「含/不含當日」模糊邊界，驗證階段觀察 attempts 數字，必要時調整 ±1 日
+- Savant 日期邊界：`game_date_gt` / `game_date_lt` 為閉區間（inclusive），驗證 Buxton 窗口時第一球 `2026-04-17` 與 `game_date_lt=2026-04-17` 對齊
+- 每球員一次 HTTP：11 人串行 ~30 秒，可接受；未來若擴展到 FA 50+ 球員需考慮並行（`concurrent.futures`）或 batched endpoint
