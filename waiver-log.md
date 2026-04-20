@@ -289,6 +289,10 @@
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
 - 04-20：xERA 1.39/xwOBA .188/HH% 22.2% 三項>P90（BBE 18 極低信心），2025 Sum 26 雙年確認，運氣 -1.50 買低訊號。2% owned 無壓力（fa_scan）
 
+### Brandon Pfaadt (AZ, SP) [mlb_id:694297] — 觀察中
+觸發：立即行動
+- 04-20：Sum 21 vs Nola(P1) 17 Δ+4, ✅ 球隊主力 無強警示 → 取代, IP/GS 5.6 AZ 強隊（fa_scan）
+
 ## 隊上觀察
 
 ### Cole Ragans (KC, SP) [mlb_id:666142] — DTD
