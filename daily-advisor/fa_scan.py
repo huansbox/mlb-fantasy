@@ -32,6 +32,7 @@ from yahoo_query import (
 TPE = ZoneInfo("Asia/Taipei")
 
 from daily_advisor import pctile_tag, BATTER_PCTILES
+from savant_rolling import fetch_savant_rolling
 from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
@@ -1199,7 +1200,7 @@ def _fmt_owned_change(d1, d3):
     return f"({d1s}/{d3s})"
 
 
-def _format_fa_batter(p):
+def _format_fa_batter(p, fa_rolling=None):
     s26 = p.get("savant_2026") or {}
     d26 = p.get("derived_2026") or {}
     s25 = p.get("savant_2025") or {}
@@ -1241,6 +1242,21 @@ def _format_fa_batter(p):
         lines.append(f"    Yahoo: {' | '.join(yp)}")
 
     lines.append(f"    {_bbe_label(p.get('bbe', 0))}")
+
+    # 14d rolling (Pass 2 task B add evaluation, BBE >= 25 gate)
+    mlb_id_str = str(p.get("mlb_id", ""))
+    r14 = (fa_rolling or {}).get(mlb_id_str) if mlb_id_str else None
+    if r14 and r14.get("bbe", 0) >= 25:
+        s26_xwoba = s26.get("xwoba")
+        r14_xwoba = r14.get("xwoba")
+        delta_str = ""
+        if s26_xwoba and r14_xwoba:
+            delta = r14_xwoba - s26_xwoba
+            delta_str = f" Δ{delta:+.3f}"
+        lines.append(
+            f"    14d: xwOBA {r14_xwoba:.3f}{delta_str} | "
+            f"HH% {r14.get('hh_pct', 0):.1f}% | BBE {r14.get('bbe', 0)}"
+        )
 
     # 2025
     if s25:
@@ -1424,6 +1440,28 @@ def _load_savant_rolling():
     except Exception as e:
         print(f"Failed to load savant_rolling.json: {e}", file=sys.stderr)
         return {}
+
+
+def _fetch_fa_rolling(fa_candidates, watch_candidates, today_str):
+    """Fetch 14d rolling Savant for FA + watchlist batters (Pass 2 add evaluation).
+
+    Returns:
+        dict[str, dict] — {mlb_id_str: {xwoba, barrel_pct, hh_pct, bbe, pa}}
+    """
+    mlb_ids = []
+    for p in list(fa_candidates) + list(watch_candidates):
+        mid = p.get("mlb_id")
+        if mid:
+            mlb_ids.append(int(mid))
+    mlb_ids = list(set(mlb_ids))  # dedupe (overlap between fa and watch possible)
+
+    if not mlb_ids:
+        return {}
+
+    print(f"  Pass 2 (batter): fetching 14d for {len(mlb_ids)} FA/watch...",
+          file=sys.stderr)
+    data = fetch_savant_rolling(mlb_ids, today_str, window_days=14)
+    return {str(pid): metrics for pid, metrics in data.items()}
 
 
 def build_weekly_data(today_str, enriched, changes, ref_1d, ref_3d,
@@ -1771,12 +1809,14 @@ def _fallback_weakest(config, savant_2026, group_type):
 
 
 def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
-                      watch_candidates, changes, ref_1d, ref_3d, config):
+                      watch_candidates, changes, ref_1d, ref_3d, config,
+                      fa_rolling=None):
     """Build data string for Pass 2 Claude prompt.
 
     Args:
         pass1_weakest: list of {name, reason} from Pass 1 Claude output
         savant_2026: Savant CSV data for 2026 Savant lookup
+        fa_rolling: dict[mlb_id_str, dict] of 14d data for FA/watch (batter only)
     """
     lines = []
 
@@ -1866,7 +1906,7 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
         lines.append(f"\n--- {fa_label} ({len(fa_candidates)} 人) ---")
         for p in fa_candidates:
             if group_type == "batter":
-                lines.append(_format_fa_batter(p))
+                lines.append(_format_fa_batter(p, fa_rolling=fa_rolling))
             else:
                 lines.append(_format_fa_pitcher(p))
     else:
@@ -1877,7 +1917,7 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
         lines.append(f"\n--- waiver-log 觀察中{label} ({len(watch_candidates)} 人) ---")
         for p in watch_candidates:
             if group_type == "batter":
-                lines.append(_format_fa_batter(p))
+                lines.append(_format_fa_batter(p, fa_rolling=fa_rolling))
             else:
                 lines.append(_format_fa_pitcher(p))
 
@@ -2035,9 +2075,15 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
         prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
 
+        # FA 14d rolling enrichment (batter only — Pass 2 task B add evaluation)
+        fa_rolling = (
+            _fetch_fa_rolling(fa_candidates, watch_candidates, today_str)
+            if group_type == "batter" else {}
+        )
+
         data = _build_pass2_data(
             group_type, pass1_weakest, savant_2026, fa_candidates, watch_candidates,
-            changes, ref_1d, ref_3d, config,
+            changes, ref_1d, ref_3d, config, fa_rolling=fa_rolling,
         )
         advice = _call_claude(prompt_path, data)
 
