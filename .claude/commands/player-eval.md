@@ -65,6 +65,22 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 > 回傳 2025 + 2026 的 xwOBA / HH% / Barrel% / BBE，不需 Yahoo auth。
 > 名字支援模糊匹配（Jesús = Jesus）。
 
+**Step 1.1a：14d Rolling 數據**（urgency 第 3 因子用）
+
+- **隊上球員**：直接讀 `daily-advisor/savant_rolling.json`（每日 TW 12:00 cron 更新）
+  ```bash
+  python -c "import json; d=json.load(open('daily-advisor/savant_rolling.json'))['players']; print(d.get('{mlb_id}'))"
+  ```
+- **FA / 觀察中球員**：JSON 沒這人 → 動態抓
+  ```bash
+  cd daily-advisor && python3 -c "
+  from savant_rolling import fetch_savant_rolling
+  import json
+  print(json.dumps(fetch_savant_rolling([{mlb_id}], '{今天 YYYY-MM-DD}')))
+  "
+  ```
+- BBE <25 → 不輸出旗標，14d 因子算 0
+
 **Step 1.1b：近期新聞（必做，非補充）**
 
 ```
@@ -117,26 +133,55 @@ WebSearch: "{球員名} {今年} news injury rotation role"
 **轉隊**：確認球員目前球隊 = 搜尋到的數據球隊。如有出入，重新評估打線位置、球場效應、先發機會。
 
 **小樣本**：
-- 打者上季 < 80 場：需額外查 career stats 或多年趨勢，不可只看單季
 - 投手上季 < 80 IP：用預期值區間而非單點估計
 - 季初前 3 週實際數據：標記「小樣本，僅供傾向參考」
+- 打者：用 BBE 信心 gate（<30 低信心 / 30-50 中 / >50 高，CLAUDE.md 規則）；不再查 career stats（資料流無支援）
 
 ## Step 2：評估框架
 
 > **直接引用 CLAUDE.md「球員評估框架」區段**，不在此複製。
 
 讀取 CLAUDE.md 確認：
-- 打者核心 3 指標 + 產量指標 + 輔助指標
-- SP 核心 3 指標 + 產量指標 + 輔助指標
-- RP 評估方式
+- 打者：Sum 打分表（3 指標 P25-P90 對應分數）+ Step 1/2 兩步分工 + urgency 四因子 + ✅/⚠️ add tags
+- SP / RP：核心 3 指標 + 產量 + 輔助
 - 百分位表（打者/SP/RP 分開）
-- 樣本量加權規則
-- 7×7 格式規則
-- 陣容脈絡檢查項目
+- 樣本量加權規則 + 7×7 格式規則
 
-**評估流程**：
-- 打者：讀 roster_config.json 全隊打者 → 排出最弱 5 人 → FA 只跟這 5 人比
-- SP：排出最弱 4 位 SP → FA 只跟最弱的比
+### 與 fa_scan 的分工
+
+| 流程 | 職責 | 對打者的處理 |
+|------|------|------------|
+| fa_scan（自動）| 批量篩選 + drop 排序 | Layer 2 Sum≥21 → Pass 1 最弱 4 人 → Pass 2 urgency + ✅/⚠️ tags |
+| /player-eval（手動）| 單點深入 + 陣容脈絡 | 同樣 Sum / urgency / tags **+** 守位/角色/單點故障/邊際遞減 |
+
+→ `/player-eval` **完整套用 fa_scan 的評估規則**（保證一致），再加 fa_scan **不做**的陣容脈絡判斷。
+
+### 打者評估流程（對齊 fa_scan Pass 1/2）
+
+**Step 2.1 — 排最弱 4 人錨點**（fa_scan Pass 1 規則）：
+1. 讀 `roster_config.json` 全隊 11 打者
+2. 對每人用 2026 當季數據算 Sum：
+   - xwOBA / BB% / Barrel% 三指標各按百分位 → 1-10 分
+   - Sum 範圍 3-30
+3. 升冪排序取最弱 4 人
+
+**Step 2.2 — drop 優先序（urgency 四因子）**：
+對最弱 4 人逐一算 urgency：
+- 2026 Sum：<9 +5 / 9-11 +4 / 12-14 +3 / 15-17 +2 / 18-21 +1
+- 2025 Sum：≥24 → **Slump hold 移出排序** / 22-23 +0 / 18-21 +1 / <18 +2
+- 14d xwOBA Δ（BBE ≥25 才啟用）：≥+0.050 -2 / +0.035 to +0.050 -1 / ±0.035 持平 0 / -0.050 to -0.035 +1 / ≤-0.050 +2
+- 2026 PA/Team_G：≥3.5 +2 / 3.0-3.5 +1 / 2.5-3.0 +0 / <2.5 +0
+
+排序得 P1-P4（P1 最該 drop）+ Slump hold 獨立列。
+
+**Step 2.3 — 評估目標球員**（被詢問的球員）：
+- 若是 FA → 用 Sum + ✅/⚠️ tags 比較 P1-P4
+- 若是隊上球員 → 重新看 urgency + 雙年檢核
+- 若是交易標的 → 計算對方陣容相對位置（用同 Sum 規則）
+
+### SP / RP 流程（暫沿用舊規則）
+
+- SP：排出最弱 4 位 SP → FA 只跟最弱的比（核心 3 指標 2/3 勝出）
 - RP：只有 2 人，FA 直接跟目前 RP 比
 
 ## Step 2.5：Savant 回歸驗證（條件觸發）
@@ -163,17 +208,51 @@ python -c "..." # 用 /api/v1/people/{id}/stats?stats=gameLog&season=2026&group=
 
 ## Step 3：比較與輸出
 
-用表格逐項列出實際數值對比：
-- 打者欄位：xwOBA / Barrel% / BB% / HH% / OPS / PA/Team_G / HR / RBI / SB（權重低）/ 守位
-  - 附 MLB 百分位定位（如 xwOBA .320 = ~P70）
-  - 附樣本量（PA / BBE）
+### 打者（對齊 fa_scan Pass 2 task B 規則）
+
+**3.1 — Sum 比較表**（核心 3 指標）
+
+| 球員 | xwOBA | BB% | Barrel% | Sum | 2025 Sum | 14d Δ | PA/TG | BBE |
+|------|-------|-----|---------|-----|----------|-------|-------|-----|
+| FA  | .320 (8) | 9.0% (7) | 10.5% (8) | **23** | 25 | +0.045 | 3.4 | 38 |
+| 我隊 P1 | .250 (5) | 6.0% (3) | 4.0% (1) | **9**  | 14 | -0.033 | 4.1 | 61 |
+| 差   | +3 | +4 | +7 | **+14** | — | — | — | — |
+
+**3.2 — 勝出判斷**（fa_scan Pass 2 B.1 規則）
+
+- Sum 差 ≥ 3 + 至少 2 項指標正向（每項 ≥ 0）→ 進評估
+- `+5 +1 -3 = +3` 不算（一項大輸）
+- `+1 +1 +1 = +3` 算（三項都贏）
+
+**3.3 — Add ✅/⚠️ tags**（B.2 / B.3 規則）
+
+| 標籤 | 條件 | FA 範例 |
+|------|------|---------|
+| ✅ 雙年菁英 | 2025 Sum ≥ 24 | 25 ✓ |
+| ✅ 球隊主力 | 2026 PA/TG ≥ 3.5 | 3.4 ✗（接近邊緣）|
+| ✅ 近況確認 | 14d Δ ≥ +0.035 | +0.045 ✓ |
+| ⚠️ 上場有限（強警示）| PA/TG <2.5 | — |
+| ⚠️ 樣本小 | BBE <30 | — |
+| ⚠️ Breakout 待驗 | 2025 Sum <18 或無 | — |
+| ⚠️ 近況下滑 | 14d Δ ≤ -0.035 | — |
+
+**3.4 — 升級判斷**（B.4 規則）
+
+- ≥2 ✅ + 無 ⚠️ → **立即取代**
+- 1 ✅ + 無 ⚠️ 上場有限 → 取代
+- 1 ✅ + ⚠️ 上場有限 → 觀察（強警示否決）
+- 多個 ⚠️ 或無 ✅ → 觀察
+
+### SP / RP（暫沿用舊規則）
+
 - SP 欄位：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / IP/GS / ERA / WHIP / K/9 / |xERA-ERA| / QS 潛力 / W 支援
-  - 附 MLB 百分位定位
-  - 附樣本量（BBE）
+  - 附 MLB 百分位定位 + 樣本量（BBE）
   - |xERA-ERA| 超過百分位 P70+ 時標記運氣方向
 - RP 欄位：同 SP + K/9 / IP/Team_G / SV+H（留意但不追）
 
-末行給明確決策結論。**「不動也是策略」** — 如果 FA 球員未明顯優於現有球員，結論應為「不換」。
+### 末行明確決策結論
+
+**「不動也是策略」** — 如果 FA 球員未明顯優於現有球員（無 ✅ 或多個 ⚠️），結論應為「不換」。
 
 **Owned% 判讀**（輔助，非決策依據）：
 - 高 owned（>80%）+ Savant 差 → 市場溢價中，sell-high / trade 窗口存在
