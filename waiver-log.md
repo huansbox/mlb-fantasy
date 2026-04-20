@@ -279,6 +279,12 @@
 - 04-19：xwOBA .361(>P90)/BB% 12.2(>P90)/Barrel% 10.3(P70) BBE 58 高信心，2025 雙年確認（.338/425 BBE）。63% owned drop 失誤，3/3 勝 Albies（fa_scan）
 - 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
 
+### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
+觸發：立即行動
+- 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
+- 04-20：[eval] vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅ (雙年菁英 + 球隊主力) + 0 ⚠️ → **立即取代**。14d xwOBA .323 Δ-0.083 雖 ❄️ 但 BBE 21<25 不啟用。建議 FAAB $3-5 取代 Albies。fallback Correa $1。mlb_id 修正 571970→691777（LAD 老 Muncy vs ATH 年輕）
+- 04-20：⚠️ **cron 誤判被搶**（commit `afbe6ca`）— 當時 waiver-log 條目還是舊 mlb_id 571970（LAD 老 Muncy），cron 查 571970 的 ownership 為 rostered → 誤把 ATH Muncy 標為已結案。實際 ATH Muncy (691777) 仍 50% owned 可撿。已恢復觀察中
+
 ### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
 - 04-20：xERA 1.39/xwOBA .188/HH% 22.2% 三項>P90（BBE 18 極低信心），2025 Sum 26 雙年確認，運氣 -1.50 買低訊號。2% owned 無壓力（fa_scan）
@@ -330,10 +336,6 @@
 
 ### Chad Patrick (MIL, SP) — 被搶（自動偵測）
 - 2026-04-20：Yahoo ownership_type=team，從觀察中移除。
-
-### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 被搶（自動偵測）
-- 2026-04-20：Yahoo ownership_type=team，從觀察中移除。
-- 04-20：[eval] session 評估過：vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅ + 0 ⚠️ → **立即取代**（建議 FAAB $3-5）。可惜 fa_scan 於 TW 15:15 snapshot 前已被別隊撿走（推測與 Chad Patrick 同時被某 GM 連環撿）。留下的教訓：51% owned 三日 +0 仍有急迫被搶風險，遇到雙年菁英候選應搶 claim 而非等待確認。mlb_id 修正 571970→691777（LAD 老 Muncy vs ATH 年輕）
 
 ### Austin Martin (MIN, 2B,LF,CF) — 被搶（自動偵測）
 - 2026-04-18：Yahoo ownership_type=team，從觀察中移除。
