@@ -451,6 +451,7 @@ waiver-log.md（球員追蹤唯一來源）
 |------|------|
 | `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP / 週一 RP / snapshot-only） |
+| `daily-advisor/savant_rolling.py` | 14d Savant rolling 抓取（cron TW 12:00，產出 `savant_rolling.json` 供 fa_scan + daily_advisor 讀取） |
 | `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據 + Yahoo 格位 + MLB 狀態） |
 | `waiver-log.md` | 球員追蹤（FA 觀察中 / 隊上觀察 / 已結案） |
 | `week-reviews.md` | 累積式週覆盤記錄 |
