@@ -1281,7 +1281,7 @@ def _format_fa_batter(p, fa_rolling=None):
     return "\n".join(lines)
 
 
-def _format_fa_pitcher(p):
+def _format_fa_pitcher(p, fa_rolling=None):
     s26 = p.get("savant_2026") or {}
     d26 = p.get("derived_2026") or {}
     s25 = p.get("savant_2025") or {}
@@ -1365,6 +1365,22 @@ def _format_fa_pitcher(p):
         if y25:
             lines.append(f"    2025: {' | '.join(y25)}")
 
+    # 21d rolling (SP only, Pass 2 task B add evaluation, BBE >= 20 gate)
+    if fa_type == "sp" and fa_rolling:
+        mlb_id_str = str(p.get("mlb_id", ""))
+        r21 = fa_rolling.get(mlb_id_str) if mlb_id_str else None
+        if r21 and r21.get("bbe", 0) >= 20:
+            s26_xwoba = s26.get("xwoba")
+            r21_xwoba = r21.get("xwoba")
+            delta_str = ""
+            if s26_xwoba and r21_xwoba:
+                delta = r21_xwoba - s26_xwoba
+                delta_str = f" Δ{delta:+.3f}"
+            lines.append(
+                f"    21d: xwOBA {r21_xwoba:.3f}{delta_str} | "
+                f"HH% {r21.get('hh_pct', 0):.1f}% | BBE {r21.get('bbe', 0)}"
+            )
+
     return "\n".join(lines)
 
 
@@ -1437,8 +1453,11 @@ def _extract_eval_framework():
         return ""
 
 
-def _load_savant_rolling():
-    """Load savant_rolling.json if exists, else return empty dict.
+def _load_savant_rolling(player_type="batter"):
+    """Load savant_rolling.json, returning batter 14d or pitcher 21d section.
+
+    Args:
+        player_type: "batter" → players section; "sp"/"pitcher" → pitchers section
 
     Returns:
         dict[str, dict] — {player_id_str: {name, xwoba, hh_pct, barrel_pct, bbe, pa}}
@@ -1449,14 +1468,18 @@ def _load_savant_rolling():
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
-        return data.get("players", {})
+        key = "players" if player_type == "batter" else "pitchers"
+        return data.get(key, {})
     except Exception as e:
         print(f"Failed to load savant_rolling.json: {e}", file=sys.stderr)
         return {}
 
 
-def _fetch_fa_rolling(fa_candidates, watch_candidates, today_str):
-    """Fetch 14d rolling Savant for FA + watchlist batters (Pass 2 add evaluation).
+def _fetch_fa_rolling(fa_candidates, watch_candidates, today_str, player_type="batter"):
+    """Fetch rolling Savant for FA + watchlist (Pass 2 add evaluation).
+
+    Args:
+        player_type: "batter" (14d) or "pitcher" (21d)
 
     Returns:
         dict[str, dict] — {mlb_id_str: {xwoba, barrel_pct, hh_pct, bbe, pa}}
@@ -1471,9 +1494,12 @@ def _fetch_fa_rolling(fa_candidates, watch_candidates, today_str):
     if not mlb_ids:
         return {}
 
-    print(f"  Pass 2 (batter): fetching 14d for {len(mlb_ids)} FA/watch...",
+    window = 14 if player_type == "batter" else 21
+    label = player_type
+    print(f"  Pass 2 ({label}): fetching {window}d for {len(mlb_ids)} FA/watch...",
           file=sys.stderr)
-    data = fetch_savant_rolling(mlb_ids, today_str, window_days=14)
+    data = fetch_savant_rolling(mlb_ids, today_str, window_days=window,
+                                player_type=player_type)
     return {str(pid): metrics for pid, metrics in data.items()}
 
 
@@ -1845,8 +1871,8 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
     lines.append(f"--- 我方最弱{label}（Pass 1 篩出）---")
     all_players = config.get("batters" if group_type == "batter" else "pitchers", [])
 
-    # 14d rolling data (batter only, loaded once)
-    rolling = _load_savant_rolling() if group_type == "batter" else {}
+    # Rolling data: batter 14d / SP 21d (loaded once per group)
+    rolling = _load_savant_rolling(player_type=group_type)
 
     # SP-only: fetch team_games once for IP/Team_G computation
     standings = _fetch_team_games() if group_type == "sp" else {}
@@ -1912,21 +1938,23 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
                 if vol:
                     parts.append("產量: " + " | ".join(vol))
 
-        # 14d rolling data — only if batter + BBE ≥ 25
-        if group_type == "batter":
-            mlb_id_str = str(p.get("mlb_id", ""))
-            r14 = rolling.get(mlb_id_str) if mlb_id_str else None
-            if r14 and r14.get("bbe", 0) >= 25:
-                s26 = _extract_savant_by_id(p.get("mlb_id"), pt, savant_2026) if p.get("mlb_id") else None
-                s26_xwoba = s26.get("xwoba") if s26 else None
-                r14_xwoba = r14.get("xwoba")
+        # Rolling data (batter 14d BBE≥25 / SP 21d BBE≥20)
+        mlb_id_str = str(p.get("mlb_id", ""))
+        roll = rolling.get(mlb_id_str) if mlb_id_str else None
+        if roll:
+            bbe_threshold = 25 if group_type == "batter" else 20
+            if roll.get("bbe", 0) >= bbe_threshold:
+                s26_local = _extract_savant_by_id(p.get("mlb_id"), pt, savant_2026) if p.get("mlb_id") else None
+                s26_xwoba = s26_local.get("xwoba") if s26_local else None
+                roll_xwoba = roll.get("xwoba")
                 delta_str = ""
-                if s26_xwoba and r14_xwoba:
-                    delta = r14_xwoba - s26_xwoba
+                if s26_xwoba and roll_xwoba:
+                    delta = roll_xwoba - s26_xwoba
                     delta_str = f" Δ{delta:+.3f}"
+                window_label = "14d" if group_type == "batter" else "21d"
                 parts.append(
-                    f"14d: xwOBA {r14_xwoba:.3f}{delta_str} | "
-                    f"HH% {r14.get('hh_pct', 0):.1f}% | BBE {r14.get('bbe', 0)}"
+                    f"{window_label}: xwOBA {roll_xwoba:.3f}{delta_str} | "
+                    f"HH% {roll.get('hh_pct', 0):.1f}% | BBE {roll.get('bbe', 0)}"
                 )
 
         # Prior year stats
@@ -1954,7 +1982,7 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
             if group_type == "batter":
                 lines.append(_format_fa_batter(p, fa_rolling=fa_rolling))
             else:
-                lines.append(_format_fa_pitcher(p))
+                lines.append(_format_fa_pitcher(p, fa_rolling=fa_rolling))
     else:
         lines.append(f"\n--- {fa_label}: 無 ---")
 
@@ -1965,7 +1993,7 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
             if group_type == "batter":
                 lines.append(_format_fa_batter(p, fa_rolling=fa_rolling))
             else:
-                lines.append(_format_fa_pitcher(p))
+                lines.append(_format_fa_pitcher(p, fa_rolling=fa_rolling))
 
     # %owned risers (filtered to this group)
     group_changes = [c for c in changes
@@ -2136,10 +2164,10 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
         prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
 
-        # FA 14d rolling enrichment (batter only — Pass 2 task B add evaluation)
-        fa_rolling = (
-            _fetch_fa_rolling(fa_candidates, watch_candidates, today_str)
-            if group_type == "batter" else {}
+        # FA rolling enrichment (batter 14d / SP 21d) — Pass 2 task B add evaluation
+        fa_rolling_type = "batter" if group_type == "batter" else "pitcher"
+        fa_rolling = _fetch_fa_rolling(
+            fa_candidates, watch_candidates, today_str, player_type=fa_rolling_type,
         )
 
         data = _build_pass2_data(
