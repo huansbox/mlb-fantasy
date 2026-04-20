@@ -1,7 +1,7 @@
 # 打者評估框架改版計畫
 
-**狀態**：規則定稿，待實施
-**日期**：2026-04-19 初版 / 2026-04-20 Part C 規則定稿
+**狀態**：Step 1-7 完成上線，Step 4/8 觀察期中
+**日期**：2026-04-19 初版 / 2026-04-20 Part C 規則定稿 + Step 1-7 實施
 **觸發 session**：2026-04-17 / 2026-04-19 / 2026-04-20
 
 ---
@@ -11,7 +11,7 @@
 Session 內討論累積的改動，分三部分：
 - **Part A**（✅ 已完成）：Daily Advisor 精簡（砍 H2H 比分 + IP 進度）
 - **Part B**（✅ 已完成）：FA Scan prompt 調整（Pass 1 錨點宣告 + Pass 2 觀察/Pass 區塊精簡 + 連續取代警示）
-- **Part C**（✅ 規則定稿 2026-04-20，待實施）：打者評估框架全面改版（本計畫主體）
+- **Part C**（✅ Step 1-7 完成 2026-04-20，Step 4/8 觀察期中）：打者評估框架全面改版（本計畫主體）
 
 ---
 
@@ -288,29 +288,47 @@ Session 內討論累積的改動，分三部分：
 
 ### 分段執行
 
-| Step | 內容 | 檔案 | 複雜度 |
-|------|------|------|-------|
-| 1 | CLAUDE.md 打者評估節重寫（Sum 打分表 + Step 1/2 規則）| `CLAUDE.md` | 低（純文件）|
-| 2 | Pass 1 prompt 更新（Sum 算法 + 警示，移除 Profile）| `prompt_fa_scan_pass1_batter.txt` | 低 |
-| 3 | Pass 2 prompt 更新（urgency 四因子 + drop 排序 + 陣容脈絡分離）| `prompt_fa_scan_pass2_batter.txt` | 低 |
-| 4 | 驗證 1-2 週 fa_scan 輸出 | —（觀察）| — |
-| 5 | 14d Savant 抓取實作（Step 2 與 daily_advisor 共用）| 新增 `rolling_stats.py` 或擴充 `roster_stats.py` | 中 |
-| 6 | fa_scan Step 2 整合 14d 旗標 | `fa_scan.py` + Pass 2 prompt | 中 |
-| 7 | daily_advisor Section 1 加 sit/start 近況旗標（🔥/❄️/⚠️ K%/⚠️ HH%）| `daily_advisor.py` + prompt | 中 |
-| 8 | 整體回顧 | —（觀察）| — |
+| Step | 內容 | 檔案 | 狀態 | Commit |
+|------|------|------|------|--------|
+| 1 | CLAUDE.md 打者評估節重寫（Sum 打分表 + Step 1/2 規則）| `CLAUDE.md` | ✅ Done | `1fc1817` |
+| 2 | Pass 1 prompt 更新（Sum 算法 + 警示，移除 Profile）+ fa_scan.py 補 BB% 欄位 | `prompt_fa_scan_pass1_batter.txt`, `fa_scan.py` | ✅ Done | `8c23630` |
+| 3 | Pass 2 prompt 更新（urgency 四因子 + drop 排序 + 陣容脈絡分離）+ Pass 2 帶 Pass 1 score | `prompt_fa_scan_pass2_batter.txt`, `fa_scan.py` | ✅ Done | `1836edb` |
+| 4 | 驗證 1-2 週 fa_scan 輸出 | —（觀察）| 🔄 In progress | — |
+| 5 | 14d Savant 抓取實作（statcast_search/csv pitch-level + 本地聚合） | 新增 `daily-advisor/savant_rolling.py` | ✅ Done | `1032bc1` + `7b59812` |
+| 6 | fa_scan Pass 2 整合 14d 旗標（讀 savant_rolling.json）| `fa_scan.py` | ✅ Done | `addaf56` |
+| 7 | daily_advisor Section 1 加 sit/start 近況旗標（🔥/❄️/⚠️ HH%）| `daily_advisor.py` | ✅ Done | `fd00f2a` + hotfix `8cbe733` |
+| — | VPS cron TW 12:00 設定 + smoke test | infra | ✅ Done | (cron 配置非 repo) |
+| 8 | 整體回顧 | —（觀察）| 🔄 Pending | — |
 
-### 建議執行順序
+### 實施記錄（2026-04-20 一日完成 Step 1-7）
 
-- **第 1 批（文件層）**：Step 1+2+3 → 即時生效，驗證成本低。14d 因子先在 prompt 寫規則，資料欄位缺值時 AI 跳過（Fallback）
-- **第 2 批（程式層）**：Step 5+6+7 → 視 Step 4 結果決定
-- **Step 4/8** 為觀察期，不需動手
+**Step 1-3（文件層，當 session 直接做）**：
+- 規則文字化，CLAUDE.md / Pass 1 / Pass 2 prompt 一致
 
-### 14d 資料相依注意
+**Step 5-7（程式層，architect-builder workflow）**：
+- 計畫文件：`docs/plans/2026-04-20-savant-rolling-recency.md`
+- Builder Task 1 失敗（Savant leaderboard 不支援 date range），STOP 回報
+- Architect 改用 `statcast_search/csv` pitch-level endpoint，重寫 Task 2 含完整聚合邏輯（PA / BBE / xwOBA 完整公式 / HH% / Barrel%）
+- Builder 再次執行 Task 2-3-5-6 + Buxton 對齊驗證（xwOBA 0.384 完全 match）
+- Phase 4 整合：merge `85a6b0f` + hotfix `8cbe733`（`compute_recency_flags` 從 `savant_cache["current"]` 取，原本忘了 unwrap nested dict）
+- VPS cron 已加：`0 4 * * *`（TW 12:00 = UTC 04:00），早 fa_scan 30 分鐘
 
-Step 2 urgency 的 14d 因子依賴每日 rolling 數據，資料來源：
-- 目前：2026-04-04 to 04-17 一次性抓取（驗證用）
-- 正式：需實作 Step 5 持續抓取
-- 過渡期：fa_scan prompt 允許 14d 欄位缺值 → 該因子算 0，不影響其他因子
+### 14d 數據首日輸出（VPS smoke test 2026-04-20 13:15）
+
+| 球員 | Δ xwOBA | 旗標 |
+|------|---------|------|
+| **Buxton** | +0.072 | 🔥強回升（驗證 hold 判斷正確）|
+| Tovar | -0.006 | 持平 |
+| J.Walker | +0.007 | 持平（菁英持續）|
+| Langeliers | -0.008 | 持平 |
+| Machado | -0.044 | ❄️弱下滑 |
+| Walker | -0.049 | ❄️弱下滑 + ⚠️ HH% -10.9pp |
+| **Altuve** | **-0.102** | **❄️強下滑（強 sell-high 訊號）**|
+
+**Step 8 觀察期重點**：
+- 明日 fa_scan Pass 2 是否實際使用 14d 加分（看 GitHub Issue urgency breakdown）
+- 14d 旗標穩定性（會不會單日大幅跳動）
+- Altuve / Walker breakout 回歸是否進一步惡化（決定 sell-high 行動時機）
 
 ---
 
