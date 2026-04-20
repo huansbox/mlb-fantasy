@@ -39,6 +39,7 @@
 - 04-18：⚠️ 觸發確認第 6 天。BBE 37, xwOBA .459/BB% 12.7/Barrel% 21.6 全>P90 vs Albies 3/3。44% owned 急升窗口快速關閉，建議立即 FAAB claim（fa_scan）
 - 04-19：BBE 40(+3), xwOBA .446/BB% 11.9/Barrel% 20.0 全>P90 持續。觸發第 7 天，44% owned 窗口持續收窄（fa_scan）
 - 04-20：觸發第 8 天。Correa/Muncy 出現後降備案 #3（BBE/prior 信心均低於前兩者）。44% owned 持續收窄（fa_scan）
+- 04-20：[eval] vs Albies Sum 29 vs 9 Δ+20 3/3 全勝 but **位置衝突**：C 已有 Langeliers(Sum 27 菁英)。14d xwOBA .367 Δ-0.058 BBE 27 ≥25 ✅ → ⚠️ 近況下滑啟用。1 ✅ + 2 ⚠️ → **不 add**。作 Langeliers 備案待 Langeliers 掉下來才啟用
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
@@ -305,9 +306,10 @@
 - 04-01：加入陣容（取代 Littell）。2025 Savant P80-90（xERA 3.07 / HH% 29.8% / 121 BBE）。
 - 04-03：開季驗證中。觀察 Savant 品質是否持續 + CLE 是否有 innings limit 跡象。
 
-### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 隊上觀察（暫不交易/不 drop）
+### Ozzie Albies (ATL, 2B) [mlb_id:645277] — 隊上觀察 → **drop 候選**
 - 04-12：[eval] drop 優先序比較 vs Hicks。Savant 0/3 雙年確認弱，但 wRC+ 112 + 94% owned → 在 9/11 對手隊排 ≤8th，有交易價值。決定保留 Albies 繼續 shop，先 drop Hicks。BN 輪替：Albies / Jazz 擇一坐。若 Week 5（~04-20）未成交 → 重新評估 drop
 - 04-13：暫停交易試探，維持 batter 11 人配置不變動。觀察數據回歸/role 變化再議，不再設 deadline
+- 04-20：[eval] 新 Sum 框架下 Sum 9（全隊最弱），雙年確認（2025 Sum 14 <18 結構性弱），urgency 9（全隊最高）。2026 Trad .282/.799/4HR 高但 Savant xwOBA .278/Barrel 2.9 <P25 = **賣高窗口**。FA 已有 Muncy/Correa/Alvarez 3 位 ✅✅ 全勝 → **升級 drop 候選**。建議 FAAB Muncy $3-5 取代。Week 5 截止（週日 04-26）前執行
 
 ### Jazz Chisholm Jr. (NYY, 2B/3B) [mlb_id:665862] — 開季 slump（無傷）
 狀況：14G/60PA .150/.477 OPS, 0HR/0RBI/2SB/2BB（Week 3 數據）。2026 xwOBA .202 / BB% 5.0% / Barrel% 5.7% 全 <P25-P40，2025 (.346/10.9%/15.0% >P80) 全面下修。news check 無傷勢，本人解釋天氣冷影響。04-12 vs Rays 9 局擾跑失誤被坐板凳。
@@ -329,8 +331,9 @@
 ### Chad Patrick (MIL, SP) — 被搶（自動偵測）
 - 2026-04-20：Yahoo ownership_type=team，從觀察中移除。
 
-### Max Muncy (ATH, 2B,3B,SS) — 被搶（自動偵測）
+### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 被搶（自動偵測）
 - 2026-04-20：Yahoo ownership_type=team，從觀察中移除。
+- 04-20：[eval] session 評估過：vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅ + 0 ⚠️ → **立即取代**（建議 FAAB $3-5）。可惜 fa_scan 於 TW 15:15 snapshot 前已被別隊撿走（推測與 Chad Patrick 同時被某 GM 連環撿）。留下的教訓：51% owned 三日 +0 仍有急迫被搶風險，遇到雙年菁英候選應搶 claim 而非等待確認。mlb_id 修正 571970→691777（LAD 老 Muncy vs ATH 年輕）
 
 ### Austin Martin (MIN, 2B,LF,CF) — 被搶（自動偵測）
 - 2026-04-18：Yahoo ownership_type=team，從觀察中移除。
