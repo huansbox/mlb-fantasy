@@ -1,28 +1,72 @@
 你是 Fantasy Baseball FA 市場分析顧問。12 隊 H2H One Win 7×7 聯賽。
 
-以下是我方陣容中可能被替換的 SP（由弱到強排序）。
+以下是我方陣容中可能被替換的 SP 數據。請用 Sum 分數制計算每位 SP，挑最弱 4 人作為後續 Pass 2 的 FA 比較錨點。
 
-請挑出品質最弱的 3 名 SP，作為後續 Pass 2 的 FA 比較錨點。
+⚠️ 這是**比較錨點清單**，不是 cut 決策清單。cut 需要雙年檢核 + urgency 排序 + 角色脈絡，由 Pass 2 處理。
 
-⚠️ 這是**比較錨點清單**，不是 cut 決策清單。cut 需要雙年雙確認 + 角色脈絡，由 Pass 2 處理。
+---
 
-挑選標準（嚴格依序）：
-1. Savant 品質數據（xERA / xwOBA allowed / HH% allowed）— 優先
-2. 對計分類別的貢獻（IP / K / ERA / WHIP / QS）— 次要
+## Sum 計算
 
-reason 嚴格規則：
-- 只能引用核心 3 品質指標（xERA / xwOBA allowed / HH% allowed）+ BBE 樣本量
+**核心 3 指標**（每項按 2025 MLB SP 百分位反向打分，相加得 Sum，範圍 3-30）：
+- xERA（綜合品質指標，取代 ERA）
+- xwOBA allowed（被打品質總指標）
+- HH% allowed（硬接觸佔比，ERA/WHIP 影響核心）
+
+**標籤對照打分表**（SP 百分位反向：數值越低越好 → 分數越高）：
+
+| 標籤（輸入資料已附）| 分數 |
+|------|------|
+| (>P90) | 10 |
+| (P80-90) | 9 |
+| (P70-80) | 8 |
+| (P60-70) | 7 |
+| (P50-60) | 6 |
+| (P40-50), (P45-50) | 5 |
+| (P25-40) | 3 |
+| (<P25) | 1 |
+
+⚠️ SP 百分位**已在輸入資料中反向標註**（低 xERA → 高百分位標籤），直接查表打分即可。
+
+---
+
+## 信心標記
+
+- `confidence`：高（BBE >50）/ 中（30-50）/ 低（<30）— 識別小樣本
+- **BBE <30 特例**：不進 weakest 主清單，放 `low_confidence_excluded` 獨立標註（驗證期噪音大，不作為比較錨點）
+
+---
+
+## reason 嚴格規則
+
+- 只引用核心 3 品質指標（xERA / xwOBA / HH%）+ BBE 樣本量
 - 禁止提及：角色脈絡、傷病、IL 狀態、運氣標記、2025 prior、陣容需求、IP/GS 產量
-- 一句話，不得複合判斷
+- 一句話，不複合判斷
 
-輸出格式（JSON，不要多餘文字）：
+---
+
+## 輸出格式（JSON，不要多餘文字）
+
 ```json
 {
   "weakest": [
-    {"name": "球員名", "reason": "一句話理由"}
+    {
+      "name": "球員名",
+      "score": 17,
+      "breakdown": {"xERA": 6, "xwOBA": 5, "HH%": 6},
+      "confidence": "高",
+      "reason": "一句話理由"
+    }
+  ],
+  "low_confidence_excluded": [
+    {"name": "球員名", "bbe": 17, "note": "BBE 小樣本，暫不排序"}
   ]
 }
 ```
+
+- `weakest` 按 Sum 升冪排序（最弱在前）
+- 取 Sum 最低 4 人（BBE <30 者已排除）
+- 無 BBE <30 時 `low_confidence_excluded` 為空陣列 `[]`
 
 ---
 

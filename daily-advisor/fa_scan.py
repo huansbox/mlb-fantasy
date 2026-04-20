@@ -857,6 +857,12 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type,
             gs = int(mlb_stats.get("gamesStarted", 0))
             ip_per_gs = round(ip / gs, 1) if gs > 0 else None
         d["ip_per_gs"] = ip_per_gs
+        # IP/Team_G for Phase 3 urgency factor (active 輪值 vs stash)
+        if year == 2026:
+            tg = team_games.get(team, 0)
+            d["ip_per_tg"] = round(ip / tg, 2) if tg > 0 else None
+        else:
+            d["ip_per_tg"] = round(ip / FULL_SEASON_GAMES, 2) if ip > 0 else None
     else:
         k = int(mlb_stats.get("strikeOuts", 0))
         d["k_per_9"] = round(k * 9 / ip, 2) if ip > 0 else None
@@ -1314,10 +1320,17 @@ def _format_fa_pitcher(p):
 
     # Volume
     if fa_type == "sp":
+        vol = []
         ipgs = d26.get("ip_per_gs")
         if ipgs is not None:
             tier = " [深投]" if ipgs > 5.7 else (" [短局]" if ipgs < 5.3 else "")
-            lines.append(f"    產量: IP/GS {ipgs:.1f}{tier}")
+            vol.append(f"IP/GS {ipgs:.1f}{tier}")
+        iptg = d26.get("ip_per_tg")
+        if iptg is not None:
+            role = " [主力]" if iptg >= 1.0 else (" [stash]" if iptg < 0.5 else " [半 active]")
+            vol.append(f"IP/TG {iptg:.2f}{role}")
+        if vol:
+            lines.append(f"    產量: {' | '.join(vol)}")
     else:
         vol = []
         if d26.get("k_per_9") is not None:
@@ -1810,13 +1823,14 @@ def _fallback_weakest(config, savant_2026, group_type):
 
 def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
                       watch_candidates, changes, ref_1d, ref_3d, config,
-                      fa_rolling=None):
+                      fa_rolling=None, pass1_low_conf=None):
     """Build data string for Pass 2 Claude prompt.
 
     Args:
         pass1_weakest: list of {name, reason} from Pass 1 Claude output
         savant_2026: Savant CSV data for 2026 Savant lookup
         fa_rolling: dict[mlb_id_str, dict] of 14d data for FA/watch (batter only)
+        pass1_low_conf: list of {name, bbe, note} — BBE <30 excluded (SP only)
     """
     lines = []
 
@@ -1834,6 +1848,9 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
     # 14d rolling data (batter only, loaded once)
     rolling = _load_savant_rolling() if group_type == "batter" else {}
 
+    # SP-only: fetch team_games once for IP/Team_G computation
+    standings = _fetch_team_games() if group_type == "sp" else {}
+
     for w in pass1_weakest:
         name = w["name"]
         reason = w.get("reason", "")
@@ -1843,8 +1860,8 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
 
         parts = [f"  {name}({p['team']})"]
 
-        # Pass 1 Sum (new schema: score + breakdown)
-        if group_type == "batter" and w.get("score") is not None:
+        # Pass 1 Sum (new schema: score + breakdown) — batter + SP
+        if w.get("score") is not None:
             bd = w.get("breakdown") or {}
             bd_str = " / ".join(f"{k}:{v}" for k, v in bd.items()) if bd else ""
             parts.append(f"[Pass1 Sum {w['score']}{' (' + bd_str + ')' if bd_str else ''}]")
@@ -1871,6 +1888,29 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
                     if s26.get("hh_pct"):
                         parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', 'pitcher')}")
                 parts.append(f"BBE {s26.get('bbe', 0)}")
+
+        # SP-only: IP/GS + IP/Team_G for urgency (Phase 3 SP framework v2)
+        if group_type == "sp" and mlb_id:
+            ms26 = fetch_mlb_season_stats(mlb_id, 2026, "pitching") or {}
+            if ms26:
+                team = p.get("team", "")
+                d = _compute_derived_pitcher(
+                    _extract_savant_by_id(mlb_id, "sp", savant_2026),
+                    ms26, standings, team, 2026, "sp", mlb_id=mlb_id,
+                )
+                vol = []
+                if d.get("ip_per_gs") is not None:
+                    ipgs = d["ip_per_gs"]
+                    tier = " [深投]" if ipgs > 5.7 else (" [短局]" if ipgs < 5.3 else "")
+                    vol.append(f"IP/GS {ipgs:.1f}{tier}")
+                if d.get("ip_per_tg") is not None:
+                    iptg = d["ip_per_tg"]
+                    role = " [主力]" if iptg >= 1.0 else (" [stash]" if iptg < 0.5 else " [半 active]")
+                    vol.append(f"IP/TG {iptg:.2f}{role}")
+                if d.get("era_diff") is not None:
+                    vol.append(f"運氣 {d['era_diff']:+.2f}")
+                if vol:
+                    parts.append("產量: " + " | ".join(vol))
 
         # 14d rolling data — only if batter + BBE ≥ 25
         if group_type == "batter":
@@ -1899,6 +1939,12 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
             parts.append(f"[Pass 1: {reason}]")
 
         lines.append(" | ".join(parts))
+
+    # Pass 1 low confidence excluded (SP only)
+    if group_type == "sp" and pass1_low_conf:
+        lines.append(f"\n--- Pass 1 低信心排除 (BBE <30，不納入 urgency) ---")
+        for lc in pass1_low_conf:
+            lines.append(f"  {lc.get('name', '?')} — BBE {lc.get('bbe', '?')} {lc.get('note', '')}")
 
     # FA candidates
     fa_label = f"FA {label}候選"
@@ -2067,12 +2113,14 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
 
         # Parse Pass 1 output (JSON)
         pass1_weakest = []  # list of {name, reason}
+        pass1_low_conf = []  # list of {name, bbe, note} — SP BBE <30 excluded
         try:
             json_str = pass1_result
             if "```" in json_str:
                 json_str = json_str.split("```json")[-1].split("```")[0] if "```json" in json_str else json_str.split("```")[1].split("```")[0]
             pass1_json = json.loads(json_str.strip())
             pass1_weakest = pass1_json.get("weakest", [])
+            pass1_low_conf = pass1_json.get("low_confidence_excluded", [])
             weakest_names = [w["name"] for w in pass1_weakest]
         except (json.JSONDecodeError, KeyError, IndexError):
             print(f"  Pass 1 ({label}): JSON parse failed, using code fallback", file=sys.stderr)
@@ -2097,6 +2145,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         data = _build_pass2_data(
             group_type, pass1_weakest, savant_2026, fa_candidates, watch_candidates,
             changes, ref_1d, ref_3d, config, fa_rolling=fa_rolling,
+            pass1_low_conf=pass1_low_conf,
         )
         advice = _call_claude(prompt_path, data)
 
