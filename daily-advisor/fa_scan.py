@@ -2293,16 +2293,18 @@ def _run_daily_scan(access_token, config, today_str, env, args):
         p["d3"] = c.get("d3")
 
     # ── Process Batter ──
-    _process_group(
-        "batter", config, savant_2026, enriched, watch_enriched,
-        changes, ref_1d, ref_3d, today_str, env, args,
-    )
+    if not args.sp_only:
+        _process_group(
+            "batter", config, savant_2026, enriched, watch_enriched,
+            changes, ref_1d, ref_3d, today_str, env, args,
+        )
 
     # ── Process SP ──
-    _process_group(
-        "sp", config, savant_2026, enriched, watch_enriched,
-        changes, ref_1d, ref_3d, today_str, env, args,
-    )
+    if not args.batter_only:
+        _process_group(
+            "sp", config, savant_2026, enriched, watch_enriched,
+            changes, ref_1d, ref_3d, today_str, env, args,
+        )
 
 
 # ── Main ──
@@ -2315,6 +2317,8 @@ def main():
     parser.add_argument("--cleanup", action="store_true", help="Clean rostered watchlist players")
     parser.add_argument("--dry-run", action="store_true", help="Layer 1+2 only, skip Claude")
     parser.add_argument("--no-send", action="store_true", help="Skip Telegram + GitHub Issue")
+    parser.add_argument("--sp-only", action="store_true", help="Skip batter group (SP smoke test)")
+    parser.add_argument("--batter-only", action="store_true", help="Skip SP group")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
     args = parser.parse_args()
 
