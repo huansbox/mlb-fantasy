@@ -189,7 +189,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 | P25-40 | 3 |
 | <P25 | 1 |
 
-Sum 範圍 3-30。警示：任一指標 <P25 標「短板」，BBE <40 標「低信心」。
+Sum 範圍 3-30。BBE <40 標 confidence='低'（識別小樣本，不影響 Sum）。
 
 #### Step 2 — urgency 排序（最弱 4 人內部）
 
