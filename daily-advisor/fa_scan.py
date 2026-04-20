@@ -967,6 +967,8 @@ def build_roster_for_pass1(config, savant_2026, player_type="batter"):
         if player_type == "batter":
             if s.get("xwoba"):
                 parts.append(f"xwOBA {s['xwoba']:.3f} {pctile_tag(s['xwoba'], 'xwoba')}")
+            if s.get("bb_pct") is not None:
+                parts.append(f"BB% {s['bb_pct']:.1f}% {pctile_tag(s['bb_pct'], 'bb_pct')}")
             if s.get("barrel_pct"):
                 parts.append(f"Barrel% {s['barrel_pct']:.1f}% {pctile_tag(s['barrel_pct'], 'barrel_pct')}")
             if s.get("hh_pct"):
