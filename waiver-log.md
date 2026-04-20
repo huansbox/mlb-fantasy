@@ -38,6 +38,7 @@
 - 04-17：⚠️ 觸發確認第 4 天！BBE 37>25, xwOBA .459>P80, Barrel% 21.6%>P70。vs Albies 3/3 全勝。44% owned 三日+7 急升窗口快速關閉，建議立即 FAAB claim 取代 Albies（fa_scan）
 - 04-18：⚠️ 觸發確認第 6 天。BBE 37, xwOBA .459/BB% 12.7/Barrel% 21.6 全>P90 vs Albies 3/3。44% owned 急升窗口快速關閉，建議立即 FAAB claim（fa_scan）
 - 04-19：BBE 40(+3), xwOBA .446/BB% 11.9/Barrel% 20.0 全>P90 持續。觸發第 7 天，44% owned 窗口持續收窄（fa_scan）
+- 04-20：觸發第 8 天。Correa/Muncy 出現後降備案 #3（BBE/prior 信心均低於前兩者）。44% owned 持續收窄（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
@@ -127,6 +128,7 @@
 - 04-16：BBE 38→50 仍遠，xwOBA .309(P60)/Barrel% 9.8(P60)。2025 弱 breakout 待驗。0% owned（fa_scan）
 - 04-17：BBE 44→50 差 2-3 場，xwOBA .298(P50)/Barrel% 9.1(P60)。2025 弱 breakout 待驗。0% owned（fa_scan）
 - 04-19：BBE 52>觸發 50 已達但 xwOBA .280(P25-40) 未達「2 項核心>P70」。僅 Barrel% 7.7(P45) 邊緣，觸發未達成。0% owned（fa_scan）
+- 04-20：⚠️ 觸發失敗建議結案：BBE 52>50 但 xwOBA .280(P25-40)/Barrel% 7.7(P45) 均未達 P70，2025 同低(.284/4.3%) 結構未改善（fa_scan）
 
 ### Evan Carter (TEX, LF,CF,RF) [mlb_id:694497] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
@@ -138,6 +140,7 @@
 - 04-17：BBE 36→40 差 2-3 場，BB% 16.9>P90/xwOBA .367>P90 持續上修。0% owned（fa_scan）
 - 04-18：✅ BBE 39→40 觸發僅差 1！BB% 15.9/xwOBA .360 >P90 持續穩定。0% owned 安全（fa_scan）
 - 04-19：✅ 觸發達成！BBE 43>40, BB% 17.3>P80, xwOBA .344>P70，3/3 勝 Albies。Alvarez/Correa 備案，0% owned 安全（fa_scan）
+- 04-20：觸發達成穩定（BBE 45, 3/3 勝 Albies），BB% breakout 未經雙年確認降為觀察。Correa/Muncy/Alvarez 後備案 #4。0% owned 安全（fa_scan）
 
 ### Tobias Myers (NYM, SP,RP) [mlb_id:668964] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -191,6 +194,7 @@
 - 04-16：BBE 30→35 差 1-2 場，Barrel% 16.7>P90。2025 Barrel% 6.7→16.7 跳升待驗。0% owned（fa_scan）
 - 04-17：BBE 30→35 差 1-2 場，Barrel% 16.7>P90。2025 Barrel% 6.7→16.7 跳升待驗。0% owned（fa_scan）
 - 04-19：BBE 32→觸發 35 差 1-2 場，Barrel% 15.6>P90 跳升待驗。13% owned 三日+4（fa_scan）
+- 04-20：BBE 33→觸發 35 差 1-2 場。❌ 15% owned 三日+6 急升窗口收窄，Barrel% 15.6>P90 跳升待驗（2025 僅 6.7%）（fa_scan）
 
 ### Cade Povich (BAL, SP) [mlb_id:700249] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.303 維持 → vs Nola
@@ -269,6 +273,11 @@
 ### Carlos Correa (HOU, 3B,SS) [mlb_id:621043] — 觀察中
 觸發：立即行動
 - 04-19：xwOBA .361(>P90)/BB% 12.2(>P90)/Barrel% 10.3(P70) BBE 58 高信心，2025 雙年確認（.338/425 BBE）。63% owned drop 失誤，3/3 勝 Albies（fa_scan）
+- 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
+
+### Max Muncy (ATH, 2B,3B,SS) [mlb_id:571970] — 觀察中
+觸發：立即行動
+- 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
 
 ## 隊上觀察
 
