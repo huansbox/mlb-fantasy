@@ -2045,6 +2045,19 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         fa_candidates = [p for p in enriched if p["fa_type"] == group_type]
         watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
 
+        # Layer 1.5: pure RP filter (剔除 Yahoo SP,RP 雙資格但 2026 GS=0 的純 RP)
+        if group_type == "sp":
+            def _is_real_sp(p):
+                mlb = p.get("mlb_2026") or {}
+                return int(mlb.get("gamesStarted", 0) or 0) > 0
+            before = len(fa_candidates) + len(watch_candidates)
+            fa_candidates = [p for p in fa_candidates if _is_real_sp(p)]
+            watch_candidates = [p for p in watch_candidates if _is_real_sp(p)]
+            removed = before - len(fa_candidates) - len(watch_candidates)
+            if removed:
+                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (2026 GS=0)",
+                      file=sys.stderr)
+
         # Pass 1: pick weakest from roster
         print(f"  Pass 1 ({label}): picking weakest...", file=sys.stderr)
         roster_data = build_roster_for_pass1(config, savant_2026, player_type=group_type)
