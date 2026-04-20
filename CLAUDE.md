@@ -465,6 +465,10 @@ waiver-log.md（球員追蹤唯一來源）
 
 ## 待辦
 
+- [ ] **waiver-log auto-close mlb_id 驗證**（2026-04-20 發現）：roster_sync / fa_scan snapshot cron 用 waiver-log 條目的 `mlb_id` 查 Yahoo ownership → ownership_type=team 則自動移到已結案。但若條目 mlb_id 錯（如同名同姓不同人，Max Muncy LAD 571970 vs ATH 691777），會查到錯誤球員的 ownership 導致誤判
+  - 實例：commit `afbe6ca` 誤把 ATH Muncy 標為已結案（當時條目還是 571970 LAD 老 Muncy 被 rostered），`d08b1db` 人工修復
+  - 修法：auto-close 前交叉驗證 `mlb_id → player` 的 `name + team` 是否匹配 waiver-log 條目文字，不一致應警示而非直接移除
+  - 進階：waiver-log 新增條目時自動走一次 `search_mlb_id(name, team)` 確認 ID 正確
 - [ ] **fa_scan SP 池濾掉純 RP（Pass 1 階段）**：Yahoo eligibility「SP,RP」但 2026 GS=0 的球員會被誤收進 SP 候選（Winn/Alexander/Brazobán/Myers/Ben Brown/Scholtens/Dreyer/Teng/Senzatela/Dollander 等）。短局 RP 面對少量打者時 xERA/xwOBA 天然膨脹，與 SP 6 IP vs 25 打者指標不可比，造成 Pass 2 分析偏差
   - 修法：Layer 1 篩 SP 時加 filter `2026 GS > 0`，或更嚴格 `GS/G ≥ 0.5`
   - 目前 Pass 2 data 是靠「缺『產量: IP/GS』行」隱含標示 RP，訊號太隱晦易讀錯
