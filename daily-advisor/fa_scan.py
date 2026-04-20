@@ -1745,6 +1745,12 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
 
         parts = [f"  {name}({p['team']})"]
 
+        # Pass 1 Sum (new schema: score + breakdown)
+        if group_type == "batter" and w.get("score") is not None:
+            bd = w.get("breakdown") or {}
+            bd_str = " / ".join(f"{k}:{v}" for k, v in bd.items()) if bd else ""
+            parts.append(f"[Pass1 Sum {w['score']}{' (' + bd_str + ')' if bd_str else ''}]")
+
         # 2026 Savant data
         mlb_id = p.get("mlb_id")
         if mlb_id:
@@ -1753,6 +1759,8 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
                 if group_type == "batter":
                     if s26.get("xwoba"):
                         parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba')}")
+                    if s26.get("bb_pct") is not None:
+                        parts.append(f"BB% {s26['bb_pct']:.1f}% {pctile_tag(s26['bb_pct'], 'bb_pct')}")
                     if s26.get("barrel_pct"):
                         parts.append(f"Barrel% {s26['barrel_pct']:.1f}% {pctile_tag(s26['barrel_pct'], 'barrel_pct')}")
                     if s26.get("hh_pct"):
