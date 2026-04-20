@@ -1173,8 +1173,9 @@ def analyze(config, target_date, env=None, morning=False):
                 lines.append(f"    Statcast: {savant_line}")
 
             # 14d recency flags (third line, only if signal)
+            # savant_cache[pid] is {"current": {...}, "prior": {...}}; take current
             r14 = rolling_14d.get(str(mlb_id)) if mlb_id else None
-            season_s = savant_cache.get(mlb_id)
+            season_s = (savant_cache.get(mlb_id) or {}).get("current")
             recency = compute_recency_flags(r14, season_s)
             if recency:
                 lines.append(f"    {recency['line']}")
