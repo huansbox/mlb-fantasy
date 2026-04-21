@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -41,6 +42,9 @@ import fa_compute
 
 SUMMARY_FILE = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
 FULL_SEASON_GAMES = 162
+
+# Guards concurrent waiver-log git operations when batter + SP run in parallel.
+_WAIVER_LOG_LOCK = threading.Lock()
 
 
 # ── FA snapshot + %owned history (absorbed from fa_watch.py) ──
@@ -1668,8 +1672,18 @@ def _update_waiver_log(advice, today_str, env=None):
     Expects ```waiver-log ... ``` block in advice with lines:
       NEW|name|team|position|mlb_id|trigger|summary
       UPDATE|name|summary
+
+    Thread-safe: _WAIVER_LOG_LOCK serializes git pull/commit/push so that
+    parallel batter + SP scans don't race on the working tree.
     """
-    # Extract waiver-log block
+    if "```waiver-log" not in advice:
+        return
+    with _WAIVER_LOG_LOCK:
+        _update_waiver_log_locked(advice, today_str, env)
+
+
+def _update_waiver_log_locked(advice, today_str, env=None):
+    """Actual waiver-log update logic (called inside _WAIVER_LOG_LOCK)."""
     if "```waiver-log" not in advice:
         return
     try:
@@ -1766,12 +1780,24 @@ def _update_waiver_log(advice, today_str, env=None):
         print(f"  waiver-log git commit failed: {e}", file=sys.stderr)
         return
 
+    # Push to the current branch (not hard-coded master) — VPS may run on a
+    # feature branch during development; pushing to master would fail with
+    # non-fast-forward and drop waiver-log updates.
     try:
-        subprocess.run(["git", "push", "origin", "master"],
-                       cwd=repo_root, check=True, timeout=30)
-        print("  waiver-log: git push OK", file=sys.stderr)
+        branch_result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=repo_root, capture_output=True, text=True, check=True, timeout=5,
+        )
+        current_branch = branch_result.stdout.strip() or "master"
     except subprocess.CalledProcessError:
-        msg = "[fa_scan] waiver-log git push failed."
+        current_branch = "master"
+
+    try:
+        subprocess.run(["git", "push", "origin", current_branch],
+                       cwd=repo_root, check=True, timeout=30)
+        print(f"  waiver-log: git push OK ({current_branch})", file=sys.stderr)
+    except subprocess.CalledProcessError:
+        msg = f"[fa_scan] waiver-log git push failed ({current_branch})."
         print(f"  {msg}", file=sys.stderr)
         if env:
             send_telegram(msg, env)
@@ -2692,19 +2718,44 @@ def _run_daily_scan(access_token, config, today_str, env, args):
         p["d1"] = c.get("d1")
         p["d3"] = c.get("d3")
 
-    # ── Process Batter ──
-    if not args.sp_only:
-        _process_group(
-            "batter", config, savant_2026, enriched, watch_enriched,
-            changes, ref_1d, ref_3d, today_str, env, args,
-        )
+    # ── Process Batter + SP in parallel ──
+    # Both groups share read-only snapshot data (savant_2026, enriched,
+    # watch_enriched); _process_group filters by fa_type so there is no write
+    # contention on those structures. Claude subprocess + MLB API are IO-bound
+    # so threading (no GIL blocking) halves wall-clock time.
+    #
+    # Waiver-log git operations are serialized inside _update_waiver_log via
+    # _WAIVER_LOG_LOCK to avoid working-tree race conditions.
+    threads = []
+    errors = []
+    error_lock = threading.Lock()
 
-    # ── Process SP ──
+    def _run_group_thread(group_type):
+        try:
+            _process_group(
+                group_type, config, savant_2026, enriched, watch_enriched,
+                changes, ref_1d, ref_3d, today_str, env, args,
+            )
+        except Exception as e:
+            with error_lock:
+                errors.append((group_type, e))
+
+    if not args.sp_only:
+        threads.append(threading.Thread(
+            target=_run_group_thread, args=("batter",), name="fa_scan-batter",
+        ))
     if not args.batter_only:
-        _process_group(
-            "sp", config, savant_2026, enriched, watch_enriched,
-            changes, ref_1d, ref_3d, today_str, env, args,
-        )
+        threads.append(threading.Thread(
+            target=_run_group_thread, args=("sp",), name="fa_scan-sp",
+        ))
+
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    for group_type, err in errors:
+        _handle_error(f"{group_type} scan", err, env, args)
 
 
 # ── Main ──
