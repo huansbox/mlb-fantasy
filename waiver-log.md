@@ -40,6 +40,7 @@
 - 04-19：BBE 40(+3), xwOBA .446/BB% 11.9/Barrel% 20.0 全>P90 持續。觸發第 7 天，44% owned 窗口持續收窄（fa_scan）
 - 04-20：觸發第 8 天。Correa/Muncy 出現後降備案 #3（BBE/prior 信心均低於前兩者）。44% owned 持續收窄（fa_scan）
 - 04-20：[eval] vs Albies Sum 29 vs 9 Δ+20 3/3 全勝 but **位置衝突**：C 已有 Langeliers(Sum 27 菁英)。14d xwOBA .367 Δ-0.058 BBE 27 ≥25 ✅ → ⚠️ 近況下滑啟用。1 ✅ + 2 ⚠️ → **不 add**。作 Langeliers 備案待 Langeliers 掉下來才啟用
+- 04-21：BBE 44, 14d xwOBA .357 Δ-0.062近況下滑。位置衝突(C有Langeliers)確認為備案, 不主動add（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
 觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
@@ -54,6 +55,7 @@
 - 04-16：BBE 0 連續無數據。31% owned 三日+5 持續升需確認大聯盟狀態（fa_scan）
 - 04-17：BBE 0 連續無數據。34% owned 三日+3 持續升。需確認大聯盟狀態（fa_scan）
 - 04-19：BBE 0 連續無數據。⚠️ 37% owned 三日+5 加速升，窗口快速關閉（fa_scan）
+- 04-21：BBE 0連續2週無數據, ⚠️ 37% owned 3d+5窗口關閉中。需確認MLB狀態, 持續無數據→結案（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
@@ -82,6 +84,7 @@
 - 04-17：BBE 32→觸發 30 已達成但 xwOBA .296(P45-50) 未達「2 項核心>P70」門檻（僅 Barrel% 達標），觸發半達成維持觀察。0% owned（fa_scan）
 - 04-18：⚠️ xwOBA .282(P25-40) 持續惡化，BBE 37>30 但僅 Barrel% 1/3 達 P70，觸發半達成（fa_scan）
 - 04-19：⚠️ xwOBA .284(P25-40) 持續惡化，BBE 37>30 但僅 Barrel% 1/3 達 P70，觸發半達成（fa_scan）
+- 04-21：⚠️ xwOBA .284(P25-40)持續惡化, BBE 39>30觸發已達但僅Barrel% 1/3達P70, 觸發半達成品質不足（fa_scan）
 
 ### Miguel Vargas (CWS, 1B,3B) [mlb_id:678246] — 觀察中
 觸發：BBE 達 35 且 BB% 維持 >P80 + xwOBA >P60 → vs Albies/Butler
@@ -130,6 +133,7 @@
 - 04-17：BBE 44→50 差 2-3 場，xwOBA .298(P50)/Barrel% 9.1(P60)。2025 弱 breakout 待驗。0% owned（fa_scan）
 - 04-19：BBE 52>觸發 50 已達但 xwOBA .280(P25-40) 未達「2 項核心>P70」。僅 Barrel% 7.7(P45) 邊緣，觸發未達成。0% owned（fa_scan）
 - 04-20：⚠️ 觸發失敗建議結案：BBE 52>50 但 xwOBA .280(P25-40)/Barrel% 7.7(P45) 均未達 P70，2025 同低(.284/4.3%) 結構未改善（fa_scan）
+- 04-21：⚠️ 觸發失敗建議結案：BBE 56>50但xwOBA .280/Barrel% 7.7均未達P70, 2025同低結構未改善（fa_scan）
 
 ### Evan Carter (TEX, LF,CF,RF) [mlb_id:694497] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
@@ -164,6 +168,7 @@
 - 04-17：BBE 28→35 差 3-4 場，三項>P70 雙年確認。COL 主場加成，0% owned（fa_scan）
 - 04-19：BBE 33→觸發 35 差 1-2 場，三項>P70 雙年確認。0% owned（fa_scan）
 - 04-21：✅ BBE 33距觸發35差1-2場，三項>P70雙年確認穩定。0% owned（fa_scan）
+- 04-21：✅ 觸發達成！BBE 39>35, 三項>P70 雙年確認, 升級為「取代」。xwOBA .376/BB% 12.9/Barrel% 10.3, 0% owned（fa_scan）
 
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 觀察中
 觸發：BBE 達 40 且 Barrel% 維持 >P70 + xwOBA >P80 → vs Buxton/Albies
@@ -174,6 +179,7 @@
 - 04-17：BBE 35→40 差 2-3 場，三項>P90。2025 Barrel% 6.3% 未確認。⚠️ 18% owned 三日+7 升幅大需留意（fa_scan）
 - 04-19：BBE 39→觸發 40 差 1 場，三項>P90 持續。19% owned 三日+1（fa_scan）
 - 04-21：✅ BBE 39距觸發40差1場！三項>P90持續。19% owned 三日+1（fa_scan）
+- 04-21：✅ 觸發達成！BBE 44>40, 三項>P90 持續, 升級為「取代」。14d Δ+0.044🔥。C位置卡位問題。0% owned（fa_scan）
 
 ### Erick Fedde (CWS, SP,RP) [mlb_id:607200] — 觀察中
 觸發：BBE 達 70 且 xERA <3.74 + xwOBA <.301 維持 → vs Nola
@@ -185,6 +191,7 @@
 - 04-19：BBE 47→70 差 5-6 場，xERA 3.03/xwOBA .281 P80-90 穩定。%owned 4% 三日+3（fa_scan）
 - 04-20：✅ BBE 60 距觸發 70 差 10，即將觸發。xERA 3.03/xwOBA .281 P80-90 穩定，%owned 4% 三日+3 升（fa_scan）
 - 04-21：✅ BBE 60 距觸發 70 差 10 即將觸發。xERA 3.03/xwOBA .281 P80-90 穩定，%owned 4% 三日+3 升（fa_scan）
+- 04-21：BBE 60→觸發70差10即將觸發, xERA 3.03/xwOBA .281 P80-90穩定。%owned 4% 3d+3升（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
@@ -203,6 +210,7 @@
 - 04-19：BBE 32→觸發 35 差 1-2 場，Barrel% 15.6>P90 跳升待驗。13% owned 三日+4（fa_scan）
 - 04-20：BBE 33→觸發 35 差 1-2 場。❌ 15% owned 三日+6 急升窗口收窄，Barrel% 15.6>P90 跳升待驗（2025 僅 6.7%）（fa_scan）
 - 04-21：❌ 15% owned 三日+6急升窗口收窄。BBE 33距觸發35差1-2場，Barrel% 15.6>P90跳升待驗（fa_scan）
+- 04-21：❌ 17% owned 3d+7急升窗口收窄。BBE 35→觸發差1-2場, Barrel% 14.3>P90, 14d Δ+0.069🔥強回升（fa_scan）
 
 ### Cade Povich (BAL, SP) [mlb_id:700249] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.303 維持 → vs Nola
@@ -232,6 +240,7 @@
 - 04-19：⚠️ 品質惡化：xERA 2.83→3.46、xwOBA .270→.299 超過觸發門檻 .289，趨勢向下（fa_scan）
 - 04-20：⚠️ 品質惡化：xERA 2.83→3.46、xwOBA .270→.299 超觸發門檻 .289，趨勢向下（fa_scan）
 - 04-21：⚠️ 品質惡化持續：xwOBA .299>觸發.289、xERA 3.46 接近門檻3.50。IP/GS 2.0極短局。下次xERA>3.50→結案（fa_scan）
+- 04-21：⚠️ xwOBA .299超觸發門檻.289, xERA 3.46上升, 品質趨勢向下（fa_scan）
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
@@ -242,6 +251,7 @@
 - 04-19：⚠️ 品質惡化：xERA 3.84→4.12 超觸發 3.74、HH% 30.2→39.3% 超觸發 36.4%，兩項同時失守（fa_scan）
 - 04-20：⚠️ 品質崩盤：xERA 4.12 超觸發 3.74 + HH% 39.3% 超觸發 36.4% 兩項同時失守，建議結案移除（fa_scan）
 - 04-21：⚠️ 品質崩盤確認：xERA 4.12+HH% 39.3% 兩項同時破觸發門檻，建議結案移除（fa_scan）
+- 04-21：⚠️ 品質崩盤建議結案：xERA 4.12超觸發3.74 + HH% 39.3%超觸發36.4%雙項同時失守（fa_scan）
 
 ### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
@@ -251,6 +261,7 @@
 - 04-19：⚠️ 品質惡化：xERA 3.66→3.95 超過觸發 3.74，IP/GS 4.4 仍未回升至 5.0（fa_scan）
 - 04-20：⚠️ 品質惡化：xERA 3.95 超觸發 3.74，IP/GS 4.4 仍未回升。觸發邊緣惡化中（fa_scan）
 - 04-21：⚠️ 品質惡化持續：xERA 3.95>觸發3.74、IP/GS 4.4未回升至5.0。雙條件均未達且趨勢向下（fa_scan）
+- 04-21：⚠️ xERA 3.95超觸發3.74持續惡化, IP/GS 4.4未回升。邊緣惡化中（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：BBE 達 45 且 2 項核心維持 >P70 → vs Albies（Alvarez 備案）
@@ -258,6 +269,7 @@
 - 04-17：BBE 37→45 差 3-4 場，xwOBA .426/BB% 18.2/Barrel% 13.5 全>P80 雙年確認。Alvarez 備案角色。5% owned（fa_scan）
 - 04-19：BBE 41→觸發 45 差 2 場，三項>P80 雙年確認。6% owned（fa_scan）
 - 04-21：BBE 41→45差4場，三項>P80雙年確認。Alvarez備案角色。6% owned（fa_scan）
+- 04-21：BBE 43→觸發45差2場, xwOBA .409/BB% 15.6/Barrel% 14.0 三項>P80 雙年確認。7% owned 3d+2（fa_scan）
 
 ### Dominic Smith (ATL, 1B) [mlb_id:642086] — 觀察中
 觸發：BBE 達 50 且 xwOBA 維持 >P70 + BB% 回升 >P40 → vs Albies
@@ -285,17 +297,20 @@
 - 04-19：BBE 38→60 差 5-6 場，xERA 2.86/xwOBA .273 >P90 穩定（fa_scan）
 - 04-20：BBE 46→60 差 3-4 場，xERA 2.97/xwOBA .278 >P90 穩定。%owned 4% 三日+3 升（fa_scan）
 - 04-21：BBE 46(+8)距觸發60差14，xERA 2.97/xwOBA .278 >P90穩定。%owned 4% 三日+3升（fa_scan）
+- 04-21：BBE 46→60差3-4場加速, xERA 2.97/xwOBA .278 >P90穩定。%owned 4% 3d+3升（fa_scan）
 
 ### Carlos Correa (HOU, 3B,SS) [mlb_id:621043] — 觀察中
 觸發：立即行動
 - 04-19：xwOBA .361(>P90)/BB% 12.2(>P90)/Barrel% 10.3(P70) BBE 58 高信心，2025 雙年確認（.338/425 BBE）。63% owned drop 失誤，3/3 勝 Albies（fa_scan）
 - 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
+- 04-21：觸發第2天。14d xwOBA .320 Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心, 維持優先序#1。0% owned安全（fa_scan）
 
 ### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
 觸發：立即行動
 - 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
 - 04-20：[eval] vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅ (雙年菁英 + 球隊主力) + 0 ⚠️ → **立即取代**。14d xwOBA .323 Δ-0.083 雖 ❄️ 但 BBE 21<25 不啟用。建議 FAAB $3-5 取代 Albies。fallback Correa $1。mlb_id 修正 571970→691777（LAD 老 Muncy vs ATH 年輕）
 - 04-20：⚠️ **cron 誤判被搶**（commit `afbe6ca`）— 當時 waiver-log 條目還是舊 mlb_id 571970（LAD 老 Muncy），cron 查 571970 的 ownership 為 rostered → 誤把 ATH Muncy 標為已結案。實際 ATH Muncy (691777) 仍 50% owned 可撿。已恢復觀察中
+- 04-21：機械報告2025 prior使用錯誤mlb_id(LAD #571970→.267), 正確ATH #691777(.374), waiver-log eval結論不受影響維持立即行動。49% owned窗口有限（fa_scan）
 
 ### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
@@ -310,6 +325,30 @@
 ### Walbert Ureña (LAA, SP) [mlb_id:700712] — 觀察中
 觸發：BBE 達 30 且三項維持 >P70 → 重新評估升級
 - 04-21：Sum 30(>P90全線) BBE 24 樣本小否決升級，IP/GS 6.0 深投型，1% owned 無壓力（fa_scan）
+
+### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
+觸發：立即行動
+- 04-21：Sum 25 vs Albies 9 Δ+16, xwOBA .364/BB% 17.6/Barrel% 7.0, 2025 弱(.258) breakout 待驗, 14d Δ+0.039🔥, BBE 43（fa_scan）
+
+### Oswald Peraza (LAA, 1B,2B,3B,SS) [mlb_id:672724] — 觀察中
+觸發：立即行動
+- 04-21：Sum 23 vs Albies 9 Δ+14, 14d Δ+0.075🔥強回升, 16% owned 3d+9 窗口收窄, 2025 弱 breakout 待驗（fa_scan）
+
+### Amed Rosario (NYY, 2B,3B) [mlb_id:642708] — 觀察中
+觸發：立即行動 — ⚠️ BB%雙年<P25與隊伍BB策略矛盾, 低優先fallback
+- 04-21：Sum 22 vs Albies 9 Δ+13, xwOBA .393/Barrel% 13.2 >P90 但 BB% 6.12<P25 breakdown -2（fa_scan）
+
+### Cole Young (SEA, 2B) [mlb_id:702284] — 觀察中
+觸發：BBE達70且3項核心維持>P60 → vs Albies
+- 04-21：Sum 22 BBE 56 高信心, 三項均衡(.325/11.96/7.1), 2025 確認(.297/10.9/5.6), 13% owned（fa_scan）
+
+### Gary Sánchez (MIL, C) [mlb_id:596142] — 觀察中
+觸發：BBE達40且三項核心維持>P70 → vs Albies
+- 04-21：Sum 30 但 BBE 29 ⚠️樣本小, 三項全>P90(.439/23.2/20.7), 14d Δ-0.043 回落, 2025 中等（fa_scan）
+
+### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中
+觸發：BBE達50且Barrel%維持>P70 + xwOBA>P80 → vs Albies
+- 04-21：Sum 30 BBE 34, 全>P90(.406/20.6/14.7), 2025 BB%確認但Barrel 4.8<P25未確認（fa_scan）
 
 ## 隊上觀察
 
