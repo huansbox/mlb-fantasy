@@ -376,6 +376,7 @@
 狀況：14G/60PA .150/.477 OPS, 0HR/0RBI/2SB/2BB（Week 3 數據）。2026 xwOBA .202 / BB% 5.0% / Barrel% 5.7% 全 <P25-P40，2025 (.346/10.9%/15.0% >P80) 全面下修。news check 無傷勢，本人解釋天氣冷影響。04-12 vs Rays 9 局擾跑失誤被坐板凳。
 追蹤：4 月東岸冷天可能持續 1-2 週，5 月暖再評估。心態風險：怪天氣 + 失誤可能惡性循環。BN 輪替 Albies / Jazz 二擇一坐。2025 雙年 baseline 真強 → 不 cut。
 - 04-13：[news check] 無傷勢，純 slump + 心態問題（fa_scan）
+- 04-22：[news check] 04-19 vs KC 最終戰被坐板凳；媒體標記「scapegoat / trade bait / defensive instincts declining」。本週 17 AB 打 2 支、9K。三線負面（攻/守/心），Slump hold 維持但 PA 縮減風險升高
 
 ### Byron Buxton (MIN, CF) [mlb_id:621439] — HBP 復出後慢熱
 狀況：04-03 被 Rays Kelly 91.6 mph 觸身擊中右前臂，X 光無骨折，右前臂挫傷。04-04 缺賽 1 場，04-05 復出 DH。14G/62PA .240 OPS .531, 0HR, BB:K 1:9（近 7G）。xwOBA .253 從 2025 .350 (>P90) 跌到 <P25，但 Barrel% 10.3% 仍 P70-80。
@@ -386,6 +387,7 @@
 狀況：兩肘 chronic tennis elbow，2025 拖到 6/16 才開季。2026 春訓 03-03 起，球隊「會排很多 off day 管理 elbow」。14G/55PA .764 OPS（Week 3 .118/.368 OPS 低點）。**HH% 從 2025 55.2% (>P90) 跌到 33.3% (<P25)** — 硬接觸品質退化可能與 elbow 相關。
 追蹤：HH% 是 elbow 健康代理指標，回到 50%+ 表示恢復。Off day 限制可能拖累 PA 累積。打者 cut 序列：Albies (雙年弱) → Tovar (BB 死硬傷, SS 守位保護) → 之後才輪到 Stanton（HH 退化但 xwOBA 仍 P80, Barrel% P70-80），**目前不到結構性弱門檻**。
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
+- 04-22：[news check] pre-season 媒體提及 season-ending surgery 可能性，elbow 嚴重性升級。當前仍 Active（off day 管理），監控 IL 觸發點
 
 ## 已結案
 
