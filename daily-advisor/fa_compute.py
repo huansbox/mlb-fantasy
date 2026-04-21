@@ -107,6 +107,92 @@ def compute_sum_score(metrics: dict, player_type: PlayerType) -> tuple[int, dict
     return total, breakdown
 
 
+def _confidence_label(bbe: int, player_type: PlayerType) -> str:
+    """Confidence band per CLAUDE.md 樣本量加權.
+
+    Batter: BBE <40 低 / 40-50 中 / >50 高.
+    SP:     BBE <30 is excluded from rank; remaining 30-50 中 / >50 高.
+    """
+    if player_type == "batter":
+        if bbe < 40:
+            return "低"
+        if bbe <= 50:
+            return "中"
+        return "高"
+    # sp
+    if bbe <= 50:
+        return "中"
+    return "高"
+
+
+def _sp_bbe_excluded(bbe: int) -> bool:
+    """SP: BBE <30 moved to low_confidence_excluded (per CLAUDE.md SP Step 1)."""
+    return bbe < 30
+
+
+def pick_weakest(
+    players: list[dict],
+    player_type: PlayerType,
+    n: int = 4,
+    cant_cut: set[str] | None = None,
+) -> tuple[list[dict], list[dict]]:
+    """Pick weakest N players by Sum asc + low_confidence_excluded.
+
+    Expects each player dict to have `savant_2026` pre-attached:
+        batter: {xwoba, bb_pct, barrel_pct, bbe}
+        sp:     {xera, xwoba, hh_pct, bbe}
+
+    Filters applied in order:
+        1. Exclude cant_cut by case-insensitive name.
+        2. SP only: BBE <30 → low_confidence_excluded (not in weakest).
+        3. Sort remaining by Sum asc, take first n.
+
+    Returns:
+        (weakest, excluded)
+        weakest: [{name, mlb_id, score, breakdown, confidence, savant_2026, ...原 player 欄位}]
+        excluded (SP only): [{name, bbe, note}]
+    """
+    cant_cut_lower = {c.lower() for c in (cant_cut or set())}
+
+    weakest_pool = []
+    excluded = []
+
+    for p in players:
+        if p.get("name", "").lower() in cant_cut_lower:
+            continue
+
+        savant = p.get("savant_2026") or {}
+        bbe = int(savant.get("bbe") or 0)
+
+        if player_type == "sp" and _sp_bbe_excluded(bbe):
+            excluded.append(
+                {
+                    "name": p["name"],
+                    "mlb_id": p.get("mlb_id"),
+                    "bbe": bbe,
+                    "note": "BBE 小樣本，驗證期暫不排序",
+                }
+            )
+            continue
+
+        score, breakdown = compute_sum_score(savant, player_type)
+        confidence = _confidence_label(bbe, player_type)
+
+        weakest_pool.append(
+            {
+                **p,
+                "score": score,
+                "breakdown": breakdown,
+                "confidence": confidence,
+                "bbe": bbe,
+            }
+        )
+
+    weakest_pool.sort(key=lambda e: e["score"])
+    weakest = weakest_pool[:n]
+    return weakest, excluded
+
+
 def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple[int, dict]:
     """Same as compute_sum_score but maps SP prior_stats keys (_allowed suffix).
 

@@ -6,6 +6,7 @@ from fa_compute import (
     compute_2025_sum,
     compute_sum_score,
     metric_to_score,
+    pick_weakest,
 )
 
 
@@ -184,3 +185,156 @@ class TestCompute2025Sum:
         prior = {"xera": 2.67, "xwoba_allowed": 0.256, "hh_pct_allowed": 39.4}
         score, _ = compute_2025_sum(prior, "sp")
         assert score == 27
+
+
+# ── Phase 5.2: pick_weakest ──
+def _mk_batter(name, xwoba, bb_pct, barrel_pct, bbe=60, **kwargs):
+    """Helper: build synthetic batter player dict with embedded savant_2026."""
+    return {
+        "name": name,
+        "mlb_id": kwargs.get("mlb_id", hash(name) % 1_000_000),
+        "savant_2026": {
+            "xwoba": xwoba,
+            "bb_pct": bb_pct,
+            "barrel_pct": barrel_pct,
+            "bbe": bbe,
+            **kwargs.get("extra_savant", {}),
+        },
+        **{k: v for k, v in kwargs.items() if k not in ("mlb_id", "extra_savant")},
+    }
+
+
+def _mk_sp(name, xera, xwoba, hh_pct, bbe=60, **kwargs):
+    """Helper: build synthetic SP player dict with embedded savant_2026."""
+    return {
+        "name": name,
+        "mlb_id": kwargs.get("mlb_id", hash(name) % 1_000_000),
+        "savant_2026": {
+            "xera": xera,
+            "xwoba": xwoba,
+            "hh_pct": hh_pct,
+            "bbe": bbe,
+            **kwargs.get("extra_savant", {}),
+        },
+        **{k: v for k, v in kwargs.items() if k not in ("mlb_id", "extra_savant")},
+    }
+
+
+class TestPickWeakestBatter:
+    def test_picks_bottom_4_by_sum(self):
+        players = [
+            _mk_batter("Elite1", 0.380, 13.0, 15.0),    # Sum 30
+            _mk_batter("Strong", 0.320, 10.0, 11.0),    # Sum 7+9+8=24
+            _mk_batter("Avg1", 0.300, 8.0, 8.0),        # Sum 6+6+6=18
+            _mk_batter("Avg2", 0.295, 7.5, 7.5),        # Sum 5+5+5=15
+            _mk_batter("Weak1", 0.280, 6.5, 6.0),       # Sum 3+3+3=9
+            _mk_batter("Weak2", 0.270, 5.5, 5.0),       # Sum 3+1+3=7
+            _mk_batter("Weak3", 0.260, 5.0, 4.5),       # Sum 1+1+1=3
+        ]
+        weakest, excluded = pick_weakest(players, "batter", n=4)
+        names = [w["name"] for w in weakest]
+        # Sum asc: Weak3(3), Weak2(7), Weak1(9), Avg2(15)
+        assert names == ["Weak3", "Weak2", "Weak1", "Avg2"]
+        assert excluded == []  # batter has no BBE filter
+
+    def test_batter_low_bbe_still_included(self):
+        # Batter: BBE<40 marked low_confidence but stays in rank (per CLAUDE.md).
+        # fa_compute attaches confidence label; pick_weakest does not exclude.
+        players = [
+            _mk_batter("Weak1", 0.280, 6.0, 5.0, bbe=20),   # Sum ~7, BBE<40
+            _mk_batter("Weak2", 0.270, 5.0, 4.0, bbe=60),   # Sum ~3
+            _mk_batter("Avg1", 0.310, 9.0, 10.0, bbe=80),   # Sum ~21
+        ]
+        weakest, excluded = pick_weakest(players, "batter", n=4)
+        # All included, but Weak1 should have confidence='低'
+        assert len(weakest) == 3
+        assert len(excluded) == 0
+        weak1 = next(w for w in weakest if w["name"] == "Weak1")
+        assert weak1["confidence"] == "低"
+
+    def test_cant_cut_excluded(self):
+        players = [
+            _mk_batter("Skubal", 0.220, 4.0, 3.0),   # Worst Sum but cant_cut
+            _mk_batter("Jazz", 0.230, 4.5, 3.5),     # 2nd worst but cant_cut
+            _mk_batter("Good", 0.320, 10.0, 11.0),
+            _mk_batter("Weak", 0.270, 5.5, 5.0),
+        ]
+        weakest, _ = pick_weakest(
+            players, "batter", n=4,
+            cant_cut={"Skubal", "Jazz"},
+        )
+        names = [w["name"] for w in weakest]
+        assert "Skubal" not in names
+        assert "Jazz" not in names
+        assert names[0] == "Weak"
+
+    def test_breakdown_in_output(self):
+        players = [_mk_batter("P", 0.290, 7.0, 7.0)]
+        weakest, _ = pick_weakest(players, "batter", n=4)
+        assert weakest[0]["score"] > 0
+        assert "xwOBA" in weakest[0]["breakdown"]
+        assert "BB%" in weakest[0]["breakdown"]
+        assert "Barrel%" in weakest[0]["breakdown"]
+
+
+class TestPickWeakestSp:
+    def test_low_bbe_moved_to_excluded(self):
+        # Kelly-like: BBE 17 → low_confidence_excluded (not in weakest)
+        players = [
+            _mk_sp("Kelly", 4.00, 0.300, 40.0, bbe=17),
+            _mk_sp("Nola", 4.20, 0.320, 43.0, bbe=80),
+            _mk_sp("Cantillo", 4.00, 0.310, 42.0, bbe=70),
+            _mk_sp("Lopez", 3.50, 0.290, 37.0, bbe=60),
+            _mk_sp("Sale", 3.00, 0.275, 35.0, bbe=100),
+        ]
+        weakest, excluded = pick_weakest(players, "sp", n=4)
+        names = [w["name"] for w in weakest]
+        assert "Kelly" not in names
+        assert any(e["name"] == "Kelly" for e in excluded)
+        assert excluded[0]["bbe"] == 17
+
+    def test_sp_sorted_by_sum_ascending(self):
+        # SP sum reversed (lower xera = higher score).
+        # Provide 5 SP, one with very high xera (weak) should come first.
+        players = [
+            _mk_sp("Nola", 4.20, 0.320, 43.0, bbe=80),    # Sum ≈ low
+            _mk_sp("Sale", 3.00, 0.275, 35.0, bbe=100),   # Sum ≈ high
+            _mk_sp("Cantillo", 4.00, 0.310, 42.0, bbe=70),
+            _mk_sp("Skubal", 2.80, 0.260, 33.0, bbe=150),  # Elite
+            _mk_sp("Weak", 5.50, 0.360, 46.0, bbe=60),    # Weakest
+        ]
+        weakest, _ = pick_weakest(players, "sp", n=4)
+        # Ascending by Sum → Weak first
+        assert weakest[0]["name"] == "Weak"
+        # Skubal (elite) should not be in weakest 4 out of 5
+        assert "Skubal" not in [w["name"] for w in weakest]
+
+    def test_cant_cut_plus_bbe_low(self):
+        players = [
+            _mk_sp("Skubal", 2.70, 0.255, 32.0, bbe=150),
+            _mk_sp("Kelly", 4.00, 0.300, 40.0, bbe=17),
+            _mk_sp("Nola", 4.20, 0.320, 43.0, bbe=80),
+            _mk_sp("Cantillo", 4.00, 0.310, 42.0, bbe=70),
+        ]
+        weakest, excluded = pick_weakest(
+            players, "sp", n=4,
+            cant_cut={"Skubal"},
+        )
+        names = [w["name"] for w in weakest]
+        assert "Skubal" not in names
+        assert "Kelly" not in names  # moved to excluded
+        assert [e["name"] for e in excluded] == ["Kelly"]
+        # Weakest should have Nola + Cantillo (only 2 left after cant_cut/excluded)
+        assert set(names) == {"Nola", "Cantillo"}
+
+    def test_confidence_labels(self):
+        # SP: BBE ≥50 high; 30-50 medium; <30 excluded (not low)
+        players = [
+            _mk_sp("High", 4.00, 0.310, 42.0, bbe=60),
+            _mk_sp("Med", 4.00, 0.310, 42.0, bbe=40),
+        ]
+        weakest, excluded = pick_weakest(players, "sp", n=4)
+        by_name = {w["name"]: w for w in weakest}
+        assert by_name["High"]["confidence"] == "高"
+        assert by_name["Med"]["confidence"] == "中"
+        assert excluded == []
