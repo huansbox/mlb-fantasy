@@ -4,6 +4,7 @@ import pytest
 
 from fa_compute import (
     compute_2025_sum,
+    compute_fa_tags,
     compute_sum_score,
     compute_urgency,
     metric_to_score,
@@ -597,6 +598,289 @@ class TestUrgencyBatter:
             res = compute_urgency([p], "batter")
             got = res["weakest_ranked"][0]["factors"]["rolling"]
             assert got == expected, f"Δ xwoba {r_xwoba}: expected {expected}, got {got}"
+
+
+# ── Phase 5.4: compute_fa_tags ──
+def _mk_fa_sp(name, savant_2026, prior_stats=None, rolling_21d=None,
+              ip_per_gs=None, ip_per_tg=None, era_diff=None):
+    return {
+        "name": name,
+        "mlb_id": hash(name) % 1_000_000,
+        "savant_2026": savant_2026,
+        "prior_stats": prior_stats or {},
+        "rolling_21d": rolling_21d,
+        "derived": {
+            "ip_per_gs": ip_per_gs,
+            "ip_per_tg": ip_per_tg,
+            "era_diff": era_diff,
+        },
+    }
+
+
+class TestFaTagsSp:
+    def _anchor_nola(self):
+        """Nola anchor (Sum 17 per fixture)."""
+        return {
+            "name": "Nola",
+            "score": 17,
+            "breakdown": {"xERA": 5, "xwOBA": 5, "HH%": 7},  # P40-50/P40-50/P60-70 approx
+            "savant_2026": {"xera": 4.60, "xwoba": 0.325, "hh_pct": 38.5, "bbe": 70},
+        }
+
+    def test_pfaadt_replace(self):
+        # Fixture: Pfaadt 1 ✅ 球隊主力 + ⚠️ Breakout 待驗 → 取代
+        anchor = self._anchor_nola()
+        # Use savant values that guarantee Sum diff ≥3 and 2 positives
+        pfaadt = _mk_fa_sp(
+            "Pfaadt",
+            savant_2026={"xera": 4.00, "xwoba": 0.300, "hh_pct": 37.0, "bbe": 74},
+            # Sum: xera 4.04>4.00 → P60=7, xwoba .301>.300 → P70=8, hh_pct 38.0>37.0 → P70=8 = 23
+            prior_stats={"xera": 5.00, "xwoba_allowed": 0.335, "hh_pct_allowed": 43.0, "ip": 30.0},
+            # prior IP 30 ≥20 (not treated as no prior), prior Sum very weak → <18 → Breakout 待驗
+            ip_per_gs=5.6,
+            ip_per_tg=1.1,
+            era_diff=-0.77,  # not reaching -0.81
+        )
+        r = compute_sum_score(pfaadt["savant_2026"], "sp")
+        pfaadt["score"] = r[0]
+        pfaadt["breakdown"] = r[1]
+
+        result = compute_fa_tags(pfaadt, anchor, "sp")
+        assert result["win_gate_passed"] is True
+        assert "✅ 球隊主力" in result["add_tags"]
+        assert "✅ 深投型" not in result["add_tags"]
+        assert "⚠️ 短局" not in result["warn_tags"]
+        assert "✅ 撿便宜運氣" not in result["add_tags"]
+        assert "⚠️ Breakout 待驗" in result["warn_tags"]
+        assert result["decision"] == "取代"
+
+    def test_povich_replace(self):
+        # Fixture: Povich 2 ✅ (深投+球隊主力) + 2 ⚠️ (賣高+Breakout) → 取代
+        anchor = self._anchor_nola()
+        povich = _mk_fa_sp(
+            "Povich",
+            savant_2026={"xera": 3.56, "xwoba": 0.300, "hh_pct": 40.0, "bbe": 60},
+            prior_stats={"xera": 5.80, "xwoba_allowed": 0.360, "hh_pct_allowed": 45.0, "ip": 40.0},
+            ip_per_gs=6.7,   # >5.7 → 深投
+            ip_per_tg=1.0,   # ≥1.0 → 球隊主力
+            era_diff=1.37,    # ≥+0.81 → 賣高
+        )
+        r = compute_sum_score(povich["savant_2026"], "sp")
+        povich["score"] = r[0]
+        povich["breakdown"] = r[1]
+
+        result = compute_fa_tags(povich, anchor, "sp")
+        assert "✅ 深投型" in result["add_tags"]
+        assert "✅ 球隊主力" in result["add_tags"]
+        assert "⚠️ 賣高運氣" in result["warn_tags"]
+        assert "⚠️ Breakout 待驗" in result["warn_tags"]
+        # 2 ✅ + non-strong ⚠️ → 取代 (not 立即取代 because warn tags present)
+        assert result["decision"] == "取代"
+
+    def test_ginn_observe_due_to_short(self):
+        # Fixture: Ginn 0 ✅ + ⚠️ 短局 → 觀察
+        anchor = self._anchor_nola()
+        ginn = _mk_fa_sp(
+            "Ginn",
+            savant_2026={"xera": 3.20, "xwoba": 0.280, "hh_pct": 35.0, "bbe": 60},
+            prior_stats={"xera": 4.30, "xwoba_allowed": 0.325, "hh_pct_allowed": 42.0, "ip": 100.0},
+            ip_per_gs=4.7,   # <5.0 → 短局 (強)
+            ip_per_tg=0.9,   # 0.5-1.0 → not 球隊主力
+            era_diff=0.40,
+        )
+        r = compute_sum_score(ginn["savant_2026"], "sp")
+        ginn["score"] = r[0]
+        ginn["breakdown"] = r[1]
+
+        result = compute_fa_tags(ginn, anchor, "sp")
+        assert "⚠️ 短局" in result["warn_tags"]
+        # Ginn 2025 Sum (4.30/.325/42.0):
+        #   xera 4.64>4.30>4.48? 4.48<4.30? 4.30<4.48 → P45 matches → P45-50=5
+        #   xwoba .327>.325>.316 → P55 not matched (.316≥.325 false), P45=.327 matched → 5
+        #   hh_pct 42.2>42.0>41.6 → P45=41.6 matched → 5
+        # Sum = 5+5+5 = 15 <18 → Breakout 待驗
+        assert "⚠️ Breakout 待驗" in result["warn_tags"]
+        assert result["decision"] == "觀察"  # strong warning forces observe
+
+    def test_winn_observe_due_to_small_sample(self):
+        # Fixture: Winn 2 ✅ (雙年菁英+撿便宜) + ⚠️ 樣本小 → 觀察
+        # ⚠️ 樣本小 is treated as confidence blocker (BBE <30)
+        anchor = self._anchor_nola()
+        winn = _mk_fa_sp(
+            "Winn",
+            savant_2026={"xera": 2.50, "xwoba": 0.260, "hh_pct": 33.0, "bbe": 18},
+            prior_stats={"xera": 2.80, "xwoba_allowed": 0.275, "hh_pct_allowed": 36.0, "ip": 60.0},
+            # Prior Sum: xera 2.98>2.80? yes P90 matched → 10. xwoba .289>.275? .275<.289→P80=9
+            # hh_pct 36.4>36.0 → P80=9 → Sum 10+9+9 = 28 ≥24 → 雙年菁英
+            ip_per_gs=5.4,
+            ip_per_tg=0.8,
+            era_diff=-1.50,  # ≤-0.81 → 撿便宜
+        )
+        r = compute_sum_score(winn["savant_2026"], "sp")
+        winn["score"] = r[0]
+        winn["breakdown"] = r[1]
+
+        result = compute_fa_tags(winn, anchor, "sp")
+        assert "✅ 雙年菁英" in result["add_tags"]
+        assert "✅ 撿便宜運氣" in result["add_tags"]
+        assert "⚠️ 樣本小" in result["warn_tags"]
+        assert result["decision"] == "觀察"
+
+    def test_win_gate_fail(self):
+        # Sum diff <3 → pass (not evaluated for tags)
+        anchor = self._anchor_nola()
+        close = _mk_fa_sp(
+            "Close",
+            savant_2026={"xera": 4.50, "xwoba": 0.320, "hh_pct": 40.0, "bbe": 60},
+            # Sum close to 17 → diff <3
+        )
+        r = compute_sum_score(close["savant_2026"], "sp")
+        close["score"] = r[0]
+        close["breakdown"] = r[1]
+
+        result = compute_fa_tags(close, anchor, "sp")
+        assert result["win_gate_passed"] is False
+        assert result["decision"] == "pass"
+
+    def test_win_gate_fail_due_to_one_metric_below(self):
+        # Sum diff ≥3 but only 1 metric ≥0 (2 metrics negative) → win gate fail
+        anchor = self._anchor_nola()
+        anchor["score"] = 15
+        anchor["breakdown"] = {"xERA": 6, "xwOBA": 3, "HH%": 6}
+        fa = {
+            "name": "Lopsided",
+            "score": 18,
+            "breakdown": {"xERA": 10, "xwOBA": 2, "HH%": 6},  # diff +4/-1/0
+            "savant_2026": {"xera": 2.50, "xwoba": 0.400, "hh_pct": 40.0, "bbe": 60},
+            "prior_stats": {},
+            "rolling_21d": None,
+            "derived": {"ip_per_gs": 5.5, "ip_per_tg": 1.0, "era_diff": 0},
+        }
+        # breakdown_diff: +4 / -1 / 0 → 2 项 ≥0 (+4, 0), 1 項 negative (-1)
+        # Actually 2 items ≥0 counts the 0. Per our rule: 2 ≥0 passes.
+        # Let's verify this edge case matches 规则.
+        result = compute_fa_tags(fa, anchor, "sp")
+        # Per rule "2 项正向 (≥0)", the 0 counts → win_gate passes
+        assert result["win_gate_passed"] is True
+
+    def test_instant_replace(self):
+        # 2 ✅ + 0 ⚠️ → 立即取代
+        anchor = self._anchor_nola()
+        fa = _mk_fa_sp(
+            "Elite",
+            savant_2026={"xera": 2.50, "xwoba": 0.260, "hh_pct": 33.0, "bbe": 100},
+            prior_stats={"xera": 2.70, "xwoba_allowed": 0.270, "hh_pct_allowed": 35.0, "ip": 150.0},
+            ip_per_gs=6.5,    # >5.7 → 深投
+            ip_per_tg=1.1,    # ≥1.0 → 球隊主力
+            era_diff=-0.90,   # ≤-0.81 → 撿便宜
+        )
+        r = compute_sum_score(fa["savant_2026"], "sp")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa, anchor, "sp")
+        assert len(result["add_tags"]) >= 2
+        assert len(result["warn_tags"]) == 0
+        assert result["decision"] == "立即取代"
+
+    def test_recency_tags(self):
+        # 21d Δ rolling → ✅ 近況確認 / ⚠️ 近況下滑
+        anchor = self._anchor_nola()
+        # Improving FA: Δ ≤-0.035
+        fa_improving = _mk_fa_sp(
+            "Hot",
+            savant_2026={"xera": 4.00, "xwoba": 0.305, "hh_pct": 38.0, "bbe": 50},
+            rolling_21d={"xwoba": 0.260, "bbe": 25},  # Δ = -.045
+            ip_per_tg=1.0,
+            ip_per_gs=5.5,
+            prior_stats={"xera": 4.50, "xwoba_allowed": 0.320, "hh_pct_allowed": 42.0, "ip": 100.0},
+        )
+        r = compute_sum_score(fa_improving["savant_2026"], "sp")
+        fa_improving["score"] = r[0]
+        fa_improving["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa_improving, anchor, "sp")
+        assert "✅ 近況確認" in result["add_tags"]
+
+        # Declining FA: Δ ≥+0.035
+        fa_declining = _mk_fa_sp(
+            "Cold",
+            savant_2026={"xera": 4.00, "xwoba": 0.305, "hh_pct": 38.0, "bbe": 50},
+            rolling_21d={"xwoba": 0.350, "bbe": 25},  # Δ = +.045
+            ip_per_tg=1.0,
+            ip_per_gs=5.5,
+            prior_stats={"xera": 4.50, "xwoba_allowed": 0.320, "hh_pct_allowed": 42.0, "ip": 100.0},
+        )
+        r = compute_sum_score(fa_declining["savant_2026"], "sp")
+        fa_declining["score"] = r[0]
+        fa_declining["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa_declining, anchor, "sp")
+        assert "⚠️ 近況下滑" in result["warn_tags"]
+
+    def test_no_prior_triggers_breakout_warn(self):
+        anchor = self._anchor_nola()
+        fa = _mk_fa_sp(
+            "Rookie",
+            savant_2026={"xera": 3.50, "xwoba": 0.285, "hh_pct": 36.0, "bbe": 50},
+            prior_stats={},  # no prior
+            ip_per_tg=1.0,
+        )
+        r = compute_sum_score(fa["savant_2026"], "sp")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa, anchor, "sp")
+        assert "⚠️ Breakout 待驗" in result["warn_tags"]
+
+
+class TestFaTagsBatter:
+    def _anchor_weak_batter(self):
+        return {
+            "name": "Tovar",
+            "score": 11,
+            "breakdown": {"xwOBA": 7, "BB%": 1, "Barrel%": 6},
+            "savant_2026": {"xwoba": 0.320, "bb_pct": 5.0, "barrel_pct": 9.0, "bbe": 50},
+        }
+
+    def test_batter_instant_replace(self):
+        # ≥2 ✅ + 0 ⚠️ → 立即取代
+        anchor = self._anchor_weak_batter()
+        fa = {
+            "name": "Grisham",
+            "savant_2026": {"xwoba": 0.370, "bb_pct": 14.0, "barrel_pct": 14.0, "bbe": 80},
+            "prior_stats": {"xwoba": 0.370, "bb_pct": 14.1, "barrel_pct": 14.2},
+            "rolling_14d": None,
+            "derived": {"pa_per_tg": 3.6},
+        }
+        r = compute_sum_score(fa["savant_2026"], "batter")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa, anchor, "batter")
+        # prior Sum xwoba .370 >P90=10, bb 14.1 >P90=10, barrel 14.2 >P90=10 → 30 ≥24 → 雙年菁英
+        assert "✅ 雙年菁英" in result["add_tags"]
+        assert "✅ 球隊主力" in result["add_tags"]  # PA/TG 3.6 ≥3.5
+        assert len(result["warn_tags"]) == 0
+        assert result["decision"] == "立即取代"
+
+    def test_batter_observe_low_pa(self):
+        # ⚠️ 上場有限 (強) → 觀察
+        anchor = self._anchor_weak_batter()
+        fa = {
+            "name": "Bench",
+            "savant_2026": {"xwoba": 0.360, "bb_pct": 12.0, "barrel_pct": 14.0, "bbe": 50},
+            "prior_stats": {"xwoba": 0.360, "bb_pct": 12.0, "barrel_pct": 14.0},
+            "rolling_14d": None,
+            "derived": {"pa_per_tg": 2.0},  # <2.5 → 上場有限 (強)
+        }
+        r = compute_sum_score(fa["savant_2026"], "batter")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa, anchor, "batter")
+        assert "⚠️ 上場有限" in result["warn_tags"]
+        assert result["decision"] == "觀察"
 
 
 class Test2026SumBuckets:

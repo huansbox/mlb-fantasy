@@ -421,6 +421,250 @@ def compute_urgency(
     }
 
 
+# ── Phase 5.4: FA tags + upgrade decision ──
+# Strong warnings that force "觀察" regardless of ✅ count:
+#   - 短局 / 上場有限 (CLAUDE.md 明示 "強警示")
+#   - 樣本小 (confidence blocker; CLAUDE.md 未標但 fixture 要求 — BBE <30 意義等同
+#             pick_weakest 的排除門檻，不應單純視為一般警示)
+_STRONG_WARN_TAGS = {"⚠️ 短局", "⚠️ 上場有限", "⚠️ 樣本小"}
+
+
+def _compute_sp_add_tags(fa: dict) -> list[str]:
+    tags = []
+    prior = fa.get("prior_stats") or {}
+    prior_ip = prior.get("ip")
+    derived = fa.get("derived") or {}
+    savant = fa.get("savant_2026") or {}
+    rolling = fa.get("rolling_21d")
+
+    # ✅ 雙年菁英 — 2025 Sum ≥24 且 IP ≥50
+    # (Use effective prior — IP <20 zeroes out.)
+    if prior_ip is not None and prior_ip >= _PRIOR_IP_MIN:
+        prior_sum, _ = compute_2025_sum(prior, "sp")
+        if prior_sum >= 24 and prior_ip >= _PRIOR_IP_SLUMP_HOLD_MIN:
+            tags.append("✅ 雙年菁英")
+
+    # ✅ 深投型 — IP/GS >5.7
+    ip_per_gs = derived.get("ip_per_gs")
+    if ip_per_gs is not None and ip_per_gs > 5.7:
+        tags.append("✅ 深投型")
+
+    # ✅ 球隊主力 — 2026 IP/Team_G ≥1.0
+    ip_per_tg = derived.get("ip_per_tg")
+    if ip_per_tg is not None and ip_per_tg >= 1.0:
+        tags.append("✅ 球隊主力")
+
+    # ✅ 近況確認 — 21d Δ xwOBA ≤ -0.035
+    if rolling and (rolling.get("bbe") or 0) >= 20:
+        r_x = rolling.get("xwoba")
+        s_x = savant.get("xwoba")
+        if r_x is not None and s_x is not None:
+            if (r_x - s_x) <= -0.035:
+                tags.append("✅ 近況確認")
+
+    # ✅ 撿便宜運氣 — xERA-ERA ≤ -0.81
+    era_diff = derived.get("era_diff")
+    if era_diff is not None and era_diff <= -0.81:
+        tags.append("✅ 撿便宜運氣")
+
+    return tags
+
+
+def _compute_sp_warn_tags(fa: dict) -> list[str]:
+    tags = []
+    prior = fa.get("prior_stats") or {}
+    prior_ip = prior.get("ip")
+    derived = fa.get("derived") or {}
+    savant = fa.get("savant_2026") or {}
+    rolling = fa.get("rolling_21d")
+    bbe = int(savant.get("bbe") or 0)
+
+    ip_per_gs = derived.get("ip_per_gs")
+    ip_per_tg = derived.get("ip_per_tg")
+    era_diff = derived.get("era_diff")
+
+    # ⚠️ 短局 (強) — IP/GS <5.0
+    if ip_per_gs is not None and ip_per_gs < 5.0:
+        tags.append("⚠️ 短局")
+
+    # ⚠️ 上場有限 (強) — IP/TG <0.5
+    if ip_per_tg is not None and ip_per_tg < 0.5:
+        tags.append("⚠️ 上場有限")
+
+    # ⚠️ 樣本小 — BBE <30 或 IP <20 (prior IP 缺值不觸發此警示)
+    prior_low_ip = prior_ip is not None and prior_ip < _PRIOR_IP_MIN
+    if bbe < 30 or prior_low_ip:
+        tags.append("⚠️ 樣本小")
+
+    # ⚠️ Breakout 待驗 — 2025 Sum <18 或無 prior
+    if not prior or (prior_ip is not None and prior_ip < _PRIOR_IP_MIN):
+        tags.append("⚠️ Breakout 待驗")
+    else:
+        prior_sum, _ = compute_2025_sum(prior, "sp")
+        if prior_sum < 18:
+            tags.append("⚠️ Breakout 待驗")
+
+    # ⚠️ 賣高運氣 — xERA-ERA ≥ +0.81
+    if era_diff is not None and era_diff >= 0.81:
+        tags.append("⚠️ 賣高運氣")
+
+    # ⚠️ 近況下滑 — 21d Δ xwOBA ≥ +0.035
+    if rolling and (rolling.get("bbe") or 0) >= 20:
+        r_x = rolling.get("xwoba")
+        s_x = savant.get("xwoba")
+        if r_x is not None and s_x is not None:
+            if (r_x - s_x) >= 0.035:
+                tags.append("⚠️ 近況下滑")
+
+    return tags
+
+
+def _compute_batter_add_tags(fa: dict) -> list[str]:
+    tags = []
+    prior = fa.get("prior_stats") or {}
+    derived = fa.get("derived") or {}
+    savant = fa.get("savant_2026") or {}
+    rolling = fa.get("rolling_14d")
+
+    # ✅ 雙年菁英 — 2025 Sum ≥24 (no IP gate for batter)
+    if prior:
+        prior_sum, _ = compute_2025_sum(prior, "batter")
+        if prior_sum >= 24:
+            tags.append("✅ 雙年菁英")
+
+    # ✅ 球隊主力 — 2026 PA/Team_G ≥3.5
+    pa_per_tg = derived.get("pa_per_tg")
+    if pa_per_tg is None:
+        pa_per_tg = prior.get("pa_per_team_g")  # fallback
+    if pa_per_tg is not None and pa_per_tg >= 3.5:
+        tags.append("✅ 球隊主力")
+
+    # ✅ 近況確認 — 14d xwOBA Δ ≥ +0.035 (batter direction: rising)
+    if rolling and (rolling.get("bbe") or 0) >= 25:
+        r_x = rolling.get("xwoba")
+        s_x = savant.get("xwoba")
+        if r_x is not None and s_x is not None:
+            if (r_x - s_x) >= 0.035:
+                tags.append("✅ 近況確認")
+
+    return tags
+
+
+def _compute_batter_warn_tags(fa: dict) -> list[str]:
+    tags = []
+    prior = fa.get("prior_stats") or {}
+    derived = fa.get("derived") or {}
+    savant = fa.get("savant_2026") or {}
+    rolling = fa.get("rolling_14d")
+    bbe = int(savant.get("bbe") or 0)
+
+    # ⚠️ 上場有限 (強) — PA/Team_G <2.5
+    pa_per_tg = derived.get("pa_per_tg")
+    if pa_per_tg is None:
+        pa_per_tg = prior.get("pa_per_team_g")
+    if pa_per_tg is not None and pa_per_tg < 2.5:
+        tags.append("⚠️ 上場有限")
+
+    # ⚠️ 樣本小 — BBE <30
+    if bbe < 30:
+        tags.append("⚠️ 樣本小")
+
+    # ⚠️ Breakout 待驗 — 2025 Sum <18 或無 prior
+    if not prior:
+        tags.append("⚠️ Breakout 待驗")
+    else:
+        prior_sum, _ = compute_2025_sum(prior, "batter")
+        if prior_sum < 18:
+            tags.append("⚠️ Breakout 待驗")
+
+    # ⚠️ 近況下滑 — 14d Δ ≤ -0.035
+    if rolling and (rolling.get("bbe") or 0) >= 25:
+        r_x = rolling.get("xwoba")
+        s_x = savant.get("xwoba")
+        if r_x is not None and s_x is not None:
+            if (r_x - s_x) <= -0.035:
+                tags.append("⚠️ 近況下滑")
+
+    return tags
+
+
+def _decision_from_tags(add_tags: list[str], warn_tags: list[str]) -> str:
+    """Upgrade decision per CLAUDE.md + fixture behavior.
+
+    立即取代 — ≥2 ✅ AND 0 ⚠️
+    取代    — ≥1 ✅ AND no strong ⚠️
+    觀察    — has strong ⚠️, or 0 ✅
+    """
+    has_strong_warn = any(w in _STRONG_WARN_TAGS for w in warn_tags)
+    if has_strong_warn:
+        return "觀察"
+    if not add_tags:
+        return "觀察"
+    if len(add_tags) >= 2 and not warn_tags:
+        return "立即取代"
+    return "取代"
+
+
+def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerType) -> dict:
+    """Compute Sum diff + ✅⚠️ tags + upgrade decision for one FA candidate.
+
+    Args:
+        fa_player: FA candidate with {name, score, breakdown, savant_2026,
+                   prior_stats, rolling_21d/14d, derived}
+        anchor_player: weakest player to compare (with {name, score, breakdown})
+        player_type: "batter" or "sp"
+
+    Returns:
+        {
+            sum_diff: int,
+            breakdown_diff: dict,
+            win_gate_passed: bool,
+            add_tags: list[str],
+            warn_tags: list[str],
+            decision: "立即取代" | "取代" | "觀察" | "pass",
+            anchor_name: str,
+        }
+    """
+    sum_diff = fa_player["score"] - anchor_player["score"]
+    anchor_bd = anchor_player.get("breakdown") or {}
+    fa_bd = fa_player.get("breakdown") or {}
+    breakdown_diff = {k: fa_bd.get(k, 0) - anchor_bd.get(k, 0) for k in fa_bd}
+
+    # Win gate: Sum diff ≥3 且 at least 2 metrics ≥0
+    positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
+    win_gate_passed = sum_diff >= 3 and positive_count >= 2
+
+    if not win_gate_passed:
+        return {
+            "sum_diff": sum_diff,
+            "breakdown_diff": breakdown_diff,
+            "win_gate_passed": False,
+            "add_tags": [],
+            "warn_tags": [],
+            "decision": "pass",
+            "anchor_name": anchor_player["name"],
+        }
+
+    if player_type == "sp":
+        add_tags = _compute_sp_add_tags(fa_player)
+        warn_tags = _compute_sp_warn_tags(fa_player)
+    else:
+        add_tags = _compute_batter_add_tags(fa_player)
+        warn_tags = _compute_batter_warn_tags(fa_player)
+
+    decision = _decision_from_tags(add_tags, warn_tags)
+
+    return {
+        "sum_diff": sum_diff,
+        "breakdown_diff": breakdown_diff,
+        "win_gate_passed": True,
+        "add_tags": add_tags,
+        "warn_tags": warn_tags,
+        "decision": decision,
+        "anchor_name": anchor_player["name"],
+    }
+
+
 def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple[int, dict]:
     """Same as compute_sum_score but maps SP prior_stats keys (_allowed suffix).
 
