@@ -1822,7 +1822,14 @@ def _is_condition_pass(content, player_name):
 
 
 def _insert_update_line(content, player_name, short_date, summary):
-    """Insert a date line under an existing player's section in waiver-log."""
+    """Insert or replace a date line under an existing player's section.
+
+    Dedup strategy: when a same-date (fa_scan) line already exists within
+    the player's section, replace the last one with the new summary rather
+    than appending. Prevents the 5-6 near-duplicate lines per player that
+    accumulated when fa_scan ran multiple times in one day (12:30 cron +
+    ad-hoc reruns both appended). The most recent run's phrasing wins.
+    """
     # Find the player's ### header
     pattern = re.compile(
         rf"### {re.escape(player_name)} \([^)]+\)[^\n]*\n",
@@ -1836,21 +1843,33 @@ def _insert_update_line(content, player_name, short_date, summary):
     rest = content[match.end():]
     next_header = re.search(r"^###? ", rest, re.MULTILINE)
     if next_header:
-        insert_pos = match.end() + next_header.start()
+        section_end = match.end() + next_header.start()
     else:
-        insert_pos = len(content)
-
-    # Ensure exactly one \n before new line (strip trailing blank lines)
-    before = content[:insert_pos].rstrip("\n") + "\n"
-    after = content[insert_pos:]
+        section_end = len(content)
 
     # Strip trailing （fa_scan） if Claude already included it in summary
     summary = summary.rstrip()
     while summary.endswith("（fa_scan）"):
         summary = summary[:-len("（fa_scan）")].rstrip()
-
     new_line = f"- {short_date}：{summary}（fa_scan）\n"
-    content = before + new_line + "\n" + after
+
+    # Dedup: replace last same-date fa_scan line in this player's section
+    section_start = match.end()
+    section = content[section_start:section_end]
+    same_date_re = re.compile(
+        rf"^- {re.escape(short_date)}：[^\n]*（fa_scan）\n",
+        re.MULTILINE,
+    )
+    matches = list(same_date_re.finditer(section))
+    if matches:
+        last = matches[-1]
+        new_section = section[:last.start()] + new_line + section[last.end():]
+        content = content[:section_start] + new_section + content[section_end:]
+    else:
+        # No same-date line yet → append at section end
+        before = content[:section_end].rstrip("\n") + "\n"
+        after = content[section_end:]
+        content = before + new_line + "\n" + after
     return content
 
 
