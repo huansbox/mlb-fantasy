@@ -540,6 +540,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
+| `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
 
 ## 待辦
 
@@ -549,6 +550,10 @@ waiver-log.md（球員追蹤唯一來源）
   - 進階：waiver-log 新增條目時自動走一次 `search_mlb_id(name, team)` 確認 ID 正確
 - [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理
 - [ ] **IP/GS fallback naive 計算潛在 bug**（roster_sync.py:858 / fa_scan.py:857）：`_ip_per_gs_from_gamelog` API 失敗時 fallback 用 `total_ip / gs`，對 swingman（兼救援的先發）會把救援局數混入 → 膨脹 IP/GS。目前隊上 10 SP 全純先發無觸發，未來 swingman / API 失敗才會出現。風險低先不動，若要修改為回傳 None（寧可缺資料不要錯資料）
+- [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
+  - finding C：`fa_scan.py:2161` Slump hold 訊息「≥50」寫死 → 改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數
+  - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
+  - finding E：`fa_scan.py:1637` `_publish` 在 `--no-send` mode 用 `print(advice)` 沒 flush，threading + nohup 環境下 stdout buffered 看不到 advice → 加 `print(advice, flush=True)` 或改 `sys.stderr.write`
 - [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - [ ] **roster_sync --init 不 backfill 新欄位**：當沒有 add/drop 也沒有 key/stats 缺失時，`run_init` 提前 return，不走 `update_config()`，導致 `selected_pos`/`status` 等新欄位不會被寫入。日常 cron 有異動時正常 backfill，僅手動 `--init` 無異動時觸發

@@ -1,9 +1,11 @@
 # fa_scan Python Compute Layer — Design + Plan
 
-**狀態**：Phase 5 architect plan，待 Builder session 實作
+**狀態**：✅ 已實作完成（2026-04-21 merged master `a5d057a`）— smoke test 5:33 vs 重構前 40 分鐘
+**Architect 審查結果**：通過（5 finding，A 已修，C/D/E 記入 CLAUDE.md 待辦未來處理）
 **前置**：feat/sp-framework-v2 分支已完成 SP 框架 v2（Sum / urgency 四因子 / ✅⚠️ 標籤 / 升級判定 / Layer 1.5 RP filter / savant_rolling pitcher 21d 擴充）
-**目標分支**：從 `feat/sp-framework-v2` 開新分支 `feat/phase5-python-compute`
+**目標分支**：從 `feat/sp-framework-v2` 開新分支 `feat/phase5-python-compute`（已 merge 並刪除）
 **架構模式**：architect-builder（本檔由 Architect 寫，user 另開 session 當 Builder 實作，再回 Architect 審查）
+**完整實作記錄**：見 Obsidian worklog [[評估框架]] §「2026-04-21 更新」
 
 ---
 
