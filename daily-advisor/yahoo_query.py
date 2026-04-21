@@ -360,7 +360,12 @@ def cmd_player(args, access_token, config):
 
 
 def send_telegram(message, env):
-    """Send message via Telegram Bot API."""
+    """Send message via Telegram Bot API.
+
+    Tries Markdown parse_mode first; on HTTP 400 (parse error from unbalanced
+    `*` / `_` / `[` etc. in Claude-generated content), falls back to plain
+    text so the message still arrives, just without formatting.
+    """
     token = env.get("TELEGRAM_BOT_TOKEN")
     chat_id = env.get("TELEGRAM_CHAT_ID")
     if not token or not chat_id:
@@ -369,16 +374,31 @@ def send_telegram(message, env):
     MAX_LEN = 4096
     if len(message) > MAX_LEN:
         message = message[:MAX_LEN - 20] + "\n\n(訊息截斷)"
-    payload = json.dumps({
-        "chat_id": chat_id, "text": message, "parse_mode": "Markdown",
-    }).encode("utf-8")
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        data=payload, headers={"Content-Type": "application/json"},
-    )
-    try:
+
+    def _send(parse_mode):
+        body = {"chat_id": chat_id, "text": message}
+        if parse_mode:
+            body["parse_mode"] = parse_mode
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.loads(resp.read()).get("ok", False)
+
+    try:
+        return _send("Markdown")
+    except urllib.error.HTTPError as e:
+        if e.code == 400:
+            print("Telegram Markdown 400, fallback plain text", file=sys.stderr)
+            try:
+                return _send(None)
+            except Exception as e2:
+                print(f"Telegram plain send error: {e2}", file=sys.stderr)
+                return False
+        print(f"Telegram send error: {e}", file=sys.stderr)
+        return False
     except Exception as e:
         print(f"Telegram send error: {e}", file=sys.stderr)
         return False

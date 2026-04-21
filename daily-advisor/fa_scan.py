@@ -2093,6 +2093,31 @@ def _format_fa_for_layer5(entry, group_type, idx):
     return lines
 
 
+def _filter_waiver_log_by_group(section_content, group_type):
+    """Split waiver-log 觀察中 section into per-player entries and keep only
+    those matching group_type ('batter' or 'sp').
+
+    Entry format: `### 球員名 (TEAM, POSITIONS) [mlb_id:XXX] — 觀察中`
+    POSITIONS examples: "SP", "RP", "SP,RP" (pitcher) vs "C", "1B,3B" (batter).
+    """
+    entries = re.split(r"(?=^### )", section_content, flags=re.MULTILINE)
+    kept = []
+    for entry in entries:
+        if not entry.startswith("### "):
+            kept.append(entry)  # Preamble before first ### header
+            continue
+        m = re.match(r"### [^(]+\([A-Z]+,\s*([^)]+)\)", entry)
+        if not m:
+            continue  # Malformed header, skip defensively
+        positions = m.group(1).strip()
+        is_pitcher = "SP" in positions or "RP" in positions
+        if group_type == "sp" and is_pitcher:
+            kept.append(entry)
+        elif group_type == "batter" and not is_pitcher:
+            kept.append(entry)
+    return "".join(kept)
+
+
 def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
                          watch_tagged, changes, ref_1d, ref_3d, config):
     """Build Claude Layer 5 input string: mechanical report + context.
@@ -2208,7 +2233,10 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
         for c in group_changes[:10]:
             lines.append(f"  {c['name']:20} 3d:+{c['d3']:>3} {c['pct']:>3}%  {c['position']}")
 
-    # ── waiver-log 觀察中（觸發條件） ──
+    # ── waiver-log 觀察中（觸發條件，按 group_type 過濾） ──
+    # Filter by position in the entry header: pitcher (SP/RP) vs batter (C/1B/…).
+    # Without filtering, Claude sees ALL watch entries and flags batter-type
+    # players in SP 觀察中更新 section (and vice versa).
     waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
     if os.path.exists(waiver_log_path):
         with open(waiver_log_path, encoding="utf-8") as f:
@@ -2217,7 +2245,9 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
             section = wl_content.split("## 觀察中")[1]
             if "## 已結案" in section:
                 section = section.split("## 已結案")[0]
-            lines.append(f"\n--- waiver-log 觀察中（含觸發條件）---\n## 觀察中{section}")
+            filtered = _filter_waiver_log_by_group(section, group_type)
+            if filtered.strip():
+                lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅 {label}）---\n## 觀察中{filtered}")
 
     return "\n".join(lines)
 
