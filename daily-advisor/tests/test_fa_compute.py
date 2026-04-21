@@ -5,6 +5,7 @@ import pytest
 from fa_compute import (
     compute_2025_sum,
     compute_sum_score,
+    compute_urgency,
     metric_to_score,
     pick_weakest,
 )
@@ -338,3 +339,278 @@ class TestPickWeakestSp:
         assert by_name["High"]["confidence"] == "高"
         assert by_name["Med"]["confidence"] == "中"
         assert excluded == []
+
+
+# ── Phase 5.3: compute_urgency ──
+def _mk_weakest_sp(name, sum_2026, prior_stats=None, rolling_21d=None,
+                    ip_per_tg=None, era_diff=None, ip_per_gs=None):
+    """Build a weakest-entry (Pass 1 output shape) for urgency tests."""
+    entry = {
+        "name": name,
+        "score": sum_2026,
+        "breakdown": {},
+        "confidence": "高",
+        "mlb_id": hash(name) % 1_000_000,
+        "savant_2026": {"xwoba": 0.320, "hh_pct": 42.0, "xera": 4.20, "bbe": 60},
+        "prior_stats": prior_stats or {},
+        "rolling_21d": rolling_21d,
+        "derived": {
+            "ip_per_tg": ip_per_tg,
+            "era_diff": era_diff,
+            "ip_per_gs": ip_per_gs,
+        },
+    }
+    return entry
+
+
+def _mk_weakest_batter(name, sum_2026, prior_stats=None, rolling_14d=None, pa_per_tg=None):
+    entry = {
+        "name": name,
+        "score": sum_2026,
+        "breakdown": {},
+        "confidence": "高",
+        "mlb_id": hash(name) % 1_000_000,
+        "savant_2026": {"xwoba": 0.310, "bb_pct": 8.0, "barrel_pct": 8.0, "bbe": 60},
+        "prior_stats": prior_stats or {},
+        "rolling_14d": rolling_14d,
+        "derived": {"pa_per_tg": pa_per_tg},
+    }
+    return entry
+
+
+class TestUrgencySp:
+    def test_nola_regression(self):
+        # Fixture: Nola urgency=6
+        # 2026 Sum 17 → +2 / 2025 Sum 15 (<18) + IP 94.3 → +2 / 21d Δ持平 → 0 / IP/TG 1.1 → +2
+        nola = _mk_weakest_sp(
+            "Nola",
+            sum_2026=17,
+            prior_stats={
+                "xera": 4.13, "xwoba_allowed": 0.315, "hh_pct_allowed": 43.3,
+                "ip": 94.3,
+            },
+            rolling_21d={"xwoba": 0.296, "bbe": 50},  # Δ = 0.296-.320 = -.024 持平
+            ip_per_tg=1.1,
+        )
+        result = compute_urgency([nola], "sp")
+        assert len(result["weakest_ranked"]) == 1
+        r = result["weakest_ranked"][0]
+        assert r["name"] == "Nola"
+        assert r["urgency"] == 6
+        assert r["factors"]["sum_2026"] == 2
+        assert r["factors"]["sum_2025"] == 2
+        assert r["factors"]["rolling"] == 0
+        assert r["factors"]["ip_per_tg"] == 2
+        assert result["slump_hold"] == []
+
+    def test_cantillo_regression(self):
+        # Fixture: Cantillo urgency=4
+        # 2026 Sum 18 → +1 / 2025 Sum 21 (18-21) + IP 95.3 → +1 / 21d 持平 → 0 / IP/TG 1.0 → +2
+        cantillo = _mk_weakest_sp(
+            "Cantillo",
+            sum_2026=18,
+            prior_stats={
+                "xera": 3.71, "xwoba_allowed": 0.300, "hh_pct_allowed": 41.8,
+                "ip": 95.3,
+            },
+            rolling_21d={"xwoba": 0.305, "bbe": 40},  # Δ -.015 持平
+            ip_per_tg=1.0,
+        )
+        result = compute_urgency([cantillo], "sp")
+        r = result["weakest_ranked"][0]
+        assert r["urgency"] == 4
+        assert r["factors"]["sum_2026"] == 1
+        assert r["factors"]["sum_2025"] == 1
+
+    def test_lopez_bug_fix(self):
+        # Fixture: López urgency=3 (but 5 IP noise → should drop to 1 after #2 fix)
+        # 2026 Sum 24 → +0 (>21 no bonus) / prior IP 5.0 <20 → treat as no prior → +0
+        # 21d 持平 → 0 / IP/TG 0.8 (0.5-1.0) → +1
+        # Total = 0+0+0+1 = 1 (was 3 before fix)
+        lopez = _mk_weakest_sp(
+            "Lopez",
+            sum_2026=24,
+            prior_stats={
+                "xera": 10.73, "xwoba_allowed": 0.465, "hh_pct_allowed": 50.0,
+                "ip": 5.0,
+            },
+            rolling_21d={"xwoba": 0.302, "bbe": 30},  # Δ -.018 持平
+            ip_per_tg=0.8,
+        )
+        result = compute_urgency([lopez], "sp")
+        r = result["weakest_ranked"][0]
+        assert r["urgency"] == 1, f"Expected 1 after #2 fix, got {r['urgency']}"
+        assert r["factors"]["sum_2025"] == 0  # IP <20 → treated as no prior
+        assert r["notes"]  # Should have note about low-IP prior
+        assert "無效" in " ".join(r["notes"]) or "IP" in " ".join(r["notes"])
+
+    def test_ragans_slump_hold(self):
+        # Fixture: Ragans Slump hold — 2025 Sum 27 ≥24 + IP 61.7 ≥50
+        # Should NOT appear in weakest_ranked; should be in slump_hold.
+        ragans = _mk_weakest_sp(
+            "Ragans",
+            sum_2026=3,  # very bad 2026
+            prior_stats={
+                "xera": 2.67, "xwoba_allowed": 0.256, "hh_pct_allowed": 39.4,
+                "ip": 61.7,
+            },
+            rolling_21d={"xwoba": 0.350, "bbe": 30},
+            ip_per_tg=1.1,
+        )
+        result = compute_urgency([ragans], "sp")
+        assert result["weakest_ranked"] == []
+        assert len(result["slump_hold"]) == 1
+        s = result["slump_hold"][0]
+        assert s["name"] == "Ragans"
+        assert s["prior_sum"] == 27
+        assert s["prior_ip"] == 61.7
+
+    def test_sum_2025_ge24_low_ip_no_slump_hold(self):
+        # 2025 Sum ≥24 but IP <50 → +0 (not Slump hold)
+        p = _mk_weakest_sp(
+            "Breakout",
+            sum_2026=10,  # 9-11 → +4
+            prior_stats={
+                "xera": 2.80, "xwoba_allowed": 0.260, "hh_pct_allowed": 35.0,
+                "ip": 30.0,  # <50
+            },
+            rolling_21d=None,
+            ip_per_tg=1.0,
+        )
+        result = compute_urgency([p], "sp")
+        assert result["slump_hold"] == []
+        r = result["weakest_ranked"][0]
+        assert r["factors"]["sum_2026"] == 4
+        assert r["factors"]["sum_2025"] == 0  # ≥24 but IP <50
+
+    def test_rolling_delta_buckets(self):
+        base = {"xera": 4.00, "xwoba_allowed": 0.310, "hh_pct_allowed": 41.0, "ip": 100.0}
+
+        # season xwoba = 0.320 (from savant_2026 default)
+        # Δ = rolling_21d.xwoba - 0.320
+        cases = [
+            # (rolling_xwoba, expected_factor)
+            (0.265, -2),   # Δ = -.055 strong improve
+            (0.280, -1),   # Δ = -.040 weak improve
+            (0.300, 0),    # Δ = -.020 flat
+            (0.360, 1),    # Δ = +.040 weak decay
+            (0.380, 2),    # Δ = +.060 strong decay
+        ]
+        for r_xwoba, expected in cases:
+            p = _mk_weakest_sp("P", 18, base, {"xwoba": r_xwoba, "bbe": 30}, ip_per_tg=1.0)
+            res = compute_urgency([p], "sp")
+            factor = res["weakest_ranked"][0]["factors"]["rolling"]
+            assert factor == expected, f"rolling Δ for xwoba {r_xwoba}: expected {expected}, got {factor}"
+
+    def test_rolling_low_bbe_skipped(self):
+        # BBE <20 → rolling factor = 0
+        p = _mk_weakest_sp(
+            "P", 10,
+            {"xera": 4.00, "xwoba_allowed": 0.310, "hh_pct_allowed": 41.0, "ip": 100.0},
+            {"xwoba": 0.400, "bbe": 15},  # huge Δ but BBE too low
+            ip_per_tg=1.0,
+        )
+        res = compute_urgency([p], "sp")
+        assert res["weakest_ranked"][0]["factors"]["rolling"] == 0
+
+    def test_ip_per_tg_buckets(self):
+        base = {"xera": 4.00, "xwoba_allowed": 0.310, "hh_pct_allowed": 41.0, "ip": 100.0}
+        for ip_tg, expected in [(1.2, 2), (1.0, 2), (0.7, 1), (0.5, 1), (0.3, 0), (None, 0)]:
+            p = _mk_weakest_sp("P", 18, base, None, ip_per_tg=ip_tg)
+            res = compute_urgency([p], "sp")
+            assert res["weakest_ranked"][0]["factors"]["ip_per_tg"] == expected, \
+                f"ip/tg {ip_tg}: expected {expected}"
+
+    def test_sort_descending_by_urgency(self):
+        a = _mk_weakest_sp(
+            "A", 17,
+            {"xera": 4.13, "xwoba_allowed": 0.315, "hh_pct_allowed": 43.3, "ip": 94.0},
+            None, 1.1,
+        )  # urgency = 2+2+0+2 = 6
+        b = _mk_weakest_sp(
+            "B", 18,
+            {"xera": 3.71, "xwoba_allowed": 0.300, "hh_pct_allowed": 41.8, "ip": 95.0},
+            None, 1.0,
+        )  # urgency = 1+1+0+2 = 4
+        res = compute_urgency([b, a], "sp")  # input order B first
+        names = [r["name"] for r in res["weakest_ranked"]]
+        assert names == ["A", "B"]  # sorted by urgency desc
+
+
+class TestUrgencyBatter:
+    def test_batter_no_ip_gate(self):
+        # Batter: Slump hold only requires 2025 Sum ≥24 (no IP gate).
+        p = _mk_weakest_batter(
+            "Buxton",
+            sum_2026=5,
+            prior_stats={"xwoba": 0.350, "bb_pct": 7.6, "barrel_pct": 17.6},
+            # Sum = 10+6+10 = 26 (xwoba .349 P90=10, bb 7.4-7.8 P45-50=5... wait)
+            # xwoba .350>.349 = >P90 = 10
+            # bb_pct 7.6 between P45=7.4 and P50=7.8 → P45-50 = 5
+            # barrel 17.6 > 14.0 = >P90 = 10
+            # Sum = 25 ≥24 → slump hold
+        )
+        res = compute_urgency([p], "batter")
+        assert len(res["slump_hold"]) == 1
+        assert res["slump_hold"][0]["prior_sum"] == 25
+
+    def test_batter_pa_per_tg_buckets(self):
+        prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}  # weak prior
+        for pa_tg, expected in [(4.0, 2), (3.5, 2), (3.2, 1), (2.8, 0), (1.0, 0)]:
+            p = _mk_weakest_batter("P", 10, prior, None, pa_per_tg=pa_tg)
+            res = compute_urgency([p], "batter")
+            assert res["weakest_ranked"][0]["factors"]["pa_per_tg"] == expected
+
+    def test_batter_rolling_bbe_gate(self):
+        # Batter: 14d BBE <25 → rolling factor = 0
+        prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}
+        p = _mk_weakest_batter(
+            "P", 10, prior,
+            {"xwoba": 0.400, "bbe": 20},  # BBE <25
+            pa_per_tg=3.5,
+        )
+        res = compute_urgency([p], "batter")
+        assert res["weakest_ranked"][0]["factors"]["rolling"] == 0
+
+    def test_batter_rolling_direction(self):
+        # Batter: 14d 🔥 = RISING Δ (opposite to SP where ❄️ = decay rising).
+        # Batter: Δ positive = hot (rising) → negative urgency (subtract)
+        # Per CLAUDE.md batter table:
+        #   ≥ +0.050 🔥強回升 = -2
+        #   +0.035 ≤ Δ < +0.050 = -1
+        #   持平 = 0
+        #   -0.050 < Δ ≤ -0.035 = +1
+        #   ≤ -0.050 = +2
+        prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}
+        # season xwoba default 0.310 (_mk_weakest_batter)
+        cases = [
+            (0.365, -2),  # Δ = +.055 強回升
+            (0.347, -1),  # Δ = +.037 弱回升
+            (0.310, 0),   # Δ = 0 持平
+            (0.273, 1),   # Δ = -.037 弱下滑
+            (0.255, 2),   # Δ = -.055 強下滑
+        ]
+        for r_xwoba, expected in cases:
+            p = _mk_weakest_batter("P", 10, prior,
+                                    {"xwoba": r_xwoba, "bbe": 30},
+                                    pa_per_tg=3.0)
+            res = compute_urgency([p], "batter")
+            got = res["weakest_ranked"][0]["factors"]["rolling"]
+            assert got == expected, f"Δ xwoba {r_xwoba}: expected {expected}, got {got}"
+
+
+class Test2026SumBuckets:
+    @pytest.mark.parametrize("sum_2026,expected", [
+        (5, 5),    # <9 → +5
+        (9, 4),    # 9-11
+        (12, 3),   # 12-14
+        (15, 2),   # 15-17
+        (18, 1),   # 18-21
+        (22, 0),   # ≥22 no bonus
+        (30, 0),
+    ])
+    def test_sp_2026_sum_bucket(self, sum_2026, expected):
+        base = {"xera": 4.00, "xwoba_allowed": 0.310, "hh_pct_allowed": 41.0, "ip": 100.0}
+        p = _mk_weakest_sp("P", sum_2026, base, None, ip_per_tg=0.3)
+        res = compute_urgency([p], "sp")
+        assert res["weakest_ranked"][0]["factors"]["sum_2026"] == expected

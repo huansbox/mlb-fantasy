@@ -193,6 +193,234 @@ def pick_weakest(
     return weakest, excluded
 
 
+# ── Phase 5.3: urgency four-factor computation ──
+# Prior IP <20 → too small a sample to count as prior data (per #2 bug fix).
+# CLAUDE.md rule: "2025 Sum 雙年檢核（需 2025 IP ≥50）" for Slump hold gate,
+# but the base Sum scoring also skips on <20 IP to avoid 5-IP noise
+# (López 5 IP, 22 BBE → xera 10.73 was giving +2 结构性確認 erroneously).
+_PRIOR_IP_MIN = 20
+_PRIOR_IP_SLUMP_HOLD_MIN = 50
+
+
+def _factor_2026_sum(sum_2026: int) -> int:
+    """Per CLAUDE.md urgency factor (1): 2026 Sum bucket.
+
+    <9=+5, 9-11=+4, 12-14=+3, 15-17=+2, 18-21=+1, ≥22=+0.
+    """
+    if sum_2026 < 9:
+        return 5
+    if sum_2026 <= 11:
+        return 4
+    if sum_2026 <= 14:
+        return 3
+    if sum_2026 <= 17:
+        return 2
+    if sum_2026 <= 21:
+        return 1
+    return 0
+
+
+def _factor_2025_sum(sum_2025: int, prior_ip: float | None, player_type: PlayerType) -> int:
+    """Per CLAUDE.md urgency factor (2): 2025 Sum (with optional IP gate for SP).
+
+    SP rules:
+        Sum ≥24 + IP ≥50 → Slump hold (handled separately, this returns +0)
+        Sum ≥24 + IP <50 → +0 (菁英但低樣本)
+        Sum 22-23 → +0 (灰色帶)
+        Sum 18-21 → +1
+        Sum <18   → +2 (結構性確認)
+
+    Batter rules: same except no IP gate (Slump hold handled separately).
+    """
+    if sum_2025 == 0:
+        return 0  # no prior (or prior IP <20 for SP, already zeroed in caller)
+    if sum_2025 >= 24:
+        return 0  # Slump hold handled by caller; low-IP also +0
+    if sum_2025 >= 22:
+        return 0  # 灰色帶
+    if sum_2025 >= 18:
+        return 1
+    return 2  # 結構性確認
+
+
+def _factor_rolling(rolling: dict | None, season_xwoba_allowed: float | None,
+                    player_type: PlayerType) -> int:
+    """Per CLAUDE.md urgency factor (3): 21d Δ xwOBA (SP) / 14d Δ xwOBA (batter).
+
+    SP direction (allowed): Δ ≤ -.050 = 🔥強回升 = -2; Δ ≥ +.050 = ❄️強劣化 = +2.
+    Batter direction: Δ ≥ +.050 = 🔥強回升 = -2; Δ ≤ -.050 = ❄️強下滑 = +2.
+
+    BBE gate: batter ≥25, SP ≥20 (per CLAUDE.md).
+    """
+    if not rolling:
+        return 0
+    bbe_gate = 25 if player_type == "batter" else 20
+    if (rolling.get("bbe") or 0) < bbe_gate:
+        return 0
+    r_xwoba = rolling.get("xwoba")
+    if r_xwoba is None or season_xwoba_allowed is None:
+        return 0
+    delta = r_xwoba - season_xwoba_allowed
+
+    if player_type == "sp":
+        # Allowed direction: lower = better, so Δ negative = improving (-urgency)
+        if delta <= -0.050:
+            return -2
+        if delta <= -0.035:
+            return -1
+        if delta >= 0.050:
+            return 2
+        if delta >= 0.035:
+            return 1
+        return 0
+    # batter: higher xwOBA = better → Δ positive = rising (-urgency)
+    if delta >= 0.050:
+        return -2
+    if delta >= 0.035:
+        return -1
+    if delta <= -0.050:
+        return 2
+    if delta <= -0.035:
+        return 1
+    return 0
+
+
+def _factor_sp_ip_per_tg(ip_per_tg: float | None) -> int:
+    """SP factor (4): 2026 IP/Team_G — active 輪值越多越拖比率."""
+    if ip_per_tg is None:
+        return 0
+    if ip_per_tg >= 1.0:
+        return 2
+    if ip_per_tg >= 0.5:
+        return 1
+    return 0
+
+
+def _factor_batter_pa_per_tg(pa_per_tg: float | None) -> int:
+    """Batter factor (4): 2026 PA/Team_G — 越主力越拖 stats."""
+    if pa_per_tg is None:
+        return 0
+    if pa_per_tg >= 3.5:
+        return 2
+    if pa_per_tg >= 3.0:
+        return 1
+    return 0
+
+
+def compute_urgency(
+    weakest_n: list[dict],
+    player_type: PlayerType,
+) -> dict:
+    """Compute urgency four-factor score for weakest-N players.
+
+    Each weakest entry should include:
+        score         — 2026 Sum (from pick_weakest)
+        prior_stats   — 2025 prior dict (may be empty/None)
+        rolling_21d   — SP 21d rolling {xwoba, bbe} (or None)
+        rolling_14d   — batter 14d rolling (or None)
+        savant_2026   — current-season Savant (for rolling Δ base xwoba)
+        derived       — {ip_per_tg (SP) / pa_per_tg (batter)}
+
+    Returns:
+        {
+            "weakest_ranked": [  # sorted by urgency desc
+                {name, urgency, factors: {...}, prior_sum, prior_ip, notes: [...],
+                 ...original weakest entry}
+            ],
+            "slump_hold": [{name, prior_sum, prior_ip}]  # excluded from rank
+        }
+    """
+    season_xwoba_key = "xwoba" if player_type == "batter" else "xwoba"
+    # For SP, Savant xwoba in 2026 data represents xwOBA allowed (same key).
+
+    ranked = []
+    slump_hold = []
+
+    for w in weakest_n:
+        name = w["name"]
+        sum_2026 = w.get("score", 0)
+        prior = w.get("prior_stats") or {}
+        prior_ip = prior.get("ip") if player_type == "sp" else None
+
+        # Prior Sum — with #2 bug fix: SP prior IP <20 ⇒ treat as no prior
+        notes = []
+        effective_prior = prior
+        if player_type == "sp" and prior and prior_ip is not None and prior_ip < _PRIOR_IP_MIN:
+            effective_prior = {}
+            notes.append(
+                f"2025 prior IP {prior_ip:.1f} <{_PRIOR_IP_MIN} 無效（樣本過小），視為無 prior"
+            )
+
+        sum_2025, prior_breakdown = compute_2025_sum(effective_prior, player_type)
+
+        # Slump hold detection (BEFORE adding 2025 factor)
+        is_slump_hold = False
+        if sum_2025 >= 24:
+            if player_type == "sp":
+                if prior_ip is not None and prior_ip >= _PRIOR_IP_SLUMP_HOLD_MIN:
+                    is_slump_hold = True
+            else:
+                is_slump_hold = True  # batter: no IP gate
+
+        if is_slump_hold:
+            slump_hold.append(
+                {
+                    "name": name,
+                    "mlb_id": w.get("mlb_id"),
+                    "prior_sum": sum_2025,
+                    "prior_ip": prior_ip,
+                    "prior_breakdown": prior_breakdown,
+                    "sum_2026": sum_2026,
+                    "note": "菁英底，slump 候選",
+                }
+            )
+            continue
+
+        # Four factors
+        f_2026 = _factor_2026_sum(sum_2026)
+        f_2025 = _factor_2025_sum(sum_2025, prior_ip, player_type)
+
+        # Rolling Δ base: season xwOBA (allowed for SP; batting for batter)
+        season_savant = w.get("savant_2026") or {}
+        season_xwoba = season_savant.get(season_xwoba_key)
+
+        if player_type == "sp":
+            rolling = w.get("rolling_21d")
+            f_rolling = _factor_rolling(rolling, season_xwoba, "sp")
+            ip_per_tg = (w.get("derived") or {}).get("ip_per_tg")
+            f_production = _factor_sp_ip_per_tg(ip_per_tg)
+        else:
+            rolling = w.get("rolling_14d")
+            f_rolling = _factor_rolling(rolling, season_xwoba, "batter")
+            pa_per_tg = (w.get("derived") or {}).get("pa_per_tg")
+            f_production = _factor_batter_pa_per_tg(pa_per_tg)
+
+        urgency = f_2026 + f_2025 + f_rolling + f_production
+
+        entry = {
+            **w,
+            "urgency": urgency,
+            "factors": {
+                "sum_2026": f_2026,
+                "sum_2025": f_2025,
+                "rolling": f_rolling,
+                "ip_per_tg" if player_type == "sp" else "pa_per_tg": f_production,
+            },
+            "prior_sum": sum_2025,
+            "prior_ip": prior_ip,
+            "prior_breakdown": prior_breakdown,
+            "notes": notes,
+        }
+        ranked.append(entry)
+
+    ranked.sort(key=lambda e: e["urgency"], reverse=True)
+
+    return {
+        "weakest_ranked": ranked,
+        "slump_hold": slump_hold,
+    }
+
+
 def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple[int, dict]:
     """Same as compute_sum_score but maps SP prior_stats keys (_allowed suffix).
 
