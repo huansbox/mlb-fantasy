@@ -174,6 +174,7 @@
 - 04-21：⚠️ 21d Δ+0.046近況下滑+IP/GS 2.0極短局, SP產量價值嚴重存疑（fa_scan）
 - 04-21：⚠️ 21d Δ+0.046近況下滑+IP/GS 2.0極短局, SP產量價值嚴重存疑（fa_scan）
 - 04-21：⚠️ 21d Δ+0.046 近況下滑首現+IP/GS 2.0 極短局, SP 產量價值嚴重存疑, 觀察降級中（fa_scan）
+- 04-21：⚠️ 21d Δ+0.046 近況下滑首現+IP/GS 2.0 極短局, SP 產量價值嚴重存疑, 觀察降級中（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：BBE 達 35 且 3 項核心維持 >P70 → vs Albies
@@ -217,6 +218,7 @@
 - 04-21：BBE 60 距觸發 70 差 10 即將觸發，xERA 3.03/xwOBA .281 P80-90 穩定不動搖（fa_scan）
 - 04-21：BBE 60距觸發70差10即將觸發, xERA 3.03/xwOBA .281 P80-90穩定不動搖（fa_scan）
 - 04-21：✅ BBE 60 距觸發 70 差 10 即將觸發, P80-90 穩定不動搖（fa_scan）
+- 04-21：✅ BBE 60 距觸發 70 差 10 即將觸發, P80-90 穩定不動搖（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P70 → vs Buxton
@@ -253,6 +255,7 @@
 - 04-21：機械判「取代」人工降級觀察：BBE 38 僅過半+運氣 +1.37 賣高+2025 極差三重風險。品質穩定等 BBE 60（fa_scan）
 - 04-21：機械判「取代」人工降級觀察：BBE 38僅過半+運氣+1.37賣高+2025極差三重風險。等BBE 60（fa_scan）
 - 04-21：機械取代人工降級: BBE 38+運氣+1.37+2025極差三重風險, 等 BBE 60（fa_scan）
+- 04-21：機械取代人工降級: BBE 38+運氣+1.37+2025極差三重風險, 等 BBE 60（fa_scan）
 
 ### Tyler Wells (BAL, SP,RP) [mlb_id:669330] — 觀察中
 觸發：BBE 達 50 且 xERA <4.04 + HH% <36.4% 維持 → vs Nola
@@ -277,6 +280,7 @@
 - 04-21：⚠️ xwOBA .299超觸發.289, xERA 3.46逼近3.50。下次xERA>3.50→結案（fa_scan）
 - 04-21：⚠️ xwOBA .299超觸發.289, xERA 3.46逼近3.50。下次xERA>3.50→結案（fa_scan）
 - 04-21：⚠️ xwOBA .299 超觸發 .289, xERA 3.46 逼近 3.50 紅線, 下次超→結案（fa_scan）
+- 04-21：⚠️ xwOBA .299 超觸發 .289, xERA 3.46 逼近 3.50 紅線, 下次超→結案（fa_scan）
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
@@ -291,6 +295,7 @@
 - 04-21：⚠️ 品質崩盤建議結案：xERA 4.12+HH% 39.3%雙項破觸發門檻（fa_scan）
 - 04-21：⚠️ 品質崩盤建議結案：xERA 4.12+HH% 39.3%雙項破觸發門檻（fa_scan）
 - 04-21：⚠️ 品質崩盤 xERA 4.12+HH% 39.3% 雙項破觸發, 建議結案移除（fa_scan）
+- 04-21：⚠️ 品質崩盤 xERA 4.12+HH% 39.3% 雙項破觸發, 建議結案移除（fa_scan）
 
 ### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
@@ -304,6 +309,7 @@
 - 04-21：⚠️ xERA 3.95 超觸發 3.74 持續+IP/GS 4.4 未回升，雙條件惡化中（fa_scan）
 - 04-21：⚠️ xERA 3.95+IP/GS 4.4雙條件持續惡化, 接近結案邊緣（fa_scan）
 - 04-21：⚠️ xERA 3.95+IP/GS 4.4雙條件持續惡化, 接近結案邊緣（fa_scan）
+- 04-21：⚠️ xERA 3.95+IP/GS 4.4 雙條件持續惡化, 接近結案（fa_scan）
 - 04-21：⚠️ xERA 3.95+IP/GS 4.4 雙條件持續惡化, 接近結案（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
@@ -339,6 +345,7 @@
 - 04-21：BBE 45→70差5-6場，品質穩定（xERA 3.06/xwOBA .282 P80-90）。IP/GS 4.4短局+ATH弱隊拖產量（fa_scan）
 - 04-21：BBE 45→70 差 5-6 場穩定追蹤，IP/GS 4.4 短局+ATH 弱隊拖產量（fa_scan）
 - 04-21：BBE 45→70差5-6場, 品質穩定P80-90。IP/GS 4.4短局+ATH弱隊拖產量（fa_scan）
+- 04-21：BBE 45→70差5-6場, 品質穩定P80-90。IP/GS 4.4短局+ATH弱隊拖產量（fa_scan）
 
 ### Ben Brown (CHC, SP,RP) [mlb_id:676962] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持 → 取代 Nola
@@ -349,6 +356,7 @@
 - 04-21：BBE 46→60差3-4場加速, xERA 2.97/xwOBA .278 >P90穩定。%owned 4% 3d+3升（fa_scan）
 - 04-21：BBE 46→60 加速中，xERA 2.97/xwOBA .278 >P90 穩定，%owned 4% 安全（fa_scan）
 - 04-21：BBE 46→60加速中, xERA 2.97/xwOBA .278 >P90穩定。4% owned安全（fa_scan）
+- 04-21：BBE 46→60 加速(+8), >P90 穩定, 差 3-4 場觸發（fa_scan）
 - 04-21：BBE 46→60 加速(+8), >P90 穩定, 差 3-4 場觸發（fa_scan）
 
 ### Carlos Correa (HOU, 3B,SS) [mlb_id:621043] — 觀察中
@@ -374,6 +382,7 @@
 - 04-21：BBE 18極低信心驗證期。三項>P90+2025 Sum 26雙年確認+運氣-1.50買低。2% owned無壓力（fa_scan）
 - 04-21：BBE 18 極低信心驗證期，三項>P90+2025 雙年確認+運氣買低，2% owned 無壓力（fa_scan）
 - 04-21：BBE 18極低信心驗證期, 三項>P90+2025雙年確認+運氣買低。2% owned無壓力（fa_scan）
+- 04-21：BBE 18極低信心驗證期, 三項>P90+2025雙年確認+運氣買低。2% owned無壓力（fa_scan）
 
 ### Brandon Pfaadt (AZ, SP) [mlb_id:694297] — 觀察中
 觸發：立即行動
@@ -382,11 +391,13 @@
 - 04-21：機械判「取代」人工降級：2025 breakout 未確認不追單年。建議觸發門檻降至 BBE 60 再評估（fa_scan）
 - 04-21：機械判「取代」人工降級：2025 breakout未確認不追單年。建議觸發門檻降至BBE 60再評估。0% owned（fa_scan）
 - 04-21：機械取代人工降級: 2025 breakout 未確認. BBE 74 高信心為最強 edge case, 觸發門檻降至下次先發確認（fa_scan）
+- 04-21：機械取代人工降級: 2025 breakout 未確認. BBE 74 高信心為最強 edge case, 觸發門檻降至下次先發確認（fa_scan）
 
 ### Walbert Ureña (LAA, SP) [mlb_id:700712] — 觀察中
 觸發：BBE 達 30 且三項維持 >P70 → 重新評估升級
 - 04-21：Sum 30(>P90全線) BBE 24 樣本小否決升級，IP/GS 6.0 深投型，1% owned 無壓力（fa_scan）
 - 04-21：BBE 24 樣本小否決升級，IP/GS 6.0 深投型，1% owned 持續觀察（fa_scan）
+- 04-21：BBE 24樣本小否決升級, IP/GS 6.0深投型, 1% owned持續觀察（fa_scan）
 - 04-21：BBE 24樣本小否決升級, IP/GS 6.0深投型, 1% owned持續觀察（fa_scan）
 
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
@@ -423,15 +434,18 @@
 觸發：BBE 達 50 且確認固定先發 + HH% >30%
 - 04-21：Sum 27 但 BBE 25 極低+IP/GS 0.7 極短局+運氣 +2.4 賣高，品質不可信（fa_scan）
 - 04-21：Sum 27但BBE 25極低+IP/GS 0.7極短局+運氣+2.4賣高, 品質不可信（fa_scan）
+- 04-21：Sum 27但BBE 25極低+IP/GS 0.7極短局+運氣+2.4賣高, 品質不可信（fa_scan）
 
 ### Cade Horton (CHC, SP) [mlb_id:690990] — 觀察中
 觸發：BBE 達 40 且 IP/GS ≥5.0
 - 04-21：Sum 27 品質 P80-90 但 BBE 20+IP/GS 3.7 雙重硬傷，35% owned 窗口有限（fa_scan）
 - 04-21：Sum 27品質P80-90但BBE 20+IP/GS 3.7雙重硬傷, 35% owned窗口有限（fa_scan）
+- 04-21：Sum 27品質P80-90但BBE 20+IP/GS 3.7雙重硬傷, 35% owned窗口有限（fa_scan）
 
 ### Jacob Latz (TEX, SP,RP) [mlb_id:656641] — 觀察中
 觸發：BBE 達 50 且 HH% <42% + IP/GS 回升
 - 04-21：xERA 1.69 極端但 HH% 45.5% 崩盤單項否決，breakout 待驗（fa_scan）
+- 04-21：xERA 1.69極端但HH% 45.5%崩盤單項否決, breakout待驗（fa_scan）
 - 04-21：xERA 1.69極端但HH% 45.5%崩盤單項否決, breakout待驗（fa_scan）
 
 ### Leody Taveras (BAL, CF,RF) [mlb_id:665750] — 觀察中
