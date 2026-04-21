@@ -2093,23 +2093,32 @@ def _format_fa_for_layer5(entry, group_type, idx):
     return lines
 
 
-def _filter_waiver_log_by_group(section_content, group_type):
+def _filter_waiver_log_by_group(section_content, group_type, rostered_names=None):
     """Split waiver-log 觀察中 section into per-player entries and keep only
-    those matching group_type ('batter' or 'sp').
+    those matching group_type ('batter' or 'sp') AND not already rostered.
 
     Entry format: `### 球員名 (TEAM, POSITIONS) [mlb_id:XXX] — 觀察中`
     POSITIONS examples: "SP", "RP", "SP,RP" (pitcher) vs "C", "1B,3B" (batter).
+
+    rostered_names: set of player names already rostered by some team. These
+    entries are dropped from Claude's view even though they still live in
+    waiver-log.md (snapshot-only cron at TW 15:15 will auto-close them).
+    Without this filter, Claude sees them and writes stale 結案 suggestions.
     """
+    rostered = rostered_names or set()
     entries = re.split(r"(?=^### )", section_content, flags=re.MULTILINE)
     kept = []
     for entry in entries:
         if not entry.startswith("### "):
             kept.append(entry)  # Preamble before first ### header
             continue
-        m = re.match(r"### [^(]+\([A-Z]+,\s*([^)]+)\)", entry)
+        m = re.match(r"### ([^(]+)\(([A-Z]+),\s*([^)]+)\)", entry)
         if not m:
             continue  # Malformed header, skip defensively
-        positions = m.group(1).strip()
+        name = m.group(1).strip()
+        positions = m.group(3).strip()
+        if name in rostered:
+            continue  # Already rostered — snapshot cron will auto-close
         is_pitcher = "SP" in positions or "RP" in positions
         if group_type == "sp" and is_pitcher:
             kept.append(entry)
@@ -2119,7 +2128,8 @@ def _filter_waiver_log_by_group(section_content, group_type):
 
 
 def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
-                         watch_tagged, changes, ref_1d, ref_3d, config):
+                         watch_tagged, changes, ref_1d, ref_3d, config,
+                         rostered_names=None):
     """Build Claude Layer 5 input string: mechanical report + context.
 
     Claude task is to text-ify the pre-computed Sum/urgency/tags/decision and
@@ -2245,7 +2255,7 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
             section = wl_content.split("## 觀察中")[1]
             if "## 已結案" in section:
                 section = section.split("## 已結案")[0]
-            filtered = _filter_waiver_log_by_group(section, group_type)
+            filtered = _filter_waiver_log_by_group(section, group_type, rostered_names)
             if filtered.strip():
                 lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅 {label}）---\n## 觀察中{filtered}")
 
@@ -2344,7 +2354,8 @@ def _run_rp_scan(access_token, config, today_str, env, args):
 
 
 def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
-                   changes, ref_1d, ref_3d, today_str, env, args):
+                   changes, ref_1d, ref_3d, today_str, env, args,
+                   rostered_names=None):
     """Process one group (batter or SP) via Python compute layer + Claude text layer.
 
     Pipeline (Phase 5):
@@ -2448,6 +2459,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         data = _build_pass2_data_v2(
             group_type, urgency_result, low_conf, fa_tagged, watch_tagged,
             changes, ref_1d, ref_3d, config,
+            rostered_names=rostered_names,
         )
         advice = _call_claude(prompt_path, data, timeout=900)
 
@@ -2506,12 +2518,14 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     # Filter out watchlist players already rostered (no longer FA)
     league_key = config["league"]["league_key"]
     still_fa = []
+    rostered_names = set()
     print(f"  Ownership check: {len(watchlist)} watch players...", file=sys.stderr)
     for w in watchlist:
         try:
             ownership = _check_player_ownership(w["name"], league_key, access_token)
             if ownership == "team":
                 print(f"  Watch skip (rostered): {w['name']}", file=sys.stderr)
+                rostered_names.add(w["name"])
             else:
                 still_fa.append(w)
         except Exception as e:
@@ -2581,6 +2595,7 @@ def _run_daily_scan(access_token, config, today_str, env, args):
             _process_group(
                 group_type, config, savant_2026, enriched, watch_enriched,
                 changes, ref_1d, ref_3d, today_str, env, args,
+                rostered_names=rostered_names,
             )
         except Exception as e:
             with error_lock:
