@@ -46,24 +46,6 @@
 - 04-21：BBE 44, 14d xwOBA .357 Δ-0.062近況下滑。位置衝突(C有Langeliers)確認為備案, 不主動add（fa_scan）
 - 04-21：BBE 44, 14d xwOBA .357 Δ-0.062近況下滑。位置衝突(C有Langeliers)確認為備案, 不主動add（fa_scan）
 
-### Dillon Dingler (DET, C) [mlb_id:698349] — 觀察中
-觸發：BBE 達 30 且 Barrel% > P70 → 重新評估
-- 04-07：2026 xwOBA .468(>P90) / Barrel% 29.4%(>P90) / BB% 10.0%(P70-80)，17 BBE。2025 xwOBA .351(P90) 但 BB% 4.9%(<P25)，BB% 跳升待驗（fa_scan）
-- 04-08：本次 BBE 0（數據延遲），%owned 26% 三日+3 上升，等數據更新（fa_scan）
-- 04-09：BBE 0 無新數據，%owned 26% 持續升，等數據更新（fa_scan）
-- 04-10：BBE 0 無新數據，%owned 26%，等數據更新（fa_scan）
-- 04-11：BBE 0 連續無新數據，%owned 27% 三日+1。需確認大聯盟狀態（fa_scan）
-- 04-13：BBE 0 連續無數據，需確認大聯盟狀態。29% owned 三日+3（fa_scan）
-- 04-14：BBE 0 連續無數據，需確認大聯盟狀態。31% owned 三日+4（fa_scan）
-- 04-15：BBE 0 連續無數據。31% owned 三日+5 持續升。需確認大聯盟狀態（fa_scan）
-- 04-16：BBE 0 連續無數據。31% owned 三日+5 持續升需確認大聯盟狀態（fa_scan）
-- 04-17：BBE 0 連續無數據。34% owned 三日+3 持續升。需確認大聯盟狀態（fa_scan）
-- 04-19：BBE 0 連續無數據。⚠️ 37% owned 三日+5 加速升，窗口快速關閉（fa_scan）
-- 04-21：BBE 0連續2週無數據, ⚠️ 37% owned 3d+5窗口關閉中。需確認MLB狀態, 持續無數據→結案（fa_scan）
-- 04-21：BBE 0連續2週, 37% owned 3d+5。需確認MLB狀態(IL/下放?), 持續無數據→結案（fa_scan）
-- 04-21：BBE 0連續2週, 37% owned 3d+5。需確認MLB狀態(IL/下放?), 持續無數據→結案（fa_scan）
-- 04-21：BBE 0連續2週, 37% owned 3d+5。需確認MLB狀態(IL/下放?), 持續無數據→結案（fa_scan）
-
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：BBE 達 30 且 2 項核心指標維持 >P70 → vs Butler
 - 04-08：三項>P90（.384/12.5%/13.3%）BBE 15 低信心，2025 prior P25-40 弱，%owned 15% 三日+11 急升（fa_scan）
@@ -295,21 +277,6 @@
 - 04-21：⚠️ xwOBA .299 超觸發 .289, xERA 3.46 逼近 3.50 紅線, 下次超→結案（fa_scan）
 - 04-21：⚠️ xwOBA .299 超觸發 .289, xERA 3.46 逼近 3.50 紅線, 下次超→結案（fa_scan）
 
-### Martín Pérez (ATL, SP) [mlb_id:527048] — 觀察中
-觸發：BBE 達 60 且 xERA <3.74 + HH% <36.4% 維持 → vs Nola
-- 04-14：3/3 勝 Nola（xERA 3.80/xwOBA .312/HH% 30.2% >P90）BBE 43，ATL 強隊。但 2025 極差（5.37/.354）breakout 未確認，IP/GS 5.0 短局（fa_scan）
-- 04-15：BBE 43（觸發 60），xERA 3.85/HH% 30.2% >P90，2025 極差 breakout 未確認。IP/GS 5.0 短局。距觸發差 4-5 場，0% owned（fa_scan）
-- 04-16：BBE 43→60 差 4-5 場，xERA 3.83/HH% 30.2% 3/3 勝 Nola，IP/GS 5.0 短局，2025 極差 breakout 未確認。0% owned（fa_scan）
-- 04-17：BBE 43→60 差 4-5 場，xERA 3.84/HH% 30.2% 品質達標邊緣，2025 極差 breakout 未確認。0% owned（fa_scan）
-- 04-19：⚠️ 品質惡化：xERA 3.84→4.12 超觸發 3.74、HH% 30.2→39.3% 超觸發 36.4%，兩項同時失守（fa_scan）
-- 04-20：⚠️ 品質崩盤：xERA 4.12 超觸發 3.74 + HH% 39.3% 超觸發 36.4% 兩項同時失守，建議結案移除（fa_scan）
-- 04-21：⚠️ 品質崩盤確認：xERA 4.12+HH% 39.3% 兩項同時破觸發門檻，建議結案移除（fa_scan）
-- 04-21：⚠️ 品質崩盤建議結案：xERA 4.12超觸發3.74 + HH% 39.3%超觸發36.4%雙項同時失守（fa_scan）
-- 04-21：⚠️ 品質崩盤建議結案：xERA 4.12+HH% 39.3%雙項破觸發門檻（fa_scan）
-- 04-21：⚠️ 品質崩盤建議結案：xERA 4.12+HH% 39.3%雙項破觸發門檻（fa_scan）
-- 04-21：⚠️ 品質崩盤 xERA 4.12+HH% 39.3% 雙項破觸發, 建議結案移除（fa_scan）
-- 04-21：⚠️ 品質崩盤 xERA 4.12+HH% 39.3% 雙項破觸發, 建議結案移除（fa_scan）
-
 ### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
 觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
 - 04-15：xERA 3.67/xwOBA .305/HH% 33.3% 3/3 勝 Nola（BBE 36 中等），2025 極差（5.41/.355）breakout 未確認。IP/GS 4.2 短局 QS 打折，運氣 -1.30 買低。SD 強隊。2% owned（fa_scan）
@@ -383,16 +350,6 @@
 - 04-21：14d xwOBA .320 Δ-0.040弱下滑啟用(BBE 27≥25), 但季線.360>P90 BBE 63全場最高信心壓倒。Muncy fallback $1（fa_scan）
 - 04-21：觸發第3天。14d Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心壓倒。建議 FAAB $1 立即取代 Albies，Muncy $3-5 fallback（fa_scan）
 - 04-21：觸發第3天。14d Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心壓倒。建議 FAAB $1 立即取代 Albies，Muncy $3-5 fallback（fa_scan）
-
-### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
-觸發：立即行動
-- 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
-- 04-20：[eval] vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅ (雙年菁英 + 球隊主力) + 0 ⚠️ → **立即取代**。14d xwOBA .323 Δ-0.083 雖 ❄️ 但 BBE 21<25 不啟用。建議 FAAB $3-5 取代 Albies。fallback Correa $1。mlb_id 修正 571970→691777（LAD 老 Muncy vs ATH 年輕）
-- 04-20：⚠️ **cron 誤判被搶**（commit `afbe6ca`）— 當時 waiver-log 條目還是舊 mlb_id 571970（LAD 老 Muncy），cron 查 571970 的 ownership 為 rostered → 誤把 ATH Muncy 標為已結案。實際 ATH Muncy (691777) 仍 50% owned 可撿。已恢復觀察中
-- 04-21：機械報告2025 prior使用錯誤mlb_id(LAD #571970→.267), 正確ATH #691777(.374), waiver-log eval結論不受影響維持立即行動。49% owned窗口有限（fa_scan）
-- 04-21：機械報告2025 prior用錯mlb_id(LAD→.267), 正確ATH #691777(.374)=雙年菁英確認。49% owned窗口收窄, 維持FAAB $3-5立即取代Albies（fa_scan）
-- 04-21：機械報告2025 prior用錯mlb_id(LAD→.267), 正確ATH #691777(.374)=雙年菁英確認。49% owned窗口收窄, 維持FAAB $3-5立即取代Albies（fa_scan）
-- 04-21：機械報告2025 prior用錯mlb_id(LAD→.267), 正確ATH #691777(.374)=雙年菁英確認。49% owned窗口收窄, 維持FAAB $3-5立即取代Albies（fa_scan）
 
 ### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
@@ -528,6 +485,15 @@
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 
 ## 已結案
+
+### Dillon Dingler (DET, C) — 被搶（自動偵測）
+- 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
+
+### Martín Pérez (ATL, SP) — 被搶（自動偵測）
+- 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
+
+### Max Muncy (ATH, 2B,3B,SS) — 被搶（自動偵測）
+- 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
 
 ### Chad Patrick (MIL, SP) — 被搶（自動偵測）
 - 2026-04-20：Yahoo ownership_type=team，從觀察中移除。
