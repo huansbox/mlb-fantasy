@@ -791,14 +791,20 @@ def filter_by_savant(snapshot, savant_2026):
 
 
 def _fetch_team_games():
-    """Fetch 2026 gamesPlayed for all 30 teams. Returns abbr→games."""
+    """Fetch 2026 gamesPlayed for all 30 teams. Returns abbr→games.
+
+    Requires `hydrate=team` because the default standings response no longer
+    includes `team.abbreviation` (only id/name/link). Without hydrate every
+    abbr collapses to "" and IP/TG / PA/TG factors silently zero out.
+    """
     try:
-        data = mlb_api_get("/standings?leagueId=103,104&season=2026")
+        data = mlb_api_get("/standings?leagueId=103,104&season=2026&hydrate=team")
         result = {}
         for record in data.get("records", []):
             for entry in record.get("teamRecords", []):
                 abbr = entry["team"].get("abbreviation", "")
-                result[abbr] = entry.get("gamesPlayed", 0)
+                if abbr:
+                    result[abbr] = entry.get("gamesPlayed", 0)
         return result
     except Exception as e:
         print(f"  Standings fetch failed: {e}", file=sys.stderr)
@@ -2321,17 +2327,25 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         fa_candidates = [p for p in enriched if p["fa_type"] == group_type]
         watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
 
-        # Layer 1.5: pure RP filter (Yahoo SP,RP 雙資格但 2026 GS=0)
+        # Layer 1.5: pure RP filter — drop SP,RP dual-eligible players whose
+        # 2026 usage is opener / extreme swingman (GS=0 or IP/GS <2.0).
+        # IP/GS<2.0 catches "1-2 starts but only 0.5-1.0 IP each" RP usage
+        # like Bernardino (0.7 IP/GS) which Yahoo eligibility doesn't filter.
         if group_type == "sp":
             def _is_real_sp(p):
                 mlb = p.get("mlb_2026") or {}
-                return int(mlb.get("gamesStarted", 0) or 0) > 0
+                gs = int(mlb.get("gamesStarted", 0) or 0)
+                if gs == 0:
+                    return False
+                ip = _parse_ip(mlb.get("inningsPitched", "0"))
+                ip_per_gs = ip / gs if gs > 0 else 0
+                return ip_per_gs >= 2.0
             before = len(fa_candidates) + len(watch_candidates)
             fa_candidates = [p for p in fa_candidates if _is_real_sp(p)]
             watch_candidates = [p for p in watch_candidates if _is_real_sp(p)]
             removed = before - len(fa_candidates) - len(watch_candidates)
             if removed:
-                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (2026 GS=0)",
+                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (GS=0 or IP/GS<2.0)",
                       file=sys.stderr)
 
         # ── Layer 4: Python compute (Sum / urgency / FA tags) ──
