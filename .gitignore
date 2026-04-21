@@ -8,3 +8,4 @@ daily-advisor/.last_sync
 *.stackdump
 __pycache__/
 .DS_Store
+.claude/

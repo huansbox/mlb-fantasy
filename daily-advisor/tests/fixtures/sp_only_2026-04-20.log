@@ -1,0 +1,137 @@
+[FA Scan] Daily scan 2026-04-20...
+  Layer 1: Yahoo FA queries...
+  Layer 2: Savant quality filter...
+  Savant batter_sc 2026: 435 rows
+  Savant batter_ex 2026: 438 rows
+  Savant pitcher_sc 2026: 498 rows
+  Savant pitcher_ex 2026: 499 rows
+  Ownership check: 30 watch players...
+  Watch skip (rostered): Dillon Dingler
+  Watch skip (rostered): Martín Pérez
+  Watch skip (rostered): Max Muncy
+  Layer 2: 47 FA → 47 name-matched + 0 fallback → 24 passed (10 bat Sum≥21 / 14 SP P40×2 / 0 RP)
+  Layer 2: 1 FA → 1 name-matched + 0 fallback → 0 passed (0 bat Sum≥21 / 0 SP P40×2 / 0 RP)
+  Layer 2: 1 FA → 1 name-matched + 0 fallback → 0 passed (0 bat Sum≥21 / 0 SP P40×2 / 0 RP)
+  Layer 2: 1 FA → 1 name-matched + 0 fallback → 0 passed (0 bat Sum≥21 / 0 SP P40×2 / 0 RP)
+  Layer 2: 1 FA → 1 name-matched + 0 fallback → 0 passed (0 bat Sum≥21 / 0 SP P40×2 / 0 RP)
+  Layer 3: Enriching FA candidates...
+  Downloading 2025 Savant CSVs...
+  Savant batter_sc 2025: 666 rows
+  Savant batter_ex 2025: 673 rows
+  Savant pitcher_sc 2025: 873 rows
+  Savant pitcher_ex 2025: 873 rows
+  Layer 3: 24 → 24 enriched
+  Layer 3: Enriching watch players...
+  Layer 1.5 (SP): 10 pure RP removed (2026 GS=0)
+  Pass 1 (SP): picking weakest...
+  Pass 2 (SP): comparing...
+  Pass 2 (pitcher): fetching 21d for 14 FA/watch...
+  claude -p attempt 1 failed (TimeoutExpired), retrying...
+From https://github.com/huansbox/mlb-fantasy
+ * branch            master     -> FETCH_HEAD
+Current branch feat/sp-framework-v2 is up to date.
+  waiver-log: UPDATE Brandon Pfaadt
+  waiver-log: UPDATE Martín Pérez
+  waiver-log: UPDATE Walker Buehler
+  waiver-log: UPDATE Brent Suter
+[feat/sp-framework-v2 3e32ab7] chore(waiver-log): fa_scan auto-update 2026-04-20
+ 1 file changed, 4 insertions(+)
+To https://github.com/huansbox/mlb-fantasy.git
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'https://github.com/huansbox/mlb-fantasy.git'
+hint: Updates were rejected because a pushed branch tip is behind its remote
+hint: counterpart. If you want to integrate the remote changes, use 'git pull'
+hint: before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+  [fa_scan] waiver-log git push failed.
+## 任務 A — Urgency 排序
+
+### 2025 Sum 計算
+
+| 球員 | xERA | → | xwOBA | → | HH% | → | 2025 Sum | IP | 判定 |
+|------|------|---|-------|---|-----|---|----------|-----|------|
+| Ragans | 2.67 >P90 | 10 | .256 >P90 | 10 | 39.4% P60 | 7 | **27** | 61.7 | **Slump hold** |
+| Nola | 4.13 P55-60 | 6 | .315 P55-60 | 6 | 43.3% P25-40 | 3 | **15** | 94.3 | +2（結構性確認）|
+| Cantillo | 3.71 P70-80 | 8 | .300 P70-80 | 8 | 41.8% P40-45 | 5 | **21** | 95.3 | +1 |
+| López | 10.73 <P25 | 1 | .465 <P25 | 1 | 50.0% <P25 | 1 | **3** | 5.0 | +2*（但 22 BBE/5.0 IP 本質無效數據）|
+
+### Urgency 四因子
+
+| 球員 | 2026 Sum | 加分 | 2025 Sum | 加分 | 21d Δ xwOBA | 加分 | IP/TG（估） | 加分 | **合計** |
+|------|----------|------|----------|------|-------------|------|-------------|------|----------|
+| **Nola** | 17 | +2 | 15 (<18) | +2 | -.024 持平 | 0 | ~1.1 ≥1.0 | +2 | **6** |
+| **Cantillo** | 18 | +1 | 21 (18-21) | +1 | -.015 持平 | 0 | ~1.0 ≥1.0 | +2 | **4** |
+| **López** | 24 | +0 | 3* (<18) | +2 | -.018 持平 | 0 | ~0.8 (BN/SUSP) | +1 | **3** |
+
+*López 2025 BBE 22 / IP 5.0 = 1 場樣本，+2 的「結構性確認」實質不成立。2026 Sum 24 品質實際不差（xERA P70-80 / HH% P80-90），在最弱 4 人中是最強的。
+
+---
+
+**我方最弱 SP**（urgency 降冪）
+
+- **P1 Aaron Nola** urgency 6：2026 Sum 17(+2) / 2025 Sum 15(+2, 94.3IP 結構性確認) / 21d 持平(0) / IP/TG ~1.1(+2)
+  - 定性：當季 P45-60 中段 + 前一年 P55/P55/P25-40 雙年確認弱。運氣 +0.06 中性 = 帳面就是真實水準。32 歲，無回升結構
+- **P2 Joey Cantillo** urgency 4：2026 Sum 18(+1) / 2025 Sum 21(+1, 95.3IP) / 21d 持平(0) / IP/TG ~1.0(+2)
+  - 定性：xERA/xwOBA P60-80 中上，但 HH% 43.3% P25-40 拖累。2025 Sum 21 中等底子（非菁英非結構弱），IP/GS 5.1 短局 QS 打折
+- **P3 Reynaldo López** urgency 3：2026 Sum 24(+0) / 2025 Sum 3(+2, 但 5.0IP/22BBE 無效) / 21d 持平(0) / IP/TG ~0.8(+1)
+  - 定性：2026 品質實際不差（HH% P80-90 亮點），⚠️ 運氣 +1.56 賣高（ERA 會回升）。2025 本質無 prior → 接近「breakout 待驗」
+- **Slump hold Cole Ragans**：2025 Sum 27 ≥24 菁英底（61.7IP ≥50）— 2026 xERA/xwOBA 雙 <P25 但 2025 全 >P90，等回歸
+- **低信心排除 Merrill Kelly**：BBE 17 驗證期，暫不排序
+
+---
+
+
+
+**取代/觀察的 FA**（按優先順序）
+
+1. **Brandon Pfaadt**（AZ, SP）0% — **取代**
+   vs Nola（P1）：Sum 21 vs 17 = 差 +4，breakdown +0/+1/+1（3 項均 ≥0，2 項正向）
+   標籤：✅ 球隊主力（IP/TG ~1.1）+ ⚠️ Breakout 待驗（2025 Sum 3）
+   升級：1 ✅ + 無強警示 → **取代**
+   加分：IP/GS 5.6（非短局）+ AZ 強隊 W 加成 + BBE 74 高信心
+   附註：運氣 -0.77 接近 ✅ 撿便宜（差 0.04 未達 -0.81 門檻）
+   觸發：立即行動
+
+2. **Cade Povich**（BAL, SP）0% — **取代**（waiver-log 觸發 BBE 60 未達，但 Pass 2 獨立評估通過）
+   vs Nola（P1）：Sum 22 vs 17 = 差 +5，breakdown +1/+2/0（3 項均 ≥0，2 項正向）
+   標籤：✅ 深投型（IP/GS 6.7）+ ✅ 球隊主力（IP/TG ~1.0）+ ⚠️ 賣高運氣（+1.37 >P90）+ ⚠️ Breakout 待驗（2025 Sum 3）
+   升級：2 ✅ + 無強警示 → **取代**（⚠️ 賣高 + ⚠️ Breakout 為一般警示，非強警示）
+   加分：BAL 強隊 W 加成 + 深投 6.7 IP/GS 穩拿 QS
+   風險：運氣 +1.37 ERA 2.19 會回升（xERA 3.56 才是真實水準），2025 全 <P25 breakout 未經驗證
+   觸發：waiver-log 原觸發 BBE 60 未達（差 22），但品質指標已穩定超過門檻 → 可提前行動
+
+3. **Erick Fedde**（CWS, SP,RP）4% — **觀察**
+   vs Nola（P1）：Sum 20 vs 17 = 差 +3，breakdown +1/+2/-2（2 項正向 ≥0 ✓）
+   標籤：✅ 球隊主力（IP/TG ~1.0）+ ⚠️ 短局（IP/GS 4.9 <5.0，強警示）+ ⚠️ Breakout 待驗（2025 Sum 5）
+   升級：1 ✅ + 有強警示 → **觀察**
+   觸發：BBE 達 70 且 xERA <3.74 + xwOBA <.301 維持（BBE 60→70 差 10）
+
+4. **J.T. Ginn**（ATH, SP）2% — **觀察**
+   vs Nola（P1）：Sum 28 vs 17 = 差 +11，breakdown +2/+4/+3（3 項全勝）
+   標籤：⚠️ 短局（IP/GS 4.7 <5.0，強警示）+ ⚠️ Breakout 待驗（2025 Sum 17 <18）
+   升級：0 ✅ + 強警示 → **觀察**
+   觸發：BBE 達 70 且 xERA <3.74 + IP/GS 回升至 5.0+
+
+5. **Tobias Myers**（NYM, SP,RP）3% — **觀察**
+   vs Nola（P1）：Sum 29 vs 17 = 差 +12，breakdown +3/+5/+2（3 項全勝）
+   標籤：⚠️ 短局（IP/GS 2.0，強警示，極短）+ ⚠️ Breakout 待驗（2025 Sum 11）
+   升級：0 ✅ + 強警示 → **觀察**
+   觸發：BBE 達 50 且角色確認為固定先發 + IP/GS 回升
+
+6. **Ben Brown**（CHC, SP,RP）4% — **觀察**
+   vs Nola（P1）：Sum 27 vs 17 = 差 +10，breakdown +2/+4/+2（3 項全勝）
+   標籤：⚠️ Breakout 待驗（2025 P40-45）；IP/GS 缺值待確認
+   觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.301 維持（BBE 46→60 差 14）
+
+7. **Keaton Winn**（SF, SP,RP）2% — **觀察**
+   vs Nola（P1）：Sum 30 vs 17 = 差 +13，breakdown +3/+5/+3（3 項全勝）
+   標籤：✅ 雙年菁英（2025 Sum 26，需確認 IP ≥50）+ ✅ 撿便宜運氣（xERA-ERA -1.50）+ ⚠️ 樣本小（BBE 18 極低）
+   升級：2 ✅ 但 ⚠️ 樣本小 + BBE 僅 18 → **觀察**（信心不足以行動）
+   觸發：BBE 達 30 且 3 項核心維持 >P70
+
+**觀察中更新**
+
+- ⚠️ **Martín Pérez**：品質崩盤 — xERA 4.12(>觸發 3.74) + HH% 39.3%(>觸發 36.4%) 兩項同時失守，建議結案移除
+- ⚠️ **Walker Buehler**：品質惡化 — xERA 3.95 超觸發 3.74 + IP/GS 4.4 仍未回升至 5.0，兩條件均不達標
+- ⚠️ **Brent Suter**：品質惡化 — xwOBA .299 超觸發門檻 .289，xERA 2.83→3.46 趨勢向下
+- ✅ **Erick Fedde**：BBE 60 距觸發 70 差 10，即將觸發

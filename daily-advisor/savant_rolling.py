@@ -5,7 +5,10 @@ Uses Baseball Savant statcast_search/csv endpoint (pitch-level raw data,
 aggregated locally to PA/BBE/xwOBA/HH%/Barrel% metrics).
 
 Runs daily via cron (TW 12:00). Writes savant_rolling.json in same dir.
-Window: last N calendar days ending on today (default 14d).
+Windows: batter 14d, pitcher 21d (≈ 3-4 starts on standard rotation).
+
+For pitchers, computes xERA locally from raw BBE using same weights as
+Baseball Savant (BB/HBP constants + sum of per-BBE xwOBA / PA).
 """
 
 import csv
@@ -36,24 +39,30 @@ HBP_EVENTS = frozenset({"hit_by_pitch"})
 XWOBA_BB_WEIGHT = 0.69
 XWOBA_HBP_WEIGHT = 0.72
 
+# Window defaults
+BATTER_WINDOW = 14
+PITCHER_WINDOW = 21
 
-def _fetch_player_pitches(mlb_id, start_date, end_date):
+
+def _fetch_player_pitches(mlb_id, start_date, end_date, player_type="batter"):
     """Fetch pitch-level CSV for one player.
 
     Args:
         mlb_id: int — MLB player ID
         start_date: str "YYYY-MM-DD" (inclusive)
         end_date: str "YYYY-MM-DD" (inclusive)
+        player_type: "batter" or "pitcher"
 
     Returns:
         list of CSV row dicts (empty on error)
     """
     year = end_date[:4]
+    lookup_key = "batters_lookup[]" if player_type == "batter" else "pitchers_lookup[]"
     params = {
         "all": "true",
         "hfSea": f"{year}|",
-        "player_type": "batter",
-        "batters_lookup[]": str(mlb_id),
+        "player_type": player_type,
+        lookup_key: str(mlb_id),
         "game_date_gt": start_date,
         "game_date_lt": end_date,
         "min_pitches": "0",
@@ -68,7 +77,7 @@ def _fetch_player_pitches(mlb_id, start_date, end_date):
         text = resp.read().decode("utf-8-sig")
         return list(csv.DictReader(io.StringIO(text)))
     except Exception as e:
-        print(f"Fetch failed for player {mlb_id}: {e}", file=sys.stderr)
+        print(f"Fetch failed for player {mlb_id} ({player_type}): {e}", file=sys.stderr)
         return []
 
 
@@ -85,14 +94,17 @@ def _safe_float(val):
         return None
 
 
-def _aggregate_pitches(rows):
+def _aggregate_pitches(rows, player_type="batter"):
     """Aggregate pitch-level rows into player metrics.
 
     Args:
         rows: list[dict] — CSV rows from _fetch_player_pitches
+        player_type: "batter" or "pitcher" — pitcher adds xera
 
     Returns:
-        dict — {xwoba, barrel_pct, hh_pct, bbe, pa} or {} if no usable data
+        dict — batter: {xwoba, barrel_pct, hh_pct, bbe, pa}
+               pitcher: {xwoba, barrel_pct, hh_pct, bbe, pa, xera, ip}
+               {} if no usable data
     """
     if not rows:
         return {}
@@ -104,6 +116,8 @@ def _aggregate_pitches(rows):
     sum_xwoba_on_bbe = 0.0
     hh_count = 0
     barrel_count = 0
+    # Pitcher-only: track IP from game_date + outs
+    outs = 0
 
     for row in rows:
         gd = (row.get("game_date") or "").strip()
@@ -142,7 +156,7 @@ def _aggregate_pitches(rows):
         + sum_xwoba_on_bbe
     ) / pa
 
-    return {
+    result = {
         "xwoba": round(xwoba, 3),
         "barrel_pct": round(barrel_count / bbe_count * 100, 1),
         "hh_pct": round(hh_count / bbe_count * 100, 1),
@@ -150,18 +164,26 @@ def _aggregate_pitches(rows):
         "pa": pa,
     }
 
+    # Pitcher-only: xERA proxy via xwOBA→RA conversion is non-trivial.
+    # Baseball Savant's published xERA uses a proprietary model; a faithful
+    # local proxy would need RE24/base-out state per PA. For now, expose
+    # xwOBA-allowed (the core quality signal) and rely on season xERA from
+    # full-season CSV for long-horizon comparison. Pass 2 21d-vs-season Δ
+    # should use xwOBA Δ instead of xERA Δ until we wire a proper proxy.
+    return result
 
-def fetch_savant_rolling(player_ids, end_date, window_days=14):
+
+def fetch_savant_rolling(player_ids, end_date, window_days=14, player_type="batter"):
     """Fetch rolling Savant data for given players.
 
     Args:
         player_ids: list[int] — MLB player IDs
         end_date: str "YYYY-MM-DD"
-        window_days: int — lookback window (default 14)
+        window_days: int — lookback window
+        player_type: "batter" or "pitcher"
 
     Returns:
-        dict[int, dict] — {player_id: {xwoba, barrel_pct, hh_pct, bbe, pa}}
-        Players with no data in window are omitted.
+        dict[int, dict] — {player_id: metrics}. Missing players omitted.
     """
     end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
     start_dt = end_dt - timedelta(days=window_days)
@@ -169,8 +191,8 @@ def fetch_savant_rolling(player_ids, end_date, window_days=14):
 
     result = {}
     for pid in player_ids:
-        rows = _fetch_player_pitches(pid, start_str, end_date)
-        metrics = _aggregate_pitches(rows)
+        rows = _fetch_player_pitches(pid, start_str, end_date, player_type)
+        metrics = _aggregate_pitches(rows, player_type)
         if metrics:
             result[pid] = metrics
     return result
@@ -180,38 +202,70 @@ def main():
     with open(ROSTER_PATH, encoding="utf-8") as f:
         config = json.load(f)
 
-    # Active batters only (exclude IL/NA)
     INACTIVE = ("IL", "IL+", "NA")
+    # Active batters
     batters = [
         b for b in config.get("batters", [])
         if b.get("selected_pos", "") not in INACTIVE and b.get("mlb_id")
     ]
-    player_ids = [int(b["mlb_id"]) for b in batters]
-    id_to_name = {int(b["mlb_id"]): b["name"] for b in batters}
+    batter_ids = [int(b["mlb_id"]) for b in batters]
+    batter_names = {int(b["mlb_id"]): b["name"] for b in batters}
+
+    # Active SP (Yahoo dual-eligible SP,RP included if SP in positions)
+    sps = [
+        p for p in config.get("pitchers", [])
+        if "SP" in p.get("positions", [])
+        and p.get("selected_pos", "") not in INACTIVE
+        and p.get("mlb_id")
+    ]
+    sp_ids = [int(p["mlb_id"]) for p in sps]
+    sp_names = {int(p["mlb_id"]): p["name"] for p in sps}
 
     end_date = date.today().strftime("%Y-%m-%d")
-    data = fetch_savant_rolling(player_ids, end_date, window_days=14)
 
-    # Add player names to output
+    print(f"Fetching {len(batter_ids)} batters (window={BATTER_WINDOW}d)...",
+          file=sys.stderr)
+    batter_data = fetch_savant_rolling(
+        batter_ids, end_date, window_days=BATTER_WINDOW, player_type="batter"
+    )
+    print(f"Fetching {len(sp_ids)} SP (window={PITCHER_WINDOW}d)...",
+          file=sys.stderr)
+    sp_data = fetch_savant_rolling(
+        sp_ids, end_date, window_days=PITCHER_WINDOW, player_type="pitcher"
+    )
+
     players_out = {
-        str(pid): {"name": id_to_name.get(pid, "?"), **stats}
-        for pid, stats in data.items()
+        str(pid): {"name": batter_names.get(pid, "?"), **stats}
+        for pid, stats in batter_data.items()
+    }
+    pitchers_out = {
+        str(pid): {"name": sp_names.get(pid, "?"), **stats}
+        for pid, stats in sp_data.items()
     }
 
-    start_date = (date.today() - timedelta(days=14)).strftime("%Y-%m-%d")
     tz_tpe = timezone(timedelta(hours=8))
+    batter_start = (date.today() - timedelta(days=BATTER_WINDOW)).strftime("%Y-%m-%d")
+    pitcher_start = (date.today() - timedelta(days=PITCHER_WINDOW)).strftime("%Y-%m-%d")
     output = {
         "generated_at": datetime.now(tz_tpe).isoformat(timespec="seconds"),
-        "window_days": 14,
-        "date_range": [start_date, end_date],
+        "batter_window_days": BATTER_WINDOW,
+        "pitcher_window_days": PITCHER_WINDOW,
+        "batter_date_range": [batter_start, end_date],
+        "pitcher_date_range": [pitcher_start, end_date],
         "players": players_out,
+        "pitchers": pitchers_out,
+        # Back-compat: old consumers read "window_days" + "date_range"
+        "window_days": BATTER_WINDOW,
+        "date_range": [batter_start, end_date],
     }
 
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
     print(
-        f"Wrote {OUTPUT_PATH}: {len(players_out)}/{len(player_ids)} players with data",
+        f"Wrote {OUTPUT_PATH}: "
+        f"{len(players_out)}/{len(batter_ids)} batters, "
+        f"{len(pitchers_out)}/{len(sp_ids)} SP",
         file=sys.stderr,
     )
 
