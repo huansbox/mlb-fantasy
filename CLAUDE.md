@@ -544,10 +544,12 @@ waiver-log.md（球員追蹤唯一來源）
 
 ## 待辦
 
-- [ ] **waiver-log auto-close mlb_id 驗證**（2026-04-20 發現）：roster_sync / fa_scan snapshot cron 用 waiver-log 條目的 `mlb_id` 查 Yahoo ownership → ownership_type=team 則自動移到已結案。但若條目 mlb_id 錯（如同名同姓不同人，Max Muncy LAD 571970 vs ATH 691777），會查到錯誤球員的 ownership 導致誤判
-  - 實例：commit `afbe6ca` 誤把 ATH Muncy 標為已結案（當時條目還是 571970 LAD 老 Muncy 被 rostered），`d08b1db` 人工修復
-  - 修法：auto-close 前交叉驗證 `mlb_id → player` 的 `name + team` 是否匹配 waiver-log 條目文字，不一致應警示而非直接移除
-  - 進階：waiver-log 新增條目時自動走一次 `search_mlb_id(name, team)` 確認 ID 正確
+<!-- 已完成 2026-04-21 commit 3ce1eae：
+- waiver-log auto-close mlb_id 驗證 — _check_player_ownership 加 expected_team
+  參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
+  ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
+-->
+- [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理
 - [ ] **IP/GS fallback naive 計算潛在 bug**（roster_sync.py:858 / fa_scan.py:857）：`_ip_per_gs_from_gamelog` API 失敗時 fallback 用 `total_ip / gs`，對 swingman（兼救援的先發）會把救援局數混入 → 膨脹 IP/GS。目前隊上 10 SP 全純先發無觸發，未來 swingman / API 失敗才會出現。風險低先不動，若要修改為回傳 None（寧可缺資料不要錯資料）
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
