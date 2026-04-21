@@ -666,10 +666,16 @@ def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerTyp
 
 
 def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple[int, dict]:
-    """Same as compute_sum_score but maps SP prior_stats keys (_allowed suffix).
+    """Same as compute_sum_score but tolerates two prior schemas.
+
+    Accepts:
+      - Config schema (roster_config prior_stats): SP uses ``xwoba_allowed`` /
+        ``hh_pct_allowed`` keys.
+      - Raw Savant schema (from Savant CSV extraction): SP uses plain ``xwoba``
+        / ``hh_pct`` keys (same field names as batter, disambiguated by role).
 
     Args:
-        prior_stats: roster_config prior_stats dict (or None for no prior)
+        prior_stats: prior dict in either schema, or None for no prior.
 
     Returns:
         (sum_score, breakdown). Returns (0, zero-filled breakdown) if prior is
@@ -679,6 +685,13 @@ def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple
         labels = _BREAKDOWN_LABELS[player_type]
         return 0, {label: 0 for label in labels.values()}
 
-    key_map = _PRIOR_KEY_MAP[player_type]
-    metrics = {metric: prior_stats.get(prior_key) for metric, prior_key in key_map.items()}
+    if player_type == "sp":
+        metrics = {
+            "xera": prior_stats.get("xera"),
+            "xwoba": prior_stats.get("xwoba_allowed") or prior_stats.get("xwoba"),
+            "hh_pct": prior_stats.get("hh_pct_allowed") or prior_stats.get("hh_pct"),
+        }
+    else:
+        key_map = _PRIOR_KEY_MAP["batter"]
+        metrics = {metric: prior_stats.get(prior_key) for metric, prior_key in key_map.items()}
     return compute_sum_score(metrics, player_type)

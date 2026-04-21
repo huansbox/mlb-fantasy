@@ -37,6 +37,7 @@ from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
 )
+import fa_compute
 
 SUMMARY_FILE = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
 FULL_SEASON_GAMES = 162
@@ -2019,6 +2020,374 @@ def _build_pass2_data(group_type, pass1_weakest, savant_2026, fa_candidates,
     return "\n".join(lines)
 
 
+# ── Phase 5: Python compute layer (Layer 4) integration ──
+
+
+def _prep_my_roster_for_compute(group_type, config, savant_2026, standings, rolling):
+    """Build active-roster entries ready for fa_compute.pick_weakest/compute_urgency.
+
+    Each entry carries 2026 Savant (+ bb_pct for batter), prior_stats from config,
+    derived (ip_per_gs/ip_per_tg/era_diff for SP; bb_pct/pa_per_tg for batter),
+    and rolling data keyed for its group (rolling_21d for SP, rolling_14d for
+    batter).
+    """
+    if group_type == "batter":
+        players = [p for p in config.get("batters", []) if is_active(p)]
+        fa_type_key = "batter"
+        stat_group = "hitting"
+    else:
+        players = [
+            p for p in config.get("pitchers", [])
+            if pitcher_type(p) == "SP" and is_active(p)
+        ]
+        fa_type_key = "sp"
+        stat_group = "pitching"
+
+    entries = []
+    for p in players:
+        mlb_id = p.get("mlb_id")
+        if not mlb_id:
+            continue
+        savant = _extract_savant_by_id(mlb_id, fa_type_key, savant_2026)
+        if not savant:
+            # No 2026 Savant → cannot score; skip (matches build_roster_for_pass1).
+            continue
+
+        mlb_2026 = fetch_mlb_season_stats(mlb_id, 2026, stat_group)
+
+        if group_type == "batter":
+            derived = _compute_derived_batter(mlb_2026, standings, p["team"], 2026) or {}
+            bb_pct = derived.get("bb_pct")
+            if bb_pct is not None:
+                savant = {**savant, "bb_pct": bb_pct}
+        else:
+            derived = _compute_derived_pitcher(
+                savant, mlb_2026, standings, p["team"], 2026, "sp", mlb_id=mlb_id,
+            ) or {}
+
+        mid_str = str(mlb_id)
+        rolling_data = rolling.get(mid_str) if rolling else None
+
+        entry = {
+            "name": p["name"],
+            "mlb_id": mlb_id,
+            "team": p["team"],
+            "positions": p.get("positions", []),
+            "selected_pos": p.get("selected_pos", ""),
+            "status": p.get("status", ""),
+            "savant_2026": savant,
+            "prior_stats": p.get("prior_stats", {}) or {},
+            "derived": derived,
+            "mlb_2026": mlb_2026,
+        }
+        if group_type == "sp":
+            entry["rolling_21d"] = rolling_data
+        else:
+            entry["rolling_14d"] = rolling_data
+        entries.append(entry)
+        time.sleep(0.2)  # MLB API rate limit
+
+    return entries
+
+
+def _normalize_fa_for_compute(p, group_type, fa_rolling):
+    """Convert Layer 3 enriched FA dict → compute_fa_tags-ready entry."""
+    savant = dict(p.get("savant_2026") or {})
+    mlb_26 = p.get("mlb_2026") or {}
+
+    if group_type == "batter":
+        pa = int(mlb_26.get("plateAppearances", 0) or 0)
+        bb = int(mlb_26.get("baseOnBalls", 0) or 0)
+        if pa > 0 and savant.get("bb_pct") is None:
+            savant["bb_pct"] = round(bb / pa * 100, 2)
+
+    # Prior from savant_2025 + mlb_2025 (Layer 3 enrichment already fetched both)
+    savant_25 = p.get("savant_2025") or {}
+    mlb_25 = p.get("mlb_2025") or {}
+    prior_stats = {}
+    if group_type == "sp":
+        if savant_25:
+            prior_ip = 0.0
+            if mlb_25:
+                prior_ip = _parse_ip(mlb_25.get("inningsPitched", "0"))
+            prior_stats = {
+                "xera": savant_25.get("xera"),
+                "xwoba_allowed": savant_25.get("xwoba"),
+                "hh_pct_allowed": savant_25.get("hh_pct"),
+                "ip": prior_ip,
+            }
+    else:
+        if savant_25:
+            prior_bb_pct = None
+            if mlb_25:
+                pa25 = int(mlb_25.get("plateAppearances", 0) or 0)
+                bb25 = int(mlb_25.get("baseOnBalls", 0) or 0)
+                if pa25 > 0:
+                    prior_bb_pct = round(bb25 / pa25 * 100, 2)
+            prior_stats = {
+                "xwoba": savant_25.get("xwoba"),
+                "bb_pct": prior_bb_pct,
+                "barrel_pct": savant_25.get("barrel_pct"),
+            }
+
+    mid_str = str(p.get("mlb_id", ""))
+    rolling_data = (fa_rolling or {}).get(mid_str)
+
+    entry = {
+        "name": p["name"],
+        "mlb_id": p.get("mlb_id"),
+        "team": p.get("team", ""),
+        "position": p.get("position", ""),
+        "pct": p.get("pct"),
+        "waiver_date": p.get("waiver_date", ""),
+        "savant_2026": savant,
+        "prior_stats": prior_stats,
+        "derived": p.get("derived_2026") or {},
+    }
+    if group_type == "sp":
+        entry["rolling_21d"] = rolling_data
+    else:
+        entry["rolling_14d"] = rolling_data
+
+    score, breakdown = fa_compute.compute_sum_score(savant, group_type)
+    entry["score"] = score
+    entry["breakdown"] = breakdown
+    return entry
+
+
+def _rolling_tag(rolling, season_savant, group_type):
+    """Return e.g. '持平' / '🔥弱回升' / '❄️強劣化' for display in machine report."""
+    if not rolling or not season_savant or season_savant.get("xwoba") is None:
+        return "—"
+    r_x = rolling.get("xwoba")
+    if r_x is None:
+        return "—"
+    bbe_gate = 25 if group_type == "batter" else 20
+    if (rolling.get("bbe") or 0) < bbe_gate:
+        return "樣本不足"
+    delta = r_x - season_savant["xwoba"]
+    if group_type == "sp":
+        if delta <= -0.050:
+            return "🔥強回升"
+        if delta <= -0.035:
+            return "🔥弱回升"
+        if delta >= 0.050:
+            return "❄️強劣化"
+        if delta >= 0.035:
+            return "❄️弱劣化"
+    else:
+        if delta >= 0.050:
+            return "🔥強回升"
+        if delta >= 0.035:
+            return "🔥弱回升"
+        if delta <= -0.050:
+            return "❄️強下滑"
+        if delta <= -0.035:
+            return "❄️弱下滑"
+    return "持平"
+
+
+def _format_fa_for_layer5(entry, group_type, idx):
+    """Format one FA / watch entry as multi-line text for Claude Layer 5 input."""
+    name = entry.get("name", "?")
+    team = entry.get("team", "")
+    pos = entry.get("position", "")
+    pct = entry.get("pct")
+    pct_str = f"{pct}%" if pct is not None else "?"
+    decision = entry.get("decision", "?")
+    sum_diff = entry.get("sum_diff", 0)
+    bd_diff = entry.get("breakdown_diff", {})
+    add_tags = entry.get("add_tags", [])
+    warn_tags = entry.get("warn_tags", [])
+    anchor = entry.get("anchor_name", "?")
+
+    prefix = f"{idx}. " if idx is not None else "- "
+    lines = [f"{prefix}**{name}**（{team}, {pos}）{pct_str} — {decision}"]
+
+    if entry.get("win_gate_passed"):
+        fa_sum = entry.get("score", 0)
+        my_sum = fa_sum - sum_diff
+        bd_str = " / ".join(
+            f"{'+' if v >= 0 else ''}{v}" for v in bd_diff.values()
+        )
+        lines.append(
+            f"   vs {anchor}：Sum {fa_sum} vs {my_sum} = 差 +{sum_diff}, breakdown {bd_str}"
+        )
+    else:
+        lines.append(
+            f"   win gate 未過 (Sum 差 {sum_diff}, 2 项正向不足) — 建議 pass"
+        )
+
+    tag_parts = list(add_tags) + list(warn_tags)
+    if tag_parts:
+        lines.append(f"   標籤：{' + '.join(tag_parts)}")
+
+    sv = entry.get("savant_2026") or {}
+    if group_type == "sp":
+        d = entry.get("derived") or {}
+        lines.append(
+            f"   2026: xERA {sv.get('xera','?')} / xwOBA {sv.get('xwoba','?')} / "
+            f"HH% {sv.get('hh_pct','?')} / BBE {sv.get('bbe',0)} / "
+            f"IP/GS {d.get('ip_per_gs','?')} / IP/TG {d.get('ip_per_tg','?')} / "
+            f"運氣 {d.get('era_diff','?')}"
+        )
+    else:
+        bb = sv.get("bb_pct")
+        lines.append(
+            f"   2026: xwOBA {sv.get('xwoba','?')} / BB% {bb if bb is not None else '?'} / "
+            f"Barrel% {sv.get('barrel_pct','?')} / HH% {sv.get('hh_pct','?')} / "
+            f"BBE {sv.get('bbe',0)}"
+        )
+
+    prior = entry.get("prior_stats") or {}
+    if prior:
+        lines.append(f"   2025 prior: {json.dumps(prior, ensure_ascii=False)}")
+
+    rolling = entry.get("rolling_21d") or entry.get("rolling_14d")
+    if rolling:
+        window = "21d" if group_type == "sp" else "14d"
+        r_x = rolling.get("xwoba")
+        delta = None
+        if r_x is not None and sv.get("xwoba") is not None:
+            delta = r_x - sv["xwoba"]
+        delta_str = f" Δ{delta:+.3f}" if delta is not None else ""
+        lines.append(
+            f"   {window}: xwOBA {r_x}{delta_str} / HH% {rolling.get('hh_pct','?')} / "
+            f"BBE {rolling.get('bbe',0)}"
+        )
+
+    return lines
+
+
+def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
+                         watch_tagged, changes, ref_1d, ref_3d, config):
+    """Build Claude Layer 5 input string: mechanical report + context.
+
+    Claude task is to text-ify the pre-computed Sum/urgency/tags/decision and
+    flag edge cases — NOT to re-compute rules.
+    """
+    lines = []
+    label = "打者" if group_type == "batter" else "SP"
+    window = "14d" if group_type == "batter" else "21d"
+    factor_tg_label = "PA/TG" if group_type == "batter" else "IP/TG"
+    factor_tg_key = "pa_per_tg" if group_type == "batter" else "ip_per_tg"
+
+    # ── 機械報告：我方最弱 ──
+    lines.append(f"--- 我方最弱{label}（機械報告，Sum/urgency/決策已算）---")
+    ranked = urgency_result.get("weakest_ranked", [])
+    for i, r in enumerate(ranked, start=1):
+        factors = r.get("factors", {})
+        f26 = factors.get("sum_2026", 0)
+        f25 = factors.get("sum_2025", 0)
+        f_roll = factors.get("rolling", 0)
+        f_tg = factors.get(factor_tg_key, 0)
+        prior_sum = r.get("prior_sum", 0)
+        prior_ip = r.get("prior_ip")
+        prior_ip_str = f", {prior_ip:.1f}IP" if prior_ip is not None else ""
+
+        season_savant = r.get("savant_2026") or {}
+        rolling = r.get("rolling_21d") or r.get("rolling_14d")
+        roll_tag = _rolling_tag(rolling, season_savant, group_type)
+
+        tg_val = (r.get("derived") or {}).get(factor_tg_key)
+        tg_str = f"{tg_val:.2f}" if isinstance(tg_val, (int, float)) else "?"
+
+        sign_roll = "+" if f_roll >= 0 else ""
+        sign_tg = "+" if f_tg >= 0 else ""
+        lines.append(
+            f"- **P{i} {r['name']}** urgency {r['urgency']}："
+            f"2026 Sum {r.get('score', 0)}(+{f26}) / "
+            f"2025 Sum {prior_sum}(+{f25}{prior_ip_str}) / "
+            f"{window} {roll_tag}({sign_roll}{f_roll}) / "
+            f"{factor_tg_label} {tg_str}({sign_tg}{f_tg})"
+        )
+
+        # Supplementary data for Claude's 定性 writing
+        sv = season_savant
+        if group_type == "sp":
+            lines.append(
+                f"    2026 Savant: xERA {sv.get('xera','?')} / xwOBA {sv.get('xwoba','?')} / "
+                f"HH% {sv.get('hh_pct','?')} / BBE {sv.get('bbe',0)}"
+            )
+            d = r.get("derived") or {}
+            lines.append(
+                f"    產量: IP/GS {d.get('ip_per_gs','?')} / IP/TG {d.get('ip_per_tg','?')} "
+                f"/ 運氣 {d.get('era_diff','?')}"
+            )
+        else:
+            lines.append(
+                f"    2026 Savant: xwOBA {sv.get('xwoba','?')} / BB% {sv.get('bb_pct','?')} / "
+                f"Barrel% {sv.get('barrel_pct','?')} / HH% {sv.get('hh_pct','?')} / "
+                f"BBE {sv.get('bbe',0)}"
+            )
+        prior = r.get("prior_stats") or {}
+        if prior:
+            lines.append(f"    2025 prior: {json.dumps(prior, ensure_ascii=False)}")
+        for n in r.get("notes") or []:
+            lines.append(f"    ⚠️ {n}")
+
+    # Slump hold
+    for s in urgency_result.get("slump_hold", []):
+        ip_str = f"{s['prior_ip']:.1f}IP" if s.get("prior_ip") is not None else "?"
+        lines.append(
+            f"- **Slump hold {s['name']}**：2025 Sum {s['prior_sum']} ≥24 菁英底（{ip_str} ≥50）— 2026 表現低，等回歸"
+        )
+        prior = s.get("prior_stats")
+        if prior:
+            lines.append(f"    2025 prior: {json.dumps(prior, ensure_ascii=False)}")
+
+    # Low-confidence excluded (SP only)
+    for lc in low_conf:
+        lines.append(
+            f"- **低信心排除 {lc['name']}**：BBE {lc['bbe']} 驗證期，暫不排序"
+        )
+
+    # ── 機械報告：FA 候選 ──
+    if fa_tagged:
+        lines.append(f"\n--- FA {label}候選（機械報告，已算好決策）---")
+        decision_order = {"立即取代": 0, "取代": 1, "觀察": 2, "pass": 3}
+        fa_sorted = sorted(
+            fa_tagged,
+            key=lambda x: (decision_order.get(x.get("decision", "pass"), 9),
+                           -x.get("sum_diff", 0)),
+        )
+        for idx, f in enumerate(fa_sorted, start=1):
+            lines.extend(_format_fa_for_layer5(f, group_type, idx))
+    else:
+        lines.append(f"\n--- FA {label}候選: 無 ---")
+
+    # ── 觀察中 watch ──
+    if watch_tagged:
+        lines.append(f"\n--- waiver-log 觀察中{label}（含機械決策 + 當前數據）---")
+        for w in watch_tagged:
+            lines.extend(_format_fa_for_layer5(w, group_type, None))
+
+    # ── %owned 升幅 ──
+    group_changes = [
+        c for c in changes
+        if _classify_fa_type(c.get("position", "")) == group_type
+        and c.get("d3") is not None and c["d3"] > 0
+    ]
+    group_changes.sort(key=lambda x: x["d3"], reverse=True)
+    if group_changes:
+        lines.append(f"\n--- %owned 升幅 ({label}, 3 日) ---")
+        for c in group_changes[:10]:
+            lines.append(f"  {c['name']:20} 3d:+{c['d3']:>3} {c['pct']:>3}%  {c['position']}")
+
+    # ── waiver-log 觀察中（觸發條件） ──
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    if os.path.exists(waiver_log_path):
+        with open(waiver_log_path, encoding="utf-8") as f:
+            wl_content = f.read()
+        if "## 觀察中" in wl_content:
+            section = wl_content.split("## 觀察中")[1]
+            if "## 已結案" in section:
+                section = section.split("## 已結案")[0]
+            lines.append(f"\n--- waiver-log 觀察中（含觸發條件）---\n## 觀察中{section}")
+
+    return "\n".join(lines)
+
+
 def _build_rp_data(enriched_rps, my_rps_str, config):
     """Build data string for RP mode Claude prompt."""
     lines = []
@@ -2112,14 +2481,19 @@ def _run_rp_scan(access_token, config, today_str, env, args):
 
 def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                    changes, ref_1d, ref_3d, today_str, env, args):
-    """Process one group (batter or SP): Pass 1 + Pass 2."""
+    """Process one group (batter or SP) via Python compute layer + Claude text layer.
+
+    Pipeline (Phase 5):
+        Layer 1.5: filter pure RP from FA/watch (SP only)
+        Layer 4:   fa_compute.pick_weakest + compute_urgency + compute_fa_tags
+        Layer 5:   Claude writes 定性 reason + watch change detection
+    """
     label = "打者" if group_type == "batter" else "SP"
     try:
-        # Filter to this group
         fa_candidates = [p for p in enriched if p["fa_type"] == group_type]
         watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
 
-        # Layer 1.5: pure RP filter (剔除 Yahoo SP,RP 雙資格但 2026 GS=0 的純 RP)
+        # Layer 1.5: pure RP filter (Yahoo SP,RP 雙資格但 2026 GS=0)
         if group_type == "sp":
             def _is_real_sp(p):
                 mlb = p.get("mlb_2026") or {}
@@ -2132,50 +2506,78 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                 print(f"  Layer 1.5 ({label}): {removed} pure RP removed (2026 GS=0)",
                       file=sys.stderr)
 
-        # Pass 1: pick weakest from roster
-        print(f"  Pass 1 ({label}): picking weakest...", file=sys.stderr)
-        roster_data = build_roster_for_pass1(config, savant_2026, player_type=group_type)
-        pass1_prompt = f"prompt_fa_scan_pass1_{'batter' if group_type == 'batter' else 'sp'}.txt"
-        prompt_path = os.path.join(SCRIPT_DIR, pass1_prompt)
-        pass1_result = _call_claude(prompt_path, roster_data)
-
-        # Parse Pass 1 output (JSON)
-        pass1_weakest = []  # list of {name, reason}
-        pass1_low_conf = []  # list of {name, bbe, note} — SP BBE <30 excluded
-        try:
-            json_str = pass1_result
-            if "```" in json_str:
-                json_str = json_str.split("```json")[-1].split("```")[0] if "```json" in json_str else json_str.split("```")[1].split("```")[0]
-            pass1_json = json.loads(json_str.strip())
-            pass1_weakest = pass1_json.get("weakest", [])
-            pass1_low_conf = pass1_json.get("low_confidence_excluded", [])
-            weakest_names = [w["name"] for w in pass1_weakest]
-        except (json.JSONDecodeError, KeyError, IndexError):
-            print(f"  Pass 1 ({label}): JSON parse failed, using code fallback", file=sys.stderr)
-            weakest_names = _fallback_weakest(config, savant_2026, group_type)
-            pass1_weakest = [{"name": n, "reason": "code fallback"} for n in weakest_names]
+        # ── Layer 4: Python compute (Sum / urgency / FA tags) ──
+        print(f"  Layer 4 ({label}): computing weakest + urgency...", file=sys.stderr)
+        standings = _fetch_team_games()
+        rolling = _load_savant_rolling(player_type=group_type)
+        my_roster = _prep_my_roster_for_compute(
+            group_type, config, savant_2026, standings, rolling,
+        )
+        cant_cut = set(config.get("league", {}).get("cant_cut", []))
+        weakest, low_conf = fa_compute.pick_weakest(
+            my_roster, group_type, n=4, cant_cut=cant_cut,
+        )
+        urgency_result = fa_compute.compute_urgency(weakest, group_type)
 
         if not fa_candidates and not watch_candidates:
             _notify(env, args, f"[FA Scan {label}] 無候選通過品質門檻，waiver-log 無 watch")
             return
 
-        # Pass 2: compare
-        print(f"  Pass 2 ({label}): comparing...", file=sys.stderr)
-        prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
-        prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
-
-        # FA rolling enrichment (batter 14d / SP 21d) — Pass 2 task B add evaluation
+        # FA rolling for compute_fa_tags recency evaluation
         fa_rolling_type = "batter" if group_type == "batter" else "pitcher"
         fa_rolling = _fetch_fa_rolling(
             fa_candidates, watch_candidates, today_str, player_type=fa_rolling_type,
         )
 
-        data = _build_pass2_data(
-            group_type, pass1_weakest, savant_2026, fa_candidates, watch_candidates,
-            changes, ref_1d, ref_3d, config, fa_rolling=fa_rolling,
-            pass1_low_conf=pass1_low_conf,
+        # Anchor for FA tag comparison — P1 in urgency rank (fallback: first slump hold)
+        anchor = None
+        if urgency_result["weakest_ranked"]:
+            anchor = urgency_result["weakest_ranked"][0]
+        elif urgency_result.get("slump_hold"):
+            sh = urgency_result["slump_hold"][0]
+            anchor = {
+                "name": sh["name"],
+                "score": sh.get("sum_2026", 0),
+                "breakdown": sh.get("prior_breakdown", {}),
+                "savant_2026": sh.get("savant_2026") or {},
+            }
+
+        fa_tagged = []
+        for p in fa_candidates:
+            entry = _normalize_fa_for_compute(p, group_type, fa_rolling)
+            if anchor is None:
+                entry.update({
+                    "sum_diff": 0, "breakdown_diff": {},
+                    "win_gate_passed": False, "add_tags": [], "warn_tags": [],
+                    "decision": "pass", "anchor_name": "—",
+                })
+            else:
+                entry.update(fa_compute.compute_fa_tags(entry, anchor, group_type))
+            fa_tagged.append(entry)
+
+        watch_tagged = []
+        for p in watch_candidates:
+            entry = _normalize_fa_for_compute(p, group_type, fa_rolling)
+            if anchor is None:
+                entry.update({
+                    "sum_diff": 0, "breakdown_diff": {},
+                    "win_gate_passed": False, "add_tags": [], "warn_tags": [],
+                    "decision": "pass", "anchor_name": "—",
+                })
+            else:
+                entry.update(fa_compute.compute_fa_tags(entry, anchor, group_type))
+            watch_tagged.append(entry)
+
+        # ── Layer 5: Claude text layer ──
+        print(f"  Layer 5 ({label}): Claude 文字化...", file=sys.stderr)
+        prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
+        prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
+
+        data = _build_pass2_data_v2(
+            group_type, urgency_result, low_conf, fa_tagged, watch_tagged,
+            changes, ref_1d, ref_3d, config,
         )
-        advice = _call_claude(prompt_path, data)
+        advice = _call_claude(prompt_path, data, timeout=900)
 
         # Telegram: strip waiver-log + pass section + delimiter markers
         advice_display = re.sub(r"```waiver-log.*?```", "", advice, flags=re.DOTALL)
@@ -2188,15 +2590,13 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         advice_issue = re.sub(r"--- (?:ACTION|END_ACTION|PASS|END_PASS) ---", "", advice_issue)
         advice_issue = advice_issue.strip()
 
-        # Combine Pass 1 + Pass 2 raw data for Issue archive
+        # Full raw dump for Issue archive (machine report + Claude output)
         full_raw = (
-            f"=== Pass 1 Input ({label}) ===\n{roster_data}\n\n"
-            f"=== Pass 1 Output ({label}) ===\n{pass1_result}\n\n"
-            f"=== Pass 2 Data ({label}) ===\n{data}"
+            f"=== Layer 4 Mechanical Report ({label}) ===\n{data}\n\n"
+            f"=== Layer 5 Claude Output ({label}) ===\n{advice}"
         )
         _publish(today_str, label, advice_display, advice_issue, full_raw, env, args)
 
-        # Auto-update waiver-log (uses full advice with waiver-log block)
         _update_waiver_log(advice, today_str, env)
 
     except Exception as e:
