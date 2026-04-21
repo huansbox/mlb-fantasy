@@ -279,6 +279,13 @@
 - 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
 - 04-21：觸發第3天。14d Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心壓倒。建議 FAAB $1 立即取代 Albies，Muncy $3-5 fallback（fa_scan）
 
+### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
+觸發：立即行動
+- 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
+- 04-20：[eval] vs Albies Sum 28 vs 9 Δ+19 3/3 全勝，2 ✅（雙年菁英 + 球隊主力）+ 0 ⚠️ → **立即取代**。14d xwOBA .323 Δ-0.083 雖 ❄️ 但 BBE 21<25 不啟用。建議 FAAB $3-5 取代 Albies。fallback Correa $1
+- 04-21：xwOBA .399(>P90)/Barrel% 14.9(>P90) BBE 47，機械「取代」→ Claude Issue #95 升級「立即取代 fallback」。mlb_id bug 確認：ATH 691777 prior 雙年菁英（非 LAD 571970 的 .267 誤值）。49% owned 窗口收窄（fa_scan）
+- 04-21：⚠️ **cron 誤判被搶第二次**（commit `39170c9`）— CLAUDE.md TODO auto-close mlb_id 驗證 bug 再次觸發，`_check_player_ownership` 用 name 搜到 LAD 老 Muncy 571970 (rostered) 回 team → 誤關 ATH 691777。實際 Issue #95 Claude 推薦 FAAB claim → 仍為本聯盟 FA。已從已結案復原
+
 ### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
 - 04-20：xERA 1.39/xwOBA .188/HH% 22.2% 三項>P90（BBE 18 極低信心），2025 Sum 26 雙年確認，運氣 -1.50 買低訊號。2% owned 無壓力（fa_scan）
@@ -386,9 +393,6 @@
 - 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
 
 ### Martín Pérez (ATL, SP) — 被搶（自動偵測）
-- 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
-
-### Max Muncy (ATH, 2B,3B,SS) — 被搶（自動偵測）
 - 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
 
 ### Chad Patrick (MIL, SP) — 被搶（自動偵測）
