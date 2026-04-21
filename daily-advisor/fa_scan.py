@@ -360,10 +360,18 @@ def enrich_watch_players(watchlist, savant_2026, config):
 # ── Waiver-log auto-cleanup ──
 
 
-def _check_player_ownership(name, league_key, access_token):
-    """Check if a player is FA or rostered via Yahoo API (2 calls).
+def _check_player_ownership(name, league_key, access_token, expected_team=None):
+    """Check if a player is FA or rostered via Yahoo API.
 
-    Returns ownership_type: 'freeagents', 'waivers', 'team', or None on error.
+    When expected_team is provided, cross-verify against Yahoo's
+    editorial_team_abbr to disambiguate same-name players (e.g. Max Muncy
+    LAD 571970 vs ATH 691777 — without team verification the name search
+    picks the first match and can wrongly report ATH Muncy as rostered
+    because LAD Muncy is rostered by someone). See CLAUDE.md TODO
+    'waiver-log auto-close mlb_id 驗證'.
+
+    Returns ownership_type: 'freeagents', 'waivers', 'team', or None on
+    error / no matching player.
     """
     players_data = _search_players(name, league_key, access_token)
     if not players_data:
@@ -372,9 +380,12 @@ def _check_player_ownership(name, league_key, access_token):
         if k == "count":
             continue
         p = extract_player_info(v["player"])
+        # Cross-verify team to avoid same-name false matches
+        if expected_team and p.get("team") and p["team"].upper() != expected_team.upper():
+            continue
         player_key = p.get("player_key")
         if not player_key:
-            return None
+            continue
         od = api_get(
             f"/league/{league_key}/players;player_keys={player_key}"
             f";out=ownership",
@@ -383,6 +394,7 @@ def _check_player_ownership(name, league_key, access_token):
         p2 = extract_player_info(
             od["fantasy_content"]["league"][1]["players"]["0"]["player"])
         return p2.get("ownership_type", "")
+    # No matching player (name + team) found — treat as unknown, not FA
     return None
 
 
@@ -429,10 +441,11 @@ def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
     for w in watchlist:
         try:
             ownership = _check_player_ownership(
-                w["name"], league_key, access_token)
+                w["name"], league_key, access_token,
+                expected_team=w.get("team"))
             if ownership == "team":
                 rostered.append(w)
-                print(f"  Rostered: {w['name']}", file=sys.stderr)
+                print(f"  Rostered: {w['name']} ({w.get('team','?')})", file=sys.stderr)
             time.sleep(0.5)
         except Exception as e:
             print(f"  Ownership check failed for {w['name']}: {e}",
@@ -2545,9 +2558,11 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     print(f"  Ownership check: {len(watchlist)} watch players...", file=sys.stderr)
     for w in watchlist:
         try:
-            ownership = _check_player_ownership(w["name"], league_key, access_token)
+            ownership = _check_player_ownership(
+                w["name"], league_key, access_token,
+                expected_team=w.get("team"))
             if ownership == "team":
-                print(f"  Watch skip (rostered): {w['name']}", file=sys.stderr)
+                print(f"  Watch skip (rostered): {w['name']} ({w.get('team','?')})", file=sys.stderr)
                 rostered_names.add(w["name"])
             else:
                 still_fa.append(w)
