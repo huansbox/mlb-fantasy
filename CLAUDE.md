@@ -484,8 +484,10 @@ daily_advisor.py（每日戰報）
   └─ 輸出：Telegram 推送 + GitHub Issue 存檔
 
 fa_scan.py（FA 市場分析唯一入口）
-  ├─ 每日：Batter + SP 兩階段 Claude（Pass 1 挑最弱 + Pass 2 比較）
-  ├─ 週一：--rp 模式（RP 獨立掃描）
+  ├─ 每日：Batter + SP 並行 threading（Python compute + Claude 文字化）
+  │   └─ fa_compute.py: pick_weakest / compute_urgency / compute_fa_tags (Layer 4)
+  │   └─ Claude 只做 定性 reason + 邊界 case flag + 觀察中變化 (Layer 5)
+  ├─ 週一：--rp 模式（RP 獨立掃描；仍保留 Claude Pass 1 單階段）
   ├─ 每日 TW 15:15：--snapshot-only（%owned 快照 + watchlist 清理）
   ├─ 被讀取：weekly_review.py（scan_summary）
   └─ 被更新：waiver-log.md（觀察中球員追蹤）
@@ -525,7 +527,9 @@ waiver-log.md（球員追蹤唯一來源）
 | 文件 | 用途 |
 |------|------|
 | `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
-| `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP / 週一 RP / snapshot-only） |
+| `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP 並行 / 週一 RP / snapshot-only） |
+| `daily-advisor/fa_compute.py` | Python 機械計算層（Sum/urgency/✅⚠️ 標籤/升級判定，Phase 5） |
+| `daily-advisor/tests/test_fa_compute.py` | fa_compute 單元測試（85 cases 覆蓋百分位分桶 + 四因子 + 標籤 + fixture 回歸） |
 | `daily-advisor/savant_rolling.py` | 14d Savant rolling 抓取（cron TW 12:00，產出 `savant_rolling.json` 供 fa_scan + daily_advisor 讀取） |
 | `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據 + Yahoo 格位 + MLB 狀態） |
 | `waiver-log.md` | 球員追蹤（FA 觀察中 / 隊上觀察 / 已結案） |
