@@ -311,6 +311,7 @@
 - 04-20：Sum 21 vs Nola(P1) 17 Δ+4, ✅ 球隊主力 無強警示 → 取代, IP/GS 5.6 AZ 強隊（fa_scan）
 - 04-21：機械取代人工降級: 2025 breakout 未確認. BBE 74 高信心為最強 edge case, 觸發門檻降至下次先發確認（fa_scan）
 - 04-22：⚠️ 21d Δ+0.036近況下滑觸發, BBE 74高信心但方向惡化, 等下次先發確認（fa_scan）
+- 04-22：[eval] vs Nola，結論：繼續觀察（不選為 Nola 替代），理由：Sum 21 最高但 K/9 5.5 結構性弱 + 04-19 1ER 是 BABIP 運氣（24BF 僅 3K）+ 21d xwOBA 下滑剛觸發 → ERA 假漸入佳境陷阱。等下次先發 K 起來 + xwOBA 收斂再升級
 
 ### Walbert Ureña (LAA, SP) [mlb_id:700712] — 觀察中
 觸發：BBE 達 30 且三項維持 >P70 → 重新評估升級
@@ -370,10 +371,12 @@
 ### Max Meyer (MIA, SP) [mlb_id:676974] — 觀察中
 觸發：立即行動
 - 04-22：Sum 18 vs Nola 11 差+7, BBE 70高信心, 三項全面勝+球隊主力, %owned 18% 3日+5窗口關閉中（fa_scan）
+- 04-22：[eval] vs Nola，結論：建議 add（FAAB $3-5），理由：唯一通過全部門檻（BBE 70 高信心 + 21d 持平 + 球隊主力），K/9 10.1 結構壓制 vs Nola 雙年雙確認弱 + 速度與 2025 災難年一致無反彈空間
 
 ### Foster Griffin (WSH, SP,RP) [mlb_id:656492] — 觀察中
 觸發：立即行動
 - 04-22：Sum 17 vs Nola 11 差+6, 三項均勝+球隊主力, 運氣+0.89 ERA會回升但Savant仍大幅勝Nola（fa_scan）
+- 04-22：[eval] vs Nola，結論：備案（Meyer 為首選），理由：Sum 17 vs Meyer 18 略低，BBE 60 中等 + 運氣+0.89 ERA 將回升 + 無 2025 prior 純 breakout 較冒險。Meyer 競爭失敗時 fallback
 
 ### Carmen Mlodzinski (PIT, SP,RP) [mlb_id:669387] — 觀察中
 觸發：HH% 回落<42% + IP/GS≥5.0
@@ -408,6 +411,11 @@
 狀況：2026 xERA 6.31/xwOBA .390 雙項 <P25（HH% 30.8% >P90 為唯一亮點，BBE 13 低信心）。2025 亦中後段，雙年結構性弱確認。
 追蹤：軟 cut 策略（2026-04-13 啟動）避免浪費 acquisition — 每天排 BN 不上場 + Detmers SP/RP 雙資格佔 RP slot，等 Kelly 04-14 歸隊 Yahoo 狀態清 IL 後 drop，由 Kelly 進 SP slot 完成替換。若 Kelly 延後 >48h → 改走 Soto add 方案（RP scan #58 首選 FAAB $2）。
 - 04-13：[news check] 軟 cut 第一步 — 今晚設 04-14 lineup 時從 RP 移至 BN 不上場。Drop 時機 = Kelly Yahoo 狀態更新
+
+### Aaron Nola (PHI, SP) [mlb_id:605400] — drop 候選確認
+狀況：5 場 1-4 / 5.06 ERA / xERA 4.67 P25-40 / 雙年雙確認弱（2025 P55-60）。32 歲 + 2025 兩次傷（腳踝/肋骨應力骨折）+ 速度 90.7 mph 完全等於 2025 災難年（春訓 92.9 已消失）= 結構性無反彈空間。CLAUDE.md 04-20 結構性 cut 候選確認。
+追蹤：fa_scan 04-22 找到 Meyer/Griffin/Pfaadt 三人三項全勝。Meyer 唯一通過全部門檻（BBE 70 + 21d 持平 + 球隊主力 + K/9 10.1）。
+- 04-22：[eval] vs Meyer/Griffin/Pfaadt — 三人 Savant 全項勝。**結論：drop Nola / add Meyer FAAB $3-5**。可選先試 1 個交易對象（24h），無回應則執行。框架邏輯：Nola 反彈天花板 ≈ Meyer 當下底，等的成本 > 動的成本
 
 ### Parker Messick (CLE, SP) [mlb_id:800048] — 開季驗證
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
