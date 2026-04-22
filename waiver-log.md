@@ -244,15 +244,6 @@
 - 04-21：⚠️ xwOBA .299 超觸發 .289, xERA 3.46 逼近 3.50 紅線, 下次超→結案（fa_scan）
 - 04-22：⚠️ xwOBA .304超觸發.289, xERA 3.59超3.50紅線→結案移除（fa_scan）
 
-### Walker Buehler (SD, SP) [mlb_id:621111] — 觀察中
-觸發：BBE 達 50 且 xERA <3.74 + IP/GS 回升至 5.0+ → vs Nola
-- 04-15：xERA 3.67/xwOBA .305/HH% 33.3% 3/3 勝 Nola（BBE 36 中等），2025 極差（5.41/.355）breakout 未確認。IP/GS 4.2 短局 QS 打折，運氣 -1.30 買低。SD 強隊。2% owned（fa_scan）
-- 04-16：BBE 36→50 差 4-5 場，xERA 3.64/xwOBA .305/HH% 33.3% 3/3 勝 Nola，IP/GS 4.2 未達 5.0 回升條件。2% owned（fa_scan）
-- 04-17：BBE 36→50 差 4-5 場，xERA 3.66 品質達標但 IP/GS 4.4 未達 5.0 回升條件。0% owned（fa_scan）
-- 04-19：⚠️ 品質惡化：xERA 3.66→3.95 超過觸發 3.74，IP/GS 4.4 仍未回升至 5.0（fa_scan）
-- 04-20：⚠️ 品質惡化：xERA 3.95 超觸發 3.74，IP/GS 4.4 仍未回升。觸發邊緣惡化中（fa_scan）
-- 04-21：⚠️ xERA 3.95+IP/GS 4.4 雙條件持續惡化, 接近結案（fa_scan）
-
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：BBE 達 45 且 2 項核心維持 >P70 → vs Albies（Alvarez 備案）
 - 04-16：xwOBA .427(>P90)/BB% 18.2(>P90)/Barrel% 13.5(P80-90) BBE 37 中等。2025 雙年確認（.321/10.7/9.6，293 BBE P70-80）。vs Albies 3/3 全勝。5% owned 安全（fa_scan）（fa_scan）
@@ -345,10 +336,6 @@
 觸發：BBE達70且3項核心維持>P60 → vs Albies
 - 04-21：Sum 22 BBE 56高信心, 三項均衡(.325/11.96/7.1), 2025確認, 13% owned（fa_scan）
 - 04-22：BBE 60高信心三項均衡, 2025確認。觸發70遠但穩定成長中。13% owned（fa_scan）
-
-### Gary Sánchez (MIL, C) [mlb_id:596142] — 觀察中
-觸發：BBE達40且三項核心維持>P70 → vs Albies
-- 04-21：Sum 30但BBE 29⚠️樣本小, 全>P90, 14d Δ-0.043回落, C位置衝突（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中
 觸發：BBE達50且Barrel%維持>P70 + xwOBA>P80 → vs Albies
@@ -450,6 +437,12 @@
 - 04-22：[news check] pre-season 媒體提及 season-ending surgery 可能性，elbow 嚴重性升級。當前仍 Active（off day 管理），監控 IL 觸發點
 
 ## 已結案
+
+### Walker Buehler (SD, SP) — 被搶（自動偵測）
+- 2026-04-22：Yahoo ownership_type=team，從觀察中移除。
+
+### Gary Sánchez (MIL, C) — 被搶（自動偵測）
+- 2026-04-22：Yahoo ownership_type=team，從觀察中移除。
 
 ### Dillon Dingler (DET, C) — 被搶（自動偵測）
 - 2026-04-21：Yahoo ownership_type=team，從觀察中移除。
