@@ -91,6 +91,7 @@
 - 04-19：BBE 54 觸發確認，BB% 13.8>P80/xwOBA .321>P60。Alvarez 優先→備案。0% owned（fa_scan）
 - 04-21：BBE 61觸發確認穩定, BB% 15.2>P80/xwOBA .331>P60。Correa/Muncy/Julien後備案#4。0% owned（fa_scan）
 - 04-22：BBE 61 高信心穩定, BB% 15.5>P90。Correa/Muncy/Julien 後備案 #4。0% owned（fa_scan）
+- 04-23：❌ 26% 3d+3窗口開始收窄, BBE 61高信心BB% 15.5>P90穩定。備案#4（fa_scan）
 
 ### Richie Palacios (TB, 2B,LF) [mlb_id:680700] — 觀察中
 觸發：BBE 達 30 且 xwOBA >P80 + BB% >P70 → vs Buxton
@@ -130,6 +131,7 @@
 - 04-20：⚠️ 觸發失敗建議結案：BBE 52>50 但 xwOBA .280(P25-40)/Barrel% 7.7(P45) 均未達 P70，2025 同低(.284/4.3%) 結構未改善（fa_scan）
 - 04-21：⚠️ 觸發失敗: BBE 56>50 但 0/3 核心達 P70, 2025 同低結構未改善, 建議結案（fa_scan）
 - 04-22：⚠️ 觸發失敗確認: BBE 58>50但0/3核心達P70+14d❄️強下滑+2025同低, 建議結案（fa_scan）
+- 04-23：⚠️觸發失敗確認第3天：BBE 59>50但0/3核心達P70+14d❄️+2025同低, 建議結案（fa_scan）
 
 ### Evan Carter (TEX, LF,CF,RF) [mlb_id:694497] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
@@ -214,6 +216,7 @@
 - 04-20：BBE 33→觸發 35 差 1-2 場。❌ 15% owned 三日+6 急升窗口收窄，Barrel% 15.6>P90 跳升待驗（2025 僅 6.7%）（fa_scan）
 - 04-21：❌ 17% owned 3d+7 急升窗口關閉中, BBE 35 觸發差 1-2 場（fa_scan）
 - 04-22：❌ 17% owned 3d+7急升窗口關閉中, BBE 36距觸發35差1場。Barrel% breakout待驗（fa_scan）
+- 04-23：✅觸發達成BBE 36>35, Barrel%>P90但2025僅6.7% breakout待驗+C位置衝突+❌17% 3d+7急升（fa_scan）
 
 ### Cade Povich (BAL, SP) [mlb_id:700249] — 觀察中
 觸發：BBE 達 60 且 xERA <3.74 + xwOBA <.303 維持 → vs Nola
@@ -255,6 +258,7 @@
 - 04-19：BBE 41→觸發 45 差 2 場，三項>P80 雙年確認。6% owned（fa_scan）
 - 04-21：BBE 43 距觸發 45 差 2 場, 三項>P80 雙年確認穩定（fa_scan）
 - 04-22：BBE 43→觸發 45 差 2 場, 三項>P80 雙年確認穩定。7% owned（fa_scan）
+- 04-23：BBE 46(+3)→觸發45已達成！三項>P80雙年確認。C位置衝突但品質面觀察中C群最穩（fa_scan）
 
 ### Dominic Smith (ATL, 1B) [mlb_id:642086] — 觀察中
 觸發：BBE 達 50 且 xwOBA 維持 >P70 + BB% 回升 >P40 → vs Albies
@@ -264,6 +268,7 @@
 - 04-19：BBE 42→觸發 50 差 4-5 場，xwOBA .414>P90 但 BB% 4.0<P25 雙年確認問題。10% owned 三日+5（fa_scan）
 - 04-21：BBE 45→觸發50差5場, xwOBA .396>P90但BB% 3.45<P25雙年確認低, 與BB策略矛盾（fa_scan）
 - 04-22：BBE 49→觸發50差1場, xwOBA .417>P90但BB% 3.5<P25雙年確認低與BB策略矛盾。14% owned（fa_scan）
+- 04-23：BBE 49→觸發50差1場, 但BB% 3.5<P25雙年確認與BB策略矛盾=即使觸發不宜行動（fa_scan）
 
 ### Trevor Larnach (MIN, LF,RF) [mlb_id:663616] — 觀察中
 觸發：BBE 達 40 且 BB% 維持 >P80 + xwOBA >P70 → vs Albies
@@ -297,6 +302,7 @@
 - 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
 - 04-21：觸發第3天。14d Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心壓倒。建議 FAAB $1 立即取代 Albies，Muncy $3-5 fallback（fa_scan）
 - 04-22：觸發第3天。14d Δ-0.033持平邊緣但季線.363>P90 BBE 66全場最高信心。建議 FAAB $1 + Muncy $3-5 同時提交。0% owned（fa_scan）
+- 04-23：觸發第4天BBE 69全場最高信心, 14d Δ-0.033持平, 季線.362>P90。⚠️已推薦4天未執行, 建議FAAB $1立即提交（fa_scan）
 
 ### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
 觸發：立即行動
@@ -305,6 +311,7 @@
 - 04-21：xwOBA .399(>P90)/Barrel% 14.9(>P90) BBE 47，機械「取代」→ Claude Issue #95 升級「立即取代 fallback」。mlb_id bug 確認：ATH 691777 prior 雙年菁英（非 LAD 571970 的 .267 誤值）。49% owned 窗口收窄（fa_scan）
 - 04-21：⚠️ **cron 誤判被搶第二次**（commit `39170c9`）— CLAUDE.md TODO auto-close mlb_id 驗證 bug 再次觸發，`_check_player_ownership` 用 name 搜到 LAD 老 Muncy 571970 (rostered) 回 team → 誤關 ATH 691777。實際 Issue #95 Claude 推薦 FAAB claim → 仍為本聯盟 FA。已從已結案復原
 - 04-22：BBE 50, xwOBA .321/Barrel% 14.0>P90。mlb_id 691777 已確認。Correa fallback FAAB $3-5。49% owned（fa_scan）
+- 04-23：BBE 53信心提升, xwOBA .321/Barrel% 14.0>P90。⚠️已推薦3天未執行+49% owned窗口幾乎關閉。建議FAAB $3-5與Correa同時提交（fa_scan）
 
 ### Keaton Winn (SF, SP,RP) [mlb_id:676775] — 觀察中
 觸發：BBE 達 30 且 3 項核心維持 >P70 → 取代 Nola
@@ -416,6 +423,14 @@
 觸發：HH%回落<42% + 2場先發品質維持
 - 04-23：Sum 17 vs Nola差+6, xERA 3.77/xwOBA .310 P60但HH% 43.5%偏高, 2025極差breakout未確認, BBE 62高信心（fa_scan）
 
+### Heliot Ramos (SF, LF,CF,RF) [mlb_id:671218] — 觀察中
+觸發：立即行動
+- 04-23：Sum 19 vs Albies 9 差+10, 2✅(球隊主力+近況確認), Barrel% 16.7>P90 + 14d xwOBA .438 Δ+0.115火燙, 46% owned窗口關閉中（fa_scan）
+
+### Spencer Steer (CIN, 1B,LF) [mlb_id:668715] — 觀察中
+觸發：Correa/Ramos備案, BBE達60+14d持續>P70再行動
+- 04-23：Sum 21 vs Albies差+12, Barrel% 18.0>P90但2025僅7.6 breakout待驗, 13% owned安全（fa_scan）
+
 ## 隊上觀察
 
 ### Cole Ragans (KC, SP) [mlb_id:666142] — DTD
@@ -454,6 +469,7 @@
 追蹤：4 月東岸冷天可能持續 1-2 週，5 月暖再評估。心態風險：怪天氣 + 失誤可能惡性循環。BN 輪替 Albies / Jazz 二擇一坐。2025 雙年 baseline 真強 → 不 cut。
 - 04-13：[news check] 無傷勢，純 slump + 心態問題（fa_scan）
 - 04-22：[news check] 04-19 vs KC 最終戰被坐板凳；媒體標記「scapegoat / trade bait / defensive instincts declining」。本週 17 AB 打 2 支、9K。三線負面（攻/守/心），Slump hold 維持但 PA 縮減風險升高
+- 04-23：🔄 04-19被坐板凳+媒體trade bait標記+本週17AB 9K, PA縮減風險正在發生。Slump hold維持但緊盯出場（fa_scan）
 
 ### Byron Buxton (MIN, CF) [mlb_id:621439] — HBP 復出後慢熱
 狀況：04-03 被 Rays Kelly 91.6 mph 觸身擊中右前臂，X 光無骨折，右前臂挫傷。04-04 缺賽 1 場，04-05 復出 DH。14G/62PA .240 OPS .531, 0HR, BB:K 1:9（近 7G）。xwOBA .253 從 2025 .350 (>P90) 跌到 <P25，但 Barrel% 10.3% 仍 P70-80。
@@ -465,6 +481,7 @@
 追蹤：HH% 是 elbow 健康代理指標，回到 50%+ 表示恢復。Off day 限制可能拖累 PA 累積。打者 cut 序列：Albies (雙年弱) → Tovar (BB 死硬傷, SS 守位保護) → 之後才輪到 Stanton（HH 退化但 xwOBA 仍 P80, Barrel% P70-80），**目前不到結構性弱門檻**。
 - 04-13：[news check] chronic elbow 管理，多 off day（fa_scan）
 - 04-22：[news check] pre-season 媒體提及 season-ending surgery 可能性，elbow 嚴重性升級。當前仍 Active（off day 管理），監控 IL 觸發點
+- 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
 
