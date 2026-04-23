@@ -339,11 +339,6 @@
 - 04-21：Sum 25, 14d Δ+0.039🔥, BB% 18.7>P90但2025全<P40 breakout跳幅極大待驗。0% owned（fa_scan）
 - 04-22：14d Δ+0.057🔥但2025全<P40 breakout跳幅極端+COL park膨脹, 不宜FAAB。0% owned（fa_scan）
 
-### Oswald Peraza (LAA, 1B,2B,3B,SS) [mlb_id:672724] — 觀察中
-觸發：立即行動
-- 04-21：Sum 23, 14d Δ+0.075🔥強回升, 16% owned 3d+9窗口收窄, 2025弱breakout待驗（fa_scan）
-- 04-22：14d Δ+0.087🔥強回升, 但BBE 47+2025弱breakout待驗。16% owned 3d+9窗口收窄（fa_scan）
-
 ### Amed Rosario (NYY, 2B,3B) [mlb_id:642708] — 觀察中
 觸發：立即行動 — ⚠️ BB%雙年<P25與隊伍BB策略矛盾, 低優先fallback
 - 04-21：Sum 22, xwOBA .393/Barrel% 13.2 >P90但BB% 6.12<P25 breakdown -2（fa_scan）
@@ -486,6 +481,9 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Oswald Peraza (LAA, 1B,2B,3B,SS) — 被搶（自動偵測）
+- 2026-04-23：Yahoo ownership_type=team，從觀察中移除。
 
 ### Walker Buehler (SD, SP) — 被搶（自動偵測）
 - 2026-04-22：Yahoo ownership_type=team，從觀察中移除。
