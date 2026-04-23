@@ -449,10 +449,12 @@
 追蹤：軟 cut 策略（2026-04-13 啟動）避免浪費 acquisition — 每天排 BN 不上場 + Detmers SP/RP 雙資格佔 RP slot，等 Kelly 04-14 歸隊 Yahoo 狀態清 IL 後 drop，由 Kelly 進 SP slot 完成替換。若 Kelly 延後 >48h → 改走 Soto add 方案（RP scan #58 首選 FAAB $2）。
 - 04-13：[news check] 軟 cut 第一步 — 今晚設 04-14 lineup 時從 RP 移至 BN 不上場。Drop 時機 = Kelly Yahoo 狀態更新
 
-### Aaron Nola (PHI, SP) [mlb_id:605400] — drop 候選確認
-狀況：5 場 1-4 / 5.06 ERA / xERA 4.67 P25-40 / 雙年雙確認弱（2025 P55-60）。32 歲 + 2025 兩次傷（腳踝/肋骨應力骨折）+ 速度 90.7 mph 完全等於 2025 災難年（春訓 92.9 已消失）= 結構性無反彈空間。CLAUDE.md 04-20 結構性 cut 候選確認。
-追蹤：fa_scan 04-22 找到 Meyer/Griffin/Pfaadt 三人三項全勝。Meyer 唯一通過全部門檻（BBE 70 + 21d 持平 + 球隊主力 + K/9 10.1）。
-- 04-22：[eval] vs Meyer/Griffin/Pfaadt — 三人 Savant 全項勝。**結論：drop Nola / add Meyer FAAB $3-5**。可選先試 1 個交易對象（24h），無回應則執行。框架邏輯：Nola 反彈天花板 ≈ Meyer 當下底，等的成本 > 動的成本
+### Aaron Nola (PHI, SP) [mlb_id:605400] — hold 觀察（2 場重評）
+狀況：5 場 1-4 / 5.06 ERA / xERA 4.67 P25-40。32 歲 + 2025 兩次傷（腳踝/肋骨應力骨折）+ 速度 90.7 mph = 2025 災難年水準。
+觸發 cut（下 2 場任一）：速度仍 ≤91 mph + xwOBA 季線 >.340 + 連 2 場 <5 IP 或 3+ ER
+觸發 hold continue（下 2 場任一）：速度回升 92+ mph / xwOBA <.320 / 新增 1+ QS
+- 04-22：[eval] vs Meyer/Griffin/Pfaadt — 三人 Savant 全項勝。結論：drop Nola / add Meyer FAAB $3-5。框架邏輯：Nola 反彈天花板 ≈ Meyer 當下底，等的成本 > 動的成本
+- 04-23：[eval] 三視角（進階/傳統/印象）重評 — Meyer xERA 4.39 vs Nola 4.70 僅差 0.31，Nola 5 GS counting 全勝（IP 26.2 / K 29 / QS 2 vs Meyer 25.0/28/0）。2025 Sum 15 實為 P45-50 中段不符「結構性確認」雙年雙低定義。Meyer add 降級為「邊際升級」而非 slam dunk。**結論：hold 2 場**，看速度是否回升 92+ / xwOBA 是否回落 <.320 / QS 是否新增
 
 ### Parker Messick (CLE, SP) [mlb_id:800048] — 開季驗證
 觸發：連 3 週 xERA > P60 (4.04) 或 CLE 限制局數跡象 → 重新評估是否保留
