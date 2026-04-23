@@ -440,13 +440,10 @@ def build_prior_stats_sp(mlb_id, savant=None):
         ip = _parse_ip(mlb_stats.get("inningsPitched", "0"))
         result["era"] = float(era) if era != "—" else 0
         result["ip"] = round(ip, 1)
-        # IP/GS from game log: only count IP in games where gamesStarted=1
-        ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, 2025)
-        if ip_per_gs is not None:
-            result["ip_per_gs"] = ip_per_gs
-        else:
-            gs = int(mlb_stats.get("gamesStarted", 0))
-            result["ip_per_gs"] = round(ip / gs, 1) if gs > 0 else 0
+        # IP/GS from game log only (GS=1 splits). None on API fail or no
+        # starts — fail loud rather than fall back to naive total-IP/GS,
+        # which inflates for swingmen with token starts.
+        result["ip_per_gs"] = _ip_per_gs_from_gamelog(mlb_id, 2025)
     return result
 
 

@@ -874,13 +874,10 @@ def _compute_derived_pitcher(savant, mlb_stats, team_games, team, year, fa_type,
         d["era_diff"] = round(xera - era, 2)
 
     if fa_type == "sp":
-        # IP/GS from game log: only count IP in games where gamesStarted=1
-        ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, year) if mlb_id else None
-        if ip_per_gs is None:
-            # Fallback: season totals (inaccurate for swingmen)
-            gs = int(mlb_stats.get("gamesStarted", 0))
-            ip_per_gs = round(ip / gs, 1) if gs > 0 else None
-        d["ip_per_gs"] = ip_per_gs
+        # IP/GS from game log only (GS=1 splits). None on API fail or no
+        # starts — fail loud rather than fall back to naive total-IP/GS,
+        # which inflates for swingmen with token starts.
+        d["ip_per_gs"] = _ip_per_gs_from_gamelog(mlb_id, year) if mlb_id else None
         # IP/Team_G for Phase 3 urgency factor (active 輪值 vs stash)
         if year == 2026:
             tg = team_games.get(team, 0)

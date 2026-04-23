@@ -554,7 +554,6 @@ waiver-log.md（球員追蹤唯一來源）
 -->
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理
-- [ ] **IP/GS fallback naive 計算潛在 bug**（roster_sync.py:858 / fa_scan.py:857）：`_ip_per_gs_from_gamelog` API 失敗時 fallback 用 `total_ip / gs`，對 swingman（兼救援的先發）會把救援局數混入 → 膨脹 IP/GS。目前隊上 10 SP 全純先發無觸發，未來 swingman / API 失敗才會出現。風險低先不動，若要修改為回傳 None（寧可缺資料不要錯資料）
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - finding C：`fa_scan.py:2161` Slump hold 訊息「≥50」寫死 → 改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
