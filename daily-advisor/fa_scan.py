@@ -2405,24 +2405,29 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
 
         # Layer 1.5: pure RP filter — drop SP,RP dual-eligible players whose
-        # 2026 usage is opener / extreme swingman (GS=0 or IP/GS <2.0).
-        # IP/GS<2.0 catches "1-2 starts but only 0.5-1.0 IP each" RP usage
-        # like Bernardino (0.7 IP/GS) which Yahoo eligibility doesn't filter.
+        # 2026 starts average <3.0 IP (opener / swingman-heavy role).
+        # Uses game-log (GS=1 only) IP/GS, not naive total-IP/GS which
+        # inflates for RPs with 1-2 token starts (e.g. Bernardino 10.3 IP
+        # total / 1 GS = naive 10.3 IP/GS, but actual start was 0.7 IP).
         if group_type == "sp":
             def _is_real_sp(p):
                 mlb = p.get("mlb_2026") or {}
                 gs = int(mlb.get("gamesStarted", 0) or 0)
                 if gs == 0:
                     return False
-                ip = _parse_ip(mlb.get("inningsPitched", "0"))
-                ip_per_gs = ip / gs if gs > 0 else 0
-                return ip_per_gs >= 2.0
+                mlb_id = p.get("mlb_id")
+                if not mlb_id:
+                    return False  # no ID — can't verify, exclude safely
+                ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, 2026)
+                if ip_per_gs is None:
+                    return False  # API fail / no GS=1 splits — exclude
+                return ip_per_gs >= 3.0
             before = len(fa_candidates) + len(watch_candidates)
             fa_candidates = [p for p in fa_candidates if _is_real_sp(p)]
             watch_candidates = [p for p in watch_candidates if _is_real_sp(p)]
             removed = before - len(fa_candidates) - len(watch_candidates)
             if removed:
-                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (GS=0 or IP/GS<2.0)",
+                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (GS=0 or game-log IP/GS<3.0)",
                       file=sys.stderr)
 
         # ── Layer 4: Python compute (Sum / urgency / FA tags) ──
