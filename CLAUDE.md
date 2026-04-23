@@ -546,6 +546,9 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
+| `docs/sp-framework-v3-weighted.md` | SP 評估 v3 設計（Impact-Weighted Sum + Rotation gate + 結構訊號缺失補充）— 未實作前 v2 仍 live rules |
+| `docs/nola-lopez-holmes-triview-2026-04-23.md` | 三視角 Nola/López/Holmes drop 評估回測材料（2/3 視角反對 v3 判斷）|
+| `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
 
 ## 待辦
 
