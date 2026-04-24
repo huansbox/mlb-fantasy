@@ -577,7 +577,13 @@ waiver-log.md（球員追蹤唯一來源）
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
 -->
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
-- [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理
+- [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理。**v4 上線後改校準 21d Δ xwOBACON 門檻**
+- [ ] **v4 框架上線前置（4 項，2026-04-24 設計完成後列出）**：
+  - **v4 prior_stats backfill**：roster_config.json 加 2025 `whiff_pct` / `gb_pct` / `xwobacon` 欄位，供 `v4_add_tags_sp` 的「✅ 雙年菁英」tag 使用（目前只有 xera/xwoba/hh_pct）
+  - **21d rolling xwOBACON fetch**：savant_rolling.py 目前只抓 xwOBA allowed，v4 時序訊號用 xwOBACON 要擴充（pitch-level CSV 聚合，排除 K/BB 只算 on-contact）
+  - **v4 production cutover 決策**：目前 `fa_scan_v4.py` 是 parallel CLI 工具（stdout only），prod cron `fa_scan.py` 仍 v2。需 feature flag 環境變數 + VPS 部署 + 1-2 週並行驗證 + 最終清 v2 SP 代碼（batter 保留 v2）
+  - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，待 production cutover 時一起改寫
+- [ ] **Luck tag BBE 小樣本 edge case**（2026-04-24 實戰發現）：Kelly xERA 13.4 / ERA 9.31 → diff +4.09 觸發「⚠️ 賣高運氣」但實際語意是「崩盤進行中」不是「運氣加持」。考慮加規則 BBE <40 禁用 luck tag，或 diff > +3 時改標「崩盤中」tag
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - finding C：`fa_scan.py:2161` Slump hold 訊息「≥50」寫死 → 改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
