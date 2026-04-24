@@ -412,6 +412,22 @@ SP IP/GS 三級分類（分布集中，不適合百分位）：
 | 5.3 - 5.7 | 一般 | 多數 SP 落在這裡 |
 | < 5.3 | 短局型 | QS 打折，IP 貢獻受限 |
 
+SP v4 百分位（2025 MLB SP, GS/G > 0.5 且 GS ≥ 10，n=178。GB%/xwOBACON 需 BBE ≥ 50, n=115。Whiff% 需 pitch-arsenal 總球數 ≥ 500）— **P90 = 菁英方向**（reverse 指標如 BB/9 / xwOBACON 顯示低值）：
+
+| 百分位 | IP/GS | Whiff% | BB/9 | GB% | xwOBACON |
+|--------|:---:|:---:|:---:|:---:|:---:|
+| P25 | 5.21 | 21.3% | 3.47 | 38.3% | .386 |
+| P40 | 5.35 | 23.1% | 3.17 | 40.5% | .375 |
+| P45 | 5.41 | 23.5% | 3.06 | 41.4% | .374 |
+| **P50** | **5.46** | **24.0%** | **2.95** | **43.2%** | **.370** |
+| P55 | 5.55 | 24.6% | 2.83 | 44.1% | .367 |
+| P60 | 5.61 | 25.1% | 2.73 | 44.7% | .364 |
+| P70 | 5.73 | 26.5% | 2.38 | 46.7% | .356 |
+| P80 | 5.89 | 27.9% | 2.18 | 51.4% | .350 |
+| P90 | 6.11 | 30.0% | 1.96 | 54.6% | .341 |
+
+（腳本：`daily-advisor/calc_v4_percentiles.py`。Whiff% 用 pitch-arsenal-stats 按球種 pitches 加權平均。v4 框架 Sum 打分的 2025 分布基線。）
+
 RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 | 百分位 | xERA | xwOBA allowed | HH% allowed | Barrel% allowed | K/9 | IP/Team_G | xERA-ERA |
@@ -543,10 +559,13 @@ waiver-log.md（球員追蹤唯一來源）
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
+| `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
+| `daily-advisor/fa_scan_v4.py` | **v4 框架分析工具（parallel 於 fa_scan.py v2 production cron）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate + 升級建議；stdout 不推送** |
 | `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
-| `docs/sp-framework-v3-weighted.md` | SP 評估 v3 設計（Impact-Weighted Sum + Rotation gate + 結構訊號缺失補充）— 未實作前 v2 仍 live rules |
+| `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）— 取代 v3，未實作前 v2 仍 live rules** |
+| `docs/sp-framework-v3-weighted.md` | SP 評估 v3 設計（已被 v4 取代，保留作設計演進紀錄）|
 | `docs/nola-lopez-holmes-triview-2026-04-23.md` | 三視角 Nola/López/Holmes drop 評估回測材料（2/3 視角反對 v3 判斷）|
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
 
