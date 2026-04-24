@@ -695,3 +695,284 @@ def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple
         key_map = _PRIOR_KEY_MAP["batter"]
         metrics = {metric: prior_stats.get(prior_key) for metric, prior_key in key_map.items()}
     return compute_sum_score(metrics, player_type)
+
+
+# ═════════════════════════════════════════════════════════════════════════
+# v4 SP framework (2026-04-24 defined in docs/sp-framework-v4-balanced.md)
+# Parallel to v2 above — v2 stays live for batter + existing cron safety.
+# v4 applies to SP only. Batters still use v2 (no user request to change).
+# ═════════════════════════════════════════════════════════════════════════
+
+# 2025 MLB SP percentile bands, computed by calc_v4_percentiles.py (n=178/115).
+# Format: [(pctile, threshold)] sorted ascending so higher-index = elite direction.
+# For "reverse" indicators (lower = better), thresholds listed low-to-high too
+# but semantically P90 = lowest = elite; use v4_metric_to_score with reverse=True.
+PITCHER_V4_PCTILES = {
+    "ip_gs": [(25, 5.21), (40, 5.35), (45, 5.41), (50, 5.46),
+              (55, 5.55), (60, 5.61), (70, 5.73), (80, 5.89), (90, 6.11)],
+    "whiff_pct": [(25, 21.3), (40, 23.1), (45, 23.5), (50, 24.0),
+                  (55, 24.6), (60, 25.1), (70, 26.5), (80, 27.9), (90, 30.0)],
+    # reverse: threshold at P25 is the "worst" value; P90 the "best" (lowest)
+    # Here we list the actual values at each elite-percentile label.
+    "bb9": [(25, 3.47), (40, 3.17), (45, 3.06), (50, 2.95),
+            (55, 2.83), (60, 2.73), (70, 2.38), (80, 2.18), (90, 1.96)],
+    "gb_pct": [(25, 38.3), (40, 40.5), (45, 41.4), (50, 43.2),
+               (55, 44.1), (60, 44.7), (70, 46.7), (80, 51.4), (90, 54.6)],
+    "xwobacon": [(25, 0.386), (40, 0.375), (45, 0.374), (50, 0.370),
+                 (55, 0.367), (60, 0.364), (70, 0.356), (80, 0.350), (90, 0.341)],
+}
+
+# Which v4 indicators are reverse-direction (lower raw value = elite).
+_V4_REVERSE_METRICS = {"bb9", "xwobacon"}
+
+# v4 SP Sum metric order (score 0-10 each, Sum 0-50)
+_V4_SP_METRICS = ("ip_gs", "whiff_pct", "bb9", "gb_pct", "xwobacon")
+
+_V4_SP_LABELS = {
+    "ip_gs": "IP/GS",
+    "whiff_pct": "Whiff%",
+    "bb9": "BB/9",
+    "gb_pct": "GB%",
+    "xwobacon": "xwOBACON",
+}
+
+
+def v4_metric_to_score(value, metric: str) -> int:
+    """Convert value → 0-10 score using 2025 v4 percentile bands.
+
+    Returns 0 for None. P90+=10, P80=9, P70=8, P60=7, P50=6, P40=5, P25=3, <P25=1.
+    Handles reverse metrics (bb9, xwobacon) by swapping comparison.
+    """
+    if value is None:
+        return 0
+    bp = PITCHER_V4_PCTILES.get(metric)
+    if not bp:
+        return 0
+    reverse = metric in _V4_REVERSE_METRICS
+    # bp is listed in elite direction: for forward, ascending thresholds;
+    # for reverse, we still iterate but compare lower-is-better.
+    matched = 0
+    for pct, thresh in bp:
+        if reverse:
+            # For reverse metrics: value <= threshold means AT LEAST that elite
+            # percentile. bp ordered by elite-pct ascending, but threshold is
+            # in descending real-value order (P25=3.47, P90=1.96 for BB/9).
+            if value <= thresh:
+                matched = pct
+        else:
+            if value >= thresh:
+                matched = pct
+    if matched >= 90:
+        return 10
+    if matched >= 80:
+        return 9
+    if matched >= 70:
+        return 8
+    if matched >= 60:
+        return 7
+    if matched >= 50:
+        return 6
+    if matched >= 40:
+        return 5
+    if matched >= 25:
+        return 3
+    return 1
+
+
+def compute_sum_score_v4_sp(data: dict) -> tuple[int, dict]:
+    """v4 SP Sum: 5 indicators × 0-10, max 50.
+
+    Args:
+        data: {ip_gs, whiff_pct, bb9, gb_pct, xwobacon}
+
+    Returns:
+        (sum_score, breakdown) where breakdown is {"IP/GS": n, "Whiff%": n, ...}
+    """
+    breakdown = {}
+    total = 0
+    for metric in _V4_SP_METRICS:
+        s = v4_metric_to_score(data.get(metric), metric)
+        breakdown[_V4_SP_LABELS[metric]] = s
+        total += s
+    return total, breakdown
+
+
+def rotation_gate_v4(g: int, gs: int) -> tuple[str, str]:
+    """Pre-filter SP by role, from GS/G ratio + absolute GS.
+
+    🟢 Active   — GS/G ≥ 0.6 AND GS ≥ 3  (full rotation member)
+    ⚠️ Swingman — 0.3 ≤ GS/G < 0.6 OR GS ∈ {1,2}  (partial / new-up)
+    🚫 Excluded — GS/G < 0.3 OR GS = 0  (pure RP / long relief)
+
+    Returns (icon, descriptor) — icon for display, descriptor for logic.
+    """
+    if g == 0 or gs == 0:
+        return ("🚫", "pure-RP/bench")
+    ratio = gs / g
+    if ratio < 0.3:
+        return ("🚫", "pure-RP/long-relief")
+    if ratio < 0.6 or gs < 3:
+        return ("⚠️", "swingman/new-up")
+    return ("🟢", "rotation-SP")
+
+
+def luck_tag_v4(xera: float | None, era: float | None) -> str | None:
+    """xERA − ERA ≤ -0.81 → ✅ 撿便宜運氣; ≥ +0.81 → ⚠️ 賣高運氣; else None.
+
+    v2 logic already uses era_diff in derived; this is the explicit tag form.
+    """
+    if xera is None or era is None:
+        return None
+    diff = xera - era
+    if diff <= -0.81:
+        return "✅ 撿便宜運氣"
+    if diff >= 0.81:
+        return "⚠️ 賣高運氣"
+    return None
+
+
+def v4_add_tags_sp(fa: dict) -> list[str]:
+    """v4 ✅ tags for SP FA candidate.
+
+    Expects fa dict with:
+      savant_v4: {ip_gs, whiff_pct, bb9, gb_pct, xwobacon, xera, era, bbe}
+      prior_stats: 2025 data for 雙年菁英 check
+      rolling_21d: optional {xwobacon, bbe}
+    """
+    tags = []
+    sv = fa.get("savant_v4") or {}
+    prior = fa.get("prior_stats") or {}
+    rolling = fa.get("rolling_21d") or {}
+
+    # ✅ 雙年菁英 — 2025 v4 Sum ≥ 40 AND 2025 IP ≥ 50
+    prior_ip = prior.get("ip")
+    if prior_ip and prior_ip >= 50:
+        prior_v4_data = {
+            "ip_gs": prior.get("ip_gs"),
+            "whiff_pct": prior.get("whiff_pct"),
+            "bb9": prior.get("bb9"),
+            "gb_pct": prior.get("gb_pct"),
+            "xwobacon": prior.get("xwobacon"),
+        }
+        prior_sum, _ = compute_sum_score_v4_sp(prior_v4_data)
+        if prior_sum >= 40:
+            tags.append("✅ 雙年菁英")
+
+    # ✅ 深投型 — IP/GS > 5.7
+    if sv.get("ip_gs") and sv["ip_gs"] > 5.7:
+        tags.append("✅ 深投型")
+
+    # ✅ GB 重型 — GB% > 50
+    if sv.get("gb_pct") and sv["gb_pct"] > 50.0:
+        tags.append("✅ GB 重型")
+
+    # ✅ K 壓制 — Whiff% > P70 (26.5)
+    if sv.get("whiff_pct") and sv["whiff_pct"] > 26.5:
+        tags.append("✅ K 壓制")
+
+    # ✅ 撿便宜運氣 — xERA - ERA ≤ -0.81
+    luck = luck_tag_v4(sv.get("xera"), sv.get("era"))
+    if luck and luck.startswith("✅"):
+        tags.append(luck)
+
+    # ✅ 近況確認 — 21d Δ xwOBACON ≤ -0.035 (improving)
+    if rolling.get("bbe", 0) >= 20:
+        r_x = rolling.get("xwobacon")
+        s_x = sv.get("xwobacon")
+        if r_x is not None and s_x is not None and (r_x - s_x) <= -0.035:
+            tags.append("✅ 近況確認")
+
+    return tags
+
+
+def v4_warn_tags_sp(fa: dict) -> list[str]:
+    """v4 ⚠️ tags for SP FA candidate."""
+    tags = []
+    sv = fa.get("savant_v4") or {}
+    prior = fa.get("prior_stats") or {}
+    rolling = fa.get("rolling_21d") or {}
+    gate = fa.get("rotation_gate")
+
+    bbe = sv.get("bbe") or 0
+    ip_2026 = sv.get("ip") or 0
+    prior_ip = prior.get("ip")
+
+    # ⚠️ 樣本小 — BBE < 30 OR IP < 20 (strong warning)
+    if bbe < 30 or ip_2026 < 20:
+        tags.append("⚠️ 樣本小")
+
+    # ⚠️ 短局 — IP/GS < 5.0
+    if sv.get("ip_gs") and sv["ip_gs"] < 5.0 and sv["ip_gs"] > 0:
+        tags.append("⚠️ 短局")
+
+    # ⚠️ Swingman 角色 — Rotation gate 黃色
+    if gate == "⚠️":
+        tags.append("⚠️ Swingman 角色")
+
+    # ⚠️ xwOBACON 極端 — <P25 (.386)
+    if sv.get("xwobacon") and sv["xwobacon"] >= 0.386:
+        tags.append("⚠️ xwOBACON 極端")
+
+    # ⚠️ K 壓制不足 — Whiff% < P40 (23.1)
+    if sv.get("whiff_pct") and sv["whiff_pct"] < 23.1:
+        tags.append("⚠️ K 壓制不足")
+
+    # ⚠️ Command 警示 — BB/9 > 3.5
+    if sv.get("bb9") and sv["bb9"] > 3.5:
+        tags.append("⚠️ Command 警示")
+
+    # ⚠️ 賣高運氣 — xERA - ERA ≥ +0.81
+    luck = luck_tag_v4(sv.get("xera"), sv.get("era"))
+    if luck and luck.startswith("⚠️"):
+        tags.append(luck)
+
+    # ⚠️ 近況下滑 — 21d Δ xwOBACON ≥ +0.035 (getting worse)
+    if rolling.get("bbe", 0) >= 20:
+        r_x = rolling.get("xwobacon")
+        s_x = sv.get("xwobacon")
+        if r_x is not None and s_x is not None and (r_x - s_x) >= 0.035:
+            tags.append("⚠️ 近況下滑")
+
+    # ⚠️ Breakout 待驗 — 2025 Sum < 25 或無 prior
+    if not prior or not prior.get("ip"):
+        tags.append("⚠️ Breakout 待驗")
+    else:
+        prior_v4_data = {
+            "ip_gs": prior.get("ip_gs"),
+            "whiff_pct": prior.get("whiff_pct"),
+            "bb9": prior.get("bb9"),
+            "gb_pct": prior.get("gb_pct"),
+            "xwobacon": prior.get("xwobacon"),
+        }
+        prior_sum, _ = compute_sum_score_v4_sp(prior_v4_data)
+        if prior_sum < 25:
+            tags.append("⚠️ Breakout 待驗")
+
+    return tags
+
+
+_V4_STRONG_WARN_TAGS = {"⚠️ 樣本小", "⚠️ 短局", "⚠️ Swingman 角色"}
+
+
+def v4_decision_sp(sum_diff: int, breakdown_diff: dict,
+                   add_tags: list[str], warn_tags: list[str]) -> str:
+    """v4 upgrade decision.
+
+    Win gate: Sum diff ≥ 5 AND ≥ 3 positive (of 5).
+    Then:
+      ≥ 2 ✅ AND no strong warn → 立即取代
+      ≥ 1 ✅ AND no strong warn → 取代
+      else → 觀察
+    """
+    positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
+    if sum_diff < 5 or positive_count < 3:
+        return "pass"
+
+    has_strong = any(w in _V4_STRONG_WARN_TAGS for w in warn_tags)
+    if has_strong:
+        return "觀察"
+    if not add_tags:
+        return "觀察"
+    if len(add_tags) >= 2 and not any(w for w in warn_tags):
+        return "立即取代"
+    return "取代"
