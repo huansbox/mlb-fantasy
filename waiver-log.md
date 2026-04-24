@@ -415,12 +415,6 @@
 - 04-22：BBE 19極低, HH% 26.3<P25接觸差, BB% breakout不可信。6% owned（fa_scan）
 - 04-24：BBE 22極低, HH% 22.7<P25接觸差, BB% breakout不可信。距觸發40極遠。6% owned（fa_scan）
 
-### Max Meyer (MIA, SP) [mlb_id:676974] — 觀察中
-觸發：立即行動
-- 04-22：Sum 18 vs Nola 11 差+7, BBE 70高信心, 三項全面勝+球隊主力, %owned 18% 3日+5窗口關閉中（fa_scan）
-- 04-22：[eval] vs Nola，結論：建議 add（FAAB $3-5），理由：唯一通過全部門檻（BBE 70 高信心 + 21d 持平 + 球隊主力），K/9 10.1 結構壓制 vs Nola 雙年雙確認弱 + 速度與 2025 災難年一致無反彈空間
-- 04-23：⚠️ 已推薦取代2天未執行, Sum 17 vs Nola 11差+6, BBE 70高信心+球隊主力, %owned 18% 3日+5窗口關閉中（fa_scan）
-
 ### Foster Griffin (WSH, SP,RP) [mlb_id:656492] — 觀察中
 觸發：立即行動
 - 04-22：Sum 17 vs Nola 11 差+6, 三項均勝+球隊主力, 運氣+0.89 ERA會回升但Savant仍大幅勝Nola（fa_scan）
@@ -526,6 +520,9 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Max Meyer (MIA, SP) — 被搶（自動偵測）
+- 2026-04-24：Yahoo ownership_type=team，從觀察中移除。
 
 ### Oswald Peraza (LAA, 1B,2B,3B,SS) — 被搶（自動偵測）
 - 2026-04-23：Yahoo ownership_type=team，從觀察中移除。
