@@ -211,46 +211,206 @@ Batter 暫不動（v2 + Phase 5 機械決策保留），未來視效果再決定
 
 ---
 
-## 7. Open questions
+## 7. Open questions（2026-04-25 詳化）
 
-實作前需要決定：
+實作前需要決定。每題給「選項 × tradeoff × 推薦」三段式，方便 cutover 動工時直接落地。
 
-1. **Multi-agent 怎麼跑**
-   - Option A：用 Claude Code Task tool 的 subagent（同 session 內，share context window）
-   - Option B：獨立的 `claude -p` subprocess 呼叫（不 share context，乾淨但較慢）
-   - Option C：Anthropic API 直接呼叫（控制度最高，需 API key 管理）
-   - 建議：先試 B，若太慢再優化
+---
 
-2. **「同意」的定義**
-   - 順序完全相同？
-   - P1 相同就算？
-   - 用「P1-P4 排列的 Kendall tau 相似度 > 0.X」？
-   - 建議：先試「P1 相同 + P2 相同就算同意」，實測再校準
+### 7.1 Multi-agent 怎麼跑？
 
-3. **Re-evaluate 上限**
-   - 避免無限迴圈
-   - 建議：上限 3 輪，超過 → 取最後一版 + log warning
+| 方案 | 機制 | 延遲 / 並行 | Debug 難度 | 依賴 / 成本 |
+|------|------|-------------|------------|-------------|
+| **A. Claude Code Task subagent** | 同 session Agent tool 呼叫 | 並行（單 user query 內可同時跑多 agent，runtime 自動排程）| 高（subagent stdout 不直接可見，需主 agent 收結果）| 走 Claude Code session 額度，依用戶 plan 計 |
+| **B. `claude -p` subprocess** | 獨立 OS 進程，stdout/stderr 完全乾淨 | **序列**（除非自己用 threading/asyncio 並行）| 低（每個 process log 獨立）| 走 user 的 Claude Code 額度（subprocess 共用 token），需 PATH 有 `claude` |
+| **C. Anthropic API（Messages API 直接呼叫）** | `anthropic.Anthropic().messages.create()` | 並行（async/threading 即可）| 中（自己處理 retry / rate limit）| 需 ANTHROPIC_API_KEY，billing 走 API tier 不走 Code 額度 |
 
-4. **Agent 是否要 share 對方的理由**
-   - Step 1 完全獨立 → 確保 diversity
-   - Step 3 review 時看到主決策 + 各自原本意見？還是只看主決策？
-   - 建議：Step 1 獨立，Step 3 看到主決策 + 自己原本意見（不互相 share 理由，保持獨立判斷）
+**Production fa_scan 環境的 hard constraint**：
+- 跑在 VPS cron，**沒有 Claude Code 環境**（Claude Code 是 desktop CLI），所以 **Option A 在 production 不可行** — Phase 5 現況也是 `claude -p` subprocess。
+- Option B 已驗證可行（Phase 5 fa_scan 用同樣機制呼叫 Claude）— 但**本質序列**：3 agent 平行跑要自己 spawn 3 個 subprocess + asyncio/threading 收尾。
 
-5. **FA Step 2 邊緣案處理**
-   - 1 票同意、2 票反對 → 確定 pass
-   - 2 票同意、1 票反對 → 進 Step 3
-   - 1.5 票同意（agent 給「prob 50%」這種模糊回答）→ 怎麼算？
-   - 建議：強制 agent 二分回答，禁止 maybe，從源頭避免
+**推薦**：**Option B + threading 並行 subprocess**（沿用 Phase 5 既有 `claude -p` infra，加 threading wrapper）。理由：
+- 不破壞 production cron 模式（VPS 已部署）
+- 不引入新 SDK 依賴
+- threading 並行 3 agent 在 I/O-bound `claude -p` 上效率夠用（fa_scan_v4.py 已示範 batter+SP threading）
+- Option C 留給 future：若 daily 月成本超預算，遷 API tier 享 batch 折扣（Anthropic batch API 50% off）
 
-6. **效能 / 成本**
-   - 一次 fa_scan SP 線：Step 1 (3 agent) + Step 2 (1 Claude) + Step 3 review (3 agent) × N 輪 + Step 4 FA 篩選 (3 agent) + Step 5 排序 (1 Claude) + Step 6 review × N 輪 + 最終決策 (1 Claude)
-   - 估計 8-15 次 Claude 呼叫（vs 現況單次）
-   - Daily 跑 → 月成本可控嗎？需試算
+**Spike 要驗的事**（Wave 1.5）：
+- 3 個 `claude -p` 並行 spawn 的 wall-clock latency vs 序列（預期 ~1/3）
+- subprocess token 帳是否正確進 Claude Code 額度
+- 失敗模式：某個 agent timeout 時主流程怎麼降級
 
-7. **Batter 要不要也套用**
-   - Batter 候選人多（10 名單），multi-agent 成本更高
-   - Batter 決策模式跟 SP 不同（位置鎖定 / UTIL 彈性 / 速度權衡）
-   - 建議：先 SP 跑通再決定 batter
+---
+
+### 7.2 「同意」的定義？
+
+| 方案 | 規則 | 嚴格度 | 失敗模式 |
+|------|------|--------|----------|
+| **A. 完全相同順序** | P1-P4 排列 100% 一致 | 高 | 太嚴格，多數情況進 re-evaluate 迴圈，月成本爆炸 |
+| **B. P1 相同就算** | 只看排首誰，P2-P4 不問 | 低 | drop 順序若 P1 並列無法區分時失準（P1 是 anchor，這個錯了所有 FA 比較都歪） |
+| **C. P1 + P2 相同**（design doc 原建議）| 排首兩位一致 | 中 | 還算合理；但 P2 相同對 anchor 結果無影響（anchor 永遠是 P1）|
+| **D. Kendall tau ≥ 0.67**（4-permutation 中最多 1 對逆序）| 排列相似度 | 中-高 | 數學上嚴謹但對 4-elem permutation 過 fine-grained，且 Claude 不直接給 tau 值 |
+| **E. P1 相同 + 反對票 ≥2 才回 re-eval** | P1 一致就放行；只要 ≥2 reviewer 提實質反對才重評 | 中-低 | 偏向結束迴圈，靠主 Claude 整合好就放行 |
+
+**關鍵洞察**：design doc §4.1 Step 5「最終 P1 = FA 比較對象」— **P1 是唯一影響下游的位置**，P2-P4 只是 backup 順序。
+- 既然 P1 是 critical decision，「同意」應該以 P1 為核心
+- P2-P4 是 nice-to-have（萬一 P1 add/drop 後下週還想動）
+
+**推薦**：**E（P1 相同 + 反對票 ≥2 才回 re-eval）**。理由：
+- P1 一致表示「最該 drop 是誰」共識達成 → 下游 FA 比較 anchor 不變
+- 反對票 ≥2 才重評 → 1 票異議視為合理 dissent，不阻塞流程
+- 自然減少 re-eval 次數，月成本可控
+
+**Spike 要驗**：Nola/López/Holmes 04-23 三視角案例下，3 agent 對 P1 的一致率（之前實測 2/3 反對 v3 判斷，恰恰是 P1 不一致的 case）— 這個歷史 case 的 agent 行為告訴我們真實 disagreement 機率。
+
+---
+
+### 7.3 Re-evaluate 上限？
+
+| 方案 | 上限 | Tradeoff |
+|------|------|----------|
+| **A. 1 輪**（design doc 原建議）| 1 次 review，不一致直接降級 | 不會無限迴圈，但「一意見 vs 三 reviewer」不平等：1 輪後若分歧仍高，沒機會收斂 |
+| **B. 2 輪** | 多給一次機會 | 平均成本翻倍但分歧 case 可收斂 |
+| **C. 3 輪**（design doc 草案建議）| 上限 3 輪 | 月成本上漲明顯（最壞 case 3× review 成本）|
+| **D. 動態上限**：分歧度低（≥2/3 同意）= 1 輪 / 中（1/3 同意）= 2 輪 / 高（0 同意）= 直接終止 + flag 人工 | 看分歧投資成本 | 邏輯複雜，但 token 投放最 reasonable |
+
+**關鍵洞察**：fa_scan 是**daily** cron，分歧 case 不解決今天可以**明天再跑**（next-day data 進來會自然 break tie）。沒必要當下一定收斂到 100%。
+- 失敗時：給最後一版 + flag「分歧未收斂」進 Telegram，人工看一眼即可
+- 別把 LLM 當 oracle 求穩定性
+
+**推薦**：**A（1 輪）+ 失敗時降級**：1 輪 review 後若 P1 仍不一致 → 取**主 Claude 最後一版** + 在最終決策 reason 加「⚠️ 分歧未收斂」標記 + Telegram 通知時放最前。下游 add/drop 動作仍走 anchor=P1，但人工 review 訊號更強。
+
+理由：daily cron 容錯空間大；節省成本；失敗訊號 surfacing 比強行收斂有用。
+
+---
+
+### 7.4 Agent 是否 share 對方的理由？
+
+| 方案 | Step 1 | Step 3 review | Diversity 損失 |
+|------|--------|---------------|----------------|
+| **A. 全程獨立** | 各自獨立 | 只看主決策，不看對方 review 理由 | 最低 |
+| **B. Step 3 見主決策 + 自己原本理由**（design doc 建議）| 各自獨立 | 看主決策 + 翻自己 step 1 筆記 | 低 |
+| **C. Step 3 全部公開**：見主決策 + 三 agent 原始排序 | 各自獨立 | 看所有 agent 的 step 1 結果 | 中（後手 agent 可能受群體效應影響）|
+| **D. Step 3 公開 + 主決策 reasoning**：所有材料 + 主 Claude 整合理由 | 各自獨立 | 最大 context | 高（agent 可能直接 endorse 主 Claude）|
+
+**關鍵洞察**：multi-agent 的 value 是 **diversity**（不同 perspective 的 sanity check）。一旦 agents 開始 anchor 在彼此的判斷上，就退化成「multi-call same Claude」。
+
+**推薦**：**B（Step 3 看主決策 + 自己原本意見）**。理由：
+- 「自己原本意見」讓 agent 能有**自我比較**錨點：「我原本選 X 但主決策選 Y，X 真的更好嗎？」
+- 不看其他 agent 的理由保持原始 diversity
+- 主決策的 reasoning 是 agent 唯一的 cross-reference 來源，足以判斷「主 Claude 是否誤讀某個訊號」
+
+實作細節：每個 agent 在 step 1 就要 emit **structured rationale**（不只 P1-P4 順序，還有「為什麼 P1 是 X」），便於 step 3 review 時自我對照。
+
+---
+
+### 7.5 FA Step 2 邊緣案處理？
+
+design doc §4.2 Step 2 是 FA 候選二分（值得研究 vs 不值得）。
+
+| 方案 | 規則 | 風險 |
+|------|------|------|
+| **A. 強制二分**（design doc 建議）| Prompt 禁止「maybe / 50%」回答 | Agent 可能仍 hedge — prompt-engineering 戰，不一定可靠 |
+| **B. 三分（值得 / 不值得 / 邊界）+ 邊界進 Step 3** | Agent 可標 borderline，全 borderline 進排序 | Step 3 排序負擔變大；但符合 LLM 自然輸出 |
+| **C. Score-based**（每個 FA 給 0-100 分）+ 閾值切分 | 量化但難解釋 | LLM scoring 不穩定，閾值校準困難 |
+| **D. 投票主決策**：3 agent 二分 → 多數票決 / 1.5 票按主 Claude 決定 | 純規則邏輯 | 1.5 票 case 仍要主 Claude，回到原問題 |
+
+**關鍵洞察**：「邊界 case」本質是有用訊號，不是 bug。強制二分丟掉資訊。
+
+**推薦**：**B（三分 + 邊界進 Step 3）**。理由：
+- 與 LLM 輸出習慣一致，prompt 簡單
+- 邊界 case 本來就值得多看一眼
+- Step 3 排序時若 borderline FA 排到後段，主 Claude 自然會 deprioritize
+- 計票規則：「不值得 ≥2 → 直接 pass」「值得 + 邊界合計 ≥2 → 進 Step 3」「3 個都不值得 → pass」「3 個都邊界 → 進 Step 3 但排序時加 ⚠️ borderline tag」
+
+---
+
+### 7.6 效能 / 成本試算（**Wave 1.5 spike 必跑**）
+
+design doc §4 一次 SP 線完整流程：
+```
+我方 4-SP drop 排序：
+  Step 1: 3 agent 平行排序        = 3 calls
+  Step 2: 主 Claude 收斂            = 1 call
+  Step 3: 3 agent review           = 3 calls
+  Step 4: 收斂判定（迴圈 ≤1 輪）   = 0~4 calls（按 7.3 推薦 1 輪）
+
+FA 線：
+  Step 1: 3 agent 二分             = 3 calls
+  Step 2: （無，純計票）           = 0 calls
+  Step 3: 主 Claude 排序            = 1 call
+  Step 4: 3 agent review           = 3 calls
+  Step 5: 收斂判定                 = 0~4 calls
+
+最終決策：
+  最弱 SP vs FA1/FA2/FA3 比較 + reason = 1 call
+```
+
+**最少**：3+1+3+0 + 3+1+3+0 + 1 = **15 calls / day**
+**最多**（1 輪 re-eval）：3+1+3+4 + 3+1+3+4 + 1 = **23 calls / day**
+
+**月估**（30 天）：450~690 calls / month。
+
+**成本變數**：
+- 每 call input tokens：完整材料（4 SP × Sum/urgency/tag + 3-5 FA × 全套指標 + 21d Δ + watch）→ 估 6k-10k tokens
+- 每 call output tokens：rationale + structured ranking → 估 1k-2k tokens
+- 模型：Sonnet（cost-efficient）= ~$3/M input + $15/M output
+
+**保守估算（每 call 8k in / 1.5k out）**：
+- Daily：23 × 8000 × $3 / 1M = $0.55 input + 23 × 1500 × $15 / 1M = $0.52 output → **~$1.07/day**
+- Monthly：~$32/month
+- Best case（15 calls）：~$0.70/day → **~$21/month**
+
+**和現況比**：Phase 5 單 call ~30k input + 4k output → ~$0.15/day → ~$4.5/month。Phase 6 約 **5-7×** 成本上升。
+
+**Tradeoff 判斷**：
+- 月 $20-32 對個人副業專案不算貴，但比現況 4.5× 是有感
+- H2H one-win 6 異動 / 週 = 24 次 / 月，每次決策成本 $1-1.5 換更穩判斷 — **價值面合理**
+- 若用 Anthropic batch API（50% off）→ 月降到 $10-16
+
+**推薦**：**先用 Sonnet 跑 spike 取得實測數字**（非估算）。如果月 $30+ 不可接受，方案：
+1. 改 Haiku（10x 便宜）跑 step 1 / step 3 review（簡單投票任務），主決策用 Sonnet
+2. 改用 batch API
+3. 簡化流程：去掉 Step 3 review（只主決策一次）
+
+---
+
+### 7.7 Batter 要不要也套用？
+
+| 方案 | 適用範圍 | 額外成本 |
+|------|----------|----------|
+| **A. 永遠不套**（design doc §8 現況）| 只 SP | $0 |
+| **B. 套用全 batter**（10 名單）| 所有 batter 線 | 額外 $20-30/month（同 SP 規模）|
+| **C. 套用「最弱 4 位 + FA 比較」**（同 SP 結構）| Batter 線複用 SP 流程 | 同 SP，~$20-30/month |
+| **D. 套但簡化**：去掉 multi-agent review，只用主 Claude 1 call 取代 Phase 5 機械決策 | 中度升級 | 微增（每 call 大致同 Phase 5）|
+
+**關鍵差異**（batter vs SP）：
+- Batter 候選池大（10 名單 vs 4 SP）+ 位置鎖定（C/SS/CF 等）讓 cut 邏輯複雜（不是 Sum 最低就 drop，要看位置覆蓋）
+- Batter punt SB 戰略需要在 prompt 里教 — multi-agent 反而可能放大這個 noise（agent 各自誤判 SB 重要性）
+- Batter Phase 5 機械決策**現在運作良好**（Muncy / Albies / Grisham / Detmers 多次 call 都對）— 沒有迫切的 pain point
+
+**推薦**：**A（暫不套，與 design doc §8 一致）+ 觀察 SP cutover 1-2 月 → 視 incident rate 決定**。理由：
+- SP cutover 是更有 fiber 的 case（Nola/López/Holmes/Pfaadt 04-22~04-24 一連串近 misjudgment 是 multi-agent 動機）
+- Batter 沒有同等密度的近期決策爭議
+- 先驗證 SP 投資 ROI 再擴張，避免一次改太多面難 attribution
+
+**未來重評觸發條件**：
+- Batter cut 出現像 Nola triview 那樣的「多視角分歧」事件 ≥2 次 → 重新考慮套用
+- SP Phase 6 月成本實測 < 預算 50% → 有預算空間擴張
+
+---
+
+### 7.8 整體推薦摘要（cutover 動工時直接抓）
+
+| Q | 決策 |
+|---|------|
+| 7.1 | **Option B + threading 並行 subprocess** |
+| 7.2 | **「P1 相同 + 反對票 ≥2 才回 re-eval」** |
+| 7.3 | **上限 1 輪，失敗降級 + flag** |
+| 7.4 | **Step 3 看主決策 + 自己原本意見** |
+| 7.5 | **三分（值得/不值得/邊界）+ 邊界進 Step 3** |
+| 7.6 | **Sonnet 跑 spike 實測，預算 $30/月可接受** |
+| 7.7 | **Batter 暫不套，SP 跑 1-2 月再評** |
 
 ---
 
