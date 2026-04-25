@@ -2224,11 +2224,11 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
         for n in r.get("notes") or []:
             lines.append(f"    ⚠️ {n}")
 
-    # Slump hold — SP shows IP gate (≥50), batter has no IP gate
+    # Slump hold — SP shows IP gate (≥_PRIOR_IP_SLUMP_HOLD_MIN), batter has no IP gate
     for s in urgency_result.get("slump_hold", []):
         if group_type == "sp":
             ip_str = f"{s['prior_ip']:.1f}IP" if s.get("prior_ip") is not None else "?"
-            gate_str = f"（{ip_str} ≥50）"
+            gate_str = f"（{ip_str} ≥{fa_compute._PRIOR_IP_SLUMP_HOLD_MIN}）"
         else:
             gate_str = ""  # Batter: no IP gate per CLAUDE.md Step 2 rules
         lines.append(
