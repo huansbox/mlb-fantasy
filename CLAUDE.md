@@ -561,8 +561,8 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
 | `daily-advisor/fa_scan_v4.py` | **v4 框架分析工具（parallel 於 fa_scan.py v2 production cron）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate + 升級建議；stdout 不推送** |
-| `daily-advisor/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
-| `daily-advisor/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
+| `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
+| `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
 | `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）— 與 v4 cutover 同波完成，前置：prior_stats backfill + 21d xwOBACON** |
 | `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）— 取代 v3，未實作前 v2 仍 live rules** |
@@ -595,12 +595,3 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
 - [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
-- [ ] **Yahoo 查詢工具集中**（2026-04-13 識別）
-  - 待移動的檔案（都在 `daily-advisor/`）：`_trade_batter_rank.py` / `_trade_lookup.py`（`_merge_weeks.py` 已移除 — 功能併入 `weekly_review.py::fetch_two_week_merge`）
-  - 目標：新建 `daily-advisor/_tools/` 目錄，把這 2 個檔案移進去
-  - 注意 import：兩個檔案都用 `sys.path.insert(0, ".")` 然後 `from yahoo_query import ...`，移動後 path 從 `daily-advisor/_tools/` 看 `yahoo_query.py` 在 `..`，要改成 `sys.path.insert(0, "..")` 或更乾淨的 `from pathlib import Path; sys.path.insert(0, str(Path(__file__).parent.parent))`
-  - 連動更新：
-    - `CLAUDE.md` 檔案索引的 `_trade_lookup.py` / `_trade_batter_rank.py` 路徑
-    - `daily-advisor/yahoo-api-reference.md` 加 toolbox 索引 section
-  - 不影響 cron（兩個都是 ad-hoc 手動工具，不在 `/etc/cron.d/daily-advisor`）
-  - 驗證：在 VPS 跑 `python3 daily-advisor/_tools/_trade_batter_rank.py` 無 import error

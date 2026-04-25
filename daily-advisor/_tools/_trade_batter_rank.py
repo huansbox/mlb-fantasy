@@ -4,21 +4,20 @@ Shows 7 batter scoring categories (R, HR, RBI, SB, BB, AVG, OPS) + wRC+
 for each opponent team's batters, inserts the target player, and reports rank.
 
 Usage:
-    python _trade_batter_rank.py "Ozzie Albies"
-    python _trade_batter_rank.py "Ozzie Albies" --threshold 8
-    python _trade_batter_rank.py "Ozzie Albies" --sort OPS
+    python _tools/_trade_batter_rank.py "Ozzie Albies"
+    python _tools/_trade_batter_rank.py "Ozzie Albies" --threshold 8
+    python _tools/_trade_batter_rank.py "Ozzie Albies" --sort OPS
 """
 
 import argparse
 import json
-import os
 import ssl
 import sys
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, SCRIPT_DIR)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from yahoo_query import load_env, load_config, refresh_token, api_get
 

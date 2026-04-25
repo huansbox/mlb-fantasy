@@ -1,21 +1,20 @@
 """League roster scanner — view any team's roster, positional depth, and 7-cat stats.
 
 Usage:
-  python3 _trade_lookup.py                          # List all 12 teams
-  python3 _trade_lookup.py "Droptheball"            # Show roster + depth for one team
-  python3 _trade_lookup.py "Droptheball" --pos SS   # Focus on a position (show depth + stats)
-  python3 _trade_lookup.py --scan SS,CF             # Scan all teams for positional surplus
-  python3 _trade_lookup.py --stats "Ozzie Albies" "CJ Abrams"  # Compare players' 7-cat stats
+  python3 _tools/_trade_lookup.py                          # List all 12 teams
+  python3 _tools/_trade_lookup.py "Droptheball"            # Show roster + depth for one team
+  python3 _tools/_trade_lookup.py "Droptheball" --pos SS   # Focus on a position (show depth + stats)
+  python3 _tools/_trade_lookup.py --scan SS,CF             # Scan all teams for positional surplus
+  python3 _tools/_trade_lookup.py --stats "Ozzie Albies" "CJ Abrams"  # Compare players' 7-cat stats
 """
 import argparse
 import json
-import os
 import sys
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, SCRIPT_DIR)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from yahoo_query import api_get, load_config, load_env, refresh_token
 
 ALL_BATTER_POS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"]

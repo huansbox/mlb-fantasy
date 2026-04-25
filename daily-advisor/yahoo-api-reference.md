@@ -92,3 +92,14 @@ GET /league/{league_key}/players;status=A;position={pos};sort=AR;count=25;start=
 | `yahoo_auth.py` | 首次 OAuth 授權（手動跑一次） |
 | `yahoo_token.json` | 存放 access_token / refresh_token（不入 git） |
 | `.env` | `YAHOO_CLIENT_ID` / `YAHOO_CLIENT_SECRET` |
+
+## Toolbox（`_tools/`）
+
+Ad-hoc 手動工具，不入 cron。執行位置：`daily-advisor/`（`python3 _tools/<tool>.py`）。
+
+| 工具 | 用途 | 依賴 |
+|------|------|------|
+| `_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） | `yahoo_query` (Yahoo API) |
+| `_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） | `yahoo_query` + MLB Stats API (sabermetrics) |
+
+> 兩個工具都用 `sys.path.insert(0, str(Path(__file__).resolve().parent.parent))` 載入 parent dir 的 `yahoo_query`，不依賴 cwd。
