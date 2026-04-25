@@ -660,6 +660,33 @@ def send_notification(added_names, dropped_names, env, dry_run=False):
 # ── Task 9-10: run_init + run_daily ──
 
 
+def _count_missing_fields(config):
+    """Count config players missing each backfillable field.
+
+    Distinguishes "key absent" from "key present with empty value":
+    selected_pos/status are populated for every player by update_config,
+    so an empty string is a valid value (e.g. healthy player status="");
+    only a missing key indicates the player has never been backfilled.
+    """
+    missing = {
+        "yahoo_player_key": 0,
+        "prior_stats": 0,
+        "selected_pos": 0,
+        "status": 0,
+    }
+    for section in ("batters", "pitchers"):
+        for p in config.get(section, []):
+            if not p.get("yahoo_player_key"):
+                missing["yahoo_player_key"] += 1
+            if not p.get("prior_stats") and p.get("mlb_id"):
+                missing["prior_stats"] += 1
+            if "selected_pos" not in p:
+                missing["selected_pos"] += 1
+            if "status" not in p:
+                missing["status"] += 1
+    return missing
+
+
 def run_init(my_key, token, config, dry_run):
     """Full bootstrap: pull roster, diff, enrich new players, update config."""
     print("Running --init: full roster sync...", file=sys.stderr)
@@ -671,20 +698,18 @@ def run_init(my_key, token, config, dry_run):
     added = diff["added"]
     dropped = diff["dropped"]
 
-    needs_key = sum(
-        1 for section in ("batters", "pitchers")
-        for p in config.get(section, [])
-        if not p.get("yahoo_player_key")
-    )
-    needs_stats = sum(
-        1 for section in ("batters", "pitchers")
-        for p in config.get(section, [])
-        if not p.get("prior_stats") and p.get("mlb_id")
+    missing = _count_missing_fields(config)
+
+    print(
+        f"Diff: +{len(added)} added, -{len(dropped)} dropped, "
+        f"{missing['yahoo_player_key']} need key, "
+        f"{missing['prior_stats']} need prior_stats, "
+        f"{missing['selected_pos']} need selected_pos, "
+        f"{missing['status']} need status",
+        file=sys.stderr,
     )
 
-    print(f"Diff: +{len(added)} added, -{len(dropped)} dropped, {needs_key} need key, {needs_stats} need prior_stats", file=sys.stderr)
-
-    if not added and not dropped and needs_key == 0 and needs_stats == 0:
+    if not added and not dropped and not any(missing.values()):
         print("No changes needed.", file=sys.stderr)
         return
 
@@ -693,10 +718,9 @@ def run_init(my_key, token, config, dry_run):
             print(f"  + {p['name']} ({p['team']}, {','.join(p['positions'])})", file=sys.stderr)
         for p in dropped:
             print(f"  - {p['name']}", file=sys.stderr)
-        if needs_key:
-            print(f"  {needs_key} players will get yahoo_player_key backfilled", file=sys.stderr)
-        if needs_stats:
-            print(f"  {needs_stats} players will get prior_stats backfilled", file=sys.stderr)
+        for field, count in missing.items():
+            if count:
+                print(f"  {count} players will get {field} backfilled", file=sys.stderr)
         print("[DRY RUN] No changes written.", file=sys.stderr)
         return
 
