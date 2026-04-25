@@ -180,6 +180,18 @@ class TestLuckTag:
         assert luck_tag_v4(3.0, None) is None
         assert luck_tag_v4(None, None) is None
 
+    def test_bbe_gate_suppresses_below_40(self):
+        # Kelly 2026-04-24 case: extreme diff but BBE <40 → 崩盤中, not 運氣加持.
+        # Without bbe arg → backward-compatible (no gate).
+        assert luck_tag_v4(2.72, 4.08) == "✅ 撿便宜運氣"
+        # With BBE 35 (<40) → suppressed
+        assert luck_tag_v4(2.72, 4.08, bbe=35) is None
+        # Boundary: BBE 40 → fires (≥40 inclusive)
+        assert luck_tag_v4(2.72, 4.08, bbe=40) == "✅ 撿便宜運氣"
+        # ⚠️ 賣高 side
+        assert luck_tag_v4(13.4, 9.31, bbe=27) is None  # Kelly actual numbers
+        assert luck_tag_v4(13.4, 9.31, bbe=40) == "⚠️ 賣高運氣"
+
 
 # ── v4 tag generation ──
 

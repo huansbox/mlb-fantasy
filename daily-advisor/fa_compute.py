@@ -201,6 +201,12 @@ def pick_weakest(
 _PRIOR_IP_MIN = 20
 _PRIOR_IP_SLUMP_HOLD_MIN = 50
 
+# Luck tag (xERA-ERA diff) needs enough BBE for xERA to be stable.
+# BBE <40 → suppress luck tag to avoid mislabeling崩盤中 cases as 賣高運氣
+# (e.g. Kelly 2026-04-24: xERA 13.4 / ERA 9.31 / BBE 27 → diff +4.09 was
+# actually crash-in-progress, not a sell-high luck signal).
+_LUCK_TAG_BBE_MIN = 40
+
 
 def _factor_2026_sum(sum_2026: int) -> int:
     """Per CLAUDE.md urgency factor (1): 2026 Sum bucket.
@@ -462,9 +468,10 @@ def _compute_sp_add_tags(fa: dict) -> list[str]:
             if (r_x - s_x) <= -0.035:
                 tags.append("✅ 近況確認")
 
-    # ✅ 撿便宜運氣 — xERA-ERA ≤ -0.81
+    # ✅ 撿便宜運氣 — xERA-ERA ≤ -0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
     era_diff = derived.get("era_diff")
-    if era_diff is not None and era_diff <= -0.81:
+    bbe_2026 = int(savant.get("bbe") or 0)
+    if era_diff is not None and era_diff <= -0.81 and bbe_2026 >= _LUCK_TAG_BBE_MIN:
         tags.append("✅ 撿便宜運氣")
 
     return tags
@@ -504,8 +511,8 @@ def _compute_sp_warn_tags(fa: dict) -> list[str]:
         if prior_sum < 18:
             tags.append("⚠️ Breakout 待驗")
 
-    # ⚠️ 賣高運氣 — xERA-ERA ≥ +0.81
-    if era_diff is not None and era_diff >= 0.81:
+    # ⚠️ 賣高運氣 — xERA-ERA ≥ +0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
+    if era_diff is not None and era_diff >= 0.81 and bbe >= _LUCK_TAG_BBE_MIN:
         tags.append("⚠️ 賣高運氣")
 
     # ⚠️ 近況下滑 — 21d Δ xwOBA ≥ +0.035
@@ -816,12 +823,21 @@ def rotation_gate_v4(g: int, gs: int) -> tuple[str, str]:
     return ("🟢", "rotation-SP")
 
 
-def luck_tag_v4(xera: float | None, era: float | None) -> str | None:
+def luck_tag_v4(
+    xera: float | None,
+    era: float | None,
+    bbe: int | None = None,
+) -> str | None:
     """xERA − ERA ≤ -0.81 → ✅ 撿便宜運氣; ≥ +0.81 → ⚠️ 賣高運氣; else None.
 
     v2 logic already uses era_diff in derived; this is the explicit tag form.
+
+    bbe: optional BBE for small-sample suppression. When given and below
+    ``_LUCK_TAG_BBE_MIN``, returns None (xERA unstable, diff is noise not luck).
     """
     if xera is None or era is None:
+        return None
+    if bbe is not None and bbe < _LUCK_TAG_BBE_MIN:
         return None
     diff = xera - era
     if diff <= -0.81:
@@ -870,8 +886,8 @@ def v4_add_tags_sp(fa: dict) -> list[str]:
     if sv.get("whiff_pct") and sv["whiff_pct"] > 26.5:
         tags.append("✅ K 壓制")
 
-    # ✅ 撿便宜運氣 — xERA - ERA ≤ -0.81
-    luck = luck_tag_v4(sv.get("xera"), sv.get("era"))
+    # ✅ 撿便宜運氣 — xERA - ERA ≤ -0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
+    luck = luck_tag_v4(sv.get("xera"), sv.get("era"), sv.get("bbe"))
     if luck and luck.startswith("✅"):
         tags.append(luck)
 
@@ -921,8 +937,8 @@ def v4_warn_tags_sp(fa: dict) -> list[str]:
     if sv.get("bb9") and sv["bb9"] > 3.5:
         tags.append("⚠️ Command 警示")
 
-    # ⚠️ 賣高運氣 — xERA - ERA ≥ +0.81
-    luck = luck_tag_v4(sv.get("xera"), sv.get("era"))
+    # ⚠️ 賣高運氣 — xERA - ERA ≥ +0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
+    luck = luck_tag_v4(sv.get("xera"), sv.get("era"), sv.get("bbe"))
     if luck and luck.startswith("⚠️"):
         tags.append(luck)
 

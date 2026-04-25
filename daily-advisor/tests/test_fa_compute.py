@@ -703,8 +703,9 @@ class TestFaTagsSp:
         assert result["decision"] == "觀察"  # strong warning forces observe
 
     def test_winn_observe_due_to_small_sample(self):
-        # Fixture: Winn 2 ✅ (雙年菁英+撿便宜) + ⚠️ 樣本小 → 觀察
+        # Fixture: Winn 1 ✅ (雙年菁英) + ⚠️ 樣本小 → 觀察
         # ⚠️ 樣本小 is treated as confidence blocker (BBE <30)
+        # ✅ 撿便宜運氣 also suppressed because BBE 18 <40 (luck tag gate)
         anchor = self._anchor_nola()
         winn = _mk_fa_sp(
             "Winn",
@@ -714,7 +715,7 @@ class TestFaTagsSp:
             # hh_pct 36.4>36.0 → P80=9 → Sum 10+9+9 = 28 ≥24 → 雙年菁英
             ip_per_gs=5.4,
             ip_per_tg=0.8,
-            era_diff=-1.50,  # ≤-0.81 → 撿便宜
+            era_diff=-1.50,  # ≤-0.81 但 BBE 18 <40 → luck tag suppressed
         )
         r = compute_sum_score(winn["savant_2026"], "sp")
         winn["score"] = r[0]
@@ -722,7 +723,7 @@ class TestFaTagsSp:
 
         result = compute_fa_tags(winn, anchor, "sp")
         assert "✅ 雙年菁英" in result["add_tags"]
-        assert "✅ 撿便宜運氣" in result["add_tags"]
+        assert "✅ 撿便宜運氣" not in result["add_tags"]  # BBE <40 suppression
         assert "⚠️ 樣本小" in result["warn_tags"]
         assert result["decision"] == "觀察"
 
@@ -832,6 +833,58 @@ class TestFaTagsSp:
 
         result = compute_fa_tags(fa, anchor, "sp")
         assert "⚠️ Breakout 待驗" in result["warn_tags"]
+
+    def test_luck_tag_suppressed_below_bbe_gate(self):
+        # Kelly 2026-04-24 case: extreme era_diff but BBE <40 → 崩盤中, not 運氣加持.
+        # ✅ 撿便宜 (negative diff) and ⚠️ 賣高 (positive diff) both suppressed.
+        anchor = self._anchor_nola()
+
+        # 撿便宜 case: era_diff -1.50 但 BBE 35 <40
+        cheap = _mk_fa_sp(
+            "CheapButThin",
+            savant_2026={"xera": 2.50, "xwoba": 0.275, "hh_pct": 36.0, "bbe": 35},
+            prior_stats={"xera": 4.50, "xwoba_allowed": 0.320, "hh_pct_allowed": 42.0, "ip": 100.0},
+            ip_per_gs=5.5,
+            ip_per_tg=1.0,
+            era_diff=-1.50,
+        )
+        r = compute_sum_score(cheap["savant_2026"], "sp")
+        cheap["score"] = r[0]
+        cheap["breakdown"] = r[1]
+        result = compute_fa_tags(cheap, anchor, "sp")
+        assert "✅ 撿便宜運氣" not in result["add_tags"]
+
+        # 賣高 case: era_diff +1.50 但 BBE 35 <40 (Kelly-style)
+        crash = _mk_fa_sp(
+            "CrashInProgress",
+            savant_2026={"xera": 6.50, "xwoba": 0.360, "hh_pct": 44.0, "bbe": 35},
+            prior_stats={"xera": 3.50, "xwoba_allowed": 0.300, "hh_pct_allowed": 38.0, "ip": 100.0},
+            ip_per_gs=5.5,
+            ip_per_tg=1.0,
+            era_diff=+1.50,
+        )
+        r = compute_sum_score(crash["savant_2026"], "sp")
+        crash["score"] = r[0]
+        crash["breakdown"] = r[1]
+        result = compute_fa_tags(crash, anchor, "sp")
+        assert "⚠️ 賣高運氣" not in result["warn_tags"]
+
+    def test_luck_tag_fires_at_bbe_gate(self):
+        # Boundary: BBE exactly 40 should fire (≥40 inclusive).
+        anchor = self._anchor_nola()
+        fa = _mk_fa_sp(
+            "Boundary",
+            savant_2026={"xera": 2.50, "xwoba": 0.275, "hh_pct": 36.0, "bbe": 40},
+            prior_stats={"xera": 4.50, "xwoba_allowed": 0.320, "hh_pct_allowed": 42.0, "ip": 100.0},
+            ip_per_gs=5.5,
+            ip_per_tg=1.0,
+            era_diff=-1.50,
+        )
+        r = compute_sum_score(fa["savant_2026"], "sp")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+        result = compute_fa_tags(fa, anchor, "sp")
+        assert "✅ 撿便宜運氣" in result["add_tags"]
 
 
 class TestFaTagsBatter:
