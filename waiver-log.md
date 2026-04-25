@@ -82,23 +82,6 @@
 - 04-22：⚠️ xwOBA .310持續回歸, BBE 42觸發已達但僅Barrel% 1/3達P70, 品質不足維持觀察（fa_scan）
 - 04-24：⚠️ xwOBA .349回升但BBE 48僅Barrel% 1/3達P70, 觸發半達成品質仍不足（fa_scan）
 
-### Miguel Vargas (CWS, 1B,3B) [mlb_id:678246] — 觀察中
-觸發：BBE 達 35 且 BB% 維持 >P80 + xwOBA >P60 → vs Albies/Butler
-- 04-09：xwOBA .324(P70-80) / BB% 14.3%(>P90) / Barrel% 7.4%(P45-50)，BBE 27。2025 prior 確認（.319/9.8%/9.3%，407 BBE）。38% owned +9 升幅（fa_scan）
-- 04-10：BBE 29→觸發 35 差 2-3 場，BB% 15.1%(>P90)/xwOBA .325(P70-80) 品質條件已達。%owned 38% 持續升（fa_scan）
-- 04-11：BBE 32 中等信心，BB% 15.8%/xwOBA .321 品質條件已達觸發門檻。距 BBE 35 觸發差 1-2 場。%owned 38%（fa_scan）
-- 04-12：⚠️ 觸發達成！BBE 35=門檻, BB% 15.8%>P80, xwOBA .323>P60。vs Albies 3/3 全勝，雙年確認。38% owned（fa_scan）
-- 04-13：⚠️ 觸發確認！BBE 35=門檻, BB% 14.5%>P80, xwOBA .323>P60。vs Albies 3/3 全勝。Alvarez 備案。38% owned（fa_scan）
-- 04-14：⚠️ 觸發確認。BBE 37, BB% 14.5%>P80, xwOBA .310>P60。Alvarez 優先→降為備案。38% owned（fa_scan）
-- 04-15：⚠️ 觸發確認。BBE 37, BB% 14.5%>P80, xwOBA .310>P60。Alvarez 優先→降備案。38% owned（fa_scan）
-- 04-16：BBE 37 觸發確認，BB% 14.1>P80/xwOBA .320>P60。Alvarez 優先→降為備案。0% owned（fa_scan）
-- 04-17：BBE 45 觸發確認，BB% 13.2>P80/xwOBA .322>P60。Alvarez 優先→降為備案。0% owned（fa_scan）
-- 04-19：BBE 54 觸發確認，BB% 13.8>P80/xwOBA .321>P60。Alvarez 優先→備案。0% owned（fa_scan）
-- 04-21：BBE 61觸發確認穩定, BB% 15.2>P80/xwOBA .331>P60。Correa/Muncy/Julien後備案#4。0% owned（fa_scan）
-- 04-22：BBE 61 高信心穩定, BB% 15.5>P90。Correa/Muncy/Julien 後備案 #4。0% owned（fa_scan）
-- 04-23：❌ 26% 3d+3窗口開始收窄, BBE 61高信心BB% 15.5>P90穩定。備案#4（fa_scan）
-- 04-24：❌ 34% 3d+10窗口急速關閉, BBE 68高信心BB% 15.9>P90/xwOBA .363>P90全穩定, 14d Δ+0.043🔥。⚠️已推薦取代多天未執行（fa_scan）
-
 ### Richie Palacios (TB, 2B,LF) [mlb_id:680700] — 觀察中
 觸發：BBE 達 30 且 xwOBA >P80 + BB% >P70 → vs Buxton
 - 04-09：xwOBA .455(>P90) / BB% 18.2%(>P90) / Barrel% 14.3%(>P90)，BBE 14 極低信心。2025 prior xwOBA .360(P90)/BB% 10.4%(P80) 確認，但 Barrel% 5.9% 未確認。0% owned（fa_scan）
@@ -365,13 +348,6 @@
 - 04-24：⚠️ 21d Δ+0.036近況下滑持續, xwOBA季線.317仍勝Nola但方向惡化, 等下次先發K起來+xwOBA收斂（fa_scan）
 - 04-25：⚠️ 21d Δ+0.036近況下滑持續, xwOBA季線.317仍勝Nola但方向惡化+K/9 5.5結構弱, 等下次先發K起來+xwOBA收斂（fa_scan）
 
-### Walbert Ureña (LAA, SP) [mlb_id:700712] — 觀察中
-觸發：BBE 達 30 且三項維持 >P70 → 重新評估升級
-- 04-21：BBE 24樣本小否決升級, IP/GS 6.0深投型, 1% owned持續觀察（fa_scan）
-- 04-22：BBE 24樣本小否決, xERA 2.43/xwOBA .252三項>P90+IP/GS 6.0深投型, 1% owned持續觀察（fa_scan）
-- 04-23：BBE 24樣本小否決, xERA 2.45/xwOBA .252三項>P90+IP/GS 6.0深投型, 0% owned（fa_scan）
-- 04-24：BBE 24樣本小否決, 三項>P90+IP/GS 6.0深投型, 0% owned（fa_scan）
-
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：立即行動
 - 04-21：Sum 25, 14d Δ+0.039🔥, BB% 18.7>P90但2025全<P40 breakout跳幅極大待驗。0% owned（fa_scan）
@@ -433,13 +409,6 @@
 - 04-21：BBE 19極低, BB% breakout不可信, HH% 26.3<P25接觸差, 6% owned（fa_scan）
 - 04-22：BBE 19極低, HH% 26.3<P25接觸差, BB% breakout不可信。6% owned（fa_scan）
 - 04-24：BBE 22極低, HH% 22.7<P25接觸差, BB% breakout不可信。距觸發40極遠。6% owned（fa_scan）
-
-### Foster Griffin (WSH, SP,RP) [mlb_id:656492] — 觀察中
-觸發：立即行動
-- 04-22：Sum 17 vs Nola 11 差+6, 三項均勝+球隊主力, 運氣+0.89 ERA會回升但Savant仍大幅勝Nola（fa_scan）
-- 04-22：[eval] vs Nola，結論：備案（Meyer 為首選），理由：Sum 17 vs Meyer 18 略低，BBE 60 中等 + 運氣+0.89 ERA 將回升 + 無 2025 prior 純 breakout 較冒險。Meyer 競爭失敗時 fallback
-- 04-23：Sum 14 vs Nola 11差+3邊緣, 三項均勝但運氣+1.04 ERA會回升, 球隊主力, %owned 10% 3日+1（fa_scan）
-- 04-24：⚠️ Sum降17→14邊緣, 運氣+1.04超賣高門檻0.81, 機械取代但margin收窄至最低門檻+3. 建議降級觀察（fa_scan）
 
 ### Carmen Mlodzinski (PIT, SP,RP) [mlb_id:669387] — 觀察中
 觸發：HH% 回落<42% + IP/GS≥5.0
@@ -555,6 +524,15 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Miguel Vargas (CWS, 1B,3B) — 被搶（自動偵測）
+- 2026-04-25：Yahoo ownership_type=team，從觀察中移除。
+
+### Walbert Ureña (LAA, SP) — 被搶（自動偵測）
+- 2026-04-25：Yahoo ownership_type=team，從觀察中移除。
+
+### Foster Griffin (WSH, SP,RP) — 被搶（自動偵測）
+- 2026-04-25：Yahoo ownership_type=team，從觀察中移除。
 
 ### Max Meyer (MIA, SP) — 被搶（自動偵測）
 - 2026-04-24：Yahoo ownership_type=team，從觀察中移除。
