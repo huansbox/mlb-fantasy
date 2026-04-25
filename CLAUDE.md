@@ -578,7 +578,7 @@ waiver-log.md（球員追蹤唯一來源）
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
 -->
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
-- [ ] **SP 21d Δ xwOBA 門檻校準**（2026-04-21 SP 框架 v2 上線，Phase 2 完成後 2 週）：目前沿用 batter 14d Δ 門檻 ±0.035/±0.050。等 savant_rolling pitcher 累積 2 週實測數據（隊上 10 SP + FA 池 SP）再按 P25/P50/P75 分布調整。batter 14d Δ 門檻 ±0.035/±0.050 是 2026-04-17 這樣實測來的，SP 依樣辦理。**v4 上線後改校準 21d Δ xwOBACON 門檻**
+- [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **v4 框架上線前置（4 項，2026-04-24 設計完成後列出）**：
   - **v4 prior_stats backfill**：roster_config.json 加 2025 `whiff_pct` / `gb_pct` / `xwobacon` 欄位，供 `v4_add_tags_sp` 的「✅ 雙年菁英」tag 使用（目前只有 xera/xwoba/hh_pct）
   - **21d rolling xwOBACON fetch**：savant_rolling.py 目前只抓 xwOBA allowed，v4 時序訊號用 xwOBACON 要擴充（pitch-level CSV 聚合，排除 K/BB 只算 on-contact）
