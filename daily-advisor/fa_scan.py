@@ -1650,7 +1650,7 @@ def _handle_error(step_name, error, env, args):
 def _publish(today_str, scan_type, advice_telegram, advice_issue, raw_data, env, args):
     """Publish results: Telegram (compact) + GitHub Issue (full analysis)."""
     if args.no_send:
-        print(advice_telegram)
+        print(advice_telegram, flush=True)
         return
 
     send_telegram(advice_telegram, env)
