@@ -561,6 +561,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
 | `daily-advisor/fa_scan_v4.py` | **v4 框架分析工具（parallel 於 fa_scan.py v2 production cron）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate + 升級建議；stdout 不推送** |
+| `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse fa_scan_v4 fetchers，idempotent，新進 SP 也可跑） |
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
@@ -580,7 +581,7 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **v4 框架上線前置（4 項，2026-04-24 設計完成後列出）**：
-  - **v4 prior_stats backfill**：roster_config.json 加 2025 `whiff_pct` / `gb_pct` / `xwobacon` 欄位，供 `v4_add_tags_sp` 的「✅ 雙年菁英」tag 使用（目前只有 xera/xwoba/hh_pct）
+  - **v4 prior_stats backfill**：~~工具~~ 已寫好（`daily-advisor/backfill_prior_stats_v4.py` + 11 unit tests），需在 v4 cutover 前實際 `python3 backfill_prior_stats_v4.py --dry-run` 確認名單 + 寫入 `roster_config.json`。供 `v4_add_tags_sp` 的「✅ 雙年菁英」tag 使用
   - **21d rolling xwOBACON fetch**：savant_rolling.py 目前只抓 xwOBA allowed，v4 時序訊號用 xwOBACON 要擴充（pitch-level CSV 聚合，排除 K/BB 只算 on-contact）
   - **v4 production cutover 決策**：目前 `fa_scan_v4.py` 是 parallel CLI 工具（stdout only），prod cron `fa_scan.py` 仍 v2。需 feature flag 環境變數 + VPS 部署 + 1-2 週並行驗證 + 最終清 v2 SP 代碼（batter 保留 v2）
   - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，待 production cutover 時一起改寫
