@@ -586,20 +586,23 @@ waiver-log.md（球員追蹤唯一來源）
 -->
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
-- [ ] **v4 框架上線前置 + Phase 6 同波決策（2026-04-26 鎖定）**：
-  - ~~**v4 prior_stats backfill**~~：✅ 2026-04-26 完成（10 SP 全 backfill，commit `523c73f`）。`backfill_prior_stats_v4.py` 保留供新進 SP 重跑
-  - ~~**21d rolling xwOBACON fetch**~~：✅ 2026-04-26 完成（`_aggregate_pitches` 加 `xwobacon = sum_xwoba_on_bbe / bbe_count` + 6 unit tests）。下次 cron TW 12:00 自動帶上欄位
-  - **Phase 6 同波 cutover 決策（D1=A）**：v4 cutover 與 Phase 6（Claude 決策層 + multi-agent）同波完成，prompt 改一次到位。詳見 `docs/v4-cutover-plan.md` Stage B-F + `docs/fa_scan-claude-decision-layer-design.md` §7.8
-  - **簡化 spike 先跑（D2=C）**：動 Stage B-F 前先跑 `docs/phase6-multi-agent-spike.md` §3.1 step 1 一次（半小時，只測 3 agent 平行排序的 P1 一致率 + 延遲），需用戶在場 supervise
-  - **Phase 6 §7 內部設計鎖定**（cutover 動工時直接抓 prompt / orchestrator）：
+- [ ] **v4 cutover + Phase 6 同波**（2026-04-26 鎖定 + Stage A-C 已完成）：
+  - **進度**：A ✅ / B ✅ / **C ✅** / D ⏳ / E ⏳ / F ⏳。詳見 `docs/v4-cutover-plan.md`
+  - ~~Stage A 資料層~~：✅ 2026-04-26 完成（commits `2a64f70` savant_rolling xwobacon + `d7fa83b` 10 SP backfill）
+  - ~~Stage B fa_compute v4 signals~~：✅ 2026-04-26 完成（commit `a525ce3` `compute_fa_tags_v4_sp` + 9 unit tests，182 tests pass）
+  - ~~Stage C Phase 6 prompt 重寫~~：✅ 2026-04-26 完成（commit `dbac88e`，5 個 `prompt_phase6_*.txt` + `prompt_fa_scan_pass2_sp.v2.txt` 備份）
+  - ~~簡化 spike（D2=C）~~：✅ 2026-04-26 跑完（commits `0873e2b` tooling + `e8f18a2` results）— Wall-clock 40s / P1 共識 100% / Result Category A → cutover 進行；§7.2 放寬為「P1 match 即收斂」（borderline gate Sum 差 <5 才強制 step 3 review）
+  - **下次 session 起點 — Stage D**：寫 `_process_group_sp_v4` multi-agent orchestrator + `SP_FRAMEWORK_VERSION` env flag dispatch（v2 production cron 不變，v4 walked path 走新邏輯）。估 4-6 hr，需在 fa_scan.py + 可能新建 `_multi_agent.py` helper 模組。Stage D 完成後 → Stage E parallel 1-2 週驗證 → Stage F cutover + 清 v2
+  - **Phase 6 §7 內部設計鎖定**：
     - §7.1 Multi-agent runtime：`claude -p` subprocess + threading（訂閱涵蓋，無 API cost 顧慮，見 memory `project_claude_p_subscription.md`）
-    - §7.2 同意定義：spike 後校準（design doc 推薦 P1 match + dissent ≥2）
-    - §7.3 Re-eval 上限：spike 後校準（design doc 推薦 1 輪 + degrade）
-    - §7.4 Step 3 visibility：**B** — 主決策 + 自己 step 1 原本意見，不看其他 agent 理由
-    - §7.5 FA Step 2 邊界：**B** — 三分（值得 / 不值得 / 邊界），邊界進 step 3
-    - §7.6 月預算：**N/A** — 訂閱涵蓋
-    - §7.7 Batter v4 升級：**B**（D5 同題）— SP cutover 跑 1-2 月後再評是否套 batter Phase 6 決策層；不升 batter 5-slot Sum
+    - §7.2 同意定義：**P1 match 即收斂**（spike 放寬，2026-04-26）+ borderline gate Sum 差 <5 才強制 step 3 review
+    - §7.3 Re-eval 上限：1 輪 + degrade（spike 沒踩到，保留待 Stage E 真 borderline case 校準）
+    - §7.4 Step 3 visibility：B — 主決策 + 自己 step 1 原本意見，不看其他 agent 理由
+    - §7.5 FA Step 2 邊界：B — 三分（值得 / 不值得 / 邊界），邊界進 step 3
+    - §7.6 月預算：N/A — 訂閱涵蓋
+    - §7.7 Batter v4 升級：B（D5 同題）— SP cutover 跑 1-2 月後再評
   - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，Stage F cutover 完成時一起改寫
+  - **fa_scan_v4.py CLI 命運**（cutover 時決策）：退役 / ad-hoc 偵錯 / Phase 6 manual frontend 三選一，待 Stage F 一起決
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
