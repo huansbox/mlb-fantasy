@@ -565,11 +565,17 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
-| `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）— 與 v4 cutover 同波完成，前置：prior_stats backfill + 21d xwOBACON** |
+| `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
 | `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）— 取代 v3，未實作前 v2 仍 live rules** |
 | `docs/sp-framework-v3-weighted.md` | SP 評估 v3 設計（已被 v4 取代，保留作設計演進紀錄）|
 | `docs/nola-lopez-holmes-triview-2026-04-23.md` | 三視角 Nola/López/Holmes drop 評估回測材料（2/3 視角反對 v3 判斷）|
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
+| `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A 已完成，下次動 Stage B-F 前讀** |
+| `docs/savant-xwobacon-endpoint-research.md` | 21d xwOBACON 端點研究（2026-04-25）— **驚喜 finding：不需新 endpoint，savant_rolling.py 4 行 patch 即可**（已實作 commit `621a5d2`）|
+| `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫（2026-04-25）— 簡化版（D2=C）只跑 step 1 取 P1 一致率，動 Stage B-F 前的最後一道驗證 |
+| `docs/batter-framework-v4-feasibility.md` | Batter v4 升級可行性研究（2026-04-25）— **結論「暫不升」**（D5/§7.7=B），SP cutover 1-2 月後再評是否套機會 A（決策層擴展） |
+| `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— v4 cutover 後 1-2 月觸發實作 |
+| `docs/savant-smoke-test-design.md` | Savant 端點 daily smoke test design（2026-04-25）— v4 cutover 前後實作 |
 
 ## 待辦
 
@@ -580,18 +586,27 @@ waiver-log.md（球員追蹤唯一來源）
 -->
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
-- [ ] **v4 框架上線前置（4 項，2026-04-24 設計完成後列出）**：
+- [ ] **v4 框架上線前置 + Phase 6 同波決策（2026-04-26 鎖定）**：
   - ~~**v4 prior_stats backfill**~~：✅ 2026-04-26 完成（10 SP 全 backfill，commit `523c73f`）。`backfill_prior_stats_v4.py` 保留供新進 SP 重跑
   - ~~**21d rolling xwOBACON fetch**~~：✅ 2026-04-26 完成（`_aggregate_pitches` 加 `xwobacon = sum_xwoba_on_bbe / bbe_count` + 6 unit tests）。下次 cron TW 12:00 自動帶上欄位
-  - **v4 production cutover 決策**：目前 `fa_scan_v4.py` 是 parallel CLI 工具（stdout only），prod cron `fa_scan.py` 仍 v2。需 feature flag 環境變數 + VPS 部署 + 1-2 週並行驗證 + 最終清 v2 SP 代碼（batter 保留 v2）
-  - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，待 production cutover 時一起改寫
+  - **Phase 6 同波 cutover 決策（D1=A）**：v4 cutover 與 Phase 6（Claude 決策層 + multi-agent）同波完成，prompt 改一次到位。詳見 `docs/v4-cutover-plan.md` Stage B-F + `docs/fa_scan-claude-decision-layer-design.md` §7.8
+  - **簡化 spike 先跑（D2=C）**：動 Stage B-F 前先跑 `docs/phase6-multi-agent-spike.md` §3.1 step 1 一次（半小時，只測 3 agent 平行排序的 P1 一致率 + 延遲），需用戶在場 supervise
+  - **Phase 6 §7 內部設計鎖定**（cutover 動工時直接抓 prompt / orchestrator）：
+    - §7.1 Multi-agent runtime：`claude -p` subprocess + threading（訂閱涵蓋，無 API cost 顧慮，見 memory `project_claude_p_subscription.md`）
+    - §7.2 同意定義：spike 後校準（design doc 推薦 P1 match + dissent ≥2）
+    - §7.3 Re-eval 上限：spike 後校準（design doc 推薦 1 輪 + degrade）
+    - §7.4 Step 3 visibility：**B** — 主決策 + 自己 step 1 原本意見，不看其他 agent 理由
+    - §7.5 FA Step 2 邊界：**B** — 三分（值得 / 不值得 / 邊界），邊界進 step 3
+    - §7.6 月預算：**N/A** — 訂閱涵蓋
+    - §7.7 Batter v4 升級：**B**（D5 同題）— SP cutover 跑 1-2 月後再評是否套 batter Phase 6 決策層；不升 batter 5-slot Sum
+  - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，Stage F cutover 完成時一起改寫
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
-  - finding C：`fa_scan.py:2161` Slump hold 訊息「≥50」寫死 → 改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數
+  - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
-  - finding E：`fa_scan.py:1637` `_publish` 在 `--no-send` mode 用 `print(advice)` 沒 flush，threading + nohup 環境下 stdout buffered 看不到 advice → 加 `print(advice, flush=True)` 或改 `sys.stderr.write`
+  - ~~finding E~~：✅ 2026-04-26 完成（commit `95c9713`，`--no-send` mode `print(advice, flush=True)`）
 - [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
-- [ ] **roster_sync --init 不 backfill 新欄位**：當沒有 add/drop 也沒有 key/stats 缺失時，`run_init` 提前 return，不走 `update_config()`，導致 `selected_pos`/`status` 等新欄位不會被寫入。日常 cron 有異動時正常 backfill，僅手動 `--init` 無異動時觸發
+- ~~**roster_sync --init 不 backfill 新欄位**~~：✅ 2026-04-26 完成（commit `1b4f4e2`，加 `_count_missing_fields` helper 把 `selected_pos`/`status` 納入 backfill 檢查 + 6 unit tests）
 - [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
