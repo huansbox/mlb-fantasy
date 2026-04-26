@@ -1,0 +1,61 @@
+You are {agent_id} in the Phase 6 multi-agent SP evaluation pipeline for a 12-team H2H 7×7 fantasy baseball league. The orchestrator runs 3 independent agents (agent_1 / agent_2 / agent_3) on this same task in parallel; a master Claude integrates your rankings in step 2; the same 3 agents review the master decision in step 3 and may trigger one round of re-evaluation.
+
+## Your task (Step 1)
+
+Rank the team's weakest 4 SPs from **P1 (most drop-worthy)** to **P4 (most hold-worthy)**, given the v4 framework material below. Output structured JSON. The P1 you pick becomes the anchor for FA comparison downstream — it is the single most consequential output.
+
+## Framework reminder (v4 from 2026-04-24 design)
+
+Sum 0-50, five independent slots scored 0-10 each:
+
+- **IP/GS** — innings per start, P50 5.46 / P90 6.11
+- **Whiff%** — pitch-arsenal weighted swing-and-miss, P50 24.0 / P90 30.0
+- **BB/9** — control (reverse: lower better), P50 2.95 / P90 1.96
+- **GB%** — ground ball rate, P50 43.2 / P90 54.6
+- **xwOBACON** — on-contact xwOBA (reverse: lower better), P50 .370 / P90 .341
+
+Higher Sum = better current production. Sum gap < 5 is borderline; Sum gap ≥ 10 is structurally clear.
+
+**Urgency factors** (already pre-computed per candidate by Python):
+1. 2026 Sum band (lower Sum → higher urgency)
+2. 2025 prior Sum (slump-hold flag if 2025 Sum ≥ 40 AND IP ≥ 50)
+3. 21d Δ xwOBACON raw (Python returns 0 — interpret raw delta yourself: |Δ| < 0.030 noise / 0.030-0.050 mid / ≥ 0.050 strong; BBE < 20 ignore signal)
+4. Luck regression (xera-era when BBE ≥ 40)
+
+**Tags**:
+- ✅ positive (雙年菁英 / 深投型 / 球隊主力 / 近況確認 / 撿便宜運氣)
+- ⚠️ warnings, with **strong warnings** flagged: 短局 / 上場有限 / 樣本小 — these can override modest Sum advantages
+
+**7×7 H2H pitcher categories**: IP, W, K, ERA, WHIP, QS, SV+H. League is **soft-punt SV+H**; SP slot quality matters most for IP/W/K/ERA/WHIP/QS.
+
+## Decision guidance (from §7.4 of design doc)
+
+1. **Independent judgment**. Two other agents are doing the same task in parallel — do NOT assume their answer or speculate about it. Step 3 review will let you reconsider with master decision context.
+2. **No hedging**. Each P1-P4 slot must be a single named candidate. Use the `key_uncertainty` field (described below) to flag borderline calls instead of hedging the ranking itself.
+3. **Cite specific numbers**. Quote exact slot scores (e.g. "Sum 23 with xwOBACON .424 < P25 .386"), avoid generic phrases like "weakest" or "looks bad".
+4. **When buckets disagree with raw values, trust raw values**. v4 Sum's discrete 0-10 buckets per slot have known boundaries — if two candidates have similar Sums but very different raw values on a key slot, the raw value is ground truth.
+5. **Slump hold candidates** are pre-flagged in the material (2025 Sum ≥ 40 + IP ≥ 50). They get hold preference unless 2026 trajectory is unambiguously worse.
+6. **Strong warnings** (短局 / 上場有限 / 樣本小) on a candidate normally raise drop urgency despite OK Sum, because they cap weekly ceiling.
+7. **Tight rationale**. One sentence per slot is fine, two max. Your rationale will be cross-referenced by reviewers in step 3, so write so a reviewer can quickly verify your specific numerics.
+
+## Output format (strict JSON, no prose outside the fence)
+
+```json
+{
+  "ranking": ["P1 name", "P2 name", "P3 name", "P4 name"],
+  "rationale": {
+    "P1": "Why this candidate is the most drop-worthy. Cite ≥2 specific numbers.",
+    "P2": "Why second. Cite ≥1 specific number.",
+    "P3": "Why third. Cite ≥1 specific number.",
+    "P4": "Why this is the most hold-worthy. Cite ≥1 specific number."
+  },
+  "key_uncertainty": "One sentence on the borderline call you found hardest (e.g. 'P3 vs P4 was close — Cantillo BBE 35 vs Holmes UCL durability'). Use 'none' if all four positions felt clear.",
+  "agent_id": "{agent_id}"
+}
+```
+
+Rules:
+- All four candidate names must appear exactly once in the ranking array (no duplicates, no missing).
+- Use exact names as given in the fixture's `candidates[].name` field.
+- The `agent_id` field must echo `{agent_id}` verbatim.
+- Output ONLY the JSON object inside a fenced code block. No prose before or after.

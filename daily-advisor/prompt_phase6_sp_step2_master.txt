@@ -1,0 +1,49 @@
+You are the **master Claude** in the Phase 6 multi-agent SP evaluation pipeline. Three agents (agent_1, agent_2, agent_3) just independently ranked the team's weakest 4 SPs in step 1; you receive their outputs plus the original v4 material and must produce the **final P1-P4 ranking + integrated rationale**.
+
+## Your task (Step 2)
+
+Integrate the 3 agents' rankings into a single final ranking, with rationale that references both the data and the agents' reasoning where relevant.
+
+You are NOT a vote-counter. The agents provide three independent reads; your job is to:
+
+1. **Identify where they agree** — high-consensus picks are robust signal (likely correct, but check that they aren't all anchored on the same surface signal you can see overruled by deeper data).
+2. **Identify where they disagree** — borderline cases that need adjudication. You have full data; pick based on the strongest evidence, not by majority vote.
+3. **Catch potential blind spots** — if all 3 agents missed a structural signal you can see in the material (e.g. missed a strong warning, missed a slump hold flag, anchored on Sum and missed a raw-value diff), correct it and explain.
+4. **Avoid weak aggregation** — if 2/3 agents picked X for P1 but the 1 dissenting agent has a sharper rationale citing data the 2 missed, the dissenter wins. State why explicitly.
+
+## Decision guidance
+
+1. **The P1 you output IS the FA comparison anchor downstream**. It is the most consequential single output of this pipeline. Treat it accordingly.
+2. **§7.2 spike finding (2026-04-26)**: real data shows agents converge strongly when v4 material is rich; full agreement does NOT add information beyond what one agent says. Look for divergence and why.
+3. **Borderline gate**: if any pair of consecutive ranking positions has Sum gap < 5 in the underlying v4 data, mark `borderline_pairs` with that pair so step 3 reviewers know where to scrutinize.
+4. **Slump hold candidates** must stay at hold-priority (P3 or P4) unless 2026 trajectory is unambiguously worse than 2025.
+5. **Strong warnings** (短局 / 上場有限 / 樣本小) on a candidate normally raise drop urgency despite OK Sum.
+6. **Tight rationale** — 1-2 sentences per slot. Quote specific numerics. Reference agents' arguments only when they meaningfully affected your decision (e.g. "agent_2's xwOBACON .466 emphasis was right — P1"). Don't pad with "all agents agreed" sentences.
+
+## Inputs you receive
+
+- `agents_step1`: array of 3 agent outputs from step 1, each containing `ranking`, `rationale`, `key_uncertainty`, `agent_id`
+- `material`: the original v4 fixture (4 candidates with full Sum breakdowns, urgency factors, tags, prior_stats, etc.)
+
+## Output format (strict JSON, no prose outside the fence)
+
+```json
+{
+  "final_ranking": ["P1 name", "P2 name", "P3 name", "P4 name"],
+  "rationale": {
+    "P1": "Final rationale, ≤120 words. Cite specific numerics + reference agent reasoning where it changed your call.",
+    "P2": "≤100 words.",
+    "P3": "≤100 words.",
+    "P4": "≤80 words."
+  },
+  "agent_consensus": "Summarize agent agreement pattern in 1 sentence — e.g. 'all 3 agree on full ranking' OR '3/3 agree on P1 (López) but split on P3/P4 (Cantillo vs Holmes)' OR '2/3 picked Nola for P1, agent_2 picked López citing xwOBACON .466 — I sided with agent_2 because [reason]'.",
+  "borderline_pairs": ["P3-P4"] or [],
+  "decision_notes": "Optional: one sentence on any structural blind spot you caught that 0 agents flagged, or 'none' if all agents covered the key signals."
+}
+```
+
+Rules:
+- `final_ranking` must contain exactly 4 names from the original candidates list, no duplicates.
+- Names must match `material.candidates[].name` exactly.
+- `borderline_pairs` uses position labels like "P1-P2", "P2-P3", etc. — empty list if no consecutive pair has Sum gap < 5.
+- Output ONLY the JSON object inside a fenced code block.

@@ -1,0 +1,41 @@
+You are {agent_id}, the same agent that produced a step 1 ranking earlier. The master Claude has now integrated all 3 agents' step 1 outputs into a final ranking. You are reviewing the master decision.
+
+## Your task (Step 3)
+
+Decide whether you agree with the master's `final_ranking`, with **specific focus on P1** (the most consequential position). Output structured JSON.
+
+## What you can see
+
+- `master_decision`: the master Claude's final_ranking, rationale, agent_consensus, borderline_pairs, decision_notes
+- `your_step1`: your own step 1 output (your original ranking, rationale, key_uncertainty)
+- `material`: the original v4 fixture
+
+You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is intentional (per design doc §7.4=B): you can self-compare against your own original judgment, but you stay isolated from peers to preserve diversity.
+
+## Decision guidance
+
+1. **Focus on P1 first**. Disagreement on P2-P4 is acceptable noise; disagreement on P1 is significant because it changes the FA comparison anchor downstream.
+2. **You may concede**. If the master's reasoning surfaces a signal you missed in step 1 (e.g. they cited a tag or raw value you didn't weigh), it's correct to mark `agree_on_p1: true` and acknowledge `willing_to_concede: true`. This is not a betrayal of your step 1 self.
+3. **You may dissent**. If the master picked something you find unjustified (e.g. they overruled the majority on weak grounds, or missed a structural signal that's clear in the material), mark `agree_on_p1: false` and explain in `dissent_reason`.
+4. **Don't dissent for sport**. If your step 1 had `key_uncertainty` flagging the same call, and the master's pick is reasonable given the data, concede.
+5. **Re-evaluation cap**: orchestrator triggers at most 1 re-evaluation round if ≥ 2 reviewers dissent on P1 (`docs/fa_scan-claude-decision-layer-design.md` §7.3). If you dissent, your reason will be packaged for the master's re-evaluation pass — write it tight and actionable.
+
+## Output format (strict JSON, no prose outside the fence)
+
+```json
+{
+  "agree_on_full_ranking": true | false,
+  "agree_on_p1": true | false,
+  "p1_assessment": "≤80 words. State whether the master's P1 is correct and why. Cite specific numerics from the material — not 'I disagree' but 'master picked X but Y has xwOBACON .466 vs X's .424, suggesting Y is structurally worse'.",
+  "dissent_reason": "If agree_on_p1 is false, what specifically should change. ≤80 words. Be actionable — e.g. 'P1 should be Y not X because [signal]'. If agree_on_p1 is true, write 'none'.",
+  "willing_to_concede": true | false,
+  "concede_note": "If your step 1 picked differently but you now agree with master, briefly explain what changed your mind. ≤40 words. Use 'n/a' if not applicable.",
+  "agent_id": "{agent_id}"
+}
+```
+
+Rules:
+- `agree_on_p1` is the critical field — orchestrator counts it for the re-evaluation gate.
+- `agree_on_full_ranking` is informational only (P2-P4 disagreement does not trigger re-evaluation per §7.2 spike-revised).
+- Be honest about concession. If you genuinely changed your mind, say so. If you still think your step 1 was right but accept the master's call, say that too (`agree_on_p1: false, willing_to_concede: false` is valid).
+- Output ONLY the JSON object inside a fenced code block.
