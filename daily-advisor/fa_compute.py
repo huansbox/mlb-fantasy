@@ -979,6 +979,11 @@ def v4_decision_sp(sum_diff: int, breakdown_diff: dict,
       ≥ 2 ✅ AND no strong warn → 立即取代
       ≥ 1 ✅ AND no strong warn → 取代
       else → 觀察
+
+    NOTE: this Python decision function is used by fa_scan_v4.py CLI tool
+    only. The Phase 6 production path uses compute_fa_tags_v4_sp() which
+    intentionally omits the decision field — Claude decides in the
+    multi-agent decision layer per docs/fa_scan-claude-decision-layer-design.md.
     """
     positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
     if sum_diff < 5 or positive_count < 3:
@@ -992,3 +997,61 @@ def v4_decision_sp(sum_diff: int, breakdown_diff: dict,
     if len(add_tags) >= 2 and not any(w for w in warn_tags):
         return "立即取代"
     return "取代"
+
+
+def compute_fa_tags_v4_sp(fa_player: dict, anchor_player: dict) -> dict:
+    """v4 SP signals for Phase 6 multi-agent decision layer (no Python decision).
+
+    Mirrors compute_fa_tags() shape but intentionally omits the "decision"
+    field. The Phase 6 design (docs/fa_scan-claude-decision-layer-design.md)
+    moves decision authority from Python to Claude with multi-agent review;
+    Python's role here is to compute mechanical signals (sum_diff, breakdown,
+    tags, win_gate) and let Claude integrate them with non-mechanical context
+    (roster needs, %owned trends, role changes) for the final call.
+
+    Args:
+        fa_player: FA candidate with v4 fields {name, score, breakdown,
+                   savant_2026, prior_stats, rolling_21d, derived}
+        anchor_player: weakest team SP to compare against (must have
+                       {name, score, breakdown})
+
+    Returns:
+        {
+            sum_diff: int,                 # fa.score - anchor.score
+            breakdown_diff: dict,          # per-slot diff (5 v4 slots)
+            win_gate_passed: bool,         # v4 gate: sum_diff ≥ 5 AND ≥ 3 positive
+            add_tags: list[str],           # v4 ✅ tags from v4_add_tags_sp
+            warn_tags: list[str],          # v4 ⚠️ tags from v4_warn_tags_sp
+            anchor_name: str,
+        }
+
+    Note: when win_gate_passed is False, add_tags and warn_tags are
+    returned empty (gate fail = no point computing tags). Claude is told
+    via prompt that gate-fail FAs are pre-filtered as "not worth taking".
+    """
+    sum_diff = fa_player["score"] - anchor_player["score"]
+    anchor_bd = anchor_player.get("breakdown") or {}
+    fa_bd = fa_player.get("breakdown") or {}
+    breakdown_diff = {k: fa_bd.get(k, 0) - anchor_bd.get(k, 0) for k in fa_bd}
+
+    positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
+    win_gate_passed = sum_diff >= 5 and positive_count >= 3
+
+    if not win_gate_passed:
+        return {
+            "sum_diff": sum_diff,
+            "breakdown_diff": breakdown_diff,
+            "win_gate_passed": False,
+            "add_tags": [],
+            "warn_tags": [],
+            "anchor_name": anchor_player["name"],
+        }
+
+    return {
+        "sum_diff": sum_diff,
+        "breakdown_diff": breakdown_diff,
+        "win_gate_passed": True,
+        "add_tags": v4_add_tags_sp(fa_player),
+        "warn_tags": v4_warn_tags_sp(fa_player),
+        "anchor_name": anchor_player["name"],
+    }
