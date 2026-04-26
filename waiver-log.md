@@ -450,13 +450,6 @@
 - 04-25：HH% 57.7%持續炸裂+IP/GS 4.7短局, breakdown一項-4不符門檻（fa_scan）
 - 04-26：⚠️ HH% 57.7%持續炸裂(觸發需<42%)方向相反, 建議降級或結案（fa_scan）
 
-### Jesse Scholtens (TB, SP,RP) [mlb_id:669947] — 觀察中
-觸發：BBE≥50 + 確認固定先發
-- 04-22：BBE 44樣本小否決, 2025 IP 8.3無效prior, IP/GS 5.7深投型但IP/TG 0.67非固定輪值（fa_scan）
-- 04-23：BBE 44樣本小否決, IP/GS 5.7深投型但IP/TG 0.64非固定輪值, 2025 IP 8.3無效prior（fa_scan）
-- 04-24：BBE 44樣本小否決, IP/GS 5.7深投型但IP/TG 0.64非固定輪值, 2025 IP 8.3無效prior（fa_scan）
-- 04-25：BBE 44樣本小否決, IP/GS 5.7深投型但IP/TG 0.61非固定輪值, 2025 IP 8.3無效prior（fa_scan）
-
 ### Kyle Freeland (COL, SP) [mlb_id:607536] — 觀察中
 觸發：運氣收斂(xERA-ERA<0.81) + BBE≥60
 - 04-22：xERA 3.86 P60但運氣+1.56極端, COL Coors結構劣勢, 2025極差（fa_scan）
@@ -472,12 +465,6 @@
 - 04-24：breakdown一項-4不符勝出門檻, 運氣-2.58買低但HH% 48.1%+短局+2025差（fa_scan）
 - 04-25：breakdown一項-4不符勝出門檻, 運氣-2.57買低但HH% 48.1%+短局+2025差（fa_scan）
 - 04-26：breakdown一項-4不符門檻, 運氣-2.57買低但HH% 48.1%+短局+2025差（fa_scan）
-
-### Kumar Rocker (TEX, SP) [mlb_id:677958] — 觀察中
-觸發：HH%回落<42% + 2場先發品質維持
-- 04-23：Sum 17 vs Nola差+6, xERA 3.77/xwOBA .310 P60但HH% 43.5%偏高, 2025極差breakout未確認, BBE 62高信心（fa_scan）
-- 04-24：Sum 17 vs Nola差+6, xERA 3.77/xwOBA .310 P60但HH% 43.5%偏高, 2025極差breakout未確認, BBE 62高信心（fa_scan）
-- 04-25：Sum 17 vs Nola差+6, xERA 3.79/xwOBA .310 P60但HH% 43.5%偏高, 2025極差breakout未確認, BBE 62高信心（fa_scan）
 
 ### Heliot Ramos (SF, LF,CF,RF) [mlb_id:671218] — 觀察中
 觸發：立即行動
@@ -580,6 +567,12 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Jesse Scholtens (TB, SP,RP) — 被搶（自動偵測）
+- 2026-04-26：Yahoo ownership_type=team，從觀察中移除。
+
+### Kumar Rocker (TEX, SP) — 被搶（自動偵測）
+- 2026-04-26：Yahoo ownership_type=team，從觀察中移除。
 
 ### Miguel Vargas (CWS, 1B,3B) — 被搶（自動偵測）
 - 2026-04-25：Yahoo ownership_type=team，從觀察中移除。
