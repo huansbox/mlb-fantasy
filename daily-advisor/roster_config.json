@@ -265,7 +265,10 @@
         "bbe": 469,
         "era": 2.21,
         "ip_per_gs": 6.3,
-        "ip": 195.3
+        "ip": 195.3,
+        "whiff_pct": 31.7,
+        "gb_pct": 46.4,
+        "xwobacon": 0.356
       },
       "selected_pos": "SP",
       "status": ""
@@ -287,7 +290,10 @@
         "bbe": 302,
         "era": 2.58,
         "ip_per_gs": 6.3,
-        "ip": 125.7
+        "ip": 125.7,
+        "whiff_pct": 30.1,
+        "gb_pct": 43.4,
+        "xwobacon": 0.348
       },
       "selected_pos": "SP",
       "status": ""
@@ -309,7 +315,10 @@
         "bbe": 137,
         "era": 4.67,
         "ip_per_gs": 4.7,
-        "ip": 61.7
+        "ip": 61.7,
+        "whiff_pct": 34.5,
+        "gb_pct": 37.5,
+        "xwobacon": 0.37
       },
       "selected_pos": "SP",
       "status": ""
@@ -331,7 +340,10 @@
         "bbe": 275,
         "era": 6.01,
         "ip_per_gs": 5.5,
-        "ip": 94.3
+        "ip": 94.3,
+        "whiff_pct": 24.1,
+        "gb_pct": 40.8,
+        "xwobacon": 0.382
       },
       "selected_pos": "SP",
       "status": ""
@@ -353,7 +365,10 @@
         "bbe": 121,
         "era": 2.72,
         "ip_per_gs": 5.7,
-        "ip": 39.7
+        "ip": 39.7,
+        "whiff_pct": 26.0,
+        "gb_pct": 49.3,
+        "xwobacon": 0.339
       },
       "selected_pos": "P",
       "status": ""
@@ -375,7 +390,10 @@
         "bbe": 531,
         "era": 3.52,
         "ip_per_gs": 5.8,
-        "ip": 184.0
+        "ip": 184.0,
+        "whiff_pct": 23.3,
+        "gb_pct": 28.6,
+        "xwobacon": 0.38
       },
       "selected_pos": "BN",
       "status": ""
@@ -422,7 +440,10 @@
         "bbe": 308,
         "era": 3.99,
         "ip": 115.0,
-        "ip_per_gs": 5.4
+        "ip_per_gs": 5.4,
+        "whiff_pct": 28.5,
+        "gb_pct": 41.7,
+        "xwobacon": 0.39
       }
     },
     {
@@ -444,7 +465,10 @@
         "bbe": 22,
         "era": 5.4,
         "ip": 5.0,
-        "ip_per_gs": 5.0
+        "ip_per_gs": 5.0,
+        "whiff_pct": 10.2,
+        "gb_pct": 34.9,
+        "xwobacon": 0.466
       }
     },
     {
@@ -467,7 +491,10 @@
         "bbe": 251,
         "era": 3.21,
         "ip": 95.3,
-        "ip_per_gs": 5.2
+        "ip_per_gs": 5.2,
+        "whiff_pct": 28.4,
+        "gb_pct": 44.2,
+        "xwobacon": 0.364
       }
     },
     {
@@ -490,7 +517,10 @@
         "bbe": 159,
         "era": 3.96,
         "ip": 63.7,
-        "ip_per_gs": 0
+        "ip_per_gs": 0,
+        "whiff_pct": 31.8,
+        "gb_pct": 39.7,
+        "xwobacon": 0.387
       }
     }
   ],
