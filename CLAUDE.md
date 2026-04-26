@@ -581,7 +581,7 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **v4 框架上線前置（4 項，2026-04-24 設計完成後列出）**：
-  - **v4 prior_stats backfill**：~~工具~~ 已寫好（`daily-advisor/backfill_prior_stats_v4.py` + 11 unit tests），需在 v4 cutover 前實際 `python3 backfill_prior_stats_v4.py --dry-run` 確認名單 + 寫入 `roster_config.json`。供 `v4_add_tags_sp` 的「✅ 雙年菁英」tag 使用
+  - ~~**v4 prior_stats backfill**~~：✅ 2026-04-26 完成（10 SP 全 backfill，commit `523c73f`）。`backfill_prior_stats_v4.py` 保留供新進 SP 重跑
   - ~~**21d rolling xwOBACON fetch**~~：✅ 2026-04-26 完成（`_aggregate_pitches` 加 `xwobacon = sum_xwoba_on_bbe / bbe_count` + 6 unit tests）。下次 cron TW 12:00 自動帶上欄位
   - **v4 production cutover 決策**：目前 `fa_scan_v4.py` 是 parallel CLI 工具（stdout only），prod cron `fa_scan.py` 仍 v2。需 feature flag 環境變數 + VPS 部署 + 1-2 週並行驗證 + 最終清 v2 SP 代碼（batter 保留 v2）
   - **CLAUDE.md「SP 評估」章節改寫 v4**：目前章節仍 v2 規則，待 production cutover 時一起改寫
