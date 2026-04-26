@@ -256,12 +256,18 @@ Batter 暫不動（v2 + Phase 5 機械決策保留），未來視效果再決定
 - 既然 P1 是 critical decision，「同意」應該以 P1 為核心
 - P2-P4 是 nice-to-have（萬一 P1 add/drop 後下週還想動）
 
-**推薦**：**E（P1 相同 + 反對票 ≥2 才回 re-eval）**。理由：
-- P1 一致表示「最該 drop 是誰」共識達成 → 下游 FA 比較 anchor 不變
-- 反對票 ≥2 才重評 → 1 票異議視為合理 dissent，不阻塞流程
-- 自然減少 re-eval 次數，月成本可控
+**原推薦**：**E（P1 相同 + 反對票 ≥2 才回 re-eval）**。
 
-**Spike 要驗**：Nola/López/Holmes 04-23 三視角案例下，3 agent 對 P1 的一致率（之前實測 2/3 反對 v3 判斷，恰恰是 P1 不一致的 case）— 這個歷史 case 的 agent 行為告訴我們真實 disagreement 機率。
+**2026-04-26 Spike 後修訂為更寬鬆的 B'（P1 match 即收斂）**：
+
+簡化 spike（4 SP fixture，commit `0873e2b`）3 agent 對 P1 完全一致（all 3 → López），完整 ranking 也 3/3 pairwise match。Rationale 內容幾乎一字不差引用同樣數據點，**證明 same-Claude 同 prior 在 v4 框架材料豐富的情況下會強烈收斂**。原推薦 E 的「反對票 ≥2 才 re-eval」對非 borderline case 過於保守，會白白觸發 review 而沒有實質 dissent 訊號。
+
+**修訂推薦**：**B'（P1 match 即視為同意，直接收斂進 step 5 抽 anchor）**。理由：
+- non-borderline case（Sum 差 ≥10）3 agent 同 prior 會強烈收斂 → review step 浪費 token
+- borderline case 才該觸發 review — 用 Sum 差作為 borderline gate（Sum 差 < 5 才強制 step 3 review）
+- 詳見 `docs/phase6-multi-agent-spike-results.md` §3 對 §7.2 的調整建議
+
+**spike 沒回答的事**：真 borderline case（Sum 差 < 5）的 P1 一致率仍不知；待 Stage E parallel 期觀察校準。
 
 ---
 
@@ -405,7 +411,7 @@ FA 線：
 | Q | 決策 |
 |---|------|
 | 7.1 | **Option B + threading 並行 subprocess** |
-| 7.2 | **「P1 相同 + 反對票 ≥2 才回 re-eval」** |
+| 7.2 | **「P1 match 即收斂」**（2026-04-26 spike 後放寬，原 E → B'）— borderline gate（Sum 差 <5）才強制 step 3 review |
 | 7.3 | **上限 1 輪，失敗降級 + flag** |
 | 7.4 | **Step 3 看主決策 + 自己原本意見** |
 | 7.5 | **三分（值得/不值得/邊界）+ 邊界進 Step 3** |
