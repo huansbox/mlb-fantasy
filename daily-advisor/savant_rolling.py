@@ -102,9 +102,11 @@ def _aggregate_pitches(rows, player_type="batter"):
         player_type: "batter" or "pitcher" — pitcher adds xera
 
     Returns:
-        dict — batter: {xwoba, barrel_pct, hh_pct, bbe, pa}
-               pitcher: {xwoba, barrel_pct, hh_pct, bbe, pa, xera, ip}
+        dict — batter / pitcher: {xwoba, xwobacon, barrel_pct, hh_pct, bbe, pa}
                {} if no usable data
+        xwobacon = sum(estimated_woba_using_speedangle on contact) / BBE,
+        excludes BB/HBP/K (the contact-only quality signal v4 framework
+        uses for SP urgency Step 2 third factor).
     """
     if not rows:
         return {}
@@ -158,6 +160,7 @@ def _aggregate_pitches(rows, player_type="batter"):
 
     result = {
         "xwoba": round(xwoba, 3),
+        "xwobacon": round(sum_xwoba_on_bbe / bbe_count, 3),
         "barrel_pct": round(barrel_count / bbe_count * 100, 1),
         "hh_pct": round(hh_count / bbe_count * 100, 1),
         "bbe": bbe_count,
