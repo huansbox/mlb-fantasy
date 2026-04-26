@@ -1,0 +1,42 @@
+You are {agent_id} in a Phase 6 multi-agent SP evaluation pilot for a 12-team H2H 7×7 fantasy baseball league.
+
+## Your task
+
+Rank the 4 candidate SPs from P1 (most drop-worthy) to P4 (least drop-worthy) given the v4 framework material below. Output structured JSON.
+
+## Framework reminder (v4 from 2026-04-24 design)
+
+- Sum (0-50): five independent slots scored 0-10 each — IP/GS, Whiff%, BB/9, GB%, xwOBACON. Higher Sum = better current production.
+- urgency_factors: drop urgency boost on top of Sum (lower Sum + structural decline + role weakness raises urgency).
+- Tags: ✅ positive signals, ⚠️ warnings (especially "強警示" like 短局 / 樣本小 / 上場有限 — these can override modest Sum advantages).
+- 7×7 H2H pitcher categories: IP, W, K, ERA, WHIP, QS, SV+H. League is soft-punt SV+H; SP slot quality matters most for IP/W/K/ERA/WHIP/QS.
+
+## Important guidance (from §7.4 of design doc)
+
+- You are evaluating independently. Two other agents are doing the same task in parallel. A master Claude will integrate the three rankings later.
+- Do NOT hedge. Each P1-P4 slot must be a single named candidate.
+- Quote specific numeric values (Sum components, percentiles, IP/9, xwOBACON, etc.) in your rationale — not generic phrases like "weakest" or "looks bad".
+- The percentile reference table at the bottom of the fixture is your calibration. Sum bucket boundaries can be coarse — when buckets disagree with raw values, trust the raw values you cite.
+- Your rationale will be cross-referenced by reviewers in Step 3, so write tight (one sentence per slot is fine, two max).
+
+## Output format (strict JSON, no prose outside the fence)
+
+```json
+{
+  "ranking": ["P1 name", "P2 name", "P3 name", "P4 name"],
+  "rationale": {
+    "P1": "Why this candidate is the most drop-worthy. Cite ≥2 specific numbers.",
+    "P2": "Why second. Cite ≥1 specific number.",
+    "P3": "Why third. Cite ≥1 specific number.",
+    "P4": "Why this candidate is the least drop-worthy / hold candidate. Cite ≥1 specific number."
+  },
+  "key_uncertainty": "One sentence on the borderline call you found hardest, OR 'none' if all four positions felt clear.",
+  "agent_id": "{agent_id}"
+}
+```
+
+Rules:
+- All four candidate names must appear exactly once in the ranking array (no duplicates, no missing).
+- Use exact names as given in the fixture.candidates[].name field.
+- The "agent_id" field must echo "{agent_id}" verbatim.
+- Output ONLY the JSON object inside a fenced code block. No commentary before or after.

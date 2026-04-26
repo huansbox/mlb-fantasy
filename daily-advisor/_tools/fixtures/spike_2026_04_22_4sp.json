@@ -1,0 +1,276 @@
+{
+  "spike_metadata": {
+    "case": "2026-04-22 fa_scan #98 weakest 4 SP (P1-P4 ranking task)",
+    "source": "Composite from docs/sp-decisions-backtest.md, docs/nola-lopez-holmes-triview-2026-04-23.md, docs/sp-framework-v4-balanced.md §「2026-04-24 全 18 SP 實戰驗證」",
+    "ground_truth_p1": "Aaron Nola (per fa_scan #98 mechanical recommendation, but downgraded to hold 04-23 after triview revealed v3 blind spots)",
+    "ground_truth_dispute": "Triview agents (進階/印象 2/3) chose Nola; (傳統 1/3) chose López. v4 04-24 framework reading placed Nola Sum 19 (mid-low) and López Sum 7 (extreme bottom). The 'true' P1 by structural quality is debatable — this is precisely why it tests multi-agent diversity.",
+    "intent": "Test whether 3 independent claude -p agents agree on P1 given identical v4 material. Disagreement is informative (matches triview history); agreement could also be informative (mechanical clarity)."
+  },
+  "framework_version": "v4 (5-slot Sum: IP/GS + Whiff% + BB/9 + GB% + xwOBACON)",
+  "evaluation_target": "weakest_4_sp",
+  "scoring_categories": "7×7 H2H one-win: pitchers track IP, W, K, ERA, WHIP, QS, SV+H",
+  "cant_cut": ["Tarik Skubal"],
+  "candidates": [
+    {
+      "name": "Aaron Nola",
+      "team": "PHI",
+      "age": 32,
+      "mlb_id": 605400,
+      "rotation_gate": "🟢 active",
+      "data_2026": {
+        "gs": 5,
+        "ip": 26.2,
+        "ip_per_gs": 5.33,
+        "era": 5.06,
+        "whip": 1.46,
+        "k": 29,
+        "k_9": 9.95,
+        "bb_9": 3.38,
+        "qs": 2,
+        "w": 1,
+        "xera": 4.70,
+        "xwoba_allowed": 0.342,
+        "xwobacon": 0.424,
+        "hh_pct_allowed": 42.1,
+        "barrel_pct_allowed": 7.9,
+        "whiff_pct": 27.4,
+        "gb_pct": 40.8,
+        "bbe": 76,
+        "fb_velo_avg_mph": 91.2,
+        "fb_velo_2025_avg_mph": 91.0
+      },
+      "data_2025_prior": {
+        "ip": 94.1,
+        "era": 6.01,
+        "k_9": 9.25,
+        "bb_9": 2.67,
+        "xera": 4.14,
+        "xwoba_allowed": 0.328,
+        "xwobacon": 0.406,
+        "hh_pct_allowed": 41.8,
+        "whiff_pct": 26.9,
+        "gb_pct": 41.5,
+        "season_context": "Disaster year: ankle + rib stress fracture, 2 IL stints"
+      },
+      "v4_sum_breakdown_2026": {
+        "ip_per_gs": 6,
+        "whiff_pct": 8,
+        "bb_9": 3,
+        "gb_pct": 5,
+        "xwobacon": 1
+      },
+      "v4_sum_2026": 23,
+      "urgency_factors": {
+        "factor_1_2026_sum_band": "+2 (sum 18-21 range)",
+        "factor_2_2025_prior_sum": "non-elite (no slump hold)",
+        "factor_3_21d_delta_xwobacon": "raw value not measured at 04-22 (savant_rolling did not yet capture xwobacon)",
+        "factor_4_luck_regression": "xera-era = -0.36 (neutral, BBE 76 above gate)"
+      },
+      "tags": [
+        "⚠️ 速度物理訊號 — FB velo avg 91.2 mph matches 2025 disaster year baseline (91.0 mph), no spring rebound",
+        "⚠️ xwOBACON .424 <P25 — on-contact damage worst among 4 candidates"
+      ],
+      "context_notes": [
+        "%owned 79% (high acquisition cost, drop is irreversible without expensive re-add)",
+        "PHI strong team — W upside if hands clean innings"
+      ]
+    },
+    {
+      "name": "Reynaldo López",
+      "team": "ATL",
+      "age": 31,
+      "mlb_id": 625643,
+      "rotation_gate": "🟢 active",
+      "data_2026": {
+        "gs": 5,
+        "ip": 21.2,
+        "ip_per_gs": 4.33,
+        "era": 4.85,
+        "whip": 1.43,
+        "k": 20,
+        "k_9": 8.21,
+        "bb_9": 4.57,
+        "qs": 0,
+        "w": 1,
+        "xera": 3.74,
+        "xwoba_allowed": 0.347,
+        "xwobacon": 0.466,
+        "hh_pct_allowed": 34.9,
+        "barrel_pct_allowed": 6.3,
+        "whiff_pct": 10.2,
+        "gb_pct": 34.9,
+        "bbe": 62,
+        "fb_velo_avg_mph": 93.9
+      },
+      "data_2025_prior": {
+        "ip": 5.0,
+        "era": 0.00,
+        "season_context": "2025-04 shoulder arthroscopic surgery, season-ending after 1 start. Prior season (2024) was elite — but 2025 sample too small (5 IP) to compute meaningful Sum."
+      },
+      "v4_sum_breakdown_2026": {
+        "ip_per_gs": 1,
+        "whiff_pct": 1,
+        "bb_9": 1,
+        "gb_pct": 3,
+        "xwobacon": 1
+      },
+      "v4_sum_2026": 7,
+      "urgency_factors": {
+        "factor_1_2026_sum_band": "+5 (sum <9, structural floor)",
+        "factor_2_2025_prior_sum": "no prior baseline (5 IP only) — breakout-待驗 not slump hold",
+        "factor_3_21d_delta_xwobacon": "raw not measured 04-22",
+        "factor_4_luck_regression": "xera-era = -1.11 (撿便宜 luck signal — xERA 3.74 says he's better than ERA 4.85 suggests; but xwOBACON .466 is structural disaster)"
+      },
+      "tags": [
+        "⚠️ Whiff% 10.2 — bottom of league, K suppression collapsed",
+        "⚠️ xwOBACON .466 — extreme structural weakness (P5 territory)",
+        "⚠️ HR/9 1.66 — worst among 4 candidates",
+        "⚠️ BB/9 4.57 + 0 QS — week ceiling structurally low",
+        "✅ 撿便宜運氣 — xera-era -1.11 P70+ (but contradicted by ⚠️ structural)",
+        "ℹ️ Post-shoulder-surgery year-1, mechanics may still be rebuilding"
+      ],
+      "context_notes": [
+        "ATL strong team — W tailwind if outings hold together",
+        "%owned moderate, drop reversible if rebound proves real"
+      ]
+    },
+    {
+      "name": "Grant Holmes",
+      "team": "ATL",
+      "age": 30,
+      "mlb_id": 656550,
+      "rotation_gate": "🟢 active",
+      "data_2026": {
+        "gs": 5,
+        "ip": 26.1,
+        "ip_per_gs": 5.27,
+        "era": 3.42,
+        "whip": 1.10,
+        "k": 21,
+        "k_9": 7.24,
+        "bb_9": 3.76,
+        "qs": 1,
+        "w": 1,
+        "xera": 3.52,
+        "xwoba_allowed": 0.300,
+        "xwobacon": 0.323,
+        "hh_pct_allowed": 40.0,
+        "barrel_pct_allowed": 5.3,
+        "whiff_pct": 31.1,
+        "gb_pct": 41.7,
+        "bbe": 65,
+        "fb_velo_avg_mph": 94.7
+      },
+      "data_2025_prior": {
+        "ip": 115.0,
+        "era": 3.99,
+        "k_9": 9.63,
+        "bb_9": 3.6,
+        "xera": 3.85,
+        "xwoba_allowed": 0.303,
+        "xwobacon": 0.350,
+        "hh_pct_allowed": 38.5,
+        "whiff_pct": 29.2,
+        "gb_pct": 41.0,
+        "season_context": "Mid-season UCL partial tear ended 2025 in July. Healthy entering 2026."
+      },
+      "v4_sum_breakdown_2026": {
+        "ip_per_gs": 6,
+        "whiff_pct": 10,
+        "bb_9": 3,
+        "gb_pct": 5,
+        "xwobacon": 8
+      },
+      "v4_sum_2026": 32,
+      "urgency_factors": {
+        "factor_1_2026_sum_band": "0 (sum >21, no urgency)",
+        "factor_2_2025_prior_sum": "non-elite but ip ≥50, no flag",
+        "factor_3_21d_delta_xwobacon": "raw not measured 04-22",
+        "factor_4_luck_regression": "xera-era = +0.10 (neutral, no luck flag)"
+      },
+      "tags": [
+        "✅ Whiff% 31.1 — highest among 4 candidates",
+        "✅ xwOBACON .323 P55-60 — on-contact quality stable",
+        "✅ FB velo 94.7 mph — fully healthy",
+        "✅ ERA 3.42 + WHIP 1.10 — ratio stabilizer",
+        "ℹ️ Post-UCL tear, monitoring durability over season"
+      ],
+      "context_notes": [
+        "ATL strong team",
+        "Stage F call: probably P4 (least drop urgency) given all-green signals"
+      ]
+    },
+    {
+      "name": "Joey Cantillo",
+      "team": "CLE",
+      "age": 26,
+      "mlb_id": 676282,
+      "rotation_gate": "🟢 active (boundary swingman, 4 GS / 1 RP outing)",
+      "data_2026": {
+        "gs": 4,
+        "ip": 18.0,
+        "ip_per_gs": 4.50,
+        "era": 4.50,
+        "whip": 1.39,
+        "k": 19,
+        "k_9": 9.50,
+        "bb_9": 3.50,
+        "qs": 0,
+        "w": 1,
+        "xera": 4.10,
+        "xwoba_allowed": 0.318,
+        "xwobacon": 0.364,
+        "hh_pct_allowed": 38.4,
+        "barrel_pct_allowed": 7.2,
+        "whiff_pct": 28.4,
+        "gb_pct": 44.2,
+        "bbe": 35,
+        "fb_velo_avg_mph": 91.5
+      },
+      "data_2025_prior": {
+        "ip": 38.0,
+        "era": 4.74,
+        "k_9": 8.5,
+        "bb_9": 3.9,
+        "xera": 4.55,
+        "xwoba_allowed": 0.325,
+        "xwobacon": 0.371,
+        "hh_pct_allowed": 41.0,
+        "whiff_pct": 27.5,
+        "gb_pct": 43.0,
+        "season_context": "Rookie-year with IL stints. <50 IP — not slump-hold eligible."
+      },
+      "v4_sum_breakdown_2026": {
+        "ip_per_gs": 5,
+        "whiff_pct": 8,
+        "bb_9": 3,
+        "gb_pct": 6,
+        "xwobacon": 5
+      },
+      "v4_sum_2026": 27,
+      "urgency_factors": {
+        "factor_1_2026_sum_band": "0 (sum >21)",
+        "factor_2_2025_prior_sum": "non-elite, prior_ip <50 → no slump hold",
+        "factor_3_21d_delta_xwobacon": "raw not measured",
+        "factor_4_luck_regression": "xera-era = -0.40 (neutral, BBE 35 below 40 gate → suppress luck tag)"
+      },
+      "tags": [
+        "⚠️ 樣本小 — BBE 35 below 40 confidence threshold",
+        "⚠️ Boundary swingman — 4/5 outings as SP, 1 as RP, role not fully locked",
+        "⚠️ IP/GS 4.50 — short outings limit weekly QS/IP ceiling",
+        "ℹ️ K/9 9.50 strong, breakout candidate but small sample"
+      ],
+      "context_notes": [
+        "CLE may use as long relief flexibility — week ceiling unclear",
+        "Drop reversible if role clarifies in either direction"
+      ]
+    }
+  ],
+  "framework_reference_percentiles_2025_sp": {
+    "whiff_pct": {"P25": 21.3, "P50": 24.0, "P70": 26.5, "P80": 27.9, "P90": 30.0},
+    "bb_9": {"P25": 3.47, "P50": 2.95, "P70": 2.38, "P80": 2.18, "P90": 1.96},
+    "gb_pct": {"P25": 38.3, "P50": 43.2, "P70": 46.7, "P80": 51.4, "P90": 54.6},
+    "xwobacon": {"P25": 0.386, "P50": 0.370, "P70": 0.356, "P80": 0.350, "P90": 0.341},
+    "ip_per_gs": {"P25": 5.21, "P50": 5.46, "P70": 5.73, "P80": 5.89, "P90": 6.11}
+  }
+}
