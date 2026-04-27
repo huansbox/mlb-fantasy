@@ -61,6 +61,36 @@ def safe_int(v, default=0):
         return default
 
 
+def _ip_str_to_real(ip_str) -> float:
+    """Convert MLB IP notation (5.1 = 5⅓, 5.2 = 5⅔) to real innings."""
+    v = safe_float(ip_str, 0.0)
+    return int(v) + (v - int(v)) * 10 / 3
+
+
+def _ip_per_gs_gamelog(pid: int, year: int):
+    """IP/GS from per-start game log only (excludes relief outings).
+
+    MLB API season stats's ip_gs is naive (total_ip / gs) which inflates for
+    swingmen who relieve between starts. This walks the game log and only
+    counts splits where gamesStarted=1.
+
+    Returns float or None. None on API failure or no starts; downstream
+    metric_to_score handles None as score 0 (fail-loud, visible in breakdown).
+    """
+    url = f"{MLB_API}/people/{pid}/stats?stats=gameLog&season={year}&group=pitching"
+    try:
+        data = json.loads(fetch_url(url, timeout=20))
+    except Exception:
+        return None
+    splits = (data.get("stats") or [{}])[0].get("splits", []) or []
+    starts = [s for s in splits if int(s.get("stat", {}).get("gamesStarted", 0)) == 1]
+    if not starts:
+        return None
+    total_ip = sum(_ip_str_to_real(s["stat"].get("inningsPitched", "0"))
+                   for s in starts)
+    return round(total_ip / len(starts), 2)
+
+
 # ── Data fetch ──
 
 def fetch_savant_custom(year: int) -> dict:
@@ -162,13 +192,15 @@ def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
                     g = int(stat.get("gamesPlayed", 0))
                     gs = int(stat.get("gamesStarted", 0))
                     ip_str = stat.get("inningsPitched", "0.0")
-                    ip_val = safe_float(ip_str, 0.0)
-                    ip_real = int(ip_val) + (ip_val - int(ip_val)) * 10 / 3
+                    ip_real = _ip_str_to_real(ip_str)
                     bb = safe_int(stat.get("baseOnBalls"), 0)
                     k = safe_int(stat.get("strikeOuts"), 0)
+                    # ip_gs from per-start game log (correct for swingmen);
+                    # falls through to None if API fails or no starts.
+                    ip_gs = _ip_per_gs_gamelog(pid, year) if gs else None
                     out[pid] = {
                         "g": g, "gs": gs, "ip": ip_real, "bb": bb, "k": k,
-                        "ip_gs": ip_real / gs if gs else 0,
+                        "ip_gs": ip_gs,
                         "bb9": 9 * bb / ip_real if ip_real else 0,
                         "k9": 9 * k / ip_real if ip_real else 0,
                         "era": safe_float(stat.get("era")),
