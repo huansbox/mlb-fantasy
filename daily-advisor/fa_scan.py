@@ -1648,12 +1648,20 @@ def _handle_error(step_name, error, env, args):
 
 
 def _publish(today_str, scan_type, advice_telegram, advice_issue, raw_data, env, args):
-    """Publish results: Telegram (compact) + GitHub Issue (full analysis)."""
+    """Publish results: Telegram (compact) + GitHub Issue (full analysis).
+
+    Skip flags:
+    - --no-send: skip Telegram + Issue (print to stdout for dev/CI)
+    - --no-issue: skip Issue only (Telegram still goes; Stage E parallel uses this)
+    """
     if args.no_send:
         print(advice_telegram, flush=True)
         return
 
     send_telegram(advice_telegram, env)
+
+    if getattr(args, "no_issue", False):
+        return
 
     title = f"[FA Scan {scan_type}] {today_str}"
     body = f"""## Analysis
@@ -2525,6 +2533,37 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         _handle_error(f"{label} scan", e, env, args)
 
 
+def _process_group_sp_v4(config, savant_2026, enriched, watch_enriched,
+                         changes, ref_1d, ref_3d, today_str, env, args,
+                         rostered_names=None):
+    """Phase 6 multi-agent v4 SP path. Thin dispatcher to _phase6_sp.process_sp_v4.
+
+    Activated via env flag SP_FRAMEWORK_VERSION=v4. Default v2 path
+    (_process_group("sp", ...)) is unchanged. See docs/v4-cutover-plan.md
+    Stage D and docs/fa_scan-claude-decision-layer-design.md §4.
+    """
+    from _phase6_sp import process_sp_v4
+
+    helpers = {
+        "notify": _notify,
+        "handle_error": _handle_error,
+        "publish": _publish,
+        "update_waiver_log": _update_waiver_log,
+        "prep_my_roster": _prep_my_roster_for_compute,
+        "normalize_fa_for_compute": _normalize_fa_for_compute,
+        "fetch_team_games": _fetch_team_games,
+        "load_savant_rolling": _load_savant_rolling,
+        "fetch_fa_rolling": _fetch_fa_rolling,
+        "ip_per_gs_from_gamelog": _ip_per_gs_from_gamelog,
+    }
+    process_sp_v4(
+        config, savant_2026, enriched, watch_enriched,
+        changes, ref_1d, ref_3d, today_str, env, args,
+        rostered_names=rostered_names,
+        fa_scan_helpers=helpers,
+    )
+
+
 def _run_daily_scan(access_token, config, today_str, env, args):
     """Daily scan: Batter + SP with two-pass Claude architecture."""
     print(f"[FA Scan] Daily scan {today_str}...", file=sys.stderr)
@@ -2630,13 +2669,22 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     errors = []
     error_lock = threading.Lock()
 
+    sp_framework = os.environ.get("SP_FRAMEWORK_VERSION", "v2")
+
     def _run_group_thread(group_type):
         try:
-            _process_group(
-                group_type, config, savant_2026, enriched, watch_enriched,
-                changes, ref_1d, ref_3d, today_str, env, args,
-                rostered_names=rostered_names,
-            )
+            if group_type == "sp" and sp_framework == "v4":
+                _process_group_sp_v4(
+                    config, savant_2026, enriched, watch_enriched,
+                    changes, ref_1d, ref_3d, today_str, env, args,
+                    rostered_names=rostered_names,
+                )
+            else:
+                _process_group(
+                    group_type, config, savant_2026, enriched, watch_enriched,
+                    changes, ref_1d, ref_3d, today_str, env, args,
+                    rostered_names=rostered_names,
+                )
         except Exception as e:
             with error_lock:
                 errors.append((group_type, e))
@@ -2646,8 +2694,9 @@ def _run_daily_scan(access_token, config, today_str, env, args):
             target=_run_group_thread, args=("batter",), name="fa_scan-batter",
         ))
     if not args.batter_only:
+        sp_label = "sp-v4" if sp_framework == "v4" else "sp"
         threads.append(threading.Thread(
-            target=_run_group_thread, args=("sp",), name="fa_scan-sp",
+            target=_run_group_thread, args=("sp",), name=f"fa_scan-{sp_label}",
         ))
 
     for t in threads:
@@ -2669,6 +2718,10 @@ def main():
     parser.add_argument("--cleanup", action="store_true", help="Clean rostered watchlist players")
     parser.add_argument("--dry-run", action="store_true", help="Layer 1+2 only, skip Claude")
     parser.add_argument("--no-send", action="store_true", help="Skip Telegram + GitHub Issue")
+    parser.add_argument("--no-issue", action="store_true",
+                        help="Skip GitHub Issue creation only (Telegram still sends; for Stage E parallel)")
+    parser.add_argument("--no-waiver-log", action="store_true",
+                        help="Skip waiver-log.md updates (for Stage E parallel)")
     parser.add_argument("--sp-only", action="store_true", help="Skip batter group (SP smoke test)")
     parser.add_argument("--batter-only", action="store_true", help="Skip SP group")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
