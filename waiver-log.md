@@ -337,17 +337,6 @@
 - 04-26：✅ BBE加速距觸發60約3-4場, >P90穩定, %owned 7% 3日+4升幅加速窗口收窄（fa_scan）
 - 04-27：✅ BBE加速距觸發60約3-4場, >P90穩定, %owned 7% 3日+4升幅加速窗口收窄（fa_scan）
 
-### Carlos Correa (HOU, 3B,SS) [mlb_id:621043] — 觀察中
-觸發：立即行動
-- 04-19：xwOBA .361(>P90)/BB% 12.2(>P90)/Barrel% 10.3(P70) BBE 58 高信心，2025 雙年確認（.338/425 BBE）。63% owned drop 失誤，3/3 勝 Albies（fa_scan）
-- 04-20：觸發第 2 天。BBE 59 高信心 > Muncy 42 > Alvarez 44，雙年確認+信心水準最高，優先序 #1。0% owned 安全（fa_scan）
-- 04-21：觸發第3天。14d Δ-0.040弱下滑但季線.360>P90 BBE 63全場最高信心壓倒。建議 FAAB $1 立即取代 Albies，Muncy $3-5 fallback（fa_scan）
-- 04-22：觸發第3天。14d Δ-0.033持平邊緣但季線.363>P90 BBE 66全場最高信心。建議 FAAB $1 + Muncy $3-5 同時提交。0% owned（fa_scan）
-- 04-23：觸發第4天BBE 69全場最高信心, 14d Δ-0.033持平, 季線.362>P90。⚠️已推薦4天未執行, 建議FAAB $1立即提交（fa_scan）
-- 04-24：觸發第5天BBE 72全場最高信心, 14d Δ-0.032持平, 季線.357>P90。⚠️已推薦5天未執行, 建議FAAB $1立即提交（fa_scan）
-- 04-25：⚠️ 已推薦 5 天未執行 — 推測原因：FAAB 考量 / 等 Ramos 優先。BBE 72 全場最高信心 + BB% 11.54 >P90，建議 FAAB $1 與 Ramos 同批提交（fa_scan）
-- 04-26：⚠️已推薦5天未執行。BBE 74全場最高信心+BB% 12.04>P90契合策略, 14d Δ-0.047弱下滑但季線.348>P90。建議FAAB $1與Ramos同批（fa_scan）
-
 ### Max Muncy (ATH, 2B,3B,SS) [mlb_id:691777] — 觀察中
 觸發：立即行動
 - 04-20：xwOBA .406(>P90)/BB% 10.0(P70)/Barrel% 19.0(>P90) BBE 42，2025 雙年全確認(.374/.165/.136)。51% owned 窗口有限，Correa 備案（fa_scan）
@@ -600,6 +589,9 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Carlos Correa (HOU, 3B,SS) — 被搶（自動偵測）
+- 2026-04-27：Yahoo ownership_type=team，從觀察中移除。
 
 ### Jesse Scholtens (TB, SP,RP) — 被搶（自動偵測）
 - 2026-04-26：Yahoo ownership_type=team，從觀察中移除。
