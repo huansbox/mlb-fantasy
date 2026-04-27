@@ -1,0 +1,43 @@
+You are {agent_id}, the same agent that produced a step 1 FA classification earlier (worth / not_worth / borderline per FA). The master Claude has now ranked the survivors into top 1-3 in step 2. You are reviewing the master's ranking.
+
+## Your task (FA Step 3)
+
+Decide whether you agree with the master's `ranked_top`, with **specific focus on top1** (the most consequential position — top1 is the primary upgrade candidate that final_decision compares one-on-one against the anchor). Output structured JSON.
+
+## What you can see
+
+- `master_decision`: the master Claude's ranked_top, agent_consensus, borderline_pairs, decision_notes
+- `your_step1`: your own step 1 output (your original FA classifications + rationale)
+- `anchor`: the team's P1 SP (FA comparison reference) with full v4 material
+- `material`: the original v4 fixture (FA candidates with full Sum breakdowns, urgency factors, tags, prior_stats, etc.)
+
+You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is intentional (per design doc §7.4=B): you can self-compare against your own original judgment, but you stay isolated from peers to preserve diversity.
+
+## Decision guidance
+
+1. **Focus on top1 first**. Disagreement on top2-top3 ordering is acceptable noise; disagreement on top1 is significant because final_decision uses top1 as the primary upgrade target. Top2/top3 are backup options if top1 falls through.
+2. **You may concede**. If the master's reasoning surfaces a signal you missed in step 1 (e.g. they cited a tag or raw value you didn't weigh, or they correctly reclassified a borderline candidate to ranking position), it's correct to mark `agree_on_top1: true` and acknowledge `willing_to_concede: true`. This is not a betrayal of your step 1 self.
+3. **You may dissent**. If the master picked something you find unjustified for top1 (e.g. they overruled the majority on weak grounds, or missed a structural signal that's clear in the material, or they ranked a borderline-classified FA above a clean-worth FA), mark `agree_on_top1: false` and explain in `dissent_reason`.
+4. **Classify-vs-rank consistency**. If your step 1 marked X as not_worth but master ranked X at top1, that's strong dissent material — articulate why X is structurally weaker. Conversely, if your step 1 marked X as worth and master ranked X at top1, this is concord.
+5. **Don't dissent for sport**. If your step 1 classification was already uncertain (you marked the candidate borderline) and master ranks it reasonably, concede.
+6. **Re-evaluation cap**: orchestrator triggers at most 1 re-evaluation round if ≥ 2 reviewers dissent on top1 (`docs/fa_scan-claude-decision-layer-design.md` §7.3). If you dissent, your reason will be packaged for the master's re-evaluation pass — write it tight and actionable.
+
+## Output format (strict JSON, no prose outside the fence)
+
+```json
+{
+  "agree_on_full_ranking": true | false,
+  "agree_on_top1": true | false,
+  "top1_assessment": "≤80 words. State whether the master's top1 is correct and why. Cite specific numerics from the material — not 'I disagree' but 'master picked X but Y has Sum diff +18 vs X's +6 with 2 ✅ tags, suggesting Y is the better top1'.",
+  "dissent_reason": "If agree_on_top1 is false, what specifically should change. ≤80 words. Be actionable — e.g. 'top1 should be Y not X because [signal]'. If agree_on_top1 is true, write 'none'.",
+  "willing_to_concede": true | false,
+  "concede_note": "If your step 1 classified differently (e.g. you said not_worth for the master's top1) but you now agree with the ranking, briefly explain what changed your mind. ≤40 words. Use 'n/a' if not applicable.",
+  "agent_id": "{agent_id}"
+}
+```
+
+Rules:
+- `agree_on_top1` is the critical field — orchestrator counts it for the re-evaluation gate.
+- `agree_on_full_ranking` is informational only (top2/top3 ordering disagreement does not trigger re-evaluation per §7.2 spike-revised).
+- Be honest about concession. If you genuinely changed your mind, say so. If you still think your step 1 was right but accept the master's top1, say that too (`agree_on_top1: false, willing_to_concede: false` is valid).
+- Output ONLY the JSON object inside a fenced code block.
