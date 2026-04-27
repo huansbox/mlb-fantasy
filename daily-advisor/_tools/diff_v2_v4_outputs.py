@@ -36,7 +36,7 @@ from datetime import datetime, timezone, timedelta
 TPE = timezone(timedelta(hours=8))
 
 VPS_HOST = "root@107.175.30.172"
-VPS_LOG_PATH = "/var/log/fa_scan_v4.log"
+VPS_LOG_PATH = "/var/log/fa-scan-v4.log"
 GH_REPO = "huansbox/mlb-fantasy"
 
 
@@ -51,7 +51,7 @@ def fetch_v2_issue_body(date: str) -> str | None:
              "--search", f"[FA Scan SP] {date} in:title",
              "--state", "all", "--limit", "5",
              "--json", "number,title"],
-            capture_output=True, text=True, timeout=30, check=True,
+            capture_output=True, text=True, encoding="utf-8", timeout=30, check=True,
         )
     except subprocess.CalledProcessError as e:
         print(f"[v2] gh issue list failed: {e.stderr.strip()}", file=sys.stderr)
@@ -72,7 +72,7 @@ def fetch_v2_issue_body(date: str) -> str | None:
         body_result = subprocess.run(
             ["gh", "issue", "view", str(issue_num), "--repo", GH_REPO,
              "--json", "body"],
-            capture_output=True, text=True, timeout=30, check=True,
+            capture_output=True, text=True, encoding="utf-8", timeout=30, check=True,
         )
     except subprocess.CalledProcessError as e:
         print(f"[v2] gh issue view failed: {e.stderr.strip()}", file=sys.stderr)
@@ -102,7 +102,7 @@ def fetch_v4_log_text(log_arg: str) -> str | None:
         try:
             result = subprocess.run(
                 ["ssh", VPS_HOST, f"cat {VPS_LOG_PATH}"],
-                capture_output=True, text=True, timeout=30, check=True,
+                capture_output=True, text=True, encoding="utf-8", timeout=30, check=True,
             )
             return result.stdout
         except subprocess.CalledProcessError as e:
