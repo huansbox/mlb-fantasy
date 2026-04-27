@@ -2527,7 +2527,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         )
         _publish(today_str, label, advice_display, advice_issue, full_raw, env, args)
 
-        _update_waiver_log(advice, today_str, env)
+        if not getattr(args, "no_waiver_log", False):
+            _update_waiver_log(advice, today_str, env)
 
     except Exception as e:
         _handle_error(f"{label} scan", e, env, args)
