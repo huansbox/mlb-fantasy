@@ -9,6 +9,7 @@ from fa_compute import (
     compute_urgency,
     metric_to_score,
     pick_weakest,
+    value_to_pctile,
 )
 
 
@@ -43,6 +44,41 @@ class TestMetricToScoreBatter:
 
     def test_none_returns_zero(self):
         assert metric_to_score(None, "xwoba", "batter") == 0
+
+
+class TestValueToPctileBatter:
+    """Reverse-lookup percentile rank used by docs/batter-framework-upgrade-design.md §3.7."""
+
+    @pytest.mark.parametrize(
+        "xwoba,expected",
+        [
+            (0.200, 0),    # well below P25 → 0
+            (0.260, 0),
+            (0.261, 25),   # exactly P25
+            (0.285, 25),
+            (0.286, 40),
+            (0.297, 50),
+            (0.321, 70),
+            (0.331, 80),
+            (0.349, 95),   # P90 collapses to 95
+            (0.400, 95),   # above-elite still 95
+        ],
+    )
+    def test_xwoba_pctile(self, xwoba, expected):
+        assert value_to_pctile(xwoba, "xwoba", "batter") == expected
+
+    def test_none_returns_none(self):
+        assert value_to_pctile(None, "xwoba", "batter") is None
+
+    def test_unknown_metric_returns_none(self):
+        assert value_to_pctile(0.300, "nonexistent", "batter") is None
+
+    def test_sp_reverse_direction(self):
+        # SP xERA: lower is better → reverse comparison.
+        # P50 = 4.33 (per CLAUDE.md), P90 = 2.98.
+        assert value_to_pctile(2.50, "xera", "sp") == 95   # better than P90
+        assert value_to_pctile(4.33, "xera", "sp") == 50   # exactly P50
+        assert value_to_pctile(7.00, "xera", "sp") == 0    # well above (worse than) P25
 
 
 # 2025 SP xERA percentile thresholds (reverse direction: lower = better):
@@ -223,10 +259,18 @@ def _mk_sp(name, xera, xwoba, hh_pct, bbe=60, **kwargs):
 
 
 class TestPickWeakestBatter:
-    def test_picks_bottom_4_by_sum(self):
+    """Batter v4 thin (raw + multi-agent free reasoning) behavior.
+
+    Hard rules: cant_cut excluded / BBE<40 → low_confidence_excluded /
+    Sum ≥25 → strong, drop candidate excluded. n is ignored for batter —
+    return all surviving Sum<25 entries sorted asc.
+    See docs/batter-framework-upgrade-design.md §3.1.
+    """
+
+    def test_picks_all_below_sum_25(self):
         players = [
-            _mk_batter("Elite1", 0.380, 13.0, 15.0),    # Sum 30
-            _mk_batter("Strong", 0.320, 10.0, 11.0),    # Sum 7+9+8=24
+            _mk_batter("Elite1", 0.380, 13.0, 15.0),    # Sum 30 (≥25 → exclude)
+            _mk_batter("Strong", 0.320, 10.0, 11.0),    # Sum 7+9+8=24 (<25 → keep)
             _mk_batter("Avg1", 0.300, 8.0, 8.0),        # Sum 6+6+6=18
             _mk_batter("Avg2", 0.295, 7.5, 7.5),        # Sum 5+5+5=15
             _mk_batter("Weak1", 0.280, 6.5, 6.0),       # Sum 3+3+3=9
@@ -235,30 +279,48 @@ class TestPickWeakestBatter:
         ]
         weakest, excluded = pick_weakest(players, "batter", n=4)
         names = [w["name"] for w in weakest]
-        # Sum asc: Weak3(3), Weak2(7), Weak1(9), Avg2(15)
-        assert names == ["Weak3", "Weak2", "Weak1", "Avg2"]
-        assert excluded == []  # batter has no BBE filter
+        # All Sum<25, sorted asc; Elite1 (Sum 30) hard-floor excluded.
+        assert names == ["Weak3", "Weak2", "Weak1", "Avg2", "Avg1", "Strong"]
+        assert excluded == []  # all have BBE ≥40 default
 
-    def test_batter_low_bbe_still_included(self):
-        # Batter: BBE<40 marked low_confidence but stays in rank (per CLAUDE.md).
-        # fa_compute attaches confidence label; pick_weakest does not exclude.
+    def test_batter_low_bbe_excluded(self):
+        # Batter v4 thin: BBE<40 → low_confidence_excluded (not in pool).
         players = [
-            _mk_batter("Weak1", 0.280, 6.0, 5.0, bbe=20),   # Sum ~7, BBE<40
-            _mk_batter("Weak2", 0.270, 5.0, 4.0, bbe=60),   # Sum ~3
-            _mk_batter("Avg1", 0.310, 9.0, 10.0, bbe=80),   # Sum ~21
+            _mk_batter("LowBbe", 0.280, 6.0, 5.0, bbe=20),  # Sum low but BBE<40 → excluded
+            _mk_batter("Weak2", 0.270, 5.0, 4.0, bbe=60),
+            _mk_batter("Avg1", 0.310, 9.0, 10.0, bbe=80),
         ]
         weakest, excluded = pick_weakest(players, "batter", n=4)
-        # All included, but Weak1 should have confidence='低'
-        assert len(weakest) == 3
-        assert len(excluded) == 0
-        weak1 = next(w for w in weakest if w["name"] == "Weak1")
-        assert weak1["confidence"] == "低"
+        names = [w["name"] for w in weakest]
+        assert "LowBbe" not in names
+        assert any(e["name"] == "LowBbe" for e in excluded)
+        assert excluded[0]["bbe"] == 20
+
+    def test_batter_sum_floor_25_excluded(self):
+        # Sum ≥25 → strong, not a drop candidate.
+        players = [
+            _mk_batter("Mvp", 0.380, 13.0, 15.0),     # Sum 30 ≥25 → exclude
+            _mk_batter("Strong", 0.350, 12.0, 14.0),  # ≈ Sum 30 ≥25 → exclude
+            _mk_batter("Weak", 0.270, 5.0, 4.5),      # Sum ~3 → keep
+        ]
+        weakest, _ = pick_weakest(players, "batter", n=4)
+        names = [w["name"] for w in weakest]
+        assert names == ["Weak"]
+
+    def test_no_n_cap(self):
+        # 5 batters all Sum<25, all surviving (no n=4 cap).
+        players = [
+            _mk_batter(f"P{i}", 0.260 + i * 0.005, 5.0, 5.0)
+            for i in range(5)
+        ]
+        weakest, _ = pick_weakest(players, "batter", n=4)
+        assert len(weakest) == 5
 
     def test_cant_cut_excluded(self):
         players = [
-            _mk_batter("Skubal", 0.220, 4.0, 3.0),   # Worst Sum but cant_cut
-            _mk_batter("Jazz", 0.230, 4.5, 3.5),     # 2nd worst but cant_cut
-            _mk_batter("Good", 0.320, 10.0, 11.0),
+            _mk_batter("Skubal", 0.220, 4.0, 3.0),
+            _mk_batter("Jazz", 0.230, 4.5, 3.5),
+            _mk_batter("Good", 0.320, 10.0, 11.0),  # Sum 7+9+8=24 (<25 → keep)
             _mk_batter("Weak", 0.270, 5.5, 5.0),
         ]
         weakest, _ = pick_weakest(
@@ -271,7 +333,7 @@ class TestPickWeakestBatter:
         assert names[0] == "Weak"
 
     def test_breakdown_in_output(self):
-        players = [_mk_batter("P", 0.290, 7.0, 7.0)]
+        players = [_mk_batter("P", 0.290, 7.0, 7.0)]  # Sum 5+5+5=15 (<25)
         weakest, _ = pick_weakest(players, "batter", n=4)
         assert weakest[0]["score"] > 0
         assert "xwOBA" in weakest[0]["breakdown"]
@@ -539,65 +601,44 @@ class TestUrgencySp:
 
 
 class TestUrgencyBatter:
-    def test_batter_no_ip_gate(self):
-        # Batter: Slump hold only requires 2025 Sum ≥24 (no IP gate).
-        p = _mk_weakest_batter(
-            "Buxton",
-            sum_2026=5,
-            prior_stats={"xwoba": 0.350, "bb_pct": 7.6, "barrel_pct": 17.6},
-            # Sum = 10+6+10 = 26 (xwoba .349 P90=10, bb 7.4-7.8 P45-50=5... wait)
-            # xwoba .350>.349 = >P90 = 10
-            # bb_pct 7.6 between P45=7.4 and P50=7.8 → P45-50 = 5
-            # barrel 17.6 > 14.0 = >P90 = 10
-            # Sum = 25 ≥24 → slump hold
-        )
-        res = compute_urgency([p], "batter")
-        assert len(res["slump_hold"]) == 1
-        assert res["slump_hold"][0]["prior_sum"] == 25
+    """Batter v4 thin: compute_urgency is passthrough — no factors, no ranking,
+    no Slump hold detection (handled by cant_cut list).
+    See docs/batter-framework-upgrade-design.md §1.2 + §1.3.
+    """
 
-    def test_batter_pa_per_tg_buckets(self):
-        prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}  # weak prior
-        for pa_tg, expected in [(4.0, 2), (3.5, 2), (3.2, 1), (2.8, 0), (1.0, 0)]:
-            p = _mk_weakest_batter("P", 10, prior, None, pa_per_tg=pa_tg)
-            res = compute_urgency([p], "batter")
-            assert res["weakest_ranked"][0]["factors"]["pa_per_tg"] == expected
-
-    def test_batter_rolling_bbe_gate(self):
-        # Batter: 14d BBE <25 → rolling factor = 0
+    def test_batter_passthrough_no_factors(self):
         prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}
-        p = _mk_weakest_batter(
-            "P", 10, prior,
-            {"xwoba": 0.400, "bbe": 20},  # BBE <25
-            pa_per_tg=3.5,
-        )
+        p = _mk_weakest_batter("P", 10, prior, None, pa_per_tg=3.5)
         res = compute_urgency([p], "batter")
-        assert res["weakest_ranked"][0]["factors"]["rolling"] == 0
+        entry = res["weakest_ranked"][0]
+        assert entry["urgency"] is None
+        assert entry["factors"] == {}
+        assert res["slump_hold"] == []
 
-    def test_batter_rolling_direction(self):
-        # Batter: 14d 🔥 = RISING Δ (opposite to SP where ❄️ = decay rising).
-        # Batter: Δ positive = hot (rising) → negative urgency (subtract)
-        # Per CLAUDE.md batter table:
-        #   ≥ +0.050 🔥強回升 = -2
-        #   +0.035 ≤ Δ < +0.050 = -1
-        #   持平 = 0
-        #   -0.050 < Δ ≤ -0.035 = +1
-        #   ≤ -0.050 = +2
-        prior = {"xwoba": 0.280, "bb_pct": 6.0, "barrel_pct": 5.0}
-        # season xwoba default 0.310 (_mk_weakest_batter)
-        cases = [
-            (0.365, -2),  # Δ = +.055 強回升
-            (0.347, -1),  # Δ = +.037 弱回升
-            (0.310, 0),   # Δ = 0 持平
-            (0.273, 1),   # Δ = -.037 弱下滑
-            (0.255, 2),   # Δ = -.055 強下滑
-        ]
-        for r_xwoba, expected in cases:
-            p = _mk_weakest_batter("P", 10, prior,
-                                    {"xwoba": r_xwoba, "bbe": 30},
-                                    pa_per_tg=3.0)
-            res = compute_urgency([p], "batter")
-            got = res["weakest_ranked"][0]["factors"]["rolling"]
-            assert got == expected, f"Δ xwoba {r_xwoba}: expected {expected}, got {got}"
+    def test_batter_no_slump_hold_detection(self):
+        # Even with elite prior (Sum ≥24), batter compute_urgency does NOT
+        # split into slump_hold — that's now handled by cant_cut list.
+        elite_prior = {"xwoba": 0.380, "bb_pct": 13.0, "barrel_pct": 16.0}
+        p = _mk_weakest_batter("Slumper", sum_2026=5, prior_stats=elite_prior)
+        res = compute_urgency([p], "batter")
+        assert res["slump_hold"] == []
+        assert len(res["weakest_ranked"]) == 1
+
+    def test_batter_prior_sum_preserved(self):
+        # prior_sum is still computed (informational, useful for report layer).
+        prior = {"xwoba": 0.380, "bb_pct": 13.0, "barrel_pct": 16.0}  # ~elite
+        p = _mk_weakest_batter("P", 10, prior)
+        res = compute_urgency([p], "batter")
+        assert res["weakest_ranked"][0]["prior_sum"] >= 24  # elite prior
+
+    def test_batter_order_preserved_from_pick_weakest(self):
+        # passthrough preserves input order (pick_weakest already sorted asc).
+        p1 = _mk_weakest_batter("First", sum_2026=3)
+        p2 = _mk_weakest_batter("Second", sum_2026=8)
+        p3 = _mk_weakest_batter("Third", sum_2026=15)
+        res = compute_urgency([p1, p2, p3], "batter")
+        names = [e["name"] for e in res["weakest_ranked"]]
+        assert names == ["First", "Second", "Third"]
 
 
 # ── Phase 5.4: compute_fa_tags ──
@@ -888,6 +929,12 @@ class TestFaTagsSp:
 
 
 class TestFaTagsBatter:
+    """Batter v4 thin: only PA-based ✅ 球隊主力 + ⚠️ 上場有限 retained.
+    Other batter tags (✅ 雙年菁英 / ✅ 近況確認 / ⚠️ Breakout 待驗 / ⚠️ 近況下滑 /
+    ⚠️ 樣本小) removed — multi-agent layer handles those signals from raw data.
+    See docs/batter-framework-upgrade-design.md §7.1.
+    """
+
     def _anchor_weak_batter(self):
         return {
             "name": "Tovar",
@@ -896,8 +943,8 @@ class TestFaTagsBatter:
             "savant_2026": {"xwoba": 0.320, "bb_pct": 5.0, "barrel_pct": 9.0, "bbe": 50},
         }
 
-    def test_batter_instant_replace(self):
-        # ≥2 ✅ + 0 ⚠️ → 立即取代
+    def test_batter_replace_only_pa_gate(self):
+        # 1 ✅ 球隊主力 + 0 ⚠️ → 取代 (was 立即取代 with old multi-tag set)
         anchor = self._anchor_weak_batter()
         fa = {
             "name": "Grisham",
@@ -911,11 +958,13 @@ class TestFaTagsBatter:
         fa["breakdown"] = r[1]
 
         result = compute_fa_tags(fa, anchor, "batter")
-        # prior Sum xwoba .370 >P90=10, bb 14.1 >P90=10, barrel 14.2 >P90=10 → 30 ≥24 → 雙年菁英
-        assert "✅ 雙年菁英" in result["add_tags"]
-        assert "✅ 球隊主力" in result["add_tags"]  # PA/TG 3.6 ≥3.5
+        assert "✅ 球隊主力" in result["add_tags"]
+        # Removed: 雙年菁英 / 近況確認
+        assert "✅ 雙年菁英" not in result["add_tags"]
+        assert "✅ 近況確認" not in result["add_tags"]
         assert len(result["warn_tags"]) == 0
-        assert result["decision"] == "立即取代"
+        # Only 1 ✅ → 取代 (per _decision_from_tags: ≥2 ✅ AND 0 ⚠️ → 立即取代)
+        assert result["decision"] == "取代"
 
     def test_batter_observe_low_pa(self):
         # ⚠️ 上場有限 (強) → 觀察
@@ -934,6 +983,26 @@ class TestFaTagsBatter:
         result = compute_fa_tags(fa, anchor, "batter")
         assert "⚠️ 上場有限" in result["warn_tags"]
         assert result["decision"] == "觀察"
+
+    def test_batter_no_legacy_warn_tags(self):
+        # Removed warns must not fire even when their old preconditions hold.
+        anchor = self._anchor_weak_batter()
+        fa = {
+            "name": "WeakPrior",
+            "savant_2026": {"xwoba": 0.360, "bb_pct": 12.0, "barrel_pct": 14.0, "bbe": 25},  # BBE<30
+            "prior_stats": {"xwoba": 0.250, "bb_pct": 4.0, "barrel_pct": 3.0},  # prior Sum <18
+            "rolling_14d": {"xwoba": 0.300, "bbe": 30},  # Δ ≤ -0.035 (down)
+            "derived": {"pa_per_tg": 3.5},
+        }
+        r = compute_sum_score(fa["savant_2026"], "batter")
+        fa["score"] = r[0]
+        fa["breakdown"] = r[1]
+
+        result = compute_fa_tags(fa, anchor, "batter")
+        # All these warns must be gone — agent layer handles via raw context.
+        assert "⚠️ 樣本小" not in result["warn_tags"]
+        assert "⚠️ Breakout 待驗" not in result["warn_tags"]
+        assert "⚠️ 近況下滑" not in result["warn_tags"]
 
 
 class Test2026SumBuckets:

@@ -1524,6 +1524,262 @@ def _fetch_fa_rolling(fa_candidates, watch_candidates, today_str, player_type="b
     return {str(pid): metrics for pid, metrics in data.items()}
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Batter v4 thin enrich helpers (docs/batter-framework-upgrade-design.md §3.2-§3.4)
+#
+# Wired up by Phase 6 batter multi-agent layer; ship now so the schema-producing
+# code is reviewable + unit-testable ahead of orchestrator work. Transitional
+# single-LLM path (Step 3) builds its own string from existing 14d / fa_history
+# sources and does not call enrich_for_multi_agent_batter directly.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def enrich_14d_trad(player_id: int, season: int = 2026,
+                    window_days: int = 14) -> dict | None:
+    """Last-N-game traditional batter stats from MLB Stats API gameLog.
+
+    Returns aggregate counting + rate stats over the most recent `window_days`
+    of game appearances (game-count window, not calendar window — the raw
+    gameLog already filters out off-days).
+
+    Args:
+        player_id: MLB player ID.
+        season: 4-digit season year (default current 2026).
+        window_days: how many trailing games to aggregate (default 14).
+
+    Returns:
+        dict with {ops, avg, obp, slg, hr, rbi, r, sb, bb, k, k_pct,
+                   pa, ab, bbe} or None if API fails / no games.
+        BBE approximated as AB - K (ignores SF, HBP — within ±1-2 BBE).
+    """
+    try:
+        data = mlb_api_get(
+            f"/people/{player_id}/stats?stats=gameLog&season={season}&group=hitting"
+        )
+    except Exception as e:
+        print(f"  enrich_14d_trad: API failed for {player_id}: {e}", file=sys.stderr)
+        return None
+    splits = (data.get("stats") or [{}])[0].get("splits", [])
+    if not splits:
+        return None
+    recent = splits[-window_days:]
+
+    pa = ab = h = bb = k = hr = rbi = r = sb = doubles = triples = hbp = sf = 0
+    for s in recent:
+        st = s.get("stat", {}) or {}
+        pa += int(st.get("plateAppearances", 0) or 0)
+        ab += int(st.get("atBats", 0) or 0)
+        h += int(st.get("hits", 0) or 0)
+        bb += int(st.get("baseOnBalls", 0) or 0)
+        k += int(st.get("strikeOuts", 0) or 0)
+        hr += int(st.get("homeRuns", 0) or 0)
+        rbi += int(st.get("rbi", 0) or 0)
+        r += int(st.get("runs", 0) or 0)
+        sb += int(st.get("stolenBases", 0) or 0)
+        doubles += int(st.get("doubles", 0) or 0)
+        triples += int(st.get("triples", 0) or 0)
+        hbp += int(st.get("hitByPitch", 0) or 0)
+        sf += int(st.get("sacFlies", 0) or 0)
+
+    if pa == 0:
+        return None
+
+    avg = h / ab if ab else 0.0
+    obp_denom = ab + bb + hbp + sf
+    obp = (h + bb + hbp) / obp_denom if obp_denom else 0.0
+    tb = h + doubles + 2 * triples + 3 * hr  # singles + 2B + 3B + HR weighted
+    slg = tb / ab if ab else 0.0
+    bbe = max(ab - k, 0)
+    k_pct = (k / pa * 100) if pa else 0.0
+
+    return {
+        "ops": round(obp + slg, 3),
+        "avg": round(avg, 3),
+        "obp": round(obp, 3),
+        "slg": round(slg, 3),
+        "hr": hr,
+        "rbi": rbi,
+        "r": r,
+        "sb": sb,
+        "bb": bb,
+        "k": k,
+        "k_pct": round(k_pct, 1),
+        "pa": pa,
+        "ab": ab,
+        "bbe": bbe,
+    }
+
+
+def enrich_owned_trend(player_name: str, fa_history: dict,
+                       today_str: str) -> dict | None:
+    """Per-player %owned trend from fa_history.
+
+    Computes 3-day and 7-day deltas + a heuristic ``shape`` label.
+
+    shape ∈ {"explosive", "rising", "plateau", "dropping"}
+        explosive — 3d Δ ≥ +10pp
+        rising    — 3d Δ in [+3, +10) pp
+        dropping  — 3d Δ ≤ -3pp
+        plateau   — otherwise
+
+    Args:
+        player_name: name as stored in fa_history snapshot (case-sensitive).
+        fa_history: dict from load_fa_history() — {date_str: {name: {pct, ...}}}
+        today_str: today's snapshot date in YYYY-MM-DD.
+
+    Returns:
+        {current_pct, delta_3d, delta_7d, shape} or None if today snapshot
+        missing the player.
+    """
+    today_data = fa_history.get(today_str, {})
+    today_entry = today_data.get(player_name)
+    if not today_entry:
+        return None
+    current_pct = today_entry.get("pct")
+    if current_pct is None:
+        return None
+
+    sorted_dates = sorted(d for d in fa_history.keys() if d <= today_str)
+
+    def _ref_pct(days_back: int):
+        target = datetime.strptime(today_str, "%Y-%m-%d")
+        for d in reversed(sorted_dates):
+            if d == today_str:
+                continue
+            diff = (target - datetime.strptime(d, "%Y-%m-%d")).days
+            if diff >= days_back:
+                snap = fa_history.get(d, {}).get(player_name)
+                if snap:
+                    return snap.get("pct")
+                return None
+        return None
+
+    ref_3d = _ref_pct(3)
+    ref_7d = _ref_pct(7)
+    delta_3d = (current_pct - ref_3d) if ref_3d is not None else None
+    delta_7d = (current_pct - ref_7d) if ref_7d is not None else None
+
+    shape = "plateau"
+    if delta_3d is not None:
+        if delta_3d >= 10:
+            shape = "explosive"
+        elif delta_3d >= 3:
+            shape = "rising"
+        elif delta_3d <= -3:
+            shape = "dropping"
+
+    return {
+        "current_pct": current_pct,
+        "delta_3d": delta_3d,
+        "delta_7d": delta_7d,
+        "shape": shape,
+    }
+
+
+def enrich_for_multi_agent_batter(weakest_pool: list[dict],
+                                   fa_pool: list[dict],
+                                   savant_rolling_14d: dict,
+                                   fa_history: dict,
+                                   today_str: str) -> dict:
+    """Assemble §3.2 (anchor) + §3.4 (FA) raw + percentile schemas.
+
+    Args:
+        weakest_pool: from fa_compute.pick_weakest (batter) — entries already
+            have score / breakdown / savant_2026 / prior_stats / derived.
+        fa_pool: FA candidates surviving Sum<21 filter — same shape.
+        savant_rolling_14d: from _load_savant_rolling("batter") — keyed by
+            mlb_id str.
+        fa_history: from load_fa_history() — for FA %owned trend.
+        today_str: YYYY-MM-DD.
+
+    Returns:
+        {
+            "anchors": [<schema dict per §3.2>, ...],
+            "fa": [<schema dict per §3.4>, ...]
+        }
+
+    Schema explicitly excludes: score / sum / breakdown / urgency / factors /
+    add_tags / warn_tags / positions / status — agent reasons from raw +
+    percentile only (per docs/batter-framework-upgrade-design.md §3.2/§3.4).
+    """
+    return {
+        "anchors": [_player_to_v4_schema(p, savant_rolling_14d) for p in weakest_pool],
+        "fa": [_player_to_v4_schema_with_owned(p, savant_rolling_14d,
+                                                fa_history, today_str)
+               for p in fa_pool],
+    }
+
+
+def _player_to_v4_schema(p: dict, savant_rolling_14d: dict) -> dict:
+    """Build §3.2 anchor schema (no owned block)."""
+    sv = p.get("savant_2026") or {}
+    prior = p.get("prior_stats") or {}
+    derived = p.get("derived") or p.get("derived_2026") or {}
+    rolling = savant_rolling_14d.get(str(p.get("mlb_id", ""))) or {}
+
+    season_block = _value_pctile_block(sv, "batter", extras={
+        "pa": int((p.get("mlb_2026") or {}).get("plateAppearances", 0) or 0),
+        "bbe": int(sv.get("bbe", 0) or 0),
+        "pa_per_tg": derived.get("pa_per_tg"),
+    })
+
+    rolling_block = None
+    if rolling:
+        # Use season-pctile table as approximation for 14d (see §3.7 docstring).
+        rolling_block = {
+            "ops": rolling.get("ops"),  # may be None — Savant rolling lacks OPS
+            "xwoba": _val_pct(rolling.get("xwoba"), "xwoba", "batter"),
+            "barrel_pct": _val_pct(rolling.get("barrel_pct"), "barrel_pct", "batter"),
+            "hh_pct": _val_pct(rolling.get("hh_pct"), "hh_pct", "batter"),
+            "bbe": int(rolling.get("bbe", 0) or 0),
+            "pa": int(rolling.get("pa", 0) or 0),
+        }
+
+    prior_block = None
+    if prior:
+        prior_block = _value_pctile_block(prior, "batter", extras={
+            "pa": int(prior.get("pa", 0) or 0),
+        })
+
+    return {
+        "name": p.get("name"),
+        "team": p.get("team", ""),
+        "season_2026": season_block,
+        "rolling_14d": rolling_block,
+        "prior_2025": prior_block,
+    }
+
+
+def _player_to_v4_schema_with_owned(p: dict, savant_rolling_14d: dict,
+                                     fa_history: dict, today_str: str) -> dict:
+    """Build §3.4 FA schema (anchor schema + owned block)."""
+    schema = _player_to_v4_schema(p, savant_rolling_14d)
+    owned = enrich_owned_trend(p.get("name", ""), fa_history, today_str)
+    if owned:
+        schema["owned"] = owned
+    return schema
+
+
+def _val_pct(value, metric: str, player_type: str):
+    """Tiny wrapper: {"value": v, "pctile": pct} or None."""
+    if value is None:
+        return None
+    return {"value": value, "pctile": fa_compute.value_to_pctile(value, metric, player_type)}
+
+
+def _value_pctile_block(metrics: dict, player_type: str, extras: dict = None) -> dict:
+    """Build {"xwoba": {value, pctile}, ...} for batter season/prior blocks."""
+    block = {}
+    for metric in ("xwoba", "bb_pct", "barrel_pct", "hh_pct", "k_pct"):
+        v = metrics.get(metric)
+        if v is not None:
+            block[metric] = _val_pct(v, metric, player_type)
+    if extras:
+        for k, v in extras.items():
+            if v is not None:
+                block[k] = v
+    return block
+
+
 def build_weekly_data(today_str, enriched, changes, ref_1d, ref_3d,
                       roster_summary, config):
     """Build comprehensive data summary for claude -p."""
@@ -2171,12 +2427,22 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
 
     Claude task is to text-ify the pre-computed Sum/urgency/tags/decision and
     flag edge cases — NOT to re-compute rules.
+
+    Batter v4 thin: dispatched to ``_build_pass2_data_batter_v4`` — raw +
+    percentile + 14d trad + %owned trend, no urgency/Sum/tags surfaced
+    (per docs/batter-framework-upgrade-design.md §1).
     """
+    if group_type == "batter":
+        return _build_pass2_data_batter_v4(
+            urgency_result, low_conf, fa_tagged, watch_tagged,
+            changes, ref_1d, ref_3d, config, rostered_names,
+        )
+
     lines = []
-    label = "打者" if group_type == "batter" else "SP"
-    window = "14d" if group_type == "batter" else "21d"
-    factor_tg_label = "PA/TG" if group_type == "batter" else "IP/TG"
-    factor_tg_key = "pa_per_tg" if group_type == "batter" else "ip_per_tg"
+    label = "SP"
+    window = "21d"
+    factor_tg_label = "IP/TG"
+    factor_tg_key = "ip_per_tg"
 
     # ── 機械報告：我方最弱 ──
     lines.append(f"--- 我方最弱{label}（機械報告，Sum/urgency/決策已算）---")
@@ -2299,6 +2565,274 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
             filtered = _filter_waiver_log_by_group(section, group_type, rostered_names)
             if filtered.strip():
                 lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅 {label}）---\n## 觀察中{filtered}")
+
+    return "\n".join(lines)
+
+
+def _fetch_14d_trad_bulk(players: list[dict], season: int = 2026) -> dict:
+    """Sequentially fetch 14d trad gameLog for a list of players.
+
+    Returns {mlb_id_str: trad_dict} where trad_dict matches enrich_14d_trad
+    output. Players with missing/failed gameLog are silently skipped.
+    """
+    out = {}
+    for p in players:
+        mid = p.get("mlb_id")
+        if not mid:
+            continue
+        trad = enrich_14d_trad(int(mid), season=season)
+        if trad:
+            out[str(mid)] = trad
+    return out
+
+
+def _fmt_pctile(value, metric: str) -> str:
+    """Format value with batter pctile for the data block (e.g. '.290 P35')."""
+    if value is None:
+        return "?"
+    pct = fa_compute.value_to_pctile(value, metric, "batter")
+    if pct is None:
+        return f"{value}"
+    if metric in ("xwoba",):
+        return f"{value:.3f} P{pct}"
+    return f"{value} P{pct}"
+
+
+def _fmt_anchor_block_batter_v4(entry: dict, label: str,
+                                 trad_14d: dict | None) -> list[str]:
+    """Render one batter (anchor or watch) as raw + percentile + 14d trad."""
+    name = entry.get("name", "?")
+    team = entry.get("team", "")
+    positions = "/".join(entry.get("positions", []) or [])
+    sv = entry.get("savant_2026") or {}
+    derived = entry.get("derived") or {}
+    prior = entry.get("prior_stats") or {}
+    rolling_savant = entry.get("rolling_14d") or {}
+
+    pa_2026 = int((entry.get("mlb_2026") or {}).get("plateAppearances", 0) or 0)
+    bbe = int(sv.get("bbe", 0) or 0)
+    pa_per_tg = derived.get("pa_per_tg")
+    pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
+
+    lines = [f"- **{label} {name}** ({team}, {positions}) [PA {pa_2026} / PA-TG {pa_tg_str} / BBE {bbe}]"]
+    season_parts = [
+        f"xwOBA {_fmt_pctile(sv.get('xwoba'), 'xwoba')}",
+        f"BB% {_fmt_pctile(sv.get('bb_pct'), 'bb_pct')}",
+        f"Barrel% {_fmt_pctile(sv.get('barrel_pct'), 'barrel_pct')}",
+        f"HH% {_fmt_pctile(sv.get('hh_pct'), 'hh_pct')}",
+    ]
+    if sv.get("k_pct") is not None:
+        season_parts.append(f"K% {sv.get('k_pct')}")
+    lines.append(f"  Season 2026: {' / '.join(season_parts)}")
+
+    # 14d block — combine Savant rolling + trad gameLog
+    trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
+    rolling_xwoba = rolling_savant.get("xwoba")
+    rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
+    delta_xwoba_str = ""
+    if rolling_xwoba is not None and sv.get("xwoba") is not None:
+        delta = rolling_xwoba - sv["xwoba"]
+        delta_xwoba_str = f" (Δ{delta:+.3f})"
+    if trad:
+        season_k_pct = sv.get("k_pct")
+        k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
+        spike_str = f" (Δ{k_spike:+.1f})" if k_spike is not None else ""
+        lines.append(
+            f"  14d: OPS {trad['ops']:.3f} / AVG {trad['avg']:.3f} / "
+            f"HR {trad['hr']} / RBI {trad['rbi']} / R {trad['r']} / SB {trad['sb']} / "
+            f"BB {trad['bb']} / K {trad['k']} (K% {trad['k_pct']:.1f}{spike_str}) / "
+            f"PA {trad['pa']} / BBE {trad['bbe']}"
+        )
+        if rolling_xwoba is not None:
+            lines.append(
+                f"  14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
+            )
+    elif rolling_xwoba is not None:
+        lines.append(
+            f"  14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
+        )
+
+    if prior:
+        prior_parts = [
+            f"xwOBA {_fmt_pctile(prior.get('xwoba'), 'xwoba')}",
+            f"BB% {_fmt_pctile(prior.get('bb_pct'), 'bb_pct')}",
+            f"Barrel% {_fmt_pctile(prior.get('barrel_pct'), 'barrel_pct')}",
+        ]
+        if prior.get("ops") is not None:
+            prior_parts.append(f"OPS {prior['ops']:.3f}")
+        if prior.get("pa"):
+            prior_parts.append(f"PA {prior['pa']}")
+        lines.append(f"  Prior 2025: {' / '.join(prior_parts)}")
+    else:
+        lines.append("  Prior 2025: 無資料")
+    return lines
+
+
+def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
+                             trad_14d: dict | None,
+                             owned: dict | None) -> list[str]:
+    """Render one FA / watch batter as raw + percentile + 14d trad + %owned."""
+    name = entry.get("name", "?")
+    team = entry.get("team", "")
+    pos = entry.get("position", "")
+    pct = entry.get("pct")
+    pct_str = f"{pct}%" if pct is not None else "?%"
+    sv = entry.get("savant_2026") or {}
+    derived = entry.get("derived") or {}
+    prior = entry.get("prior_stats") or {}
+    rolling_savant = entry.get("rolling_14d") or {}
+
+    bbe = int(sv.get("bbe", 0) or 0)
+    pa_per_tg = derived.get("pa_per_tg")
+    pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
+    add_tags = entry.get("add_tags", [])
+    warn_tags = entry.get("warn_tags", [])
+    minimal_tags = list(add_tags) + list(warn_tags)
+    tag_str = f" / {' '.join(minimal_tags)}" if minimal_tags else ""
+
+    shape_str = ""
+    if owned:
+        d3 = owned.get("delta_3d")
+        d7 = owned.get("delta_7d")
+        d3_s = f"{d3:+d}" if isinstance(d3, int) else "?"
+        d7_s = f"{d7:+d}" if isinstance(d7, int) else "?"
+        shape_str = f" [3d {d3_s} / 7d {d7_s} / {owned.get('shape', '?')}]"
+
+    prefix = f"{idx}. " if idx is not None else "- "
+    lines = [
+        f"{prefix}**{name}** ({team}, {pos}) {pct_str}{shape_str} "
+        f"[PA-TG {pa_tg_str} / BBE {bbe}]{tag_str}"
+    ]
+
+    season_parts = [
+        f"xwOBA {_fmt_pctile(sv.get('xwoba'), 'xwoba')}",
+        f"BB% {_fmt_pctile(sv.get('bb_pct'), 'bb_pct')}",
+        f"Barrel% {_fmt_pctile(sv.get('barrel_pct'), 'barrel_pct')}",
+        f"HH% {_fmt_pctile(sv.get('hh_pct'), 'hh_pct')}",
+    ]
+    if sv.get("k_pct") is not None:
+        season_parts.append(f"K% {sv.get('k_pct')}")
+    lines.append(f"   Season 2026: {' / '.join(season_parts)}")
+
+    trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
+    rolling_xwoba = rolling_savant.get("xwoba")
+    rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
+    delta_xwoba_str = ""
+    if rolling_xwoba is not None and sv.get("xwoba") is not None:
+        delta = rolling_xwoba - sv["xwoba"]
+        delta_xwoba_str = f" (Δ{delta:+.3f})"
+    if trad:
+        season_k_pct = sv.get("k_pct")
+        k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
+        spike_str = f" (Δ{k_spike:+.1f})" if k_spike is not None else ""
+        lines.append(
+            f"   14d: OPS {trad['ops']:.3f} / AVG {trad['avg']:.3f} / "
+            f"HR {trad['hr']} / RBI {trad['rbi']} / R {trad['r']} / SB {trad['sb']} / "
+            f"BB {trad['bb']} / K {trad['k']} (K% {trad['k_pct']:.1f}{spike_str}) / "
+            f"PA {trad['pa']} / BBE {trad['bbe']}"
+        )
+        if rolling_xwoba is not None:
+            lines.append(
+                f"   14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
+            )
+    elif rolling_xwoba is not None:
+        lines.append(
+            f"   14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
+        )
+
+    if prior:
+        prior_parts = [
+            f"xwOBA {_fmt_pctile(prior.get('xwoba'), 'xwoba')}",
+            f"BB% {_fmt_pctile(prior.get('bb_pct'), 'bb_pct')}",
+            f"Barrel% {_fmt_pctile(prior.get('barrel_pct'), 'barrel_pct')}",
+        ]
+        lines.append(f"   Prior 2025: {' / '.join(prior_parts)}")
+    else:
+        lines.append("   Prior 2025: 無資料 (新人 or 上季 PA 不足)")
+    return lines
+
+
+def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
+                                 watch_tagged, changes, ref_1d, ref_3d, config,
+                                 rostered_names=None):
+    """Batter v4 thin Pass-2 input string.
+
+    Composition (per docs/batter-framework-upgrade-design.md §1):
+        - 我方候選 drop pool (Sum<25 surviving, BBE<40 excluded shown separately)
+        - FA 候選 (still annotated with minimal tags + decision per fa_compute,
+          but raw + percentile + 14d trad + %owned dominate the signal)
+        - %owned 升幅, waiver-log 觀察中 (filtered by group)
+
+    All anchor / FA / watch entries get raw + percentile + 14d trad +
+    (FA-only) %owned trend. No urgency/Sum/breakdown surfaced.
+    """
+    lines = []
+
+    weakest_pool = urgency_result.get("weakest_ranked", [])
+    fa_history = load_fa_history()
+    today_str = max(fa_history.keys()) if fa_history else ""
+
+    # Bulk fetch 14d trad — anchor + FA + watch
+    trad_subjects = list(weakest_pool) + list(fa_tagged) + list(watch_tagged)
+    trad_14d = _fetch_14d_trad_bulk(trad_subjects)
+
+    # ── 我方候選 drop ──
+    lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
+    if weakest_pool:
+        for i, r in enumerate(weakest_pool, start=1):
+            lines.extend(_fmt_anchor_block_batter_v4(r, f"P{i}", trad_14d))
+    else:
+        lines.append("- 池為空：全隊打者 Sum 皆 ≥25（強），無 drop 候選")
+
+    if low_conf:
+        lines.append("\n低信心排除（BBE <40，觀察期暫不入池）:")
+        for lc in low_conf:
+            lines.append(f"- {lc['name']}：BBE {lc['bbe']} / {lc.get('note', '')}")
+
+    # ── FA 候選 ──
+    if fa_tagged:
+        lines.append(f"\n--- FA 打者候選 ({len(fa_tagged)} 人，Sum≥21 通過品質門檻) ---")
+        # Sort: prefer larger Sum diff (still useful as ordering hint, not a verdict)
+        fa_sorted = sorted(fa_tagged, key=lambda x: -x.get("sum_diff", 0))
+        for idx, f in enumerate(fa_sorted, start=1):
+            owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
+                if today_str else None
+            lines.extend(_fmt_fa_block_batter_v4(f, idx, trad_14d, owned))
+    else:
+        lines.append("\n--- FA 打者候選: 無通過品質門檻 ---")
+
+    # ── 觀察中 watch ──
+    if watch_tagged:
+        lines.append(f"\n--- waiver-log 觀察中打者 ({len(watch_tagged)} 人) ---")
+        for w in watch_tagged:
+            owned = enrich_owned_trend(w.get("name", ""), fa_history, today_str) \
+                if today_str else None
+            lines.extend(_fmt_fa_block_batter_v4(w, None, trad_14d, owned))
+
+    # ── %owned 升幅 ──
+    group_changes = [
+        c for c in changes
+        if _classify_fa_type(c.get("position", "")) == "batter"
+        and c.get("d3") is not None and c["d3"] > 0
+    ]
+    group_changes.sort(key=lambda x: x["d3"], reverse=True)
+    if group_changes:
+        lines.append("\n--- %owned 升幅 (打者, 3 日) ---")
+        for c in group_changes[:10]:
+            lines.append(f"  {c['name']:20} 3d:+{c['d3']:>3} {c['pct']:>3}%  {c['position']}")
+
+    # ── waiver-log 觀察中（觸發條件，按 batter 過濾） ──
+    waiver_log_path = os.path.join(SCRIPT_DIR, "..", "waiver-log.md")
+    if os.path.exists(waiver_log_path):
+        with open(waiver_log_path, encoding="utf-8") as f:
+            wl_content = f.read()
+        if "## 觀察中" in wl_content:
+            section = wl_content.split("## 觀察中")[1]
+            if "## 已結案" in section:
+                section = section.split("## 已結案")[0]
+            filtered = _filter_waiver_log_by_group(section, "batter", rostered_names)
+            if filtered.strip():
+                lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅打者）---\n## 觀察中{filtered}")
 
     return "\n".join(lines)
 

@@ -158,30 +158,35 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 - 轉隊確認：球員目前球隊 = 數據球隊？不符就重新評估
 - 12 隊聯賽 xwOBA > P90 的 FA 基本不存在 → 出現代表 drop 失誤
 
-### 打者評估
+### 打者評估（v4 thin — raw + agent 自由 reasoning）
 
-**兩步分工**（fa_scan 機械化處理主流，特殊情況手動處理）：
-- **Step 1**（Pass 1）：挑最弱 4 人作為 FA 比較錨點（Sum 分數排序）
-- **Step 2**（Pass 2）：最弱 4 人內部 urgency 排序，決定 drop 優先序（P1 最該 drop）
+> 設計依據：`docs/batter-framework-upgrade-design.md`（2026-04-28 對齊定稿）。SP 仍走 v2 機械決策（cutover 進行中），batter 走 v4 thin。
 
-**核心 3 指標**（Step 1 Sum 用，2 項勝出 = 值得行動）：
-- **xwOBA** — 打擊品質總指標，取代 AVG
+**兩層分工**：
+- **機械層（Python）**：只做 hard rule 排除（cant_cut / BBE<40 / 2026 Sum ≥25 排除），**不算 urgency / 不打 ✅⚠️ tag / 不預判 decision**。Sum 內部用作 ≥25 filter，**不暴露給 LLM**。
+- **LLM 層**（Phase 6 將升級為 multi-agent，過渡期單 LLM）：拿 raw + percentile + 14d trad + %owned trend，自由 reasoning 排 drop 優先序 + 標 FA 取代/觀察。
+
+**核心 3 指標**（機械層 Sum filter 用，LLM 層也看其 percentile）：
+- **xwOBA** — 打擊品質總指標
 - **BB%** — 最高效指標（BB 欄 + OPS 的 OBP 端，7×7 雙重計算）
 - **Barrel%** — HR 最佳預測指標，7×7 無 K 懲罰下 power 是核心價值
 
-**產量指標**（Step 2 urgency 用）：
-- **PA / Team_G** — drop 觀點的拖累放大器（越主力 urgency 越高）
+**LLM 層額外看的訊號**（過去機械層硬編碼的 factor 改交 LLM 自判）：
+- **14d trad**：OPS / AVG / HR / RBI / R / SB / BB / K / K% spike — 當週 H2H 決策的 first-order signal
+- **%owned trend**：3d / 7d delta + shape（explosive/rising/plateau/dropping）— 聯盟動態
+- **2025 prior**：xwOBA / BB% / Barrel% percentile — 區分 breakout 真假 / slump 候選
+- **Production**：PA、PA/Team_G、BBE — 樣本可信度 + 隊內角色
 
-**輔助指標**（警示/附註）：
-- HH%（Barrel% 上層接觸品質）
-- OPS（計分類別直接影響）
-- K%（14d 激升 = 傷勢警訊，daily sit/start 用）
+#### 機械層 hard rules（pick_weakest batter）
 
-#### Step 1 — 挑最弱 4 人（Sum 排序）
+| 規則 | 對象 | 原因 |
+|------|------|------|
+| **cant_cut 名單排除** | 從 league config（Skubal / Jazz Chisholm / Manny Machado）| 不想動的核心，含 skill cant_cut + slump hold 統一管理 |
+| **BBE <40 → low_confidence_excluded** | 全隊 batter | 樣本噪音大，剛 call up / 受傷 1 週球員不該作 anchor |
+| **2026 Sum ≥25 排除** | 全隊 batter | 當下表現 P75+ 全方位 = 不該列 drop 候選 |
+| **不限 n 人** | 全隊 batter | Sum<25 全進池，由 LLM 自判排序（不再 n=4 cap）|
 
-對全隊打者用 3 核心指標打分 → 按 Sum 升冪排序取最弱 4 人。
-
-**打分表**：
+**Sum 計算**（內部 filter 用，不暴露）：3 核心指標各取 percentile 打 1-10 分，加總 3-30。Sum ≥25 過 hard floor。
 
 | 百分位 | 分數 |
 |--------|------|
@@ -194,55 +199,35 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 | P25-40 | 3 |
 | <P25 | 1 |
 
-Sum 範圍 3-30。BBE <40 標 confidence='低'（識別小樣本，不影響 Sum）。
+#### LLM 層自由 reasoning
 
-#### Step 2 — urgency 排序（最弱 4 人內部）
+**不給判斷框架**。沒有「整季強+14d 強 → hold」這類 2×2 矩陣。LLM 從 raw + percentile + 14d trad + %owned 自行 reasoning：
 
-四因子加總 urgency 分數，降冪排序得 drop 優先序（P1 最該 drop）。
+- 結構性弱（雙年低）→ 結構性確認，drop 候選
+- 14d 火燙（OPS ≥.850）但 season Sum 低 → 賣低風險，hold
+- K% 短期跳 +5pp 以上 → 傷勢警訊
+- BBE 在排除門檻邊緣（剛過 40）→ 信心仍低，hedge
 
-| 因子 | 條件 | 分數 |
-|------|------|------|
-| **2026 Sum** | <9 | +5 |
-|  | 9-11 | +4 |
-|  | 12-14 | +3 |
-|  | 15-17 | +2 |
-|  | 18-21 | +1 |
-| **2025 Sum**（雙年檢核）| **≥24** | **Slump hold**（移出 drop 排序）|
-|  | 22-23 | +0（灰色帶，給機會）|
-|  | 18-21 | +1 |
-|  | <18 | +2 |
-| **14d 近況**（BBE ≥25 才啟用）| Δ ≥ +0.050（🔥強回升）| -2 |
-|  | +0.035 ≤ Δ < +0.050（🔥弱回升）| -1 |
-|  | -0.035 < Δ < +0.035（持平）| 0 |
-|  | -0.050 < Δ ≤ -0.035（❄️弱下滑）| +1 |
-|  | Δ ≤ -0.050（❄️強下滑）| +2 |
-| **2026 PA/Team_G** | ≥3.5 | +2 |
-|  | 3.0-3.5 | +1 |
-|  | 2.5-3.0 | +0 |
-|  | <2.5 | +0 |
+> Phase 6 將拆 multi-agent（3 agent rank → master 整合 → 1-1-1 才 re-review），給 dissent surface 跟雙候選空間。詳見 `docs/batter-framework-upgrade-design.md` §4。
 
-Δ = 14d xwOBA - season xwOBA（絕對差值）。14d 資料缺值時該因子算 0，不影響其他因子。
+#### FA 勝出門檻（過渡期）
 
-**Slump hold 特例**：2025 Sum ≥24 獨立標註「菁英底，slump 候選」，不參與 urgency 排序。14d 🔥 附註「回升中」強化 hold 信心。
+過渡期沿用 fa_compute 計算 Sum 差作為 LLM 排序提示（不是 verdict）：
+- Sum 差 ≥3 + 至少 2 項 metric 正向 → 機械標 win_gate_passed
+- 但最終取代/觀察判斷由 LLM 自由 reasoning 決定，不卡 binary tag
 
-#### FA 勝出門檻（add/drop 決策）
+**保留的 FA tag**（PA-based gate）：
+- ✅ 球隊主力（PA/TG ≥3.5）— 信心提升
+- ⚠️ 上場有限（PA/TG <2.5）— 強警示
 
-- **Sum 差 ≥ 3 分**（整體明顯勝）
-- **且**至少 2 項指標正向（每項 ≥ 0），避免單項爆表誤判
-- `+5 +1 -3 = +3` **不算勝出**（一項大輸）
-- `+1 +1 +1 = +3` 算勝出（三項都贏）
-- `+2 +2 -1 = +3` 算勝出（兩項明顯勝）
-
-#### PA/Team_G 方向說明
-
-- **Drop 觀點**（最弱 4 人 urgency）：PA/TG 越高 = 每天拖累 stats 越多 = urgency 越高（主力弱是流血傷口）
-- **Add 觀點**（FA 候選評估）：PA/TG ≥3.5 → ✅ 球隊主力（信心提升）；PA/TG <2.5 → ⚠️ 上場有限（強警示，球隊不愛數據轉不成累積）
-- 兩方向相反，因意義不同：drop 看「每天傷害」，add 看「能否輸出」
+**移除的 FA tag**（交 LLM 從 raw 判斷）：✅ 雙年菁英 / ✅ 近況確認 / ⚠️ Breakout 待驗 / ⚠️ 近況下滑 / ⚠️ 樣本小
 
 #### fa_scan 不做的事（手動處理）
 
 守位判斷 / Active 或 BN 角色脈絡 / 單點故障 / 邊際遞減 / 陣容需求
 → 特殊情況由 /player-eval 或 /weekly-review 手動判斷
+
+守位 / selected_pos / status / IL/BN/DTD **不影響評價** — 評估只看打擊數據；上場狀態跟當天比賽有關，不是品質訊號。
 
 #### 7×7 格式規則
 
@@ -253,7 +238,7 @@ Sum 範圍 3-30。BBE <40 標 confidence='低'（識別小樣本，不影響 Sum
 
 #### 樣本量加權
 
-BBE 標示信心：BBE <30 低（樣本噪音大）/ 30-50 中 / >50 高。低信心標記但不排除判斷。
+BBE <40 從 anchor 池排除（low_confidence_excluded）— 跟 SP <30 對齊提高至 40。LLM 仍可看到 14d 訊號但被告知「BBE <40 信心低」。
 
 ### SP 評估
 
