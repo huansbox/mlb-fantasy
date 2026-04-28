@@ -3073,9 +3073,11 @@ def _process_group_sp_v4(config, savant_2026, enriched, watch_enriched,
                          rostered_names=None):
     """Phase 6 multi-agent v4 SP path. Thin dispatcher to _phase6_sp.process_sp_v4.
 
-    Activated via env flag SP_FRAMEWORK_VERSION=v4. Default v2 path
-    (_process_group("sp", ...)) is unchanged. See docs/v4-cutover-plan.md
-    Stage D and docs/fa_scan-claude-decision-layer-design.md §4.
+    Default since Stage F.1 cutover (2026-04-28). Set SP_FRAMEWORK_VERSION=v2
+    to fall back to legacy v2 path (_process_group("sp", ...)) — kept as
+    rollback fallback for ~1 week before Stage F.2 removes v2 SP code.
+    See docs/v4-cutover-plan.md Stage D-F and
+    docs/fa_scan-claude-decision-layer-design.md §4.
     """
     from _phase6_sp import process_sp_v4
 
@@ -3204,7 +3206,9 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     errors = []
     error_lock = threading.Lock()
 
-    sp_framework = os.environ.get("SP_FRAMEWORK_VERSION", "v2")
+    # Default v4 since Stage F.1 cutover (2026-04-28). Set
+    # SP_FRAMEWORK_VERSION=v2 to fall back during ~1-week soak period.
+    sp_framework = os.environ.get("SP_FRAMEWORK_VERSION", "v4")
 
     def _run_group_thread(group_type):
         try:
