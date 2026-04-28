@@ -1,6 +1,6 @@
 # Batter Framework 升級 Design — Raw Data + Multi-Agent 自由 Reasoning
 
-> **Status**: 設計定稿（2026-04-28）。本文對齊不寫 code — 機械層精簡可立即動工，多 agent 層待 SP v4 multi-agent infrastructure 證明穩定後接續。
+> **Status**: 設計定稿（2026-04-28）。**機械層精簡 ✅ 完成（PR #125, 2026-04-28）** — 含 C1/D1/R1 review fix。多 agent 層待 SP F.1 cutover 觀察期 ~5-7 天 production 健康後接續（見 §13.2 Option B）。
 >
 > **Background**: 2026-04-28 session 中兩輪 ad-hoc 3 agent 投票實驗暴露 fa_scan 季 Sum 對 H2H 一週決策的盲點。FA 端（Cam Smith 季 Sum 28 但 14d OPS .340）與 Anchor 端（Albies 季 Sum 8 但 14d OPS .947）兩個 case 同時印證問題。
 
@@ -935,42 +935,56 @@ Batter 升級在「raw + agent 自由 reasoning」這個 axis 上**比 SP v4 更
 
 ### 13.2 開工選項
 
-**選 A — 機械層精簡（無前置條件，可立即動工）**：
-- 工作量：1-2 天
-- 範圍：§7.1 改動清單 9 個檔案
-- 不依賴 multi-agent 層 — 改完先讓 fa_scan 用「機械層精簡 + 現役單 LLM」過渡，等 SP cutover 完再上 multi-agent
+**選 A — 機械層精簡** — ✅ **完成 2026-04-28（PR #125）**
+- Commits: `d0225f7` (cant_cut Machado) / `b5d1be1` (fa_compute thin) / `90a38c5` (fa_scan thin pipeline) / `d5c0bd5` (C1 fix) / `dd64fb9` (D1 doc) / `5efab4a` (R1 fix) → merge `cc97d2a`
+- 250 tests pass。VPS smoke 4 次驗證 LLM reasoning 質量明顯升級
+- Code review 兩 round 完成（C1+D1+R1），所有 critical findings closed
 
-**選 B — 等 SP cutover 完整動 multi-agent 層**：
-- 前置：SP Stage E 連 5+ 天綠燈 + Stage F 啟動（移除 v2 SP code）
-- 進度查詢：`docs/v4-cutover-plan.md` Stage E 進度 + VPS `/var/log/fa-scan-v4.log` 紀錄
-- 工作量：2-3 天（Option A 機械 + 7 個 prompt 檔 + `_phase6_batter.py` orchestrator）
+**選 B — 多 agent 層**（**主軸 — 下次 session 入口**）：
+- 前置：
+  - SP **Stage F.1 cutover 已完成 2026-04-28**（commits `2837226` + `433099d`），等 ~5-7 天 production 健康
+  - 動工前需先補完 review F1 + F2（見 `docs/batter-v4-thin-implementation-review.md` Action Items #3 + #4）：
+    - **F1**: `enrich_for_multi_agent_batter` 的 `rolling_block` 補完 14d trad（HR/RBI/AVG/OBP/SLG/k_spike_pp/delta_xwoba），目前只有 Savant rolling 4 項。multi-agent 層上線時看不到 trad 訊號會不完整
+    - **F2**: 拿掉 `_build_pass2_data_batter_v4:2796` 的 `sum_diff` sort hint（multi-agent 自由 reasoning 不需排序 hint）
+- 工作量：2-3 天（7 個 prompt 檔 + `_phase6_batter.py` orchestrator + F1/F2 補正）
+- 範圍：§7.2 multi-agent 層 改動清單
 
-**選 C — A + B 接續**：先動機械層上線觀察 1-2 週，再接 multi-agent。最穩。
+**選 C** — N/A（已被 A→B 接續路徑取代，A 已完成）
 
 ### 13.3 容易卡的點 & 解法
 
 | 卡點 | 解法 |
 |---|---|
-| **百分位 lookup 怎麼算** | 看 §3.7 — `value_to_pctile` 函式範例 + 沿用 fa_compute.py:54 `metric_to_score` 邏輯 |
-| **NEW 3 agent 怎麼做** | claude -p 每次 fresh subprocess 本來就是新 agent — `_multi_agent.run_parallel_agents` 直接複用，不需特別處理 |
+| **百分位 lookup 怎麼算** | 已實作 `fa_compute.value_to_pctile` 可直接用（commit `b5d1be1`）|
+| **NEW 3 agent 怎麼做** | claude -p 每次 fresh subprocess 本來就是新 agent — `_multi_agent.run_parallel_agents` 直接複用 |
 | **報告層寫在哪** | 擴充 fa_scan.py `_publish` 函式（不是新模組）— 撈 pipeline state 中 stash 的 master metadata 組裝 |
-| **測試 fixture case data 哪來** | 2026-04-28 commit 訊息 `139c80d` / `265ca37` / `8535fca` 中提到的 case：Albies / Cam Smith / Cortes / Altuve / Heliot Ramos。raw data 從那天兩輪 ad-hoc 投票對話可重建，或 git log -p 看當時 ad-hoc 跑的數據 |
+| **測試 fixture case data 哪來** | 2026-04-28 commit 訊息中的 case：Albies / Cam Smith / Cortes / Altuve / Heliot Ramos。可從 git log -p 看當時 ad-hoc 跑的數據 |
 | **pa_per_tg 為何在 schema 裡** | 給 agent 看作 context（platoon vs everyday 判斷），**不算分**（urgency factor 已拿掉）|
-| **SP cutover 進度** | `docs/v4-cutover-plan.md` Stage E 進度 + VPS `/etc/cron.d/daily-advisor` 中 `fa-scan-v4.log` cron 每日 12:35 TPE |
+| **SP cutover 進度** | **Stage F.1 已 cutover（2026-04-28）**，v4 為 default + VPS cron 12:35 parallel entry 已撤；查 `/var/log/fa-scan.log`（不是 `fa-scan-v4.log`）|
+| **F2 sum_diff sort 在哪** | `daily-advisor/fa_scan.py:2796` 的 `_build_pass2_data_batter_v4` |
+| **F1 rolling_block 在哪補** | `daily-advisor/fa_scan.py` `_player_to_v4_schema` 函式的 `rolling_block` 構造處 |
 
 ### 13.4 不該重新討論的事（已對齊不要再翻）
 
 - 不重設 5-slot Sum
-- 不加 ✅/⚠️ tag 層
+- 不加 ✅/⚠️ data-based tag 層（PA-based gate tags 保留）
 - 不暴露 Sum / score 給 agent
 - 不依守位 / status / positions filter 或評估
+- **守位資訊任何形式進 LLM 評估**（C1+R1 fix 確立 — input 字串 / prompt template / waiver-log 三層都拿掉，position 由 `_build_position_lookup` 後處理 lookup 補）
 - urgency 機械公式全拿掉
 - Slump hold 自動偵測（2025 Sum ≥24）— 改 cant_cut 統一管理
 - pick_weakest 限人數（n=4）— 改不限，全部 Sum <25 進池
+- FA classify 三分類（worth / borderline / not_worth）用詞
+- FA rank Option B（3 agent rank → master 整合，跟 anchor 端對稱）
 
 ### 13.5 啟動指令（給下次 session）
 
 ```
-讀 docs/batter-framework-upgrade-design.md §13.1 列出的 4 個 section，然後選 §13.2
-A/B/C 任一開始實作。卡點查 §13.3。
+主軸：Option B（multi-agent 層）。前置條件:
+- SP cutover 觀察期 ~5-7 天 production 健康（Stage F.1 已 2026-04-28 完成）
+- 動工前補完 review F1（rolling_block 補 14d trad）+ F2（拿掉 sum_diff sort）
+- 進度自查：ssh root@... tail /var/log/fa-scan.log
+
+讀 §3.6 + §4 + §7.2，從 _phase6_batter.py orchestrator + 7 prompt 檔開工。
+卡點查 §13.3。
 ```
