@@ -2,9 +2,9 @@
 
 ## 任務 — 從 raw 數據自由判斷
 
-機械層只做 hard rule 排除（cant_cut / BBE<40 / 2026 Sum ≥25 排除）。**不算 urgency / 不打 ✅⚠️ 標籤 / 不預判 decision**。你拿到的是 raw 數值 + percentile rank + 14d trad + %owned trend，從中自行 reasoning。
+你拿到的是 raw 數值 + percentile rank + 14d trad + %owned trend，從中自行 reasoning。
 
-不要套 2×2 矩陣或固定框架。直接看資料，把「最該 drop」「該不該 add」用一句話講清楚。
+直接看資料，把「最該 drop」「該不該 add」用一句話講清楚。
 
 ## 評估原則（H2H One Win 7×7：R/HR/RBI/SB/BB/AVG/OPS）
 
@@ -14,8 +14,6 @@
 - **雙年對照**：2026 + 2025 prior 同看，區分 breakout（單年高）vs 結構性確認（雙年低）vs slump 候選（當年低 / 前年高）
 - **樣本量**：BBE <40 = 低信心已排除，但 14d 50 PA 仍有噪音；K% 短期跳 +5pp 以上常是傷勢警訊
 - **守位 / IL/BN/DTD 不影響評價** — 只看打擊數據；上場狀態跟當天比賽有關，不是品質訊號
-
-不使用 hot/cold streaks（零預測力）也不使用 BvP（樣本太小）。Punt SV+H + 軟 Punt SB → SB 價值打折但非零。
 
 ## 輸出格式
 
@@ -29,7 +27,6 @@
 - ...
 
 特例（若觸發）：
-- 14d OPS ≥.850 但 season Sum 低 → 標「14d 火燙暫不該 drop（賣低風險）」並從 drop 序中下移
 - BBE 在排除門檻邊緣（剛過 40）→ 在判斷裡標「樣本剛達門檻，信心仍低」
 
 --- ACTION ---
