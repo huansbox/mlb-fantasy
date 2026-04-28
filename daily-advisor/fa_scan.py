@@ -2646,6 +2646,29 @@ def _fmt_pctile(value, metric: str) -> str:
     return f"{value} P{pct}"
 
 
+def _fmt_xwoba_delta_batter(rolling_xwoba, season_xwoba) -> str:
+    """Format batter 14d xwOBA delta with direction hint.
+
+    Batter direction: positive Δ = quality improving, negative = declining.
+    (Opposite to SP allowed where positive Δ = decline.) Without an explicit
+    label the LLM has been observed misreading direction (e.g. writing
+    'Δ+0.054 品質劣化' for a batter improving by +0.054).
+
+    Threshold ±0.005 for noise floor (Savant rolling 14d resolution).
+    Returns "" when either side is None.
+    """
+    if rolling_xwoba is None or season_xwoba is None:
+        return ""
+    delta = rolling_xwoba - season_xwoba
+    if delta > 0.005:
+        direction = " 品質上升"
+    elif delta < -0.005:
+        direction = " 品質下滑"
+    else:
+        direction = " 持平"
+    return f" (Δ{delta:+.3f}{direction})"
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None) -> list[str]:
     """Render one batter (anchor or watch) as raw + percentile + 14d trad.
@@ -2681,10 +2704,7 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
     trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
     rolling_xwoba = rolling_savant.get("xwoba")
     rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
-    delta_xwoba_str = ""
-    if rolling_xwoba is not None and sv.get("xwoba") is not None:
-        delta = rolling_xwoba - sv["xwoba"]
-        delta_xwoba_str = f" (Δ{delta:+.3f})"
+    delta_xwoba_str = _fmt_xwoba_delta_batter(rolling_xwoba, sv.get("xwoba"))
     if trad:
         season_k_pct = sv.get("k_pct")
         k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
@@ -2770,10 +2790,7 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
     rolling_xwoba = rolling_savant.get("xwoba")
     rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
-    delta_xwoba_str = ""
-    if rolling_xwoba is not None and sv.get("xwoba") is not None:
-        delta = rolling_xwoba - sv["xwoba"]
-        delta_xwoba_str = f" (Δ{delta:+.3f})"
+    delta_xwoba_str = _fmt_xwoba_delta_batter(rolling_xwoba, sv.get("xwoba"))
     if trad:
         season_k_pct = sv.get("k_pct")
         k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
