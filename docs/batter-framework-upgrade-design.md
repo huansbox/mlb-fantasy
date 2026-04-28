@@ -240,6 +240,99 @@ def filter_fa_pool_v4_batter(yahoo_fa_list):
 - ❌ 不依守位 / selected_pos / status / positions 過濾或標記
 - ❌ 不算 FA 跟 anchor 的 verdict / 不預先標 worth/borderline/not_worth（這些由 agent 在 step 3 classify 標）
 
+### 3.6 Master 雙 output 結構（共用 anchor + FA master）
+
+Step 2 (anchor master) 跟 Step 5 (FA master) 都產出 **2 種 output**：
+
+```python
+def integrate_agents_v4_batter(agent_results, role: Literal["anchor", "fa"]) -> dict:
+    """Pure integrator. Picks single name + stashes dissent metadata.
+
+    Returns dict with two top-level fields:
+        downstream_output: fed to next pipeline step's LLM (slim, single name)
+        report_metadata:    stashed in pipeline state for report layer assembly
+    """
+    return {
+        "downstream_output": {
+            "selected_name": "Albies",   # ← 餵下個 step 的 LLM
+            "rationale": "season Sum 雙年弱結構性..."
+        },
+        "report_metadata": {
+            "vote_distribution": {"Albies": 2, "Altuve": 1},  # 3-0 / 2-1 / 1-1-1
+            "master_picked": "majority",        # majority / minority / self_judge_unresolved
+            "candidates_detail": [
+                {
+                    "name": "Albies",
+                    "vote": "majority",
+                    "agent_ids": ["agent_1", "agent_2"],
+                    "reasoning_summary": "season 雙年弱結構性..."
+                },
+                {
+                    "name": "Altuve",
+                    "vote": "minority",
+                    "agent_ids": ["agent_3"],
+                    "reasoning_summary": "14d OPS .559 才是真實當週傷口..."
+                }
+            ],
+            "convergence_flag": None    # 或 "⚠️ 1-1-1 unresolved" / "⚠️ master 推 minority"
+        }
+    }
+```
+
+`downstream_output` → 下個 step 看（FA classify 看 anchor name；Step 6 看 anchor + FA top）
+`report_metadata` → stash 在 pipeline state，最後 §4.12 報告層撈來組裝
+
+### 3.7 百分位 lookup 實作指引
+
+Schema 中 `"xwoba": {"value": 0.290, "pctile": 35}` 的 pctile 怎麼算：
+
+```python
+def value_to_pctile(value: float, metric: str, player_type: PlayerType) -> int:
+    """Reverse lookup percentile from value, given 2025 percentile band.
+
+    bp = [(25, 0.261), (40, 0.286), (45, 0.293), (50, 0.297), (55, 0.302),
+          (60, 0.307), (70, 0.321), (80, 0.331), (90, 0.349)]
+    higher_better = bp[-1][1] > bp[0][1]
+
+    Walk bp; return the highest pct where value crosses threshold.
+    Edge: value < first threshold → return 0 (or 25 if 25 is min in table)
+    Edge: value > last threshold → return 95 (>P90)
+    Reverse direction (lower-is-better): swap comparison.
+
+    Returns: int 0-95 (granularity = bp keys, no interpolation)
+    """
+    bp = _pctile_table(player_type).get(metric)
+    if not bp or value is None:
+        return None
+    higher_better = bp[-1][1] > bp[0][1]
+    matched = 0
+    for pct, thresh in bp:
+        if (higher_better and value >= thresh) or (not higher_better and value <= thresh):
+            matched = pct
+    if matched == 0:
+        # below first bucket — return 0 to signal "well below P25"
+        return 0
+    if matched >= 90:
+        return 95   # >P90 → call it 95 (above-elite)
+    return matched
+```
+
+**14d `pctile_vs_season` 算法**：
+
+```python
+def pctile_14d_vs_season(rolling_value, metric, player_type):
+    """For 14d window, apply same season pctile table as approximation.
+
+    14d sample 比季線寬，理論上需 separate calibration，但實證效益有限。
+    沿用季線百分位 (calibration debt 留給 Stage D 觀察期)。
+    """
+    return value_to_pctile(rolling_value, metric, player_type)
+```
+
+> ⚠️ 14d 用季線 pctile 是**公認簡化** — 14d 50 PA 樣本噪音大，「P88 OPS .947」其實過度敏感（季線 .947 才真 P88，14d 隨便個 hot streak 都到）。Stage D 觀察期決定要不要做 14d separate calibration。
+
+**已有 `metric_to_score`** function 可參考（fa_compute.py:54），邏輯結構相同（差別：score 是 1-10 分桶，pctile 是 0-95 連續百分位 rank）。
+
 ---
 
 ## 4. 多 Agent 層職責
@@ -478,42 +571,146 @@ def aggregate_fa_verdicts(classify_results) -> dict:
 | Pool | 縮為「第一輪 3 個 top 1 候選」 |
 | 仍 1-1-1 | master 看完 6 個 reasoning 自判 + ⚠️ flag「FA top 排序未收斂」|
 
-### 4.11 Step 6 — Master final decision
+### 4.11 Step 6 — Master final decision（純 1×1）
 
-最後 master 整合 anchor + FA 決定 action。
+**架構原則**：給 step 6 LLM 的 input 只有 **1 個 anchor + 1 個 FA top**。不展開組合矩陣。雙候選 / 多候選的呈現由 §4.12 報告層獨立組裝。
 
 **輸入**：
-- Anchor 端 master 結果（含 candidates_in_report，可能 1/2/3 人）
-- FA 端 master 結果（含 candidates_in_report，可能 1/2/3 人）
-- League context（FAAB 餘額 / 本週 transaction 已用次數 / cant_cut 名單）
-- ⚠️ flags from anchor / FA convergence 失敗
 
-**輸出 action**：
-- `drop_X_add_Y` — 明確 swap，X 從 anchor 候選挑、Y 從 FA 候選挑
-- `watch` — FA 接近但不夠強 / anchor 火燙不該動 → 列 watch_triggers
-- `pass` — 全 FA 都不值得 / anchor 沒可動的 → 不動
+```json
+{
+  "anchor": {
+    "name": "Albies",
+    "rationale": "...",
+    // 不含 dissent metadata — 那是給報告層的
+  },
+  "fa_top": {
+    "name": "Heliot Ramos",
+    "rationale": "...",
+    "verdict": "worth"
+  },
+  "league_context": {
+    "faab_remaining": 100,
+    "current_acquisitions_this_week": 1,
+    "cant_cut": ["Jazz Chisholm", "Manny Machado", "Tarik Skubal"]
+  },
+  "convergence_flags": [
+    "⚠️ anchor 2-1 dissent (resolved by master)"
+  ]
+}
+```
 
-**處理雙候選 / 多候選 case**：
+**輸出 action**（純 1×1 決策樹）：
 
-如果 anchor 端 master 推 2 人（dissent case）+ FA 端 master 推 2 人：
-- 4 種 swap 組合（A→X / A→Y / B→X / B→Y）
-- Master final 選最有邏輯的組合，附 rationale
-- 其他組合在 report 列出讓用戶看
+```
+1. FA top verdict = not_worth？（保險 — step 5 該已過濾）
+   → action = pass
 
-**範例輸出**：
+2. Anchor 14d 火燙（OPS ≥.850）AND FA top 是 borderline？
+   → action = watch + watch_triggers
+
+3. 雙線 1-1-1 都未收斂（雙 ⚠️ flag）？
+   → action = watch（信心低保守）
+
+4. Anchor + FA top reasoning coherent（互相支持）？
+   → action = drop_X_add_Y
+
+5. Else（reasoning 不一致）→ action = watch
+```
+
+**輸出 schema**：
 
 ```json
 {
   "action": "drop_X_add_Y",
   "drop": "Albies",
   "add": "Heliot Ramos",
-  "alternative_combos": [
-    {"drop": "Altuve", "add": "Heliot Ramos", "rationale": "2-1 anchor minority 推 Altuve"},
-    {"drop": "Albies", "add": "Carlos Cortes", "rationale": "2-1 FA majority 推 Cortes"}
-  ],
+  "rationale": "Sum +12 + 14d Ramos 火燙 + 47% owned 已驗證 — 結構性升級配當下產量",
+  "confidence": "medium",
+  "watch_target": null,
+  "watch_triggers": [],
   "telegram_summary": "[Phase 6] drop Albies add Ramos — Sum +12 + 14d 雙穩 + 47% owned 驗證",
-  "convergence_flags": ["⚠️ anchor 2-1 dissent: Albies vs Altuve"]
+  "waiver_log_updates": [
+    {"action": "UPDATE", "name": "Albies", "note": "drop — Phase 6 anchor"},
+    {"action": "UPDATE", "name": "Heliot Ramos", "note": "rostered by us — acquired via FA"}
+  ]
 }
+```
+
+**Confidence 推導**（master 自己算）：
+
+| Anchor 端 | FA 端 | Confidence |
+|---|---|---|
+| 3-0 | 3-0 | high |
+| 3-0 | 2-1 | high |
+| 2-1 | 3-0 | high |
+| 2-1 | 2-1 | medium |
+| 1-1-1 (resolved) | 3-0 / 2-1 | medium |
+| any | 1-1-1 (resolved) | medium |
+| 1-1-1 (unresolved) | any | low |
+| any | 1-1-1 (unresolved) | low |
+
+`confidence: low` 的 case 強烈傾向 `action = watch`（不要在低信心時 commit FAAB）。
+
+### 4.12 報告層 dissent surface
+
+Step 6 結束後，報告層**獨立組裝**最終報告（fa_scan.py `_publish` 函式擴充，**不是新模組**）。
+
+**報告層 input**（從 pipeline state 撈）：
+- Anchor master 的 `report_metadata`（§3.6）
+- FA master 的 `report_metadata`（§3.6）
+- Step 6 final decision output
+
+**報告組裝邏輯**：
+
+```python
+def assemble_final_report(
+    anchor_metadata: dict,    # from anchor master step 2
+    fa_metadata: dict,        # from FA master step 5
+    final_decision: dict,     # from step 6
+) -> str:
+    """Build full report aggregating decision + dissent surface.
+
+    Telegram summary stays simple (action only).
+    GitHub Issue body has full dissent details.
+    """
+```
+
+**範例輸出**（GitHub Issue 格式）：
+
+```markdown
+## 主要建議
+**Drop**: Albies
+**Add**: Heliot Ramos
+**Rationale**: Sum +12 + 14d Ramos 火燙 + 47% owned 已驗證 — 結構性升級配當下產量
+**Confidence**: medium
+
+---
+
+## 決策鏈分歧細節
+
+### 隊上 anchor 端（投票 2:1）
+- ✅ **Albies (採用)** — 2 agent: season Sum 8 雙年弱結構性
+- ⚠️ **Altuve (minority)** — 1 agent: 14d OPS .559 才是真實當週傷口
+
+### FA 端（投票 2:1）
+- ✅ **Heliot Ramos (採用)** — 2 agent: 47% owned 驗證 + 2025 prior 紮實
+- ⚠️ **Carlos Cortes (minority)** — 1 agent: 14d OPS 1.165 + %owned 1→14 explosive
+
+### Convergence flags
+- anchor 2-1 dissent: master 採 majority (Albies)
+- FA 2-1 dissent: master 採 majority (Ramos)
+
+---
+
+## Master picked minority? case
+（如 master_picked = "minority"，這段加重點呈現 — minority 的 reasoning 是 final 採用的）
+```
+
+**Telegram 推送**：
+```
+[Phase 6] drop Albies add Ramos — Sum +12 + 14d 雙穩 + 47% owned 驗證
+⚠️ anchor 2-1 dissent (詳見 GitHub Issue)
 ```
 
 ---
@@ -587,8 +784,14 @@ fa_scan.py daily run (batter path)
       step 5.5: re-review（僅 1-1-1 觸發，NEW 3 agent，pool 縮為 3 top1 候選）
 
     [Final]
-      step 6: master final decision (action + 雙候選 surface)
-      輸出 action（drop_X_add_Y / watch / pass）+ alternative_combos + reasoning
+      step 6: master final decision (純 1×1)
+      輸入: 1 anchor + 1 FA top + flags
+      輸出 action（drop_X_add_Y / watch / pass）+ rationale + confidence
+
+  Layer 5.5 [新增]: 報告層組裝
+    從 pipeline state 撈 anchor master_metadata + FA master_metadata
+    跟 step 6 output 合併 → 完整 GitHub Issue body（含 dissent 細節）
+    Telegram 推送只帶 step 6 summary（精簡）
 
   Layer 6: 推送 + waiver-log 更新（不變）
 ```
@@ -714,3 +917,56 @@ Final:
 Batter 升級在「raw + agent 自由 reasoning」這個 axis 上**比 SP v4 更徹底** — SP 還暴露 Sum + 4-factor urgency，batter 連這層都拿掉。
 
 合理性：batter 比 SP 少結構性問題（feasibility doc 已實證），所以可以更激進地把判斷推給 agent；同時 master dissent 機制給用戶更多參考訊號（不是單一 push）。
+
+---
+
+## 13. 下次 session 啟動 checklist
+
+### 13.1 先讀順序
+
+1. **§1 結論 / 設計核心** — 60 秒掌握全圖
+2. **§3.6 + §3.7** — 機械層兩個關鍵 spec（master 雙 output / 百分位 lookup）
+3. **§4.11 + §4.12** — final decision + 報告層分工
+4. **§7.1 機械層精簡 改動清單** — 立即可動的檔案 list
+
+### 13.2 開工選項
+
+**選 A — 機械層精簡（無前置條件，可立即動工）**：
+- 工作量：1-2 天
+- 範圍：§7.1 改動清單 9 個檔案
+- 不依賴 multi-agent 層 — 改完先讓 fa_scan 用「機械層精簡 + 現役單 LLM」過渡，等 SP cutover 完再上 multi-agent
+
+**選 B — 等 SP cutover 完整動 multi-agent 層**：
+- 前置：SP Stage E 連 5+ 天綠燈 + Stage F 啟動（移除 v2 SP code）
+- 進度查詢：`docs/v4-cutover-plan.md` Stage E 進度 + VPS `/var/log/fa-scan-v4.log` 紀錄
+- 工作量：2-3 天（Option A 機械 + 7 個 prompt 檔 + `_phase6_batter.py` orchestrator）
+
+**選 C — A + B 接續**：先動機械層上線觀察 1-2 週，再接 multi-agent。最穩。
+
+### 13.3 容易卡的點 & 解法
+
+| 卡點 | 解法 |
+|---|---|
+| **百分位 lookup 怎麼算** | 看 §3.7 — `value_to_pctile` 函式範例 + 沿用 fa_compute.py:54 `metric_to_score` 邏輯 |
+| **NEW 3 agent 怎麼做** | claude -p 每次 fresh subprocess 本來就是新 agent — `_multi_agent.run_parallel_agents` 直接複用，不需特別處理 |
+| **報告層寫在哪** | 擴充 fa_scan.py `_publish` 函式（不是新模組）— 撈 pipeline state 中 stash 的 master metadata 組裝 |
+| **測試 fixture case data 哪來** | 2026-04-28 commit 訊息 `139c80d` / `265ca37` / `8535fca` 中提到的 case：Albies / Cam Smith / Cortes / Altuve / Heliot Ramos。raw data 從那天兩輪 ad-hoc 投票對話可重建，或 git log -p 看當時 ad-hoc 跑的數據 |
+| **pa_per_tg 為何在 schema 裡** | 給 agent 看作 context（platoon vs everyday 判斷），**不算分**（urgency factor 已拿掉）|
+| **SP cutover 進度** | `docs/v4-cutover-plan.md` Stage E 進度 + VPS `/etc/cron.d/daily-advisor` 中 `fa-scan-v4.log` cron 每日 12:35 TPE |
+
+### 13.4 不該重新討論的事（已對齊不要再翻）
+
+- 不重設 5-slot Sum
+- 不加 ✅/⚠️ tag 層
+- 不暴露 Sum / score 給 agent
+- 不依守位 / status / positions filter 或評估
+- urgency 機械公式全拿掉
+- Slump hold 自動偵測（2025 Sum ≥24）— 改 cant_cut 統一管理
+- pick_weakest 限人數（n=4）— 改不限，全部 Sum <25 進池
+
+### 13.5 啟動指令（給下次 session）
+
+```
+讀 docs/batter-framework-upgrade-design.md §13.1 列出的 4 個 section，然後選 §13.2
+A/B/C 任一開始實作。卡點查 §13.3。
+```
