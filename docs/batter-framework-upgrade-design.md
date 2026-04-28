@@ -226,8 +226,12 @@ def filter_fa_pool_v4_batter(yahoo_fa_list):
 `shape` ∈ {"plateau", "rising", "explosive", "dropping"} — 純 heuristic 分類給 agent 看趨勢，不打分。
 
 **明確不出現的欄位**（同 anchor §3.2）：
-- ❌ `score` / `sum` / `breakdown` / `urgency` / tags
+- ❌ `score` / `sum` / `breakdown` / `urgency`
+- ❌ data-based tags（14d / xwOBA / luck / sample-size 相關）— 訊號全交 agent 從 raw + percentile 自判
 - ❌ `positions` — **完全無需考慮守位**，連 final decision 也不靠位置 fit 判斷
+
+**保留的欄位**：
+- ✅ PA-based gate tags（`✅ 球隊主力` PA/TG ≥3.5 / `⚠️ 上場有限` PA/TG <2.5）— 純 PA 計算非 data 判斷，給 agent 直接讀 role context；對應 §7.1 機械層精簡規則
 
 ### 3.5 不做的事（機械層）
 
