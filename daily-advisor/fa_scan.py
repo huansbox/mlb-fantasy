@@ -2600,10 +2600,14 @@ def _fmt_pctile(value, metric: str) -> str:
 
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None) -> list[str]:
-    """Render one batter (anchor or watch) as raw + percentile + 14d trad."""
+    """Render one batter (anchor or watch) as raw + percentile + 14d trad.
+
+    Positions intentionally omitted — design §1.2 + §3.4 require evaluation
+    on hitting data only; surfacing positions risks LLM reasoning like
+    "2B is scarce so drop is risky".
+    """
     name = entry.get("name", "?")
     team = entry.get("team", "")
-    positions = "/".join(entry.get("positions", []) or [])
     sv = entry.get("savant_2026") or {}
     derived = entry.get("derived") or {}
     prior = entry.get("prior_stats") or {}
@@ -2614,7 +2618,7 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
     pa_per_tg = derived.get("pa_per_tg")
     pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
 
-    lines = [f"- **{label} {name}** ({team}, {positions}) [PA {pa_2026} / PA-TG {pa_tg_str} / BBE {bbe}]"]
+    lines = [f"- **{label} {name}** ({team}) [PA {pa_2026} / PA-TG {pa_tg_str} / BBE {bbe}]"]
     season_parts = [
         f"xwOBA {_fmt_pctile(sv.get('xwoba'), 'xwoba')}",
         f"BB% {_fmt_pctile(sv.get('bb_pct'), 'bb_pct')}",
@@ -2674,7 +2678,8 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     """Render one FA / watch batter as raw + percentile + 14d trad + %owned."""
     name = entry.get("name", "?")
     team = entry.get("team", "")
-    pos = entry.get("position", "")
+    # Position intentionally not surfaced — design §1.2 + §3.4 evaluate on
+    # hitting data only.
     pct = entry.get("pct")
     pct_str = f"{pct}%" if pct is not None else "?%"
     sv = entry.get("savant_2026") or {}
@@ -2700,7 +2705,7 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
 
     prefix = f"{idx}. " if idx is not None else "- "
     lines = [
-        f"{prefix}**{name}** ({team}, {pos}) {pct_str}{shape_str} "
+        f"{prefix}**{name}** ({team}) {pct_str}{shape_str} "
         f"[PA-TG {pa_tg_str} / BBE {bbe}]{tag_str}"
     ]
 
