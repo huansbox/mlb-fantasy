@@ -87,7 +87,7 @@
         "g": 159
       },
       "selected_pos": "3B",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Jose Altuve",
@@ -296,7 +296,7 @@
         "gb_pct": 43.4,
         "xwobacon": 0.348
       },
-      "selected_pos": "SP",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -448,31 +448,6 @@
       }
     },
     {
-      "name": "Reynaldo López",
-      "mlb_id": 625643,
-      "yahoo_player_key": "469.p.10152",
-      "team": "ATL",
-      "positions": [
-        "SP"
-      ],
-      "selected_pos": "BN",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 10.73,
-        "xwoba_allowed": 0.465,
-        "hh_pct_allowed": 50.0,
-        "barrel_pct_allowed": 4.5,
-        "bbe": 22,
-        "era": 5.4,
-        "ip": 5.0,
-        "ip_per_gs": 5.0,
-        "whiff_pct": 10.2,
-        "gb_pct": 34.9,
-        "xwobacon": 0.466
-      }
-    },
-    {
       "name": "Joey Cantillo",
       "mlb_id": 676282,
       "yahoo_player_key": "469.p.11823",
@@ -523,6 +498,18 @@
         "gb_pct": 39.7,
         "xwobacon": 0.387
       }
+    },
+    {
+      "name": "JR Ritchie",
+      "mlb_id": 702275,
+      "yahoo_player_key": "469.p.60071",
+      "team": "ATL",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "SP",
+      "status": "",
+      "prior_stats": null
     }
   ],
   "teams": {
