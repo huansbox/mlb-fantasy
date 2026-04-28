@@ -69,6 +69,17 @@
 - 風險：drop 後回歸菁英 = 賣低吐血
 - 狀態：觀察中，不條件式 drop
 
+**drop Kelly add Junk 待決**（啟動 2026-04-28，等比完賽處理）
+- v4 Phase 6 推薦：drop Kelly add Junk — Sum +20，Kelly 結構性崩壞 + Junk 84 BBE 高信心 + GB/BB 菁英
+- 兩人都今晚 ET 投先發（TPE 2026-04-29 早 07:40 Kelly @ MIL vs Patrick / 早 10:10 Junk @ LAD vs Ohtani）
+- **行動**：今天 TPE 15:00 不提 FAAB，等比完賽決策
+- **decision rules**（明早 TPE 09:00-12:00 看結果，14:30 前提 FAAB）：
+  - Kelly 5+ IP / ≤3 ER / BB ≤2 → 改 hold Kelly，重評整輪
+  - Kelly 4-6 IP / 4-5 ER 一般 → drop Kelly add Junk（決心稍弱但 v4 仍勝）
+  - Kelly <4 IP / 5+ ER 又崩 → drop Kelly add Junk（雙重確認）
+  - Junk 結果僅供 nice-to-know（v4 框架基於季線，單場 LAD 不改變評估）
+- 風險：Junk 0% owned 等一天搶人風險低；Kelly 已 BN 不拖比率；只損 1 天 slot
+
 > **已驗證（2 週後清理）**：
 > - BB 結構性補強（Grisham，04-09）✅ Week 4 BB 單週 #2 / 2 週合併 #4 ⬆️
 > - IP 結構性補強（BN 改 1bat+2SP + Detmers，04-12）✅ Week 4 IP 單週 #5 / 2 週合併 #8 ⬆️
