@@ -1946,12 +1946,50 @@ def _publish(today_str, scan_type, advice_telegram, advice_issue, raw_data, env,
         print(f"GitHub Issue error: {e}", file=sys.stderr)
 
 
-def _update_waiver_log(advice, today_str, env=None):
+def _build_position_lookup(group_type, fa_candidates, watch_candidates, config):
+    """Map player_name → position string for waiver-log NEW lookup.
+
+    Batter v4 thin: design §1.2 + §3.4 require LLM not see/use positions —
+    prompt instructs LLM to leave position empty in NEW rows; this lookup
+    fills it from authoritative sources before writing to waiver-log.md.
+
+    Lookup priority (first match wins):
+      1. Yahoo FA list (current-day snapshot — most authoritative for FA)
+      2. Yahoo watch list (currently observed FAs)
+      3. roster_config.json (for self-team observed players)
+
+    Returns ``None`` for non-batter groups (SP path keeps positions in
+    prompt output and doesn't need lookup).
+    """
+    if group_type != "batter":
+        return None
+    lookup = {}
+    # roster_config first so Yahoo FA/watch (more current) overrides if dual
+    for b in config.get("batters", []) or []:
+        name = b.get("name")
+        positions = b.get("positions") or []
+        if name and positions:
+            lookup[name] = "/".join(positions)
+    for cand in (watch_candidates or []) + (fa_candidates or []):
+        name = cand.get("name")
+        pos = cand.get("position")
+        if name and pos:
+            lookup[name] = pos
+    return lookup
+
+
+def _update_waiver_log(advice, today_str, env=None, position_lookup=None):
     """Parse waiver-log update block from Claude output, write to waiver-log.md.
 
     Expects ```waiver-log ... ``` block in advice with lines:
-      NEW|name|team|position|mlb_id|trigger|summary
+      NEW|name|team|position|trigger|summary
       UPDATE|name|summary
+
+    The `position` field in NEW rows may be empty (batter v4 thin LLM is
+    instructed to leave it blank). When empty, looked up from
+    ``position_lookup`` (built by ``_build_position_lookup``); if lookup
+    fails the NEW row is skipped to avoid corrupting waiver-log.md
+    structure used by ``_filter_waiver_log_by_group``.
 
     Thread-safe: _WAIVER_LOG_LOCK serializes git pull/commit/push so that
     parallel batter + SP scans don't race on the working tree.
@@ -1959,10 +1997,10 @@ def _update_waiver_log(advice, today_str, env=None):
     if "```waiver-log" not in advice:
         return
     with _WAIVER_LOG_LOCK:
-        _update_waiver_log_locked(advice, today_str, env)
+        _update_waiver_log_locked(advice, today_str, env, position_lookup)
 
 
-def _update_waiver_log_locked(advice, today_str, env=None):
+def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None):
     """Actual waiver-log update logic (called inside _WAIVER_LOG_LOCK)."""
     if "```waiver-log" not in advice:
         return
@@ -1997,6 +2035,16 @@ def _update_waiver_log_locked(advice, today_str, env=None):
 
         if parts[0] == "NEW" and len(parts) >= 6:
             _, name, team, position, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], "|".join(parts[5:])
+            # Batter v4 thin: position may be empty (LLM doesn't write it).
+            # Look up from authoritative sources; skip row if lookup fails to
+            # avoid corrupting _filter_waiver_log_by_group structure.
+            if not position.strip():
+                if position_lookup:
+                    position = position_lookup.get(name, "")
+                if not position.strip():
+                    print(f"  waiver-log: SKIP NEW {name} — position lookup failed",
+                          file=sys.stderr)
+                    continue
             # Check if player already exists in 觀察中
             if name in content:
                 # Treat as UPDATE instead — but skip 條件 Pass players
@@ -2600,10 +2648,14 @@ def _fmt_pctile(value, metric: str) -> str:
 
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None) -> list[str]:
-    """Render one batter (anchor or watch) as raw + percentile + 14d trad."""
+    """Render one batter (anchor or watch) as raw + percentile + 14d trad.
+
+    Positions intentionally omitted — design §1.2 + §3.4 require evaluation
+    on hitting data only; surfacing positions risks LLM reasoning like
+    "2B is scarce so drop is risky".
+    """
     name = entry.get("name", "?")
     team = entry.get("team", "")
-    positions = "/".join(entry.get("positions", []) or [])
     sv = entry.get("savant_2026") or {}
     derived = entry.get("derived") or {}
     prior = entry.get("prior_stats") or {}
@@ -2614,7 +2666,7 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
     pa_per_tg = derived.get("pa_per_tg")
     pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
 
-    lines = [f"- **{label} {name}** ({team}, {positions}) [PA {pa_2026} / PA-TG {pa_tg_str} / BBE {bbe}]"]
+    lines = [f"- **{label} {name}** ({team}) [PA {pa_2026} / PA-TG {pa_tg_str} / BBE {bbe}]"]
     season_parts = [
         f"xwOBA {_fmt_pctile(sv.get('xwoba'), 'xwoba')}",
         f"BB% {_fmt_pctile(sv.get('bb_pct'), 'bb_pct')}",
@@ -2674,7 +2726,8 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     """Render one FA / watch batter as raw + percentile + 14d trad + %owned."""
     name = entry.get("name", "?")
     team = entry.get("team", "")
-    pos = entry.get("position", "")
+    # Position intentionally not surfaced — design §1.2 + §3.4 evaluate on
+    # hitting data only.
     pct = entry.get("pct")
     pct_str = f"{pct}%" if pct is not None else "?%"
     sv = entry.get("savant_2026") or {}
@@ -2700,7 +2753,7 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
 
     prefix = f"{idx}. " if idx is not None else "- "
     lines = [
-        f"{prefix}**{name}** ({team}, {pos}) {pct_str}{shape_str} "
+        f"{prefix}**{name}** ({team}) {pct_str}{shape_str} "
         f"[PA-TG {pa_tg_str} / BBE {bbe}]{tag_str}"
     ]
 
@@ -3062,7 +3115,10 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         _publish(today_str, label, advice_display, advice_issue, full_raw, env, args)
 
         if not getattr(args, "no_waiver_log", False):
-            _update_waiver_log(advice, today_str, env)
+            position_lookup = _build_position_lookup(
+                group_type, fa_candidates, watch_candidates, config,
+            )
+            _update_waiver_log(advice, today_str, env, position_lookup)
 
     except Exception as e:
         _handle_error(f"{label} scan", e, env, args)
