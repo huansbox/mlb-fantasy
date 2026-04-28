@@ -51,6 +51,39 @@ def _pctile_table(player_type: PlayerType):
     raise ValueError(f"unknown player_type: {player_type}")
 
 
+def value_to_pctile(value, metric: str, player_type: PlayerType) -> int | None:
+    """Reverse-lookup percentile rank from a metric value.
+
+    Walks the percentile table in elite direction, returning the highest
+    percentile bucket the value crosses. Granularity = bp keys (no
+    interpolation between buckets).
+
+    Edge cases:
+        value None or metric not in table → None
+        value below first bucket          → 0  (well below P25)
+        value at/above P90                → 95 (above-elite)
+
+    Reverse-direction metrics (lower-is-better, e.g. SP xERA) auto-detected
+    from table direction; comparison flips accordingly.
+
+    Used by docs/batter-framework-upgrade-design.md §3.7 multi-agent enrich
+    schema. Parallel to ``metric_to_score`` (1-10 score buckets).
+    """
+    if value is None:
+        return None
+    bp = _pctile_table(player_type).get(metric)
+    if not bp:
+        return None
+    higher_better = bp[-1][1] > bp[0][1]
+    matched = 0
+    for pct, thresh in bp:
+        if (higher_better and value >= thresh) or (not higher_better and value <= thresh):
+            matched = pct
+    if matched >= 90:
+        return 95
+    return matched
+
+
 def metric_to_score(value, metric: str, player_type: PlayerType) -> int:
     """Convert metric value to 1-10 score per CLAUDE.md Sum 打分表.
 
@@ -130,6 +163,16 @@ def _sp_bbe_excluded(bbe: int) -> bool:
     return bbe < 30
 
 
+# Batter v4 thin (raw + multi-agent free reasoning) — see
+# docs/batter-framework-upgrade-design.md §3.1.
+_BATTER_BBE_MIN = 40
+_BATTER_SUM_HARD_FLOOR = 25  # Sum >=25 → strong, not a drop candidate
+
+
+def _batter_bbe_excluded(bbe: int) -> bool:
+    return bbe < _BATTER_BBE_MIN
+
+
 def pick_weakest(
     players: list[dict],
     player_type: PlayerType,
@@ -145,12 +188,16 @@ def pick_weakest(
     Filters applied in order:
         1. Exclude cant_cut by case-insensitive name.
         2. SP only: BBE <30 → low_confidence_excluded (not in weakest).
-        3. Sort remaining by Sum asc, take first n.
+           Batter v4 thin: BBE <40 → low_confidence_excluded.
+        3. Batter v4 thin only: Sum ≥25 → strong, drop candidate excluded.
+        4. Sort remaining by Sum asc.
+           SP: take first n.
+           Batter v4 thin: return all surviving (n is ignored).
 
     Returns:
         (weakest, excluded)
         weakest: [{name, mlb_id, score, breakdown, confidence, savant_2026, ...原 player 欄位}]
-        excluded (SP only): [{name, bbe, note}]
+        excluded: [{name, bbe, note}] — SP BBE<30 or Batter BBE<40
     """
     cant_cut_lower = {c.lower() for c in (cant_cut or set())}
 
@@ -175,8 +222,23 @@ def pick_weakest(
             )
             continue
 
+        if player_type == "batter" and _batter_bbe_excluded(bbe):
+            excluded.append(
+                {
+                    "name": p["name"],
+                    "mlb_id": p.get("mlb_id"),
+                    "bbe": bbe,
+                    "note": "BBE 小樣本（<40），低信心暫不入池",
+                }
+            )
+            continue
+
         score, breakdown = compute_sum_score(savant, player_type)
         confidence = _confidence_label(bbe, player_type)
+
+        # Batter v4 thin: hard floor — Sum ≥25 is strong, not a drop candidate.
+        if player_type == "batter" and score >= _BATTER_SUM_HARD_FLOOR:
+            continue
 
         weakest_pool.append(
             {
@@ -189,8 +251,9 @@ def pick_weakest(
         )
 
     weakest_pool.sort(key=lambda e: e["score"])
-    weakest = weakest_pool[:n]
-    return weakest, excluded
+    if player_type == "batter":
+        return weakest_pool, excluded  # no n cap — all surviving
+    return weakest_pool[:n], excluded
 
 
 # ── Phase 5.3: urgency four-factor computation ──
@@ -317,7 +380,14 @@ def compute_urgency(
     weakest_n: list[dict],
     player_type: PlayerType,
 ) -> dict:
-    """Compute urgency four-factor score for weakest-N players.
+    """Compute urgency for weakest-N players.
+
+    SP: four-factor score + Slump hold detection (per CLAUDE.md SP Step 2).
+    Batter v4 thin: passthrough — no factors, no Slump hold (handled by
+        cant_cut list per docs/batter-framework-upgrade-design.md §1.2).
+        Returns weakest entries unsorted (Sum asc from pick_weakest preserved)
+        with empty `factors` / `urgency=None` to keep schema stable for callers
+        that still iterate `weakest_ranked`.
 
     Each weakest entry should include:
         score         — 2026 Sum (from pick_weakest)
@@ -329,13 +399,31 @@ def compute_urgency(
 
     Returns:
         {
-            "weakest_ranked": [  # sorted by urgency desc
+            "weakest_ranked": [  # SP: sorted by urgency desc; Batter: Sum asc
                 {name, urgency, factors: {...}, prior_sum, prior_ip, notes: [...],
                  ...original weakest entry}
             ],
-            "slump_hold": [{name, prior_sum, prior_ip}]  # excluded from rank
+            "slump_hold": [{name, prior_sum, prior_ip}]  # SP only; batter empty
         }
     """
+    if player_type == "batter":
+        passthrough = []
+        for w in weakest_n:
+            prior = w.get("prior_stats") or {}
+            sum_2025, prior_breakdown = compute_2025_sum(prior, "batter")
+            passthrough.append(
+                {
+                    **w,
+                    "urgency": None,
+                    "factors": {},
+                    "prior_sum": sum_2025,
+                    "prior_ip": None,
+                    "prior_breakdown": prior_breakdown,
+                    "notes": [],
+                }
+            )
+        return {"weakest_ranked": passthrough, "slump_hold": []}
+
     season_xwoba_key = "xwoba" if player_type == "batter" else "xwoba"
     # For SP, Savant xwoba in 2026 data represents xwOBA allowed (same key).
 
@@ -527,17 +615,16 @@ def _compute_sp_warn_tags(fa: dict) -> list[str]:
 
 
 def _compute_batter_add_tags(fa: dict) -> list[str]:
+    """Batter v4 thin tags — only retain PA-based ✅ 球隊主力 gate.
+
+    Other signals (✅ 雙年菁英 / ✅ 近況確認 / ⚠️ Breakout 待驗 / ⚠️ 近況下滑 /
+    ⚠️ 樣本小) are removed — multi-agent layer reads raw + percentile + 14d
+    trad and reasons freely (per docs/batter-framework-upgrade-design.md §1.2
+    & §7.1).
+    """
     tags = []
     prior = fa.get("prior_stats") or {}
     derived = fa.get("derived") or {}
-    savant = fa.get("savant_2026") or {}
-    rolling = fa.get("rolling_14d")
-
-    # ✅ 雙年菁英 — 2025 Sum ≥24 (no IP gate for batter)
-    if prior:
-        prior_sum, _ = compute_2025_sum(prior, "batter")
-        if prior_sum >= 24:
-            tags.append("✅ 雙年菁英")
 
     # ✅ 球隊主力 — 2026 PA/Team_G ≥3.5
     pa_per_tg = derived.get("pa_per_tg")
@@ -546,24 +633,17 @@ def _compute_batter_add_tags(fa: dict) -> list[str]:
     if pa_per_tg is not None and pa_per_tg >= 3.5:
         tags.append("✅ 球隊主力")
 
-    # ✅ 近況確認 — 14d xwOBA Δ ≥ +0.035 (batter direction: rising)
-    if rolling and (rolling.get("bbe") or 0) >= 25:
-        r_x = rolling.get("xwoba")
-        s_x = savant.get("xwoba")
-        if r_x is not None and s_x is not None:
-            if (r_x - s_x) >= 0.035:
-                tags.append("✅ 近況確認")
-
     return tags
 
 
 def _compute_batter_warn_tags(fa: dict) -> list[str]:
+    """Batter v4 thin warns — only retain PA-based ⚠️ 上場有限 gate.
+
+    Other warns are removed; see _compute_batter_add_tags rationale.
+    """
     tags = []
     prior = fa.get("prior_stats") or {}
     derived = fa.get("derived") or {}
-    savant = fa.get("savant_2026") or {}
-    rolling = fa.get("rolling_14d")
-    bbe = int(savant.get("bbe") or 0)
 
     # ⚠️ 上場有限 (強) — PA/Team_G <2.5
     pa_per_tg = derived.get("pa_per_tg")
@@ -571,26 +651,6 @@ def _compute_batter_warn_tags(fa: dict) -> list[str]:
         pa_per_tg = prior.get("pa_per_team_g")
     if pa_per_tg is not None and pa_per_tg < 2.5:
         tags.append("⚠️ 上場有限")
-
-    # ⚠️ 樣本小 — BBE <30
-    if bbe < 30:
-        tags.append("⚠️ 樣本小")
-
-    # ⚠️ Breakout 待驗 — 2025 Sum <18 或無 prior
-    if not prior:
-        tags.append("⚠️ Breakout 待驗")
-    else:
-        prior_sum, _ = compute_2025_sum(prior, "batter")
-        if prior_sum < 18:
-            tags.append("⚠️ Breakout 待驗")
-
-    # ⚠️ 近況下滑 — 14d Δ ≤ -0.035
-    if rolling and (rolling.get("bbe") or 0) >= 25:
-        r_x = rolling.get("xwoba")
-        s_x = savant.get("xwoba")
-        if r_x is not None and s_x is not None:
-            if (r_x - s_x) <= -0.035:
-                tags.append("⚠️ 近況下滑")
 
     return tags
 
