@@ -571,10 +571,6 @@
 - 04-27：Sum 28 三項全勝Albies(+3/+8/+9), BB% 11.3契合策略, 14d Δ-0.055弱下滑但BBE 68高信心. 建議FAAB $3-5 Ramos fallback（fa_scan）
 - 04-28：Sum 29 三項全勝Albies(+4/+8/+9), BB% 11.3契合策略, BBE 69高信心. 14d Δ-0.095下滑但季線品質>P80. 0% owned無壓力（fa_scan）
 
-### Carlos Cortes (ATH, LF,RF) [mlb_id:666126] — 觀察中
-觸發：BBE達65+PA/TG≥3.0+BB%維持>P55→重評
-- 04-27：Sum 27 xwOBA .456/Barrel 15.1>P90碾壓但⚠️上場有限+breakout待驗. 13% owned安全（fa_scan）
-
 ### Keider Montero (DET, SP,RP) [mlb_id:672456] — 觀察中
 觸發：立即行動
 - 04-28：Sum 21 vs Nola 11 差+10極大勝出, xERA 2.35/xwOBA .246 >P90 BBE 79高信心, 運氣-1.65買低, 10% owned（fa_scan）
@@ -634,6 +630,9 @@
 - 04-23：🔄 媒體提及season-ending surgery可能性, elbow嚴重性升級為IL觸發風險。當前仍Active（fa_scan）
 
 ## 已結案
+
+### Carlos Cortes (ATH, LF,RF) — 被搶（自動偵測）
+- 2026-04-28：Yahoo ownership_type=team，從觀察中移除。
 
 ### Carlos Correa (HOU, 3B,SS) — 被搶（自動偵測）
 - 2026-04-27：Yahoo ownership_type=team，從觀察中移除。
