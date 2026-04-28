@@ -8,14 +8,16 @@
 
 ## 1. 結論 / 設計核心
 
-本升級的核心是把**機械評分壓到最少 — 只剩 Sum + 必要的 hard rule**，把所有「權衡判斷」全交給 **multi-agent 自由 reasoning**。
+本升級的核心是把**機械評分壓到最少 — 機械層只負責 hard rule 排除 + Sum 用作門檻 filter，但 Sum 不出現在 output**，把所有「權衡判斷」全交給 **multi-agent 自由 reasoning**，讓 agent 純看 raw + percentile + 14d trad 自行排序。
 
 ### 1.1 機械層 vs Agent 層分工
 
-| 層 | 職責 | 輸出 |
+| 層 | 職責 | 輸出給 agent 看的 |
 |---|---|---|
-| **機械層**（Python）| 縮小 anchor pool / hard rule 排除 / 補充 raw 數據結構 | 6 候選 + 完整 raw + percentile / FA pool + 同樣 enrich |
+| **機械層**（Python）| Hard rule 排除 / 計算 Sum 作 ≥25 filter / enrich raw + percentile | **無 Sum，無 score** — 只給 raw 數值 + 各 metric percentile + 14d trad |
 | **Multi-Agent 層** | 排序 / 權衡 / 決策（drop / add / watch） | 共識 + dissent flag + 動作建議 |
+
+Sum **只在機械層內部使用**（過濾門檻），不暴露給 agent — 強制 agent 從 raw + percentile 自行判斷，不依賴 aggregated 數字。
 
 ### 1.2 拋棄的設計
 
@@ -24,17 +26,19 @@
 | **urgency 4-factor 計分** | 三個 factor 的門檻都是經驗值（14d Δ ±0.035/0.050 / PA-TG ≥3.5 / 2025 Sum ≥24）— 沒實證 calibration，false precision |
 | **2×2 矩陣強制框架** | 強加單一判斷邏輯反而限制 agent 思維；let agents 從 raw 看資料各自 reasoning |
 | **✅/⚠️ tag 層** | binary summary 損失訊息（P75 跟 P95 都是 ✅）；raw + percentile 給 agent 反而更精準 |
-| **PA/TG 進 urgency** | 隊上 active batter 同質性高（PA/TG 都在 3.5-4.5）→ 此 factor 對所有人 +2 = 沒區分能力。FA 端 add 邏輯仍保留作 context |
+| **PA/TG 進 urgency** | 隊上 active batter 同質性高（PA/TG 都在 3.5-4.5）→ 此 factor 對所有人 +2 = 沒區分能力 |
+| **Sum / score 出現在 anchor output** | Sum 是 aggregated proxy，會 anchor agent 思維；agent 應從 3 metric raw + percentile 自行 reason |
+| **守位 / selected_pos / status 進 anchor 評估** | 評價只看打擊數據；BN 與否、DTD 狀態跟當天比賽有關，不是球員品質判斷 |
+| **Slump hold 自動偵測（2025 Sum ≥24）** | 改為 hardcoded `cant_cut` 名單統一管理（不區分「skill cant_cut」vs「slump hold cant_cut」）|
 
 ### 1.3 保留的機械層
 
 | 保留 | 為什麼 |
 |---|---|
-| **Sum**（3 metric × 0-10）| 用作 pick_weakest 的粗排序錨點，不是最終決策 |
-| **pick_weakest 排序** | 必須機械方式縮 pool（不可能讓 agent 看 11 個 batter）|
-| **Slump hold 檢核**（2025 Sum ≥24 exclude）| Hard rule — 「不要 cut 去年菁英」是 floor protection，不交 agent |
-| **BBE 小樣本排除**（batter <40，新加，跟 SP <30 對齊）| Hard rule — 剛 call up / 受傷 1 週球員不該作 anchor |
-| **cant_cut 排除** | Hard rule — 從 league config |
+| **Sum 計算**（內部用）| 用作 pick_weakest 的 ≥25 門檻 filter，但**不暴露** |
+| **`cant_cut` 名單排除** | 從 league config（hardcoded：Jazz Chisholm + Manny Machado + Skubal-SP-only）|
+| **BBE 小樣本排除**（batter <40） | Hard rule — 剛 call up / 受傷 1 週球員不該作 anchor。跟 SP <30 對齊提高為 batter <40 |
+| **2026 Sum ≥25 排除** | Hard rule — 當下表現 P75+ 全方位 = 不該列 drop 候選 |
 
 ---
 
@@ -64,15 +68,17 @@
 
 盲點 1+2+3+4 是「資料層」 — 解法是補 raw context。盲點 5 是「決策層」 — 解法是 multi-agent。本升級兩者都做。
 
-### 2.3 為什麼 raw + percentile + 自由 reasoning
+### 2.3 為什麼 raw + percentile + 自由 reasoning + 不暴露 Sum
 
 | 設計選擇 | 理由 |
 |---|---|
 | **raw 數值不計分** | 計分桶（如 1/3/5/6/7/8/9/10）有資訊損失 + 邊界球員兩側 1 桶差被放大 / 縮小不對稱 |
 | **百分位 rank 給** | 提供「跟全聯盟比站哪」的 anchor，agent 不需自己 calibrate 量級 |
+| **不暴露 Sum** | Sum 是 aggregate，會 anchor agent 思維；強迫 agent 從 3 metric raw + percentile 自行權衡 |
 | **不強制 2×2 矩陣** | 強加判斷框架反而限制 agent 思維；發散後共識 = 高信心，分歧 = 該 case 真的模糊 |
 | **不加 tag** | binary summary 損失訊息；raw + percentile + season + 14d 完整脈絡讓 agent reason |
 | **不機械算 urgency** | 4-factor 公式三個門檻都未實證 calibration，false precision；agent 有 raw + percentile 可自行權衡 |
+| **守位 / status 不進 anchor 評估** | 評價只看打擊數據；BN/DTD 跟當天有沒有比賽有關，不是品質訊號 |
 
 ---
 
@@ -81,46 +87,53 @@
 ### 3.1 pick_weakest_v4_batter
 
 ```python
-def pick_weakest_v4_batter(players, n=6, cant_cut=None):
-    """Mechanical pre-filter only.
+def pick_weakest_v4_batter(players, cant_cut: set[str]):
+    """Mechanical pre-filter only. No Sum-based ranking, no urgency.
 
     Filters (in order):
-        1. Exclude cant_cut by name
-        2. Exclude IL/NA by selected_pos (already done upstream)
-        3. Exclude BBE <40 → low_confidence_excluded (沿用 SP <30 原則調為 batter <40)
-        4. Exclude 2025 Sum ≥24 → slump_hold (excluded from rank, not P1-P4 anchor)
-        5. Sort by 2026 Sum asc, take first n (default 6)
+        1. Exclude by name from cant_cut (e.g. Jazz Chisholm, Manny Machado).
+           Hardcoded in league config — no separate slump_hold mechanism.
+        2. Exclude BBE <40 → low_confidence_excluded (跟 SP <30 對齊調為 batter <40)
+        3. Compute 2026 Sum internally; exclude Sum ≥25 (current strong, not drop candidate).
+        4. Output ALL remaining batters with Sum <25 (no count cap) — 不限人數.
+
+    Note: IL/NA/BN/DTD 等 selected_pos / status **不過濾** — 評價只看打擊數據，
+          守位/出場狀態與當天比賽有關，不是品質訊號，留給 agent 自行判斷。
 
     Returns:
-        (weakest, low_confidence_excluded, slump_hold)
+        (weakest_pool, low_confidence_excluded)
+        weakest_pool: list of enriched dicts (見 §3.2)
+        low_confidence_excluded: BBE<40 移出者，僅作 metadata
     """
 ```
 
-`n=6` 比現役 4 多 — 給 multi-agent 較多選擇空間，避免 mechanical filter 把真正最弱漏掉（盲點 4）。
+**特殊情況處理**：
 
-### 3.2 enrich_for_multi_agent
+| pool size | 處理 |
+|---|---|
+| **0 人** | 整隊 Sum 都 ≥25（隊強），fa_scan 跳過 batter drop scan，不產 P1 |
+| **1-3 人** | Multi-agent step 1 任務改為「排所有」（不要求 top 3）|
+| **>3 人** | 標準流程 — agent 排 top 3 |
 
-把每個候選 attach 完整 raw + percentile 結構：
+### 3.2 enrich_for_multi_agent — anchor output schema
+
+對每個 weakest_pool 球員 attach 完整 raw + percentile：
 
 ```json
 {
   "name": "Albies",
-  "mlb_id": 645277,
   "team": "ATL",
-  "positions": ["2B"],
-  "selected_pos": "2B",
 
   "season_2026": {
-    "xwoba":     {"value": 0.290, "pctile": 35},
-    "bb_pct":    {"value": 5.6,   "pctile": 22},
-    "barrel_pct":{"value": 3.1,   "pctile": 18},
-    "hh_pct":    {"value": 38.0,  "pctile": 40},
-    "k_pct":     {"value": 12.1,  "pctile": 70},
-    "ops":       {"value": 0.799, "pctile": 60},
-    "pa":        320,
-    "bbe":       92,
-    "pa_per_tg": 4.28,
-    "sum":       8
+    "xwoba":      {"value": 0.290, "pctile": 35},
+    "bb_pct":     {"value": 5.6,   "pctile": 22},
+    "barrel_pct": {"value": 3.1,   "pctile": 18},
+    "hh_pct":     {"value": 38.0,  "pctile": 40},
+    "k_pct":      {"value": 12.1,  "pctile": 70},
+    "ops":        {"value": 0.799, "pctile": 60},
+    "pa":         320,
+    "bbe":        92,
+    "pa_per_tg":  4.28
   },
 
   "rolling_14d": {
@@ -131,8 +144,8 @@ def pick_weakest_v4_batter(players, n=6, cant_cut=None):
     "hr":           2,
     "rbi":          10,
     "r":            11,
-    "bb_pct":       {"value": 5.0, "pctile_vs_season": 18},
-    "k_pct":        {"value": 5.0, "pctile_vs_season": 95},
+    "bb_pct":       {"value": 5.0,   "pctile_vs_season": 18},
+    "k_pct":        {"value": 5.0,   "pctile_vs_season": 95},
     "k_spike_pp":   -7.1,
     "delta_xwoba":  -0.012,
     "pa":           60,
@@ -140,21 +153,31 @@ def pick_weakest_v4_batter(players, n=6, cant_cut=None):
   },
 
   "prior_2025": {
-    "sum":         15,
-    "pa":          600,
-    "ops":         0.752,
-    "xwoba":       0.310,
-    "bb_pct":      6.2,
-    "barrel_pct":  6.5,
-    "hh_pct":      40.5
+    "xwoba":      {"value": 0.310, "pctile": 50},
+    "bb_pct":     {"value": 6.2,   "pctile": 35},
+    "barrel_pct": {"value": 6.5,   "pctile": 45},
+    "hh_pct":     {"value": 40.5,  "pctile": 50},
+    "ops":        0.752,
+    "pa":         600
   }
 }
 ```
 
-對 FA candidate 額外 attach：
+**明確不出現的欄位**：
+- ❌ `score` / `sum`（任何年）— Sum 內部用，不暴露
+- ❌ `breakdown`（per-slot scores）
+- ❌ `urgency` / `factors` — 機械不算 urgency
+- ❌ `add_tags` / `warn_tags` — 不加 tag 層
+- ❌ `positions` / `selected_pos` — 守位資訊不進評估
+- ❌ `status`（DTD/IL）— 出場狀態不進評估
+
+### 3.3 FA candidate 額外欄位
+
+對 FA candidate 在上述結構之上 attach：
 
 ```json
 {
+  "team": "MIA",
   "owned": {
     "current_pct": 41,
     "delta_3d":    -4,
@@ -164,17 +187,17 @@ def pick_weakest_v4_batter(players, n=6, cant_cut=None):
 }
 ```
 
-`shape` ∈ {"plateau", "rising", "explosive", "dropping"} — heuristic 分類但純資訊用，agent 自行判斷重要性。
+`shape` ∈ {"plateau", "rising", "explosive", "dropping"} — 純 heuristic 分類給 agent 看趨勢，不打分。
 
-### 3.3 不做的事（機械層）
+### 3.4 不做的事（機械層）
 
 - ❌ 不算 urgency（無 4-factor sum）
 - ❌ 不打 ✅/⚠️ tag
 - ❌ 不應用 2×2 矩陣分類
 - ❌ 不算「Sum 差 vs anchor」（讓 agent 自己看 raw 比）
 - ❌ 不寫 14d Δ / K% spike / %owned 門檻判斷
-
-機械層**只負責資料整理**，不做評估。
+- ❌ 不暴露 Sum / score 給 agent
+- ❌ 不依守位 / selected_pos / status 過濾或標記
 
 ---
 
@@ -182,46 +205,109 @@ def pick_weakest_v4_batter(players, n=6, cant_cut=None):
 
 複用 SP v4 multi-agent infrastructure（`_multi_agent.py` + `_phase6_sp.py` template），改成 batter 專屬 prompt。
 
-### 4.1 8-step orchestrator
+### 4.1 流程概觀
 
-| Step | 角色 | 輸入 | 輸出 |
-|---|---|---|---|
-| 1 | 3 agent 平行 rank P1-P6 | 6 候選完整 raw + percentile | 各自 ranking + reasoning |
-| 2 | Master integrate | 3 個 ranking + 各自 reasoning | final_ranking + borderline_pairs |
-| 3 | 3 reviewer（borderline gate）| Master 決定 + 自己 step 1 意見 | agree_on_p1 + 反駁論述 |
-| 4 | 3 agent 平行 classify FA | FA pool 完整 raw | 各 FA 標 worth / borderline / not_worth |
-| 5 | Master rank FA survivors | 通過 classify 的 FA | ranked_top + borderline_pairs |
-| 6 | 3 reviewer FA（borderline gate）| Master FA rank + 各自 classify | agree_on_top1 |
-| 7 | Re-eval（dissent ≥2 才跑）| review feedback | revised ranking |
-| 8 | Final decision | anchor + fa_top + non_data context | action: drop_X_add_Y / watch / pass |
+```
+Step 1: 3 agent 平行 rank top 3 (most-drop-worthy first)
+   ↓
+Step 2: Master 整合 (純整合，不跑自己 ranking)
+   ├─ P1 共識 (3-0 / 2-1) → 推 P1（master 仍可看 reasoning 提反向）
+   ├─ P1 全分歧 (1-1-1) → step 2.5 re-review
+   │
+   ↓
+Step 2.5: re-review (僅 1-1-1 觸發)
+   ├─ NEW 3 agent，同 prompt，pool 縮為「3 個 P1 候選」
+   ├─ 仍 1-1-1 → master 看完所有 reasoning 自行排序 + ⚠️ flag
+   │
+   ↓
+Step 3-8: FA 線（同 SP phase6 結構）
+```
 
 ### 4.2 Step 1 prompt 哲學
 
 **不給判斷框架**。不寫「整季強+14d 強 → hold」這類 2×2 矩陣指引。
 
 prompt 給：
-- League rules（H2H 一週 / 計分類別 / BB 結構性偏低 等策略 context）
-- 6 候選的完整 raw + percentile + 14d trad + %owned
-- Hard constraints（cant_cut / slump hold 已 exclude，不需重判）
-- 任務：「請按你的判斷排 P1-P6 — 最該 drop 排第一，最不該 drop 排第六」
+- League rules（H2H 一週 / 計分類別）
+  - **不**強調「BB 結構性偏低」這類策略偏好（規則本來就含 BB/OPS 計分）
+- Pool 完整 raw + percentile + 14d trad + prior 2025 raw + percentile
+- Hard constraints（cant_cut / BBE<40 / Sum ≥25 已 exclude，不需重判）
+- 任務：「排出**最該 drop 三人**，最該 drop 排第一，附 reasoning」
+  - Pool 1-3 人時 → 排所有
 - 要求 reasoning（每位排名附 1-2 句理由）
 
 **讓 3 個 agent 從同一資料各自發散**：
-- Agent A 可能重視 long-term skill → P1 = season Sum 最低
+- Agent A 可能重視 long-term skill → P1 = season metric 最差
 - Agent B 可能重視短期 H2H → P1 = 14d 最爛
 - Agent C 可能權衡兩者 → P1 = 雙重低
 
-**Dissent 是訊號**：
-- 3-0 共識 → 高信心 P1
-- 1-1-1 全分歧 → 該 case 真模糊（dissent gate 觸發 review）
-- 2-1 → borderline_pair，看 reasoning 釐清
+### 4.3 Step 2 master 整合
 
-### 4.3 Step 8 final decision 行動類別
+Master **純整合，不跑自己的 ranking**。任務：
 
-跟 SP phase6 一致：
-- `drop_X_add_Y` — anchor X drop + FA Y add
-- `watch` — FA 接近但不夠 / 給 watch_triggers
-- `pass` — 全部 FA 都不值得，hold anchor
+1. 統計 P1 distribution（如 `{"Player A": 2, "Player B": 1}`）
+2. 看完 3 個 agent reasoning（**重要：即使 majority 共識也要看**）
+3. 決定 master_recommendation：
+   - **3-0 共識** → master 跟 majority 一致，附 1 句 rationale
+   - **2-1 majority** → 預設跟 majority，但**若 master 認為 minority reasoning 更有說服力 → 推 minority**。**兩個候選都列出**並各附 reasoning summary
+   - **1-1-1 全分歧** → 觸發 step 2.5 re-review
+
+**Master 2-1 dissent 輸出範例**：
+
+```json
+{
+  "p1_distribution": {"Player A": 2, "Player B": 1},
+  "master_recommendation": "Player B",
+  "majority_reasoning_summary": "2 agent 支持 A 因為...",
+  "minority_reasoning_summary": "1 agent 支持 B 因為...",
+  "master_rationale": "我建議 B，因為 minority 看到 A 是 14d 火燙賣高訊號，drop 會吃虧",
+  "candidates_in_report": ["Player A", "Player B"]
+}
+```
+
+對應到 final report，呈現：
+> **隊上最該 drop**：3 agent 投票 2:1（A 2 票 / B 1 票）
+> **Master 建議**：drop B（理由：minority 看到 A 是 14d 火燙賣高訊號）
+> **A 也值得考慮**：majority 認為 A 結構性弱應結案
+> ⚠️ 給用戶判斷空間
+
+### 4.4 Step 2.5 re-review（僅 1-1-1 觸發）
+
+| 設計 | 細節 |
+|---|---|
+| **Trigger** | Step 1 P1 全分歧（每個 agent 各投不同人） |
+| **Agent** | NEW 3 agent（claude -p 每次 fresh subprocess，本來就是新 agent）|
+| **Prompt** | 同 Step 1 prompt |
+| **Pool** | 縮為「第一輪 3 個 P1 候選」（共 3 人）|
+| **Task** | 同 Step 1 — 排 top 3（即排所有 3 人）|
+
+**第二輪結果處理**：
+- **3-0 / 2-1** → 同 Step 2 master 整合邏輯（master 純整合，2-1 可 dissent）
+- **仍 1-1-1** → master 看完**第一輪 + 第二輪共 6 個 reasoning** 自行排序 + 標 ⚠️ flag「P1 分歧未收斂」
+
+**第二輪仍分歧的 master 輸出範例**：
+
+```json
+{
+  "first_round": "1-1-1 (A/B/C)",
+  "second_round": "1-1-1 (A/B/C, different agents)",
+  "master_recommendation": "Player A",
+  "master_rationale": "看完 6 個 reasoning，A 在 14d / season / prior 三線都有最弱證據累積",
+  "convergence_flag": "⚠️ P1 分歧未收斂（2 輪共 6 agent vote 1:1:1）",
+  "candidates_in_report": ["Player A", "Player B", "Player C"]
+}
+```
+
+**為什麼 master 仍出 ranking 不卡死**：fa_scan 不能因分歧停擺；給用戶看「分歧 + master 自判」比沒有結論好，⚠️ flag 明確告知信心低。
+
+### 4.5 為什麼「2-1 master 可 dissent」很關鍵
+
+H2H one-week 賽制下，「賣高 vs 結構性弱」這類判斷常 borderline。Majority vote 會有 false confidence — 比如：
+- Albies case: 2 agent 看「Sum 8 雙年弱」推 P1，1 agent 看「14d OPS .947 不該 drop」反對
+- Majority 推 P1 = Albies，但 minority 的 reasoning 可能對
+
+**Master 加層**：master 看 reasoning quality，不只看票數。讓「少數派但 reasoning 強」有機會推翻 majority。
+**雙候選列出**：用戶看到完整論述空間，不是單一 push。
 
 ---
 
@@ -233,12 +319,16 @@ prompt 給：
 | 加 ✅/⚠️ tag 層 | binary summary 丟訊息，raw 給 agent 自判 |
 | 加 2×2 矩陣強制框架 | 強加邏輯限制 agent 思維 |
 | 加 SB-related 指標進 Sum | 違背軟 punt SB 策略 |
-| PA/TG 進 urgency 計分 | 隊上同質性高無區分能力（FA add 端 PA/TG 仍作 context）|
+| PA/TG 進 urgency 計分 | 隊上同質性高無區分能力 |
 | 機械算 14d Δ 分數 / K% spike 分數 | 門檻未實證，false precision；raw 給 agent |
 | 14d 重新校準百分位 | 沿用季線百分位，agent 看 raw + 跟季線比即可 |
 | 改 pick_weakest 機械層引入 14d | 14d 訊號交 agent 處理（盲點 4 由 multi-agent step 1 解）|
 | Park factor 調整 | xwOBA 已 ~90% park-neutral，殘餘偏差 fantasy 不修 |
 | 重做百分位表 | 沿用現有 2025 表，2026 mid-season 更新已是 CLAUDE.md TODO |
+| **暴露 Sum / score 給 agent** | Sum 是 aggregate proxy，會 anchor 思維；強迫 raw + percentile reasoning |
+| **守位 / selected_pos / status 進評估** | 評價只看打擊數據；出場狀態跟當天比賽有關，不是品質訊號 |
+| **Slump hold 自動偵測**（2025 Sum ≥24）| 統一改用 `cant_cut` 名單，不分 skill/slump 兩類 |
+| **Strategy context 進 step 1 prompt**（如「BB 結構性偏低」）| H2H 規則本來就含 BB 計分，不需引導 agent |
 
 ---
 
@@ -255,22 +345,29 @@ fa_scan.py daily run (batter path)
     + 14d BBE 估算
     + 14d Δ xwOBA raw 數值
 
-  Layer 3.6 [新增]: enrich_owned_trend
+  Layer 3.6 [新增]: enrich_owned_trend (FA only)
     從 fa_history.json 撈 last 7-day %owned series
     計算 delta_3d / delta_7d / shape
 
   Layer 4 [簡化]: pick_weakest_v4_batter
-    機械 pre-filter only:
-      cant_cut + IL/NA + BBE <40 + Slump hold ≥24
-    Sort by 2026 Sum asc → 取最弱 6 位
-    輸出 weakest_pool（不算 urgency）
+    Hard rule pre-filter:
+      cant_cut（Jazz + Machado）+ BBE <40 + 2026 Sum ≥25
+    輸出 weakest_pool（不限人數，全部 Sum <25）
+    Sum 內部計算後丟掉，不出現在 output
+
+    特殊：pool 0 → fa_scan 跳過 batter drop scan
+         pool 1-3 → step 1 任務變「排所有」
 
   Layer 4.5 [新增]: enrich_for_multi_agent
-    對 weakest_pool 6 + FA pool 8-12 attach raw + percentile 結構
+    對 weakest_pool + FA pool 組裝 raw + percentile 結構
+    （見 §3.2 schema — 無 sum/score/positions/status）
 
   Layer 5 [改]: phase6 batter multi-agent
-    8-step orchestrator: anchor rank → master → review → FA classify → FA rank → review → final
-    輸出 action（drop_X_add_Y / watch / pass）+ 共識 dissent flag
+    step 1: 3 agent 平行 rank top 3
+    step 2: master 整合（含 2-1 dissent 機制）
+    step 2.5: re-review（僅 1-1-1 觸發，NEW 3 agent，pool 縮為 3 P1 候選）
+    step 3-8: FA classify → master rank → review → final decision
+    輸出 action（drop_X_add_Y / watch / pass）+ 候選名單 + reasoning
 
   Layer 6: 推送 + waiver-log 更新（不變）
 ```
@@ -285,26 +382,28 @@ fa_scan.py daily run (batter path)
 
 | 檔案 | 改動 |
 |---|---|
-| `daily-advisor/fa_compute.py` | `compute_urgency` batter 分支：移除 `_factor_rolling`、移除 `_factor_batter_pa_per_tg`、移除 `_factor_2026_sum`、移除 `_factor_2025_sum` 的 batter 用法 — batter 改為**只回傳 enriched entries**（無 ranking、無 urgency 數字）|
-| `daily-advisor/fa_compute.py` | `pick_weakest` batter 分支：加 `_batter_bbe_excluded(bbe < 40)` filter，跟 SP `<30` 對齊 |
+| `daily-advisor/roster_config.json` league.cant_cut | 加 Manny Machado（目前已有 Jazz Chisholm + Skubal-SP）|
+| `daily-advisor/fa_compute.py` | `compute_urgency` batter 分支：移除 `_factor_rolling`、`_factor_batter_pa_per_tg`、`_factor_2026_sum`、`_factor_2025_sum`（batter 用法）— batter 改為**只回傳 enriched entries**（無 ranking、無 urgency 數字）|
+| `daily-advisor/fa_compute.py` | `pick_weakest` batter 分支：加 `_batter_bbe_excluded(bbe < 40)` filter；加 2026 Sum ≥25 排除；移除 `n=4` cap，改回傳全部 Sum <25 |
+| `daily-advisor/fa_compute.py` | 移除 batter slump hold 自動偵測（2025 Sum ≥24）— 改靠 cant_cut 名單 |
 | `daily-advisor/fa_compute.py` | `compute_fa_tags` batter 分支：保留 `✅ 球隊主力 / ⚠️ 上場有限`（PA-based gate）但**移除其他 14d / xwOBA / luck 相關 tag**（這些交 agent）|
 | `daily-advisor/fa_scan.py` | 加 `enrich_14d_trad(player, season=2026)` 函式 |
-| `daily-advisor/fa_scan.py` | 加 `enrich_owned_trend(player_name, fa_history_data)` 函式 |
-| `daily-advisor/fa_scan.py` | 加 `enrich_for_multi_agent(weakest, fa_pool, ...)` 函式 — 組裝最終資料結構 |
-| `daily-advisor/tests/test_fa_compute.py` | 改 batter urgency expectations（4-factor → 無 urgency）|
-| CLAUDE.md「打者評估」§Step 2 | 改寫 — 機械層不再算 urgency，交 multi-agent |
+| `daily-advisor/fa_scan.py` | 加 `enrich_owned_trend(player_name, fa_history_data)` 函式（FA only）|
+| `daily-advisor/fa_scan.py` | 加 `enrich_for_multi_agent(weakest, fa_pool, ...)` 函式 — 組裝 §3.2 schema（無 sum/score）|
+| `daily-advisor/tests/test_fa_compute.py` | 改 batter pick_weakest expectations（無 score / 無 urgency / 含 Sum<25 filter / 無 4-人 cap）|
+| CLAUDE.md「打者評估」§Step 2 | 改寫 — 機械層不再算 urgency，交 multi-agent；移除 slump hold 機制描述，改提 cant_cut |
 
 ### 7.2 Multi-Agent 層
 
 **新增檔案**：
-- `daily-advisor/_phase6_batter.py` — 8-step orchestrator（複製 `_phase6_sp.py` template，改 batter 專屬 helper）
-- `daily-advisor/prompt_phase6_batter_step1_rank.txt` — 3 agent rank P1-P6
-- `daily-advisor/prompt_phase6_batter_step2_master.txt` — master integrate
-- `daily-advisor/prompt_phase6_batter_step3_review.txt` — reviewer (gated)
-- `daily-advisor/prompt_phase6_batter_fa_step1_classify.txt` — FA worth/borderline/not_worth
-- `daily-advisor/prompt_phase6_batter_fa_step2_rank.txt` — FA master rank
-- `daily-advisor/prompt_phase6_batter_fa_step3_review.txt` — FA review (gated)
-- `daily-advisor/prompt_phase6_batter_final_decision.txt` — step 8 action
+- `daily-advisor/_phase6_batter.py` — orchestrator（複製 `_phase6_sp.py` template，改 batter 專屬 helper）
+- `daily-advisor/prompt_phase6_batter_step1_rank.txt` — 3 agent rank top 3
+- `daily-advisor/prompt_phase6_batter_step2_master.txt` — master integrate（含 2-1 dissent 規則）
+- `daily-advisor/prompt_phase6_batter_step2_5_review.txt` — re-review prompt（同 step1 prompt 結構，pool 縮為 3）
+- `daily-advisor/prompt_phase6_batter_fa_step1_classify.txt`
+- `daily-advisor/prompt_phase6_batter_fa_step2_rank.txt`
+- `daily-advisor/prompt_phase6_batter_fa_step3_review.txt`
+- `daily-advisor/prompt_phase6_batter_final_decision.txt`
 
 **改動**：
 - `daily-advisor/fa_scan.py` — 加 `BATTER_FRAMEWORK_VERSION` env var dispatch（同 SP_FRAMEWORK_VERSION 模式）
@@ -314,9 +413,9 @@ fa_scan.py daily run (batter path)
 | 元件 | 來源 | 複用方式 |
 |---|---|---|
 | `_multi_agent.py` | SP v4 已有 | 直接 import（generic helper）|
-| `_phase6_sp.py` 8-step pattern | SP v4 已有 | 複製 + 改 batter 專屬 helper（_build_step1_payload 等）|
+| `_phase6_sp.py` 8-step pattern | SP v4 已有 | 複製 + 改 batter 專屬 helper |
 | `consensus_check_key` / `count_dissent` | `_multi_agent.py` | 直接複用 |
-| Borderline gate / re-eval 1-round 上限 | SP phase6 | 同邏輯 |
+| Step 2.5 re-review 機制 | **新設計**（SP 是「同 agent re-eval with feedback」）| Batter 改為「NEW 3 agent + 縮 pool」 |
 
 ---
 
@@ -324,12 +423,12 @@ fa_scan.py daily run (batter path)
 
 | 問題 | 預設值 / 處理 |
 |---|---|
-| pick_weakest 取多少？（4 / 6 / 8）| 預設 6 — 比 SP 的 4 多，給 agent 較多選擇空間 |
-| Step 1 prompt 是否完全不給判斷框架？ | 預設不給，僅給 league rules / 策略 context；觀察期看 agent 是否需要更多 anchor |
+| `cant_cut` 是否區分 SP/batter？ | 目前共用一個 list — Skubal 對 batter scan 自然不 match（他是 SP）。簡單夠用 |
 | 14d 滾動範圍是否該調整？（vs 7d / 21d / 多窗口）| 預設 14d 一個窗口；觀察期決定是否加 7d / 21d |
 | %owned shape heuristic 門檻 | 預設：explosive ≥+10pp 3d / dropping ≤-3pp 3d / rising +3-10pp 3d / plateau 其他 |
 | Multi-agent 月成本 cap | 訂閱涵蓋（同 SP），無 cap，超 $50 觀察期重評 |
-| Step 1 是否要看 Sum 數字（vs 純百分位）？ | 預設給 Sum + 百分位 + 各 metric raw — agent 自選用哪個 |
+| Step 2.5 re-review 跑 1 輪上限 | 沿用 SP phase6 設計（最多 1 輪 re-review，仍分歧 → master 自判 + flag）|
+| Master 2-1 dissent 頻率 | 預設無上限 — agent reasoning 質量決定。觀察期統計 dissent 比率，過高 → 重審 prompt 質量 |
 
 ---
 
@@ -339,10 +438,12 @@ fa_scan.py daily run (batter path)
 |---|---|
 | 14d sample noise（小樣本誤判）| 14d BBE 進 agent context，prompt 提示「BBE <25 弱化 14d 訊號」|
 | %owned trend 反向訊號（聯盟錯）| 不直接驅動 add，僅當 LLM context |
-| 3 agent 全分歧（1-1-1）| dissent gate 觸發 step 3 review；review 仍分歧 → ⚠️ flag 推 watch（同 SP 設計）|
-| 失去 urgency 數字可解釋性 | Multi-agent 各自 reasoning 取代 urgency 數字當解釋 — 更具體 |
+| 3 agent 全分歧（1-1-1）| step 2.5 re-review 觸發；仍分歧 → master 自判 + ⚠️ flag |
+| Master dissent 過度 | 統計 master vs majority 不一致比率；若 >30% → 檢查 prompt 是否誤導 master |
+| 失去 urgency 數字可解釋性 | Multi-agent 各自 reasoning + master rationale 取代 urgency 數字 |
 | Multi-agent prompt 質量影響判斷 | 上線前用今天兩輪實驗的 case（Albies / Cam Smith / Cortes / Altuve）做 fixture 測試 |
-| 機械防線繞過（agent 推 cant_cut / slump hold）| 機械層 hard rule 在 enrich 前就排除，agent 看不到這些人 |
+| 機械防線繞過（agent 推 cant_cut）| 機械層 hard rule 在 enrich 前就排除，agent 看不到這些人 |
+| Pool 過小（0 人）造成 cron 跳過 batter scan | 預期行為 — 隊強當下不需 drop |
 
 ---
 
@@ -352,8 +453,9 @@ fa_scan.py daily run (batter path)
 |---|---|---|
 | 接刀防護率 | 上線後零接刀（add 後 7 天 OPS <.500）| 月度人工檢核 fa_scan 推薦 vs 後續 14d 結果 |
 | 真實 anchor 識別 | 不 drop 14d 火燙球員 | 統計 14d OPS ≥.850 的 P1 推薦次數 |
-| 共識率（multi-agent）| ≥ 70%（3 agent 至少 2 同意 P1）| step 1 P1 distribution log |
-| Re-eval 次數 | ≤1 輪 / 天 | step 7 觸發 log |
+| 共識率 | ≥ 70%（3 agent 至少 2 同意 P1）| step 1 P1 distribution log |
+| Re-review 觸發率 | <30%（1-1-1 不該頻繁）| step 2.5 觸發 log |
+| Master dissent 率 | <30%（不該過度反 majority）| step 2 master 輸出 log |
 | 月成本 | ≤ $50（SP 約 1.5×）| 上線後實測 |
 
 ---
@@ -363,24 +465,24 @@ fa_scan.py daily run (batter path)
 | 文件 | 關聯 |
 |---|---|
 | `docs/batter-framework-v4-feasibility.md` | 04-25 寫的 batter 5-slot 不可行性研究 — 本 doc 接續結論「不重設 Sum」|
-| `docs/sp-framework-v4-balanced.md` | SP v4 設計稿 — 本 doc 借用「raw + 不打分 + agent 判斷」哲學（SP 21d Δ xwOBACON 也是這樣）|
+| `docs/sp-framework-v4-balanced.md` | SP v4 設計稿 — 本 doc 借用「raw + 不打分 + agent 判斷」哲學 |
 | `docs/v4-cutover-plan.md` | SP v4 cutover 計畫 — 本 doc 多 agent 層複用其完成的 multi-agent infrastructure |
 | `docs/phase6-multi-agent-spike.md` | SP multi-agent 設計稿 — 本 doc 8-step orchestrator 直接複用 |
 | `daily-advisor/_phase6_sp.py` | SP multi-agent 實作 — 本 doc `_phase6_batter.py` 仿造 |
 | `daily-advisor/_multi_agent.py` | multi-agent helper — 本 doc 直接 import 複用 |
-| `CLAUDE.md` 「打者評估」章節 | 現役 batter 框架 — 本 doc 機械層精簡會 update 此章節（urgency 公式拿掉）|
+| `CLAUDE.md` 「打者評估」章節 | 現役 batter 框架 — 本 doc 機械層精簡會 update 此章節（urgency 公式拿掉 + slump hold 機制改 cant_cut）|
 
 ---
 
-## 12. 跟 SP v4 的設計哲學對應
+## 12. 跟 SP v4 的設計哲學對應 + 差異
 
 | 哲學 | SP v4 應用 | Batter 升級應用 |
 |---|---|---|
-| **減少 false precision** | 21d Δ xwOBACON 不打分（raw 給 Claude）| **更徹底**：urgency 全部 factor 不打分，全 raw 給 agent |
-| **層級分工：Python 給材料、Claude 給決策** | 部分 — Sum 仍機械算 | **更純**：Sum 機械算（pick_weakest 用），其他全 agent |
-| **Hard rule vs soft judgment 分離** | cant_cut / slump hold 機械擋；rank/decision 走 agent | **同邏輯延伸**：再加 BBE <40 機械擋 |
-| **Multi-agent 共識 + dissent** | 8-step orchestrator | **直接複用** |
+| **減少 false precision** | 21d Δ xwOBACON 不打分（raw 給 Claude）| **更徹底**：urgency 全部 factor 不打分；Sum 也不暴露給 agent |
+| **層級分工：Python 給材料、Claude 給決策** | 部分 — Sum 仍機械算且暴露 | **更純**：Sum 機械算（內部 filter）後丟掉；output 純 raw + percentile |
+| **Hard rule vs soft judgment 分離** | cant_cut + slump hold 機械擋；rank/decision 走 agent | **同邏輯延伸**：cant_cut 統一管理、再加 BBE <40 + Sum ≥25 機械擋 |
+| **Multi-agent 共識 + dissent** | step 3 reviewer + 1 round re-eval | **Master 2-1 dissent 機制 + step 2.5 NEW 3 agent re-review**（更靈活）|
 
-Batter 升級在「raw + agent 自由 reasoning」這個 axis 上**比 SP v4 更徹底** — SP 還有 4-factor urgency，batter 連這層都拿掉。
+Batter 升級在「raw + agent 自由 reasoning」這個 axis 上**比 SP v4 更徹底** — SP 還暴露 Sum + 4-factor urgency，batter 連這層都拿掉。
 
-合理性：batter 比 SP 少結構性問題（feasibility doc 已實證），所以可以更激進地把判斷推給 agent。
+合理性：batter 比 SP 少結構性問題（feasibility doc 已實證），所以可以更激進地把判斷推給 agent；同時 master dissent 機制給用戶更多參考訊號（不是單一 push）。
