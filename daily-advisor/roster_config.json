@@ -199,8 +199,8 @@
         "pa": 281,
         "g": 77
       },
-      "selected_pos": "BN",
-      "status": "DTD"
+      "selected_pos": "IL",
+      "status": "IL10"
     },
     {
       "name": "Trent Grisham",
@@ -245,6 +245,28 @@
         "pa_per_team_g": 3.6,
         "pa": 584,
         "g": 144
+      }
+    },
+    {
+      "name": "Ryan Jeffers",
+      "mlb_id": 680777,
+      "yahoo_player_key": "469.p.11794",
+      "team": "MIN",
+      "positions": [
+        "C"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.325,
+        "barrel_pct": 6.3,
+        "hh_pct": 42.1,
+        "bb_pct": 10.8,
+        "ops": 0.753,
+        "pa_per_team_g": 2.86,
+        "pa": 464,
+        "g": 119
       }
     }
   ],
