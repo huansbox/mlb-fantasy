@@ -594,6 +594,7 @@ waiver-log.md（球員追蹤唯一來源）
     - §7.7 Batter v4 升級：B（D5 同題）— SP cutover 跑 1-2 月後再評
   - ~~**CLAUDE.md「SP 評估」章節改寫 v4**~~：✅ 2026-04-29 完成（提前 Stage F.2，handoff 文件 P0 觸發；同波改 `.claude/commands/player-eval.md` v4 thin batter + v4 SP）
   - **fa_scan_v4.py CLI 命運**（cutover 時決策）：退役 / ad-hoc 偵錯 / Phase 6 manual frontend 三選一，待 Stage F 一起決
+- [ ] **SP / Batter 框架對稱性檢視**（batter Phase 6 multi-agent 上線時觸發）：目前 SP（v4 + Phase 6）與 Batter（v4 thin + single LLM）機械層厚度不一致 — SP 機械層算 urgency 4-factor + ✅⚠️ data-based tags + Sum 暴露給 LLM，Batter 機械層只 hard filter 不算 urgency / 不打 data-based tag / Sum 不暴露。差異有 intentional 部分（樣本門檻 BBE <40 vs <30、slump hold 機械 vs LLM、14d vs 21d 趨勢視窗 — 投打打數累積與時間尺度不同）也有「演化未完」部分（urgency / tags / Sum 暴露三項可能該下放給 multi-agent 自由 reasoning）。Batter Phase 6 multi-agent 上線後重評 SP 是否拆薄（option X：對齊 batter / option Y：保留 SP anchor）。詳見 2026-04-29 session 對照表。
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
