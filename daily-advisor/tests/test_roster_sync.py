@@ -1,5 +1,7 @@
 """Unit tests for roster_sync helpers."""
-from roster_sync import _count_missing_fields
+from unittest.mock import patch
+
+from roster_sync import _count_missing_fields, search_mlb_id
 
 
 def test_count_missing_fields_all_complete():
@@ -136,3 +138,42 @@ def test_count_missing_fields_aggregates_across_sections():
     missing = _count_missing_fields(config)
     assert missing["selected_pos"] == 2
     assert missing["status"] == 2
+
+
+@patch("roster_sync.mlb_api_get")
+def test_search_mlb_id_strips_yahoo_two_way_pitcher_suffix(mock_get):
+    """Yahoo splits two-way players into '<name> (Pitcher)' / '(Batter)'
+    entities; search_mlb_id must strip the suffix to find the mlb_id."""
+    mock_get.side_effect = [
+        {"people": []},                       # first try with suffix fails
+        {"people": [{"id": 547179}]},         # stripped name succeeds
+    ]
+    assert search_mlb_id("Michael Lorenzen (Pitcher)") == 547179
+    assert mock_get.call_count == 2
+    # Second call should query the stripped name
+    second_url = mock_get.call_args_list[1][0][0]
+    assert "Michael%20Lorenzen" in second_url
+    assert "Pitcher" not in second_url
+
+
+@patch("roster_sync.mlb_api_get")
+def test_search_mlb_id_strips_yahoo_two_way_batter_suffix(mock_get):
+    mock_get.side_effect = [
+        {"people": []},
+        {"people": [{"id": 660271}]},
+    ]
+    assert search_mlb_id("Shohei Ohtani (Batter)") == 660271
+
+
+@patch("roster_sync.mlb_api_get")
+def test_search_mlb_id_normal_name_no_extra_calls(mock_get):
+    """No regression: names without parens still resolve in one API call."""
+    mock_get.return_value = {"people": [{"id": 547179}]}
+    assert search_mlb_id("Michael Lorenzen") == 547179
+    assert mock_get.call_count == 1
+
+
+@patch("roster_sync.mlb_api_get")
+def test_search_mlb_id_returns_none_when_all_fallbacks_fail(mock_get):
+    mock_get.return_value = {"people": []}
+    assert search_mlb_id("Nonexistent Player (Pitcher)") is None

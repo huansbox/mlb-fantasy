@@ -255,6 +255,15 @@ def search_mlb_id(name):
     if result:
         return result
 
+    # Strip Yahoo two-way disambiguation suffix: "(Pitcher)" / "(Batter)".
+    # Yahoo splits two-way players (Lorenzen, Ohtani) into separate pitcher
+    # and batter entities; both share one MLB mlb_id.
+    no_paren = re.sub(r'\s*\([^)]*\)\s*$', '', name).strip()
+    if no_paren and no_paren != name:
+        result = try_search(no_paren)
+        if result:
+            return result
+
     stripped = re.sub(r'\s+(Jr\.|Sr\.|II|III|IV)$', '', name).strip()
     if stripped != name:
         result = try_search(stripped)
