@@ -156,33 +156,53 @@ WebSearch: "{球員名} {今年} news injury rotation role"
 
 → `/player-eval` **完整套用 fa_scan 的評估規則**（保證一致），再加 fa_scan **不做**的陣容脈絡判斷。
 
-### 打者評估流程（對齊 fa_scan Pass 1/2）
+### 打者評估流程（對齊 fa_scan v4 thin）
 
-**Step 2.1 — 排最弱 4 人錨點**（fa_scan Pass 1 規則）：
-1. 讀 `roster_config.json` 全隊 11 打者
-2. 對每人用 2026 當季數據算 Sum：
-   - xwOBA / BB% / Barrel% 三指標各按百分位 → 1-10 分
-   - Sum 範圍 3-30
-3. 升冪排序取最弱 4 人
+> 完整規則見 CLAUDE.md「打者評估」（v4 thin — raw + agent 自由 reasoning）。
 
-**Step 2.2 — drop 優先序（urgency 四因子）**：
-對最弱 4 人逐一算 urgency：
-- 2026 Sum：<9 +5 / 9-11 +4 / 12-14 +3 / 15-17 +2 / 18-21 +1
-- 2025 Sum：≥24 → **Slump hold 移出排序** / 22-23 +0 / 18-21 +1 / <18 +2
-- 14d xwOBA Δ（BBE ≥25 才啟用）：≥+0.050 -2 / +0.035 to +0.050 -1 / ±0.035 持平 0 / -0.050 to -0.035 +1 / ≤-0.050 +2
-- 2026 PA/Team_G：≥3.5 +2 / 3.0-3.5 +1 / 2.5-3.0 +0 / <2.5 +0
+**Step 2.1 — 機械層 hard filter**：
+1. 讀 `roster_config.json` 全隊 batter
+2. 排除 cant_cut 名單 + BBE <40 + 2026 Sum ≥25（內部 filter，不暴露給 LLM）
+3. 餘者全進候選池（不限 4 人 cap）
 
-排序得 P1-P4（P1 最該 drop）+ Slump hold 獨立列。
+**Step 2.2 — LLM 層自由 reasoning**（不機械化排序）：
+從 raw + percentile + 14d trad + %owned + prior 自行判斷：
+- 結構性弱（雙年雙低）→ drop 候選
+- 14d 火燙（OPS ≥.850）但 season Sum 低 → 賣低風險，hold
+- K% 短期跳 +5pp 以上 → 傷勢警訊
+- BBE 邊緣（剛過 40）→ 信心仍低，hedge
+- Savant 好 + Trad 差（BABIP 噪音）→ buy-low
+- Trad 好 + Savant 差 → 賣高窗口
 
-**Step 2.3 — 評估目標球員**（被詢問的球員）：
-- 若是 FA → 用 Sum + ✅/⚠️ tags 比較 P1-P4
-- 若是隊上球員 → 重新看 urgency + 雙年檢核
-- 若是交易標的 → 計算對方陣容相對位置（用同 Sum 規則）
+**Step 2.3 — 評估目標球員**：
+- 若是 FA → 跟池內弱者比 raw signals + Sum 差（≥3 是排序提示，不是 verdict）+ 14d 趨勢
+- 若是隊上球員 → 看 raw signals + 雙年檢核 + 14d trend + %owned
+- 若是交易標的 → 對方陣容同樣用 5 層判斷（season skill / 14d trad / playing time / market pressure / prior）
 
-### SP / RP 流程（暫沿用舊規則）
+### SP 流程（對齊 fa_scan v4 + Phase 6 multi-agent）
 
-- SP：排出最弱 4 位 SP → FA 只跟最弱的比（核心 3 指標 2/3 勝出）
-- RP：只有 2 人，FA 直接跟目前 RP 比
+> 完整規則見 CLAUDE.md「SP 評估」（v4 5-slot Sum + Phase 6 multi-agent）。
+
+**Step 2.1 — 機械層篩選**：
+1. Rotation Gate 排除 pure RP（GS=0 / IP/GS<3）+ cant_cut + IL/NA
+2. 5-slot Sum：IP/GS / Whiff% / BB/9 / GB% / xwOBACON 各取百分位 → 1-10 分加總（Sum 5-50）
+3. BBE <30 標 low_confidence_excluded（不參與排序）
+4. Slump hold（2025 Sum ≥24 且 IP ≥50）獨立標註
+
+**Step 2.2 — drop urgency**（4-factor）：
+- 2026 Sum 越低分越高
+- 2025 Sum 雙年檢核（<18 結構性 +2 / ≥24 slump hold 移出）
+- 21d xwOBACON Δ 趨勢（強劣化 +2 / 強回升 -2）
+- 2026 IP/Team_G（active 輪值放大；≥1.0 +2 / 0.5-1.0 +1）
+
+**Step 2.3 — 評估目標球員**：
+- 若是 FA → 跟最弱 SP 比 5-slot Sum + ✅⚠️ tags（Sum 差 ≥3 + 2 項正向 = 機械 win_gate）
+- 若是隊上 SP → 看 urgency + 雙年檢核 + 21d trend + slump 判斷
+- 邊界 case 走 LLM 層自由 reasoning（不機械化升級判斷）
+
+### RP 流程
+
+只有 2 人不排最弱清單，FA 直接跟目前 RP 比品質（xERA / xwOBA / HH% / Barrel%）+ K/9 + SV+H（附加項）。維持 2 RP 的 punt SV+H 前提下，品質小輸但有 SV+H 也值得換。
 
 ## Step 2.5：Savant 回歸驗證（條件觸發）
 
@@ -208,47 +228,57 @@ python -c "..." # 用 /api/v1/people/{id}/stats?stats=gameLog&season=2026&group=
 
 ## Step 3：比較與輸出
 
-### 打者（對齊 fa_scan Pass 2 task B 規則）
+### 打者（對齊 fa_scan v4 thin）
 
-**3.1 — Sum 比較表**（核心 3 指標）
+**3.1 — Raw 比較表**（核心 3 指標 + 14d + %owned + prior）
 
-| 球員 | xwOBA | BB% | Barrel% | Sum | 2025 Sum | 14d Δ | PA/TG | BBE |
-|------|-------|-----|---------|-----|----------|-------|-------|-----|
-| FA  | .320 (8) | 9.0% (7) | 10.5% (8) | **23** | 25 | +0.045 | 3.4 | 38 |
-| 我隊 P1 | .250 (5) | 6.0% (3) | 4.0% (1) | **9**  | 14 | -0.033 | 4.1 | 61 |
-| 差   | +3 | +4 | +7 | **+14** | — | — | — | — |
+| 球員 | xwOBA | BB% | Barrel% | 2025 prior | 14d trad | %owned | PA/TG | BBE |
+|------|-------|-----|---------|-----------|----------|--------|-------|-----|
+| FA   | .320 (P75) | 9.0% (P55) | 10.5% (P75) | xwOBA .310 P70 | OPS .920 (HR 3 / BB 6 / K 14%) | 28% (+5/3d) | 3.4 | 38 |
+| 我隊 P1 | .250 (P25) | 6.0% (P30) | 4.0% (P15) | xwOBA .240 P15 | OPS .560 (HR 0 / K 28%) | 65% | 4.1 | 61 |
 
-**3.2 — 勝出判斷**（fa_scan Pass 2 B.1 規則）
+附 Sum 內部差作排序提示（≥3 = 機械 win_gate hint），不是 verdict。
 
-- Sum 差 ≥ 3 + 至少 2 項指標正向（每項 ≥ 0）→ 進評估
-- `+5 +1 -3 = +3` 不算（一項大輸）
-- `+1 +1 +1 = +3` 算（三項都贏）
+**3.2 — 自由 reasoning 判斷**（不卡 binary matrix）
 
-**3.3 — Add ✅/⚠️ tags**（B.2 / B.3 規則）
+從 raw + 14d + %owned + prior 判斷球員定位：
+- 結構性弱（雙年雙低）→ drop 候選
+- Slump hold（雙年高，當季低）→ 不急 cut，等樣本回歸
+- BABIP 噪音（Savant 好 + Trad 差）→ buy-low
+- 賣高窗口（Trad 好 + Savant 差）→ trade value 最大化但結構不佳
+- 14d 火燙但 season Sum 低 → 賣低風險，hold
+- K% 短期跳 +5pp 以上 → 傷勢警訊
 
-| 標籤 | 條件 | FA 範例 |
-|------|------|---------|
-| ✅ 雙年菁英 | 2025 Sum ≥ 24 | 25 ✓ |
-| ✅ 球隊主力 | 2026 PA/TG ≥ 3.5 | 3.4 ✗（接近邊緣）|
-| ✅ 近況確認 | 14d Δ ≥ +0.035 | +0.045 ✓ |
-| ⚠️ 上場有限（強警示）| PA/TG <2.5 | — |
-| ⚠️ 樣本小 | BBE <30 | — |
-| ⚠️ Breakout 待驗 | 2025 Sum <18 或無 | — |
-| ⚠️ 近況下滑 | 14d Δ ≤ -0.035 | — |
+**3.3 — PA-based gate**（v4 thin 唯一保留 binary tag）
 
-**3.4 — 升級判斷**（B.4 規則）
+| 標籤 | 條件 | 用途 |
+|------|------|------|
+| ✅ 球隊主力 | 2026 PA/TG ≥3.5 | 信心提升（樣本能累積）|
+| ⚠️ 上場有限（強警示）| 2026 PA/TG <2.5 | 強警示，否決多數升級 |
 
-- ≥2 ✅ + 無 ⚠️ → **立即取代**
-- 1 ✅ + 無 ⚠️ 上場有限 → 取代
-- 1 ✅ + ⚠️ 上場有限 → 觀察（強警示否決）
-- 多個 ⚠️ 或無 ✅ → 觀察
+其他 ✅⚠️ tags（雙年菁英 / 近況確認 / Breakout 待驗 / 近況下滑）已從 v4 thin 移除，交 LLM 從 raw 判斷。
 
-### SP / RP（暫沿用舊規則）
+**3.4 — 升級判斷**
 
-- SP 欄位：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / IP/GS / ERA / WHIP / K/9 / |xERA-ERA| / QS 潛力 / W 支援
-  - 附 MLB 百分位定位 + 樣本量（BBE）
-  - |xERA-ERA| 超過百分位 P70+ 時標記運氣方向
-- RP 欄位：同 SP + K/9 / IP/Team_G / SV+H（留意但不追）
+不給 binary matrix。LLM 從 reasoning 自由判斷：立即取代 / 取代 / 觀察 / 不換。判斷時需考量：
+- 結構性 vs slump 區分
+- 14d 是 H2H 短期使用價值（一週決策），不是長期預測
+- %owned 窗口（dropping = 市場放棄 / explosive = 窗口正在關）
+- 陣容脈絡（守位、單點故障、邊際遞減 — Step 4 處理）
+
+### SP（對齊 fa_scan v4 5-slot）
+
+- SP 核心欄位：IP/GS / Whiff% / BB/9 / GB% / xwOBACON（5-slot Sum 用）
+- 輔助欄位：xERA / ERA / WHIP / K/9 / IP/Team_G / Barrel% allowed / |xERA-ERA|
+- 附 MLB 百分位定位（P25/P50/P70/P90）+ 樣本量（BBE，<30 信心低）
+- |xERA-ERA| 超過 P70（≥0.81）時標記運氣方向：+ = 賣高 / − = buy-low
+- 21d xwOBACON Δ：強劣化（≥+0.050）/ 強回升（≤-0.050）作 urgency 提示
+
+### RP
+
+- RP 欄位：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / K/9 / IP/Team_G / SV+H（附加項）
+- 只有 2 人，FA 直接跟現有 RP 比
+- Punt SV+H 前提下品質小輸但有 SV+H 也值得換
 
 ### 末行明確決策結論
 
@@ -291,6 +321,6 @@ python -c "..." # 用 /api/v1/people/{id}/stats?stats=gameLog&season=2026&group=
 - [ ] 所有數值都來自搜尋結果，沒有用「大概」替代？查不到的有標記？
 - [ ] 有沒有查近況（傷病/角色變化）？球員有沒有轉隊？
 - [ ] 指標差距有沒有 ≥ 10 百分位點？不到就不算顯著
-- [ ] 投手有沒有查 xERA + IP/GS？|xERA-ERA| 超 P70 要標記運氣
+- [ ] 投手有沒有查 5-slot（IP/GS / Whiff% / BB/9 / GB% / xwOBACON）+ xERA？|xERA-ERA| 超 P70（≥0.81）要標記運氣
 - [ ] 小樣本數據有沒有標記？（< 80 場/IP、季初 < 30 PA）
 - [ ] 有沒有回到陣容脈絡判斷邊際效益？不動是否才是最佳策略？
