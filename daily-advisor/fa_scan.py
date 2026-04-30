@@ -90,6 +90,8 @@ def collect_fa_snapshot(access_token, config, queries=None):
                         "pct": int(float(p["percent_owned"] or 0)),
                         "stats": stats,
                         "waiver_date": p.get("waiver_date", ""),
+                        "status": p.get("status", ""),
+                        "ownership_type": p.get("ownership_type", ""),
                     }
         except Exception as e:
             print(f"FA query error ({label}): {e}", file=sys.stderr)
@@ -328,6 +330,8 @@ def enrich_watch_players(watchlist, savant_2026, config):
             "mlb_id": mlb_id,
             "fa_type": fa_type,
             "pct": w.get("pct", 0),
+            "status": w.get("status", ""),
+            "ownership_type": w.get("ownership_type", ""),
             "source": "watch",
         }
 
@@ -745,6 +749,8 @@ def filter_by_savant(snapshot, savant_2026):
                 "pct": info["pct"],
                 "stats": info.get("stats", {}),
                 "waiver_date": info.get("waiver_date", ""),
+                "status": info.get("status", ""),
+                "ownership_type": info.get("ownership_type", ""),
                 "fa_type": fa_type,
                 "savant_2026": savant,  # may be None
                 "mlb_id": mlb_id,
@@ -785,6 +791,8 @@ def filter_by_savant(snapshot, savant_2026):
             "pct": info["pct"],
             "stats": info.get("stats", {}),
             "waiver_date": info.get("waiver_date", ""),
+            "status": info.get("status", ""),
+            "ownership_type": info.get("ownership_type", ""),
             "fa_type": fa_type,
             "savant_2026": savant,
             "mlb_id": mlb_id,
@@ -1227,6 +1235,22 @@ def _fmt_owned_change(d1, d3):
     return f"({d1s}/{d3s})"
 
 
+def _status_tag(p):
+    """Render Yahoo player status + waiver state as a short header tag.
+
+    Returns "" if healthy free-agent, otherwise " ⚠️ DTD" / " ⚠️ IL10" /
+    " 🟡 W" (on waivers) etc. so LLM sees injury / waiver context in header.
+    """
+    parts = []
+    s = (p.get("status") or "").strip()
+    if s:
+        parts.append(f"⚠️ {s}")
+    ot = (p.get("ownership_type") or "").strip().lower()
+    if ot == "waivers":
+        parts.append("🟡 W")
+    return f" {' '.join(parts)}" if parts else ""
+
+
 def _format_fa_batter(p, fa_rolling=None):
     s26 = p.get("savant_2026") or {}
     d26 = p.get("derived_2026") or {}
@@ -1235,7 +1259,8 @@ def _format_fa_batter(p, fa_rolling=None):
     yahoo = p.get("stats", {})
 
     header = (f"  {p['name']} ({p['team']}, {p['position']}) — "
-              f"{p['pct']}% {_fmt_owned_change(p.get('d1'), p.get('d3'))}")
+              f"{p['pct']}% {_fmt_owned_change(p.get('d1'), p.get('d3'))}"
+              f"{_status_tag(p)}")
     lines = [header]
 
     # Quality
@@ -1312,7 +1337,8 @@ def _format_fa_pitcher(p, fa_rolling=None):
     pt = "rp" if fa_type == "rp" else "pitcher"
 
     header = (f"  {p['name']} ({p['team']}, {p['position']}) — "
-              f"{p['pct']}% {_fmt_owned_change(p.get('d1'), p.get('d3'))}")
+              f"{p['pct']}% {_fmt_owned_change(p.get('d1'), p.get('d3'))}"
+              f"{_status_tag(p)}")
     lines = [header]
 
     # Quality
@@ -3223,15 +3249,19 @@ def _run_daily_scan(access_token, config, today_str, env, args):
         time.sleep(0.5)
     watchlist = still_fa
 
-    # Inject %owned from snapshot into watchlist before snapshot_no_watch filter.
-    # Without this, enrich_watch_players falls back to 0 and reports show 0%
-    # for watch players, misleading downstream LLM reasoning ("0% in 12-team =
-    # free pickup"). Watch players not in SCAN_QUERIES top results stay None.
+    # Inject %owned + status + ownership_type from snapshot into watchlist
+    # before snapshot_no_watch filter. Without this, enrich_watch_players falls
+    # back to defaults and reports show 0% / no injury / no waiver tag for watch
+    # players, misleading downstream LLM reasoning (e.g. "0% in 12-team = free
+    # pickup" or recommending a player who is actually DTD on waivers).
+    # Watch players not in SCAN_QUERIES top results stay None.
     for w in watchlist:
         if w["name"] in snapshot:
             w["pct"] = snapshot[w["name"]]["pct"]
+            w["status"] = snapshot[w["name"]].get("status", "")
+            w["ownership_type"] = snapshot[w["name"]].get("ownership_type", "")
         else:
-            print(f"  Watch pct unknown (not in snapshot top results): {w['name']}", file=sys.stderr)
+            print(f"  Watch pct/status unknown (not in snapshot top results): {w['name']}", file=sys.stderr)
 
     # Remove watch players from snapshot to avoid duplication
     watch_names = {w["name"] for w in watchlist}
