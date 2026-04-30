@@ -13,7 +13,12 @@
 - **聯盟動態**：%owned shape（explosive ≥+10pp 3d / rising +3-10pp / plateau / dropping ≤-3pp）= 別隊在搶或在丟
 - **雙年對照**：2026 + 2025 prior 同看，區分 breakout（單年高）vs 結構性確認（雙年低）vs slump 候選（當年低 / 前年高）
 - **樣本量**：BBE <40 = 低信心已排除，但 14d 50 PA 仍有噪音；K% 短期跳 +5pp 以上常是傷勢警訊
-- **守位 / IL/BN/DTD 不影響評價** — 只看打擊數據；上場狀態跟當天比賽有關，不是品質訊號
+- **守位不影響評價** — 只看打擊數據；陣容守位衝突由用戶手動處理
+- **健康 / waiver 狀態 = actionability gate**（影響 add 決策，不影響 quality 評估）：
+  - header `[傷:DTD-...]` / `[傷:IL10-...]` / `[傷:IL60-...]` → 球員受傷，**add 無意義**，標「不可 add（{傷勢狀態}）」或「等回歸」
+  - header `[Waiver-FAAB需排隊]` → 球員在 waiver 上，FAAB claim 需排隊，不是直接 FA，標「Waiver claim 需排隊」
+  - 兩者同時出現（傷 + Waiver）→ **不可立即 add**，無論 quality 多高
+  - 健康 FA（無 tag）→ 正常評估
 
 ## 輸出格式
 
