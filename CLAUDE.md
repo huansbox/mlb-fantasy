@@ -550,9 +550,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
 | `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
-| `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）— 取代 v3，未實作前 v2 仍 live rules** |
-| `docs/sp-framework-v3-weighted.md` | SP 評估 v3 設計（已被 v4 取代，保留作設計演進紀錄）|
-| `docs/nola-lopez-holmes-triview-2026-04-23.md` | 三視角 Nola/López/Holmes drop 評估回測材料（2/3 視角反對 v3 判斷）|
+| `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）** |
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
 | `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A 已完成，下次動 Stage B-F 前讀** |
 | `docs/savant-xwobacon-endpoint-research.md` | 21d xwOBACON 端點研究（2026-04-25）— **驚喜 finding：不需新 endpoint，savant_rolling.py 4 行 patch 即可**（已實作 commit `621a5d2`）|

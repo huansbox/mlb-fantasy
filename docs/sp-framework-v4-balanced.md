@@ -320,9 +320,7 @@ v4 data row：
 
 ## 相關文件
 
-- `CLAUDE.md` — 現行 v2 框架（live rules，Phase C 實作前）
-- `docs/sp-framework-v3-weighted.md` — v3 設計稿（已被 v4 取代）
-- `docs/nola-lopez-holmes-triview-2026-04-23.md` — 三視角回測材料
+- `CLAUDE.md` — 現行 SP 評估框架 live rules
 - `docs/sp-decisions-backtest.md` — SP 決策 living log
 - `daily-advisor/fa_compute.py` — Python 機械計算層（待 Phase C 改寫）
 - `daily-advisor/fa_scan.py` — 資料抓取 + Claude 文字化（待 Phase C 擴充）

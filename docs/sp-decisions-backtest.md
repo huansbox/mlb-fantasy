@@ -225,18 +225,7 @@
 
 ## 元回測：框架本身的準確度
 
-除了個別球員決策，也要追蹤**框架判斷模式**的成敗：
-
-### v2 → v3 顯著分歧的案例
-
-- **高估者（v2 Sum 高 → v3 Sum 低）**：J.T. Ginn (-16) / Tobias Myers (-14) / Cade Horton (-14) / Bernardino (-13) / Fedde (-10) / Pfaadt (-8)
-- **低估者（v2 Sum 低 → v3 Sum 高）**：Nola (+4) / Paddack (+1)
-
-回測問題：若這些人在接下來 2-4 週實際表現驗證了 v3 判斷（Ginn 崩、Nola 穩），則 v3 升級有效。若相反（Ginn 繼續 P80 Savant 維持、Nola 繼續衰退），v3 設計反而退步。
-
-### v3 → 三視角分歧的案例
-
-見文件 `docs/nola-lopez-holmes-triview-2026-04-23.md` — v3 判 López 最弱，但 2/3 視角判 Nola 最弱。這個案例直接決定 v3.1 是否啟動。
+除了個別球員決策，也要追蹤**框架判斷模式**的成敗。隨 v4 + Phase 6 multi-agent 上線，後續案例直接記在條目「後續走勢」與「回測判定」欄。
 
 ## 更新紀錄
 
