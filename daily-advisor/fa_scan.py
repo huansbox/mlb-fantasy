@@ -1235,19 +1235,31 @@ def _fmt_owned_change(d1, d3):
     return f"({d1s}/{d3s})"
 
 
-def _status_tag(p):
-    """Render Yahoo player status + waiver state as a short header tag.
+_STATUS_HINT = {
+    "DTD": "DTD-日傷觀察",
+    "IL10": "IL10-10日傷兵",
+    "IL15": "IL15-15日傷兵",
+    "IL60": "IL60-60日傷兵",
+    "NA": "NA-未提報",
+    "SUSP": "SUSP-禁賽",
+}
 
-    Returns "" if healthy free-agent, otherwise " ⚠️ DTD" / " ⚠️ IL10" /
-    " 🟡 W" (on waivers) etc. so LLM sees injury / waiver context in header.
+
+def _status_tag(p):
+    """Render Yahoo player status + waiver state as plain-text header tags.
+
+    Uses prose hints (e.g. "[傷:DTD-日傷觀察]" / "[Waiver-FAAB需排隊]") rather
+    than emojis so LLM does not need to guess symbol meaning. Returns "" if
+    healthy free-agent.
     """
     parts = []
     s = (p.get("status") or "").strip()
     if s:
-        parts.append(f"⚠️ {s}")
+        hint = _STATUS_HINT.get(s, s)
+        parts.append(f"[傷:{hint}]")
     ot = (p.get("ownership_type") or "").strip().lower()
     if ot == "waivers":
-        parts.append("🟡 W")
+        parts.append("[Waiver-FAAB需排隊]")
     return f" {' '.join(parts)}" if parts else ""
 
 
