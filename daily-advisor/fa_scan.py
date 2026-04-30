@@ -2798,9 +2798,12 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
         shape_str = f" [3d {d3_s} / 7d {d7_s} / {owned.get('shape', '?')}]"
 
     prefix = f"{idx}. " if idx is not None else "- "
+    # status tag (DTD/IL/W) is actionability metadata — surfaces injury and
+    # waiver state without violating §1.2/§3.4 (which excludes position to
+    # avoid biasing quality evaluation).
     lines = [
         f"{prefix}**{name}** ({team}) {pct_str}{shape_str} "
-        f"[PA-TG {pa_tg_str} / BBE {bbe}]{tag_str}"
+        f"[PA-TG {pa_tg_str} / BBE {bbe}]{tag_str}{_status_tag(entry)}"
     ]
 
     season_parts = [
