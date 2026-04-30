@@ -899,7 +899,6 @@ Final:
 
 | 文件 | 關聯 |
 |---|---|
-| `docs/batter-framework-v4-feasibility.md` | 04-25 寫的 batter 5-slot 不可行性研究 — 本 doc 接續結論「不重設 Sum」|
 | `docs/sp-framework-v4-balanced.md` | SP v4 設計稿 — 本 doc 借用「raw + 不打分 + agent 判斷」哲學 |
 | `docs/v4-cutover-plan.md` | SP v4 cutover 計畫 — 本 doc 多 agent 層複用其完成的 multi-agent infrastructure |
 | `docs/phase6-multi-agent-spike.md` | SP multi-agent 設計稿 — 本 doc 8-step orchestrator 直接複用 |
@@ -943,7 +942,7 @@ Batter 升級在「raw + agent 自由 reasoning」這個 axis 上**比 SP v4 更
 **選 B — 多 agent 層**（**主軸 — 下次 session 入口**）：
 - 前置：
   - SP **Stage F.1 cutover 已完成 2026-04-28**（commits `2837226` + `433099d`），等 ~5-7 天 production 健康
-  - 動工前需先補完 review F1 + F2（見 `docs/batter-v4-thin-implementation-review.md` Action Items #3 + #4）：
+  - 動工前需先補完兩個 review follow-up：
     - **F1**: `enrich_for_multi_agent_batter` 的 `rolling_block` 補完 14d trad（HR/RBI/AVG/OBP/SLG/k_spike_pp/delta_xwoba），目前只有 Savant rolling 4 項。multi-agent 層上線時看不到 trad 訊號會不完整
     - **F2**: 拿掉 `_build_pass2_data_batter_v4:2796` 的 `sum_diff` sort hint（multi-agent 自由 reasoning 不需排序 hint）
 - 工作量：2-3 天（7 個 prompt 檔 + `_phase6_batter.py` orchestrator + F1/F2 補正）

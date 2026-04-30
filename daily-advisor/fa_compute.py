@@ -1,10 +1,9 @@
 """fa_compute — Python compute layer for fa_scan.
 
 Mechanical rules (Sum / urgency / ✅⚠️ tags / upgrade) extracted from Claude
-prompts into deterministic, unit-testable Python. See
-`docs/fa_scan-python-compute-design.md` §3 for architecture.
+prompts into deterministic, unit-testable Python.
 
-Single source of truth for rule definitions remains CLAUDE.md. This module
+Single source of truth for rule definitions is CLAUDE.md. This module
 implements those rules 1:1.
 """
 

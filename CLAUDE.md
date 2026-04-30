@@ -548,14 +548,12 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse fa_scan_v4 fetchers，idempotent，新進 SP 也可跑） |
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
-| `docs/fa_scan-python-compute-design.md` | Phase 5 重構 design + plan（架構參考，未來 fa_scan 大改時讀） |
 | `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
 | `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）** |
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
 | `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A 已完成，下次動 Stage B-F 前讀** |
 | `docs/savant-xwobacon-endpoint-research.md` | 21d xwOBACON 端點研究（2026-04-25）— **驚喜 finding：不需新 endpoint，savant_rolling.py 4 行 patch 即可**（已實作 commit `621a5d2`）|
 | `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫（2026-04-25）— 簡化版（D2=C）只跑 step 1 取 P1 一致率，動 Stage B-F 前的最後一道驗證 |
-| `docs/batter-framework-v4-feasibility.md` | Batter v4 升級可行性研究（2026-04-25）— **結論「暫不升」**（D5/§7.7=B），SP cutover 1-2 月後再評是否套機會 A（決策層擴展） |
 | `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— v4 cutover 後 1-2 月觸發實作 |
 | `docs/savant-smoke-test-design.md` | Savant 端點 daily smoke test design（2026-04-25）— v4 cutover 前後實作 |
 

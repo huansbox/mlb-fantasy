@@ -433,7 +433,7 @@ LLM 額外看的訊號：
 
 目前 production 是單 LLM prompt `prompt_fa_scan_pass2_batter.txt`，不是完整 batter multi-agent。docs 記載未來要等 SP F.1 觀察期穩定後再接 batter multi-agent。
 
-我注意到 `docs/batter-v4-thin-implementation-review.md` 已記錄過 positions 欄位暴露、schema 不完整等 finding，後續 commit 看起來已修過主要問題。這份 repo 有明確的 code review / follow-up 習慣。
+我注意到 batter v4 thin 實作有過 code review（PR #125 round / followup round），記錄了 positions 欄位暴露、schema 不完整等 finding，後續 commit 看起來已修過主要問題。這份 repo 有明確的 code review / follow-up 習慣。
 
 ### SP：v4 + Phase 6 multi-agent
 

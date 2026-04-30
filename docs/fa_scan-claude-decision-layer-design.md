@@ -1,7 +1,7 @@
 # fa_scan Claude 決策層設計（Phase 6）
 
 > **Status**：設計討論中（2026-04-25 對齊）。前置：v4 cutover（prior_stats backfill + 21d xwOBACON fetch + production 切換）。建議與 v4 cutover **同一波**完成（反正 prompt 都要改）。
-> **取代**：Phase 5「Python 主決策、AI 翻譯」模式（見 `docs/fa_scan-python-compute-design.md`）。
+> **取代**：Phase 5「Python 主決策、AI 翻譯」模式（fa_compute 直接吐 decision，prompt 只翻譯）。
 > **不取代**：Phase 5 的 Python 機械層仍有效（Sum / urgency / tag 計算、單元測試覆蓋），只是「decision」職責從 Python 移到 Claude。
 
 ---
