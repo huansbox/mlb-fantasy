@@ -3223,6 +3223,16 @@ def _run_daily_scan(access_token, config, today_str, env, args):
         time.sleep(0.5)
     watchlist = still_fa
 
+    # Inject %owned from snapshot into watchlist before snapshot_no_watch filter.
+    # Without this, enrich_watch_players falls back to 0 and reports show 0%
+    # for watch players, misleading downstream LLM reasoning ("0% in 12-team =
+    # free pickup"). Watch players not in SCAN_QUERIES top results stay None.
+    for w in watchlist:
+        if w["name"] in snapshot:
+            w["pct"] = snapshot[w["name"]]["pct"]
+        else:
+            print(f"  Watch pct unknown (not in snapshot top results): {w['name']}", file=sys.stderr)
+
     # Remove watch players from snapshot to avoid duplication
     watch_names = {w["name"] for w in watchlist}
     snapshot_no_watch = {k: v for k, v in snapshot.items() if k not in watch_names}
