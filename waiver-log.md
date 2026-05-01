@@ -20,19 +20,10 @@
 - 04-30：xwOBA P80 / BB% P80 穩健；14d OPS .879 / Savant Δ+0.050 品質上升；仍等 Stanton 觸發條件（fa_scan）
 - 05-01：xwOBA P80 / BB% P70 穩健；14d Savant Δ+0.071 品質上升；仍等 Stanton 觸發條件（fa_scan）
 
-### Dansby Swanson (CHC, SS) [mlb_id:621020] — 觀察中
-觸發：立即行動
-- 04-29：xwOBA P80 / BB% P95 / Barrel% P80 三項全勝 Albies 30+ pctile；86% owned 撿到就是偷；14d .890 OPS + 14 RBI 產量即戰力（fa_scan）
-- 04-30：第 2 天推薦立即取代：xwOBA P95 / BB% P95 / Barrel% P80 三項碾壓 Albies；14d .890 OPS + 14 RBI；0% owned 搶人風險低但不宜再等（fa_scan）
-
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：PA-TG ≥3.2 連 7 天 + xwOBA 維持 P80+ → 升級取代
 - 04-30：xwOBA P95 / BB% P95 / Barrel% P70；2025 prior P70/P70/P80 雙年確認；14d OPS .924 + 9 BB；PA-TG 2.87 + COL 主場膨脹需觀察（fa_scan）
 - 05-01：xwOBA P95 / BB% P80 / Barrel% P70 穩健；14d OPS .807 + Savant Δ+0.030；PA-TG 2.84 仍未達 3.2 門檻（fa_scan）
-
-### Cole Young (SEA, 2B) [mlb_id:702284] — 觀察中
-觸發：BBE 達 100 + xwOBA 維持 P80+ + Barrel% 升至 P60+ → 升級取代
-- 04-30：xwOBA P95 / BB% P60 / Barrel% P45；PA-TG 3.94 全職主力；14d Savant Δ+0.082 急升；2025 Barrel% P25 breakout 待驗；15% rising（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 80 → 升級取代
@@ -45,4 +36,10 @@
 ## 隊上觀察
 
 ## 已結案
+
+### Dansby Swanson (CHC, SS) — 被搶（自動偵測）
+- 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
+
+### Cole Young (SEA, 2B) — 被搶（自動偵測）
+- 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
 
