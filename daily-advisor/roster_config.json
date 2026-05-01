@@ -87,7 +87,7 @@
         "g": 159
       },
       "selected_pos": "3B",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Jose Altuve",
@@ -210,7 +210,7 @@
       "positions": [
         "CF"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -255,7 +255,7 @@
       "positions": [
         "C"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -318,7 +318,7 @@
         "gb_pct": 43.4,
         "xwobacon": 0.348
       },
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": ""
     },
     {
@@ -397,31 +397,6 @@
       "status": ""
     },
     {
-      "name": "Merrill Kelly",
-      "mlb_id": 518876,
-      "team": "AZ",
-      "positions": [
-        "SP"
-      ],
-      "yahoo_player_key": "469.p.11251",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.16,
-        "xwoba_allowed": 0.316,
-        "hh_pct_allowed": 43.5,
-        "barrel_pct_allowed": 9.2,
-        "bbe": 531,
-        "era": 3.52,
-        "ip_per_gs": 5.8,
-        "ip": 184.0,
-        "whiff_pct": 23.3,
-        "gb_pct": 28.6,
-        "xwobacon": 0.38
-      },
-      "selected_pos": "P",
-      "status": ""
-    },
-    {
       "name": "Graham Ashcraft",
       "mlb_id": 668933,
       "yahoo_player_key": "469.p.12392",
@@ -429,8 +404,8 @@
       "positions": [
         "RP"
       ],
-      "selected_pos": "RP",
-      "status": "",
+      "selected_pos": "NA",
+      "status": "NA",
       "prior_stats": {
         "season": 2025,
         "xera": 3.46,
@@ -452,7 +427,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "SP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -529,9 +504,32 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "SP",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": null
+    },
+    {
+      "name": "Janson Junk",
+      "mlb_id": 676083,
+      "yahoo_player_key": "469.p.12263",
+      "team": "MIA",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.45,
+        "xwoba_allowed": 0.326,
+        "hh_pct_allowed": 47.3,
+        "barrel_pct_allowed": 8.5,
+        "bbe": 353,
+        "era": 4.17,
+        "ip": 110.0,
+        "ip_per_gs": 5.5
+      }
     }
   ],
   "teams": {
