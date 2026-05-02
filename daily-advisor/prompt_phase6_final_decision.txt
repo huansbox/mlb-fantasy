@@ -36,7 +36,7 @@ Output exactly one of three actions:
 5. **Roster context matters for action vs watch**:
    - If team has empty BN slot or IL slot freed up, swap is cheaper (no drop pain)
    - If anchor is currently the best of a thin position group, swap risks structural hole
-6. **One sentence per reason in `reason` field**. Don't repeat the data — interpret it. Bad: "Pfaadt has Sum 37 vs Nola 19 = +18". Good: "Pfaadt's K-rate has finally caught up to his stuff, breaking the BABIP suspicion that kept him outside earlier upgrades — the Sum +18 is real, not a sample fluke."
+6. **One sentence per reason in `reason` field**. Don't repeat the data — interpret it. Bad: 「Pfaadt Sum 37 vs Nola 19 = +18」. Good: 「Pfaadt 的 K 率終於追上 stuff，過去 BABIP 假象被打破 — Sum +18 是真升級，不是樣本噪音」.
 
 ## Waiver-log integration
 
@@ -64,19 +64,19 @@ If you choose `pass`, emit no waiver_log_updates unless one of the FAs needs UPD
   "drop": "name" | null,
   "add": "name" | null,
   "watch_target": "name" | null,
-  "reason": "≤200 words. Interpret the data, don't recite. Reference key signals (specific numbers + tags) but synthesize them into a coherent narrative for the action.",
+  "reason": "繁體中文（臺灣用語），≤200 字。Interpret the data, don't recite. Reference key signals (specific numbers + tags) but synthesize them into a coherent narrative for the action. 技術術語與球員名保留英文。",
   "watch_triggers": [
-    "Specific condition 1 (e.g. 'next start IP/GS ≥ 5.5 + K/9 ≥ 8 → upgrade to drop_add')",
-    "Specific condition 2"
+    "繁體中文，具體條件 1（例：『下一場 IP/GS ≥ 5.5 + K/9 ≥ 8 → 升級為 drop_add』）",
+    "繁體中文，具體條件 2"
   ],
   "waiver_log_updates": [
     {
       "action": "NEW" | "UPDATE",
       "name": "player name",
-      "note": "one-line context"
+      "note": "繁體中文一行脈絡"
     }
   ],
-  "telegram_summary": "≤150 chars. Single line for Telegram push. Format: '[Phase 6] action — short reason'. Example: '[Phase 6] drop Nola add Pfaadt — Sum +18 + 雙年菁英 + K finally caught up to stuff'."
+  "telegram_summary": "繁體中文，≤80 字（≤150 chars）。單行 Telegram 推送。格式：『[Phase 6] action — 短理由』。例：『[Phase 6] drop Nola add Pfaadt — Sum +18 雙年菁英，K 率追上 stuff』。"
 }
 ```
 
@@ -86,5 +86,6 @@ Rules:
 - If `action` is `pass`, `drop` / `add` / `watch_target` MUST be null. `watch_triggers` MUST be empty array.
 - `reason` is mandatory regardless of action.
 - `telegram_summary` is mandatory and ≤ 150 chars (will be embedded in Telegram message).
+- **Language**: `reason` / `watch_triggers` / `waiver_log_updates.note` / `telegram_summary` 一律輸出繁體中文（臺灣用語）。技術術語（xERA、Whiff%、Sum、Barrel% 等）與球員名保留英文原文。其餘 JSON 欄位（`action` / `drop` / `add` / `watch_target` / `waiver_log_updates.action`）保持英文 enum 值。
 - `waiver_log_updates` may be empty array but the field must be present.
 - Output ONLY the JSON object inside a fenced code block.
