@@ -37,10 +37,9 @@
 
 - **Punt SV+H**：不為 SV+H 多拿 RP（維持 2 位），但現有 RP 有 SV+H 是加分
 - **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
-- **SP 重裝**：10 SP 深度（含 Kelly IL 歸隊中 + López SUSP），40 IP 門檻輕鬆過
-- **BN 配置**：1 打者（Albies/Jazz 輪替）+ 2 SP（López SUSP + 機動）。打者深度換投手產量（2026-04-12 確立，Week 2-3 IP 倒數第 3 驅動）
+- **SP 重裝**：11 SP 深度（含 IL 替補），40 IP 門檻輕鬆過
+- **BN 配置**：1 打者 + 2 SP（2026-04-12 確立，Week 2-3 IP 倒數第 3 驅動）
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
-- **BB 結構性偏低**（2026-04-09 觀察，Week 1-3 排 5th/10th/8th）：OPS 穩定前 2-4 但 BB 中後段，Tovar/Chisholm BB% 極低拉低整隊。同等條件優先高 BB% 打者
 - **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
 
 ### 進行中補強行動
@@ -57,22 +56,6 @@
   3. 主場場至少 1 場 ER ≤2（破除 2025 home ERA 6.01 結構弱點）
 - **失守降級**（任一觸發 → 降回觀察 / hold）：BB ≥4 任一場 / IP <5 任一場
 - 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
-
-**Ragans Slump 觀察**（啟動 2026-04-20 下午，先前定位修正）
-- 觸發：2026 Sum 16（xERA 5.18 / xwOBA .358 / HH% 34.1% >P90）+ 2025 Sum 27（2.67 / .256 / 39.4%）
-- 判定：「當季低 + 前一年高 → Slump 候選」（2025 菁英底，2025 xERA 2.67 >P90）
-- 運氣 -0.82 運氣差，實際水準 ~P40-50，不是 ERA 6.00 這麼爛
-- 行動：**不急 cut**，按框架等樣本回歸
-- H2H 短期止血：當週拖比率嚴重時可排 BN（非 drop）
-- 風險：drop 後回歸菁英 = 賣低吐血
-- 狀態：觀察中，不條件式 drop
-
-> **已驗證（2 週後清理）**：
-> - BB 結構性補強（Grisham，04-09）✅ Week 4 BB 單週 #2 / 2 週合併 #4 ⬆️
-> - IP 結構性補強（BN 改 1bat+2SP + Detmers，04-12）✅ Week 4 IP 單週 #5 / 2 週合併 #8 ⬆️
-> - Whitlock 軟 cut（04-13）✅ 已 drop，Kelly 在 BN
-> - drop Kelly add Junk（04-30）✅ Kelly 雙年結構性崩壞確認 + Junk 102 BBE 高信心 + GB/BB 菁英；Phase 6 推薦的 Ashcraft 04-30 已被別隊搶走，Junk 是合理 fallback
-> - Nola drop 候選 → hold（04-23）✅ 三視角重評降級為 hold，05-02 v4 跑 Sum 15 + ✅ 撿便宜運氣 -1.22，hold 結論不變
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
@@ -115,7 +98,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 - **上場時效**：claim（TW 15:00 前）→ 當日 TW 15:00 處理 → 當晚設 Daily-Tomorrow lineup → 隔天上場（前置 1 天）
 - **被 drop 球員**：1 天 waiver period
 - **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
-- **FAAB 餘額**：$100（2026-04-12 更新，Detmers $0 取得）
+- **FAAB 餘額**：$100（至 2026-05-02 仍滿；Detmers / Junk / Severino 皆 $0 取得）
 - **每週上限**：6 次 add（add/drop 一組算 1 次）
 
 ### 陣容風險
@@ -534,16 +517,16 @@ waiver-log.md（球員追蹤唯一來源）
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
-| `daily-advisor/fa_scan_v4.py` | **v4 框架分析工具（parallel 於 fa_scan.py v2 production cron）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate + 升級建議；stdout 不推送** |
+| `daily-advisor/fa_scan_v4.py` | **v4 ad-hoc CLI 工具（純 stdlib + 公開 API，本機 / VPS 皆可跑）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate；不入 production cron。Stage F 一起決命運（退役 / 偵錯 / Phase 6 manual frontend）** |
 | `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse fa_scan_v4 fetchers，idempotent，新進 SP 也可跑） |
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
 | `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）** |
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
-| `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A 已完成，下次動 Stage B-F 前讀** |
+| `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A-D 完成，E parallel 並行中（04-28 起），動 Stage F 前讀** |
 | `docs/savant-xwobacon-endpoint-research.md` | 21d xwOBACON 端點研究（2026-04-25）— **驚喜 finding：不需新 endpoint，savant_rolling.py 4 行 patch 即可**（已實作 commit `621a5d2`）|
-| `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫（2026-04-25）— 簡化版（D2=C）只跑 step 1 取 P1 一致率，動 Stage B-F 前的最後一道驗證 |
+| `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫 + 結果（2026-04-25 plan / 04-26 跑完）— P1 共識 100%，§7.2 放寬為「P1 match 即收斂」（borderline gate Sum 差 <5 才強制 step 3 review） |
 | `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— v4 cutover 後 1-2 月觸發實作 |
 | `docs/savant-smoke-test-design.md` | Savant 端點 daily smoke test design（2026-04-25）— v4 cutover 前後實作 |
 
@@ -553,7 +536,7 @@ waiver-log.md（球員追蹤唯一來源）
 - waiver-log auto-close mlb_id 驗證 — _check_player_ownership 加 expected_team
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
--->
+  -->
 - [ ] **Phase 6 reason 中文化驗證**（2026-05-02 改完，明天 cron 第一天看效果）：commit `c63f13c` 改 `prompt_phase6_final_decision.txt` 強制 reason / watch_triggers / waiver_log_updates.note / telegram_summary 輸出繁體中文（player names + 技術術語保留英文）。明天 12:30 cron 跑出 #140 SP-v4 報告後驗收 Telegram 推送語言；若仍英文，prompt 需加強指令位置或前置 system 提示
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見「進行中補強行動」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
@@ -565,13 +548,7 @@ waiver-log.md（球員追蹤唯一來源）
   - ~~Stage C Phase 6 prompt 重寫~~：✅ 2026-04-26 完成（commit `dbac88e`，5 個 `prompt_phase6_*.txt` + `prompt_fa_scan_pass2_sp.v2.txt` 備份）
   - ~~簡化 spike（D2=C）~~：✅ 2026-04-26 跑完（commits `0873e2b` tooling + `e8f18a2` results）— Wall-clock 40s / P1 共識 100% / Result Category A → cutover 進行；§7.2 放寬為「P1 match 即收斂」（borderline gate Sum 差 <5 才強制 step 3 review）
   - ~~Stage D Phase 6 multi-agent orchestrator~~：✅ 2026-04-27 完成（5 commits `f055e35`/`7436370`/`677b7e9`/`9f17a0e`/`3a66ac5`）。Plan 範圍外加做：(a) 補 2 個 FA prompt（master rank + review；plan 中對齊用戶選項 2「拆 FA master rank + review」）/ (b) fa_compute 補 `pick_weakest_v4_sp` + `compute_urgency_v4_sp` + 3 個 v4 factor helper（Stage B 只加了 fa_tags）/ (c) 新建獨立模組 `_phase6_sp.py` 8-step orchestrator（避免 fa_scan.py 膨脹）/ (d) `_multi_agent.py` 抽出 spike runner pattern + 42 unit tests + 1 happy-path smoke test。225 tests pass（v2 path 不變）。本機 dry-run 因 Yahoo token 不在退讓給 Stage E parallel 驗證。
-  - **Stage E parallel 1-2 週驗證（進行中）**：
-    - (1) ~~VPS cron 加 v4 並行行~~：✅ 2026-04-27（`/etc/cron.d/daily-advisor` append `35 4 * * *`，UTC = TPE 12:35，v2 後 5 min；plan 範圍外加 `--sp-only` 旗標只測 SP 線省 batter 重跑）
-    - (2) ~~`daily-advisor/_tools/diff_v2_v4_outputs.py`~~：✅ 2026-04-27 完成（commit `5226301`，含 v2 path `--no-waiver-log` wire up；v2 parser 用 #114/#118 真實 Issue 驗證）
-    - (3) ⏳ 連續 5+ 天 v4 行為合理 + 9-13 calls/day 訂閱負載合理 → 進 Stage F cutover。紅燈條件：v4 判 P1=cant_cut / re-eval 不收斂 >1 次 / Telegram 噪音超出（degrade flag）。詳見 cutover plan §6
-    - (4) ⏳ 首跑後建 `docs/v4-cutover-parallel-log.md`（每日對照記錄；模板未開，等首日真內容再起）
-    - (5) v4 parser 未實機驗證（regex 依 final prompt schema 寫）— 首跑後跑 `diff_v2_v4_outputs.py --raw` 確認，必要時校準
-    - 首跑：明日 2026-04-28 12:35 TPE。驗收：`ssh root@107.175.30.172 "tail -200 /var/log/fa-scan-v4.log"` + `python3 daily-advisor/_tools/diff_v2_v4_outputs.py`
+  - **Stage E parallel 驗證**：✅ 2026-04-28 首跑後連跑 4 天（04-29~05-02）production 健康，跳過 5 天 parallel 驗證直接 cutover。詳見 `docs/v4-cutover-plan.md` §6
   - **Phase 6 §7 內部設計鎖定**：
     - §7.1 Multi-agent runtime：`claude -p` subprocess + threading（訂閱涵蓋，無 API cost 顧慮，見 memory `project_claude_p_subscription.md`）
     - §7.2 同意定義：**P1 match 即收斂**（spike 放寬，2026-04-26）+ borderline gate Sum 差 <5 才強制 step 3 review
@@ -590,7 +567,5 @@ waiver-log.md（球員追蹤唯一來源）
 - [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - ~~**roster_sync --init 不 backfill 新欄位**~~：✅ 2026-04-26 完成（commit `1b4f4e2`，加 `_count_missing_fields` helper 把 `selected_pos`/`status` 納入 backfill 檢查 + 6 unit tests）
-- [ ] Week 4-5（~04-14）：回顧新指標框架（feedback_metrics_framework_observations.md 的 3 個觀察點）— ⚠️ 已過期（今日 04-27），下次 session 評估補做或標 stale 移除
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
-- [ ] **追蹤 Liberatore drop 後表現**（驗證運氣回歸判斷）：是否被別隊撿走 + 接下來幾場是否被打。ERA 3.38 / xERA 5.61 運氣 +2.23 是賣高訊號，需實際結果驗證模型
