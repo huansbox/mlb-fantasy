@@ -47,7 +47,9 @@
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 70 → 升級
 - 05-02：xwOBA P95 / BB% P80 / Barrel% P80 結構全菁英；14d OPS 1.115 / 5 HR；PA-TG 1.94 嚴重上場有限 + 2025 prior 平庸 = breakout 待驗（fa_scan）
 
-## 隊上觀察
+### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
+觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
+- 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
 
 ## 已結案
 
