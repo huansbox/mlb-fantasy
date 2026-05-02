@@ -33,6 +33,8 @@
 
 > 完整陣容見 `daily-advisor/roster_config.json`（唯一名單來源）。
 
+> **文檔分工原則**（2026-05-03 B1 refactor 後）：本檔只寫類型 / 規則 / 策略，**不點名具體球員**（核心球員段的 cant_cut 3 人例外）。具體球員觀察（傷勢、角色變化、限局跡象、borderline anchor 驗證等）一律進 `waiver-log.md`「隊上觀察」段；已執行 add/drop 理由看 git log。原因：球員會被 drop / 換隊 / 變更角色，CLAUDE.md 留具體球員會變孤兒（如 04-09 寫的 Tovar BB% 弱點，04-27 換 Correa 後孤兒近 1 週才被發現）。
+
 ## 執行中策略
 
 - **Punt SV+H**：不為 SV+H 多拿 RP（維持 2 位），但現有 RP 有 SV+H 是加分
