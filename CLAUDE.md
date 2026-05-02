@@ -168,6 +168,7 @@ curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydr
 - 「不動也是策略」— FA 未明顯優於現有球員 → 不換
 - 轉隊確認：球員目前球隊 = 數據球隊？不符就重新評估
 - 12 隊聯賽 xwOBA > P90 的 FA 基本不存在 → 出現代表 drop 失誤
+- **投手 selected_pos（SP/BN/P/RP）不影響品質評估** — 投手會在 SP/BN 間輪換調度（當天先發放 SP、已先發過放 BN 等下次輪值），BN ≠「非主力」「占位」。drop 理由只能來自結構面（v4 Sum / 雙年 prior / 樣本可信度 / 運氣訊號 / 21d 趨勢 / Rotation gate）。打者才適用「BN = 角色脈絡」判斷
 
 ### 打者評估（v4 thin — raw + agent 自由 reasoning）
 
