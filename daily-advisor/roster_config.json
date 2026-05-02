@@ -479,7 +479,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -529,6 +529,28 @@
         "era": 4.17,
         "ip": 110.0,
         "ip_per_gs": 5.5
+      }
+    },
+    {
+      "name": "Luis Severino",
+      "mlb_id": 622663,
+      "yahoo_player_key": "469.p.9879",
+      "team": "ATH",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.61,
+        "xwoba_allowed": 0.331,
+        "hh_pct_allowed": 41.9,
+        "barrel_pct_allowed": 6.0,
+        "bbe": 515,
+        "era": 4.54,
+        "ip": 162.7,
+        "ip_per_gs": 5.6
       }
     }
   ],
