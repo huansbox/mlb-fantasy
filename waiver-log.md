@@ -51,6 +51,22 @@
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
 
+## 隊上觀察
+
+> 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
+
+### Luis Severino (ATH, SP) [mlb_id:622663] — borderline anchor 觀察
+觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），近 2 場 transformation level（13.2 IP / 2 ER / 3 BB / 13 K = ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）
+- 啟動 2026-05-02（roster_sync 自動 add）
+- 新聞脈絡：04-29 Sutter 簽約後最佳場（7 IP / 1 ER / 8 K），fastball 使用率 reverted（sit 96 / top 99 mph，stuff elite 沒退化）
+- A's Opening Day starter，球隊 2026 唯一可靠 SP，輪值 100% 鎖定
+- **驗證觸發**（下 2 場 ALL 通過 → borderline 轉正式 anchor）：
+  1. BB ≤2（控球修復確認，非 2 場 fluke）
+  2. IP ≥6（IP/GS 結構維持）
+  3. 主場場至少 1 場 ER ≤2（破除 2025 home ERA 6.01 結構弱點）
+- **失守降級**（任一觸發 → 降回觀察 / hold）：BB ≥4 任一場 / IP <5 任一場
+- 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
+
 ## 已結案
 
 ### Dansby Swanson (CHC, SS) — 被搶（自動偵測）

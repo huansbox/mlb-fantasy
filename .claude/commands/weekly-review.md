@@ -40,10 +40,11 @@
    - 對手強弱多半混合運氣與真實力，不可控；我方陣容才是可調整的
    - 時間比重：對手 5% / 戰績歸因 10% / **我方球員 45%** / 策略驗證 20% / 行動清單 20%
 
-7. **跨週連續性**：Phase 0 必讀 CLAUDE.md「進行中補強行動」section
-   - 每週 review 開頭載入當前進行中項目（如 BB 補強、IP 補強、Whitlock 軟 cut）
-   - Phase 1C 對每個項目逐一驗證指標 + 更新狀態
-   - 已驗證/失敗 2 週後清理（避免 CLAUDE.md 膨脹）
+7. **跨週連續性**：Phase 0 載入兩個來源
+   - `waiver-log.md` 「隊上觀察」段：觀察中的自家球員（borderline anchor / 角色變化 / 限局跡象）
+   - `git log --since='1 week ago'`：上週執行的 add/drop + commit message 中的理由
+   - Phase 1C 對每個觀察項目逐一驗證指標 + 更新狀態
+   - 已驗證/失守 2 週後從 waiver-log 移到「已結案」（git log 留痕）
    - 防止「忘記上週做了什麼」造成的決策斷層
 
 8. **拖累者分類**：Phase 1B 識別拖累者後必須再分類（不能模糊「拖累者」一詞）
@@ -68,7 +69,7 @@
    ```
 2. 讀 `daily-advisor/weekly-data/week-{N}.json`（N = 當前週數，由 cron 自動準備）
 3. 讀 `week-reviews.md`（上週的 predicted_outcome，用於覆盤對照）
-4. **讀 CLAUDE.md `### 進行中補強行動` section**（自動已在 context，不需手動讀檔）
+4. **讀 `waiver-log.md` 「隊上觀察」段** + `git log --since='1 week ago' --oneline`（兩個來源都需手動讀）
 
 若 JSON 不存在，提示用戶：
 - VPS 上跑：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && python3 daily-advisor/weekly_review.py --prepare'`
@@ -88,15 +89,15 @@
 
 ## Phase 0：策略現況載入（5 min）
 
-從 CLAUDE.md `### 進行中補強行動` section 列出當前所有項目，標記每個項目的：
-- **觸發**：當初為什麼啟動
-- **行動**：執行了什麼
-- **驗證指標**：要看哪個類別 / 球員 / 排名
-- **驗證日期**：本週是否該驗證
+從兩個來源彙整本週要驗證的策略項目：
+
+1. **`waiver-log.md` 「隊上觀察」段**：當前自家球員觀察項目（borderline anchor / 角色變化 / 限局跡象等）
+   - 每個項目標記：觸發 / 啟動日期 / 驗證觸發條件 / 失守條件 / 風險
+
+2. **`git log --since='1 week ago' --oneline`**：上週執行的 add/drop / 重大決策 commit
+   - commit message 已記錄理由，重點看「驗證指標是否如預期」
 
 **輸出**：「本週要驗證的策略項目清單」（Phase 1C 會逐一檢核）。
-
-如果上一個 review 後沒新增 review，這份清單就是「上週啟動 + 本週啟動」的並集。
 
 ## Phase 1A：戰績結果 + 簡短歸因（10%，5 min）
 
@@ -153,19 +154,19 @@
 
 ## Phase 1C：策略行動驗證（20%，5 min）
 
-對 Phase 0 載入的每個進行中補強項目逐一驗證：
+對 Phase 0 載入的每個觀察項目（waiver-log「隊上觀察」+ git log 上週決策）逐一驗證：
 
-1. 找對應驗證指標（類別排名 / 球員 stats）
+1. 找對應驗證指標（類別排名 / 球員 stats / 觸發條件達成情況）
 2. 比對 1 週前狀態
 3. 判定狀態：
-   - **執行中**：尚未到驗證日期
-   - **驗證中**：到驗證日期但結果不明顯（再等 1 週）
-   - **已驗證（成功）**：指標明確改善
-   - **已驗證（失敗）**：指標沒改善或惡化
-4. 更新 CLAUDE.md `### 進行中補強行動` section：
-   - 已驗證/失敗超過 2 週的項目移除（git log 留痕）
-   - 新項目從 Phase 2C 行動清單啟動時加入
-5. 記錄學習：失敗的補強項目要寫進「學到什麼」
+   - **觀察中**：尚未達觸發 / 失守條件
+   - **驗證中**：條件部分達成（再等 1 週樣本）
+   - **已驗證（成功）**：觸發條件全通過 → 升級為正式 anchor
+   - **已驗證（失敗）**：失守條件達成 → 降級或 drop 候選
+4. 更新 `waiver-log.md`：
+   - 「隊上觀察」段：已驗證 / 失守超過 2 週的項目移到「已結案」（git log 留痕）
+   - 新項目從 Phase 2C 行動清單啟動時加入「隊上觀察」
+5. 記錄學習：失敗的觀察項目要寫進「學到什麼」
 
 ## Phase 2A：對手摘要（5%，3 min）
 
@@ -224,9 +225,9 @@
 - 哪些球員「如果本週爆炸就 drop」（單場意外延續 / 趨勢下降）
 - 列出明確觸發條件
 
-### (e) 啟動新補強項目（如有）
-- 寫進 CLAUDE.md `### 進行中補強行動` section
-- 觸發 / 行動 / 預期 / 驗證日期 / 狀態
+### (e) 啟動新觀察項目（如有）
+- 寫進 `waiver-log.md` 「隊上觀察」段
+- 觸發 / 啟動日期 / 驗證觸發條件 / 失守條件 / 風險
 
 ## Step 3：寫入 + Commit
 
@@ -236,7 +237,7 @@
 |------|------|------|
 | `daily-advisor/weekly-data/week-{N}.json` | `preview.predicted_outcome`（machine-readable）| 結構化 |
 | `week-reviews.md` | 完整覆盤 + 預測 + 行動清單（human-readable）| 摘要 |
-| `CLAUDE.md` | `### 進行中補強行動` section 更新 | 滾動狀態 |
+| `waiver-log.md` | 「隊上觀察」段更新（新項目啟動 / 升級 / 失守） | 滾動狀態 |
 
 ### `predicted_outcome` JSON 格式
 ```json
@@ -251,7 +252,7 @@
 ```
 
 ### Commit
-1 個 commit 包含：JSON + week-reviews.md + CLAUDE.md（如更新）
+1 個 commit 包含：JSON + week-reviews.md + waiver-log.md（如更新）
 
 ## `week-reviews.md` 寫入格式
 
@@ -322,7 +323,7 @@
 | Phase | 時間 | 內容 |
 |-------|------|------|
 | Step 1+2 資料準備 | 3 min | 讀 JSON（含 `review.two_week_ranks`） |
-| Phase 0 策略載入 | 5 min | CLAUDE.md 現況 |
+| Phase 0 策略載入 | 5 min | waiver-log 隊上觀察 + git log 1 週 |
 | Phase 1A 戰績歸因 | 5 min | 14 類別 + 簡短分類 |
 | Phase 1B 球員狀態 | 15-20 min | **核心**，含 news check |
 | Phase 1C 策略驗證 | 5 min | 對 Phase 0 項目逐一檢核 |

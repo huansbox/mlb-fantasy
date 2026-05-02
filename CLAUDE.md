@@ -42,21 +42,6 @@
 - **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
 - **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
 
-### 進行中補強行動
-
-> 每週 weekly-review Phase 1C 更新狀態。已驗證/失敗 2 週後移除（git log 留痕）。新項目觸發即加入。
-
-**Severino transformation 觀察**（啟動 2026-05-02，roster_sync 自動 add）
-- 觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），近 2 場 transformation level（13.2 IP / 2 ER / 3 BB / 13 K = ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）
-- 新聞脈絡：04-29 Sutter 簽約後最佳場（7 IP / 1 ER / 8 K），fastball 使用率 reverted（sit 96 / top 99 mph，stuff elite 沒退化）
-- A's Opening Day starter，球隊 2026 唯一可靠 SP，輪值 100% 鎖定
-- **驗證觸發**（下 2 場 ALL 通過 → 從 borderline 轉正式 anchor）：
-  1. BB ≤2（控球修復確認，非 2 場 fluke）
-  2. IP ≥6（IP/GS 結構維持）
-  3. 主場場至少 1 場 ER ≤2（破除 2025 home ERA 6.01 結構弱點）
-- **失守降級**（任一觸發 → 降回觀察 / hold）：BB ≥4 任一場 / IP <5 任一場
-- 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
-
 ### 串流 SP 決策規則（2026-03-30 確立）
 
 | 情境 | 做法 |
@@ -538,7 +523,7 @@ waiver-log.md（球員追蹤唯一來源）
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
 - [ ] **Phase 6 reason 中文化驗證**（2026-05-02 改完，明天 cron 第一天看效果）：commit `c63f13c` 改 `prompt_phase6_final_decision.txt` 強制 reason / watch_triggers / waiver_log_updates.note / telegram_summary 輸出繁體中文（player names + 技術術語保留英文）。明天 12:30 cron 跑出 #140 SP-v4 報告後驗收 Telegram 推送語言；若仍英文，prompt 需加強指令位置或前置 system 提示
-- [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見「進行中補強行動」段
+- [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **v4 cutover + Phase 6 同波**（2026-04-26 鎖定 + Stage A-C 已完成）：
