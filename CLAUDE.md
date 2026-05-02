@@ -47,18 +47,16 @@
 
 > 每週 weekly-review Phase 1C 更新狀態。已驗證/失敗 2 週後移除（git log 留痕）。新項目觸發即加入。
 
-**Nola drop 候選觀察**（啟動 2026-04-20，04-23 降級為 hold）
-- 原觸發：2026 Sum 11 + 2025 Sum 15 + 速度 90.7 mph = 2025 災難年水準
-- 04-23 三視角重評修正：
-  - 2025 Sum 15 實為 P45-50 中段，非「結構性確認」要求的雙年雙低
-  - 純 counting 類別 Nola 5 GS 略勝 Meyer（IP 26.2 / K 29 / QS 2 vs 25.0/28/0）
-  - xERA 真實差距 Meyer 4.39 vs Nola 4.70 僅 0.31，20 週會被樣本噪音淹沒
-- Meyer add 從 "slam dunk" 降級為 "邊際升級"：ERA/WHIP 小贏，QS/W/IP/K 略輸
-- **hold → cut 條件**（下 2 場任一）：速度仍 ≤91 mph + xwOBA 季線 >.340 + 連 2 場 <5 IP 或 3+ ER
-- **hold → continue 條件**（下 2 場任一）：速度回升 92+ mph / xwOBA <.320 / 新增 1+ QS
-- 窗口風險：Meyer 18% owned 3d+5 可能被搶，但 MIA 弱隊 + 0 QS 降低聯盟搶人意願
-- 候選池（保留備查）：Meyer (MIA) 首選 / Griffin (WSH) 備案（運氣 +1.04 ERA 會回升）/ Pfaadt (AZ) 等 K 起來
-- 狀態：hold 2 場觀察，~05-01 前重評
+**Severino transformation 觀察**（啟動 2026-05-02，roster_sync 自動 add）
+- 觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），近 2 場 transformation level（13.2 IP / 2 ER / 3 BB / 13 K = ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）
+- 新聞脈絡：04-29 Sutter 簽約後最佳場（7 IP / 1 ER / 8 K），fastball 使用率 reverted（sit 96 / top 99 mph，stuff elite 沒退化）
+- A's Opening Day starter，球隊 2026 唯一可靠 SP，輪值 100% 鎖定
+- **驗證觸發**（下 2 場 ALL 通過 → 從 borderline 轉正式 anchor）：
+  1. BB ≤2（控球修復確認，非 2 場 fluke）
+  2. IP ≥6（IP/GS 結構維持）
+  3. 主場場至少 1 場 ER ≤2（破除 2025 home ERA 6.01 結構弱點）
+- **失守降級**（任一觸發 → 降回觀察 / hold）：BB ≥4 任一場 / IP <5 任一場
+- 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
 
 **Ragans Slump 觀察**（啟動 2026-04-20 下午，先前定位修正）
 - 觸發：2026 Sum 16（xERA 5.18 / xwOBA .358 / HH% 34.1% >P90）+ 2025 Sum 27（2.67 / .256 / 39.4%）
@@ -69,21 +67,12 @@
 - 風險：drop 後回歸菁英 = 賣低吐血
 - 狀態：觀察中，不條件式 drop
 
-**drop Kelly add Junk 待決**（啟動 2026-04-28，等比完賽處理）
-- v4 Phase 6 推薦：drop Kelly add Junk — Sum +20，Kelly 結構性崩壞 + Junk 84 BBE 高信心 + GB/BB 菁英
-- 兩人都今晚 ET 投先發（TPE 2026-04-29 早 07:40 Kelly @ MIL vs Patrick / 早 10:10 Junk @ LAD vs Ohtani）
-- **行動**：今天 TPE 15:00 不提 FAAB，等比完賽決策
-- **decision rules**（明早 TPE 09:00-12:00 看結果，14:30 前提 FAAB）：
-  - Kelly 5+ IP / ≤3 ER / BB ≤2 → 改 hold Kelly，重評整輪
-  - Kelly 4-6 IP / 4-5 ER 一般 → drop Kelly add Junk（決心稍弱但 v4 仍勝）
-  - Kelly <4 IP / 5+ ER 又崩 → drop Kelly add Junk（雙重確認）
-  - Junk 結果僅供 nice-to-know（v4 框架基於季線，單場 LAD 不改變評估）
-- 風險：Junk 0% owned 等一天搶人風險低；Kelly 已 BN 不拖比率；只損 1 天 slot
-
 > **已驗證（2 週後清理）**：
 > - BB 結構性補強（Grisham，04-09）✅ Week 4 BB 單週 #2 / 2 週合併 #4 ⬆️
 > - IP 結構性補強（BN 改 1bat+2SP + Detmers，04-12）✅ Week 4 IP 單週 #5 / 2 週合併 #8 ⬆️
 > - Whitlock 軟 cut（04-13）✅ 已 drop，Kelly 在 BN
+> - drop Kelly add Junk（04-30）✅ Kelly 雙年結構性崩壞確認 + Junk 102 BBE 高信心 + GB/BB 菁英；Phase 6 推薦的 Ashcraft 04-30 已被別隊搶走，Junk 是合理 fallback
+> - Nola drop 候選 → hold（04-23）✅ 三視角重評降級為 hold，05-02 v4 跑 Sum 15 + ✅ 撿便宜運氣 -1.22，hold 結論不變
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
@@ -565,6 +554,8 @@ waiver-log.md（球員追蹤唯一來源）
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
 -->
+- [ ] **Phase 6 reason 中文化驗證**（2026-05-02 改完，明天 cron 第一天看效果）：commit `c63f13c` 改 `prompt_phase6_final_decision.txt` 強制 reason / watch_triggers / waiver_log_updates.note / telegram_summary 輸出繁體中文（player names + 技術術語保留英文）。明天 12:30 cron 跑出 #140 SP-v4 報告後驗收 Telegram 推送語言；若仍英文，prompt 需加強指令位置或前置 system 提示
+- [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見「進行中補強行動」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **v4 cutover + Phase 6 同波**（2026-04-26 鎖定 + Stage A-C 已完成）：
