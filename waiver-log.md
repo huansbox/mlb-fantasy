@@ -89,3 +89,9 @@
 ### Jose Caballero (NYY, 2B/3B/SS/LF/RF) [mlb_id:676609] — Pass
 - 2026-05-03：[eval] xwOBA / HH% / Barrel% **雙年雙確認 <P25 結構性弱**（Sum 內部 5，全隊最低）；SB 是唯一亮點（2025 49 / 2026 pace 60+）但我隊軟 punt SB 不主動追；BB% 從 2025 P90+ 崩到 2026 <P25 大幅退化；14d trad .313 是 BABIP 幻覺（Savant 全 <P25）；79% owned 市場溢價（player-eval）
 
+### Anthony Kay (CWS, SP) [mlb_id:641743] — Pass
+- 2026-05-04：[stream-eval] Week 6 vs WorkWork 串流評估；K/9 5.4 + WHIP 1.68（季線 25 IP / 6.12 ERA）對 SD 預期 5 IP / 3 K，補 K 邊際小但 WHIP 拉爆。對手 2 SP（Luzardo K9 10.7 / Matz K9 7.8）K 預期 +12-14，撿 Kay 補 +3 K 仍翻不了 K，且 ERA 4.70→4.78、WHIP 1.39→1.41 把已輸的拉更開。整體 1 win 機率撿 Kay 4.9% vs 不撿 4.1%，邊際 +0.8pp 不值得動 acquisition
+
+### Trey Gibson (BAL, SP) [mlb_id:694346] — Pass
+- 2026-05-04：[stream-eval] 5/3 新秀首登 @ NYY 評估；AAA 4.01 ERA / K9 9.1 / BB9 4.4 / 球速 93.6 + plus death ball stuff，對位最差（NYY elite 打線 + Yankee Stadium 左打天堂 + 客場新秀首登）。Yahoo 系統 NA 狀態（撿了若 24h 內未升級成 SP，stats 不算 = 浪費 acquisition）。預期 4-5 IP / 4-6 K / WHIP 1.7+，K upside 被 NA 風險吃掉後跟 Kay 差不多但 WHIP 更傷。Kay > Gibson > 不撿（Kay vs Gibson Yahoo NA 風險 + 對位差是 deal-breaker）
+
