@@ -59,10 +59,6 @@
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
 
-### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中
-觸發：Albies 14d OPS 跌破 .750 或 Crawford 14d OPS 升破 .800 → drop Albies add Crawford
-- 05-03：xwOBA P95 / BB% P95 / Barrel% P70 結構全面碾壓 Albies；PA-TG 3.33 穩定先發；6% 零壓力；2025 P70/P80 雙年 BB 菁英確認（fa_scan）（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -80,6 +76,9 @@
 - 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
 
 ## 已結案
+
+### J.P. Crawford (SEA, SS) — 被搶（自動偵測）
+- 2026-05-03：Yahoo ownership_type=team，從觀察中移除。
 
 ### Dansby Swanson (CHC, SS) — 被搶（自動偵測）
 - 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
