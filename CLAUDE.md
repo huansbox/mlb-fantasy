@@ -7,7 +7,8 @@
 ## 聯賽設定（開季確認版 2026-03-26）
 
 - **平台**：Yahoo Fantasy Baseball
-- **賽制**：H2H **One Win 勝負制**（14 類別合計，贏 8+ = 1 週勝）
+- **賽制**：H2H **One Win 勝負制**（14 類別中贏的類別 > 輸的類別 = 1 W；相等 = T；平手類別雙方都不計）
+  - **majority rule，不是 8+ 門檻**：6-6-2 = T，7-5-2 = 1 W，差 1 個類別就決定 W/T/L
 - **隊伍數**：12 隊，無分區
 - **名單配置**：
   - 打者：C / 1B / 2B / 3B / SS / **LF / CF / RF** / UTIL×2（共 10 人）
@@ -41,8 +42,46 @@
 - **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
 - **SP 重裝**：11 SP 深度（含 IL 替補），40 IP 門檻輕鬆過
 - **BN 配置**：1 打者 + 2 SP（2026-04-12 確立，Week 2-3 IP 倒數第 3 驅動）
-- **目標**：每週穩拿 R/HR/RBI/BB/AVG/OPS + IP/W/K/QS/ERA/WHIP 共 12 項中的 8+
+- **目標**：每週「贏的類別 > 輸的類別」拿 1 W；contested 類別（差距 ≤ 1 場操作能翻）優先搶
 - **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
+
+### Week 中 H2H 決策框架（One Win majority rule，2026-05-04 確立）
+
+**Contested 類別判斷**（決定哪些值得用 acquisition 搶）：
+
+| 類別 | Contested 門檻 | 判斷 |
+|------|---|---|
+| Counting（K / R / SB / BB / HR / RBI / W / QS / SV+H）| 差距 ≤ 5 | 1-2 場操作可翻 |
+| Ratio（AVG / OPS）| 差距 ≤ 0.030 | 數場打席可翻 |
+| Ratio（ERA / WHIP）| 差距 ≤ 0.30 / 0.05 | 1 場好投可翻 |
+| 已輸定 | 差距 > 上述 1.5 倍 | 不掙扎 |
+
+**Controllable vs Random 變數**（決定哪些可預測進翻盤路徑）：
+
+- **Controllable**（有期望值算式，可精準預測）：
+  - K = K9 × 預期 IP（FA SP 季線 K9 × 5 IP）
+  - IP / QS / SV+H — SP/RP 場次直接累加
+  - HR / RBI / R 對特定 platoon → 有結構訊號
+- **Random**（單週 swing 太大，**不該納入翻盤路徑算式**）：
+  - BB / 短期 R / SB — 受 lineup / 對戰 / 配球大量影響
+  - 一場 OPS / AVG spike — noise
+
+**已輸定類別的零邊際成本原則**：
+- ERA / WHIP / IP 等比率/累積類別已差超過 contested 門檻 1.5 倍 → 撿爛 SP 多虧 0.05 ERA / 0.02 WHIP **不算戰術損失**（已輸的不會變更輸）
+- 不該成為阻止撿 contested 類別補強的理由
+
+**判斷例**：K -2 + Kay K9 5.4 × 5 IP 期望 +3 K → 翻 K = +1 win 期望，撿。
+**反例**（錯誤判斷）：「ERA 會從 4.70→4.78 拉爛」→ 已輸定（差 -1.32 遠超門檻），多 0.08 不影響輸贏，不該阻止撿。
+
+### 串流 SP mental model（2026-05-04 確立）
+
+**正確心態：用 1 acquisition 額度租用 1 場數據**（不是「加入隊伍」）
+
+- Drop 對象優先序：BN borderline anchor > BN 觀察中球員 > active worst SP
+- BN 投手 drop 後可在下次 acquisition 撿回（FA 池基本不缺中等 SP）
+- **Sunk cost 警示**：「不想動 roster」是心理摩擦，不是戰術理由
+- 1 場操作後，串流 SP 通常隔天就 drop 換下一個 — 不該對串流 SP 產生情感
+- Acquisition 成本：1/6 週額度（≈ 16%）+ FAAB 1 元（≈ 1% 季預算）；補 1 contested 類別期望勝率提升 ≥ 30% → 成本值得
 
 ### 串流 SP 決策規則（2026-03-30 確立）
 
