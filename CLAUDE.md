@@ -474,6 +474,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
+| `docs/handoff-claude-md-cleanup.md` | **CLAUDE.md cleanup handoff（2026-05-04）— v2 SP code 完整移除 + 抽出更多 playbook 段，下次 session 接手** |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
@@ -497,6 +498,7 @@ waiver-log.md（球員追蹤唯一來源）
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
+- [ ] **CLAUDE.md cleanup handoff（下次 session 處理）**：(1) v2 SP code 完整移除（Stage F.2 主體，v4 production 已穩定 6 天） + (2) 抽出其他「不常用 + 多行」段成 playbook（同串流 SP 模式）。完整 scope / 候選清單 / 風險見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Phase 6 reason 中文化驗證**（2026-05-02 改完，明天 cron 第一天看效果）：commit `c63f13c` 改 `prompt_phase6_final_decision.txt` 強制 reason / watch_triggers / waiver_log_updates.note / telegram_summary 輸出繁體中文（player names + 技術術語保留英文）。明天 12:30 cron 跑出 #140 SP-v4 報告後驗收 Telegram 推送語言；若仍英文，prompt 需加強指令位置或前置 system 提示
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
