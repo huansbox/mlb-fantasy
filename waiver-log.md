@@ -9,6 +9,7 @@
 - 05-01：xwOBA P95 / 14d OPS 1.196 持續火燙；PA-TG 2.55 仍未達 3.0；3d +6 rising 31% 窗口收窄中（fa_scan）
 - 05-02：xwOBA P95 / 14d OPS 1.053 持續火燙；PA-TG 2.59 連 4 天未達 3.0；31% rising 3d+3 窗口持續收窄 — 再等 2-3 天 PA-TG 仍不達標需決定降低門檻（fa_scan）
 - 05-03：xwOBA P95 / 14d OPS .956 持續火燙；PA-TG 2.64 連 5 天未達 3.0；31% plateau — 降低門檻：PA-TG ≥2.8 連 3 天即可行動（原 3.0 連 7 天過嚴）（fa_scan）
+- 05-04：xwOBA P80 / 14d OPS .926 / K% 12.5 控 K 極佳；PA-TG 2.71 連 6 天未達降低後門檻 2.8；31% plateau 窗口收窄中（fa_scan）
 
 ### Austin Martin (MIN, 2B,LF,CF) [mlb_id:668885] — 觀察中
 觸發：BBE 達 60 + xwOBA 維持 P80+ + PA-TG ≥3.0 → 升級取代
@@ -17,6 +18,7 @@
 - 05-01：BB% P95 持續但 Barrel% P0 雙年確認無 power；PA-TG 2.69；排序在 Ballesteros / Carson Kelly 之後（fa_scan）
 - 05-02：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .982 靠 AVG .359 非 power；排序落後 Ballesteros / Carson Kelly / Julien（fa_scan）
 - 05-03：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .982 靠 AVG .359；PA-TG 2.68；Crawford 結構更優且 BB% 同等 → Martin 優先度再降（fa_scan）
+- 05-04：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .979 靠 AVG .368；Julien 結構更優使 Martin 優先度持續下降（fa_scan）
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：Stanton BB% 持續 <P40 至 Week 7 + 14d OPS 未回 .750 → 升級取代
@@ -25,6 +27,7 @@
 - 05-01：xwOBA P80 / BB% P70 穩健；14d Savant Δ+0.071 品質上升；仍等 Stanton 觸發條件（fa_scan）
 - 05-02：xwOBA P60 / BB% P70 穩健；14d Savant Δ+0.052 品質上升；仍等 Stanton 觸發條件（fa_scan）
 - 05-03：xwOBA P70 / BB% P70 穩健；14d Savant Δ+0.015 平穩；仍等 Stanton 觸發條件（fa_scan）
+- 05-04：xwOBA P60 / BB% P80 穩健；14d OPS .777 平穩；仍等 Stanton 觸發條件（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：PA-TG ≥3.2 連 7 天 + xwOBA 維持 P80+ → 升級取代
@@ -32,32 +35,42 @@
 - 05-01：xwOBA P95 / BB% P80 / Barrel% P70 穩健；14d OPS .807 + Savant Δ+0.030；PA-TG 2.84 仍未達 3.2 門檻（fa_scan）
 - 05-02：xwOBA P95 / BB% P95 / Barrel% P70；14d Savant Δ+0.030 穩定上升；PA-TG 2.91 仍未達 3.2；3% 零壓力（fa_scan）
 - 05-03：xwOBA P95 / BB% P95 / Barrel% P70；14d Savant Δ+0.023 上升；PA-TG 2.82 仍未達 3.2；3% 零壓力（fa_scan）
+- 05-04：xwOBA P95 / BB% P95 / Barrel% P70 雙年確認；14d 9 BB；PA-TG 2.89 仍未達 3.2；3% 零壓力（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 80 → 升級取代
 - 05-01：xwOBA P95 / BB% P95 / Barrel% P70 結構全面；14d OPS .978；PA-TG 2.84 是唯一疑慮；7% owned 無急迫（fa_scan）
 - 05-02：xwOBA P95 / BB% P95 / Barrel% P70 結構全面；14d OPS .957；PA-TG 2.88 接近 3.0 未達；7% 無壓力（fa_scan）
 - 05-03：xwOBA P95 / BB% P95 結構菁英但 14d Savant Δ-0.140 品質暴跌；PA-TG 2.79 接近 3.0；.957 OPS 靠 BABIP 撐；7% 無壓力（fa_scan）
+- 05-04：xwOBA P95 結構仍菁英但 14d Savant Δ-0.110 品質暴跌；OPS .911 靠 BABIP；PA-TG 2.82；需警惕下修（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:693307] — 觀察中
 觸發：Buxton 14d OPS 連跌 <.700 + xwOBA 未回 P70 → 升級取代 Buxton
 - 05-01：xwOBA P95 / Barrel% P95 雙年菁英；14d Savant Δ-0.081 品質下滑；42% dropping 需留意（fa_scan）
 - 05-02：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.072 品質下滑；41% dropping；BB% P25 不填 BB 缺口；維持觀察不急（fa_scan）
 - 05-03：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.073 品質下滑持續；41% plateau；BB% P25 不填 BB 缺口；維持觀察（fa_scan）
+- 05-04：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.100 品質下滑第 3 天；42% plateau；BB% P25；維持觀察（fa_scan）
 
 ### Spencer Steer (CIN, 1B,LF) [mlb_id:668715] — 觀察中
 觸發：xwOBA 維持 P80+ 至 BBE 100 + 14d OPS ≥.800 持續 → 升級取代
 - 05-02：xwOBA P95 / Barrel% P95 / 球隊主力 PA-TG 3.53；14d OPS .944 + Savant Δ+0.058 上升；2025 prior P45 breakout 待驗，13% 無壓力（fa_scan）
 - 05-03：xwOBA P95 / Barrel% P95 / PA-TG 3.55 球隊主力；14d OPS .935 + Savant Δ+0.066 加速上升；2025 P45 breakout 待驗；13% 無壓力（fa_scan）
+- 05-04：xwOBA P95 / Barrel% P95 / PA-TG 3.53 球隊主力；14d OPS .977 + Savant Δ+0.085 加速上升；2025 P45 breakout 待驗；14% 無壓力（fa_scan）
 
 ### Nathaniel Lowe (CIN, 1B) [mlb_id:663993] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 70 → 升級
 - 05-02：xwOBA P95 / BB% P80 / Barrel% P80 結構全菁英；14d OPS 1.115 / 5 HR；PA-TG 1.94 嚴重上場有限 + 2025 prior 平庸 = breakout 待驗（fa_scan）
 - 05-03：xwOBA P95 / BB% P70 / Barrel% P80 全菁英；14d OPS 1.125 / 5 HR 爆量；PA-TG 2.00 嚴重限制；3d +3 rising 6%；breakout 待驗（fa_scan）
+- 05-04：xwOBA P95 / Barrel% P95 全菁英；14d OPS 1.085 / 5 HR；PA-TG 2.03 嚴重限制；3d +4 / 7d +7 rising 8%；breakout 待驗（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
+- 05-04：xwOBA P55 / BB% P0 雙年確認；14d OPS .820 / 4 HR / Savant Δ+0.062 上升；但結構弱點未改（BB% P0）；等 Nootbaar 回歸後 PT 觀察（fa_scan）
+
+### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
+觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
+- 05-04：xwOBA P80 / BB% P70 / HH% P80 均衡；14d OPS 1.009 + Savant Δ+0.086 品質急升；PA-TG 2.94 接近主力；2025 prior P40/P0 breakout 待驗（fa_scan）
 
 ## 隊上觀察
 
