@@ -4,7 +4,7 @@
 
 2026 Yahoo Fantasy Baseball 聯賽 — 選秀已完成，目前為 in-season 管理階段。
 
-## 聯賽設定（開季確認版 2026-03-26）
+## 聯賽設定
 
 - **平台**：Yahoo Fantasy Baseball
 - **賽制**：H2H **One Win 勝負制**（14 類別中贏的類別 > 輸的類別 = 1 W；相等 = T；平手類別雙方都不計）
@@ -28,24 +28,22 @@
 ## 核心球員
 
 不可動的核心（can't cut 等級）：
-- **Tarik Skubal**（DET, SP）— 全聯盟 #1
-- **Jazz Chisholm Jr.**（NYY, 2B/3B）— 2B 稀缺
-- **Manny Machado**（SD, 3B）— 穩定輸出
+- **Tarik Skubal**（DET, SP）
+- **Jazz Chisholm Jr.**（NYY, 2B/3B）
+- **Manny Machado**（SD, 3B）
 
 > 完整陣容見 `daily-advisor/roster_config.json`（唯一名單來源）。
 
-> **文檔分工原則**（2026-05-03 B1 refactor 後）：本檔只寫類型 / 規則 / 策略，**不點名具體球員**（核心球員段的 cant_cut 3 人例外）。具體球員觀察（傷勢、角色變化、限局跡象、borderline anchor 驗證等）一律進 `waiver-log.md`「隊上觀察」段；已執行 add/drop 理由看 git log。原因：球員會被 drop / 換隊 / 變更角色，CLAUDE.md 留具體球員會變孤兒（如 04-09 寫的 Tovar BB% 弱點，04-27 換 Correa 後孤兒近 1 週才被發現）。
+> **文檔分工原則**：本檔只寫類型 / 規則 / 策略，**不點名具體球員**（核心球員段的 cant_cut 3 人例外）。具體球員觀察（傷勢、角色變化、限局跡象、borderline anchor 驗證等）一律進 `waiver-log.md`「隊上觀察」段；已執行 add/drop 理由看 git log。原因：球員會被 drop / 換隊 / 變更角色，CLAUDE.md 留具體球員會變孤兒（如 04-09 寫的 Tovar BB% 弱點，04-27 換 Correa 後孤兒近 1 週才被發現）。
 
 ## 執行中策略
 
-- **Punt SV+H**：不為 SV+H 多拿 RP（維持 2 位），但現有 RP 有 SV+H 是加分
+- **Punt SV+H**：不為 SV+H 多拿 RP（最多 2 位），但現有 RP 有 SV+H 是加分
 - **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
-- **SP 重裝**：11 SP 深度（含 IL 替補），40 IP 門檻輕鬆過
-- **BN 配置**：1 打者 + 2 SP（2026-04-12 確立，Week 2-3 IP 倒數第 3 驅動）
 - **目標**：每週「贏的類別 > 輸的類別」拿 1 W；contested 類別（差距 ≤ 1 場操作能翻）優先搶
-- **串流 SP**：預設不串流，具體依下方決策規則判斷（FA 池品質、對手強弱、比率餘裕）
+- **串流 SP**：預設不串流。要用時見 [`docs/streaming-sp-playbook.md`](docs/streaming-sp-playbook.md)（mental model / 決策規則 / 操作流程）— 觸發判斷依「Week 中 H2H 決策框架」的 contested 類別 + controllable 變數推算
 
-### Week 中 H2H 決策框架（One Win majority rule，2026-05-04 確立）
+### Week 中 H2H 決策框架（One Win majority rule）
 
 **Contested 類別判斷**（決定哪些值得用 acquisition 搶）：
 
@@ -73,51 +71,7 @@
 **判斷例**：K -2 + Kay K9 5.4 × 5 IP 期望 +3 K → 翻 K = +1 win 期望，撿。
 **反例**（錯誤判斷）：「ERA 會從 4.70→4.78 拉爛」→ 已輸定（差 -1.32 遠超門檻），多 0.08 不影響輸贏，不該阻止撿。
 
-### 串流 SP mental model（2026-05-04 確立）
-
-**正確心態：用 1 acquisition 額度租用 1 場數據**（不是「加入隊伍」）
-
-- Drop 對象優先序：BN borderline anchor > BN 觀察中球員 > active worst SP
-- BN 投手 drop 後可在下次 acquisition 撿回（FA 池基本不缺中等 SP）
-- **Sunk cost 警示**：「不想動 roster」是心理摩擦，不是戰術理由
-- 1 場操作後，串流 SP 通常隔天就 drop 換下一個 — 不該對串流 SP 產生情感
-- Acquisition 成本：1/6 週額度（≈ 16%）+ FAAB 1 元（≈ 1% 季預算）；補 1 contested 類別期望勝率提升 ≥ 30% → 成本值得
-
-### 串流 SP 決策規則（2026-03-30 確立）
-
-| 情境 | 做法 |
-|------|------|
-| 週四發現 IP 差 40 很遠（< 30 IP 且只剩 1 場先發） | 撿 1 個 matchup 好的串流 SP |
-| 某項 counting stat 接近翻盤（K 差 3-5 個） | 精準撿 1 場高 K 率 SP |
-| ERA/WHIP 已大幅領先（ERA < 2.50） | 比率有餘裕，可冒險加 1 場 |
-| 對手弱到本週穩贏 | 可用 2-3 次異動測試串流效果 |
-| **預設** | **不串流，留異動額度給傷兵替補和 hot bat** |
-
-### 串流 SP 操作流程（2026-04-06 確立）
-
-**查先發日程的正確方法**：
-```bash
-# 用 MLB API 逐日查 probable pitcher（只提前 1-2 天公布）
-curl -s "https://statsapi.mlb.com/api/v1/schedule?date=2026-04-08&sportId=1&hydrate=probablePitcher"
-```
-- ⚠️ **不要用 FanGraphs/FantasyPros 的 probables grid 推測**（常有錯誤，例如把 5 天間隔排成 3 天）
-- **正確方式**：查球員 game log 最後一場日期 + 5 天推算，再用 MLB API 確認
-- MLB API 只提前 1-2 天公布 probable，更遠的日期需用輪值間隔推算
-
-**FAAB 時效與串流時程**：
-1. 提交 FAAB claim（在每日 TW 15:00 前）
-2. 當日 TW 15:00（= ET 3AM）處理
-3. 處理後當晚設 Daily-Tomorrow lineup
-4. **隔天上場（前置 1 天）**
-5. → 串流 SP 需在目標先發日的**前一天** TW 15:00 前 claim
-6. ⚠️ 若 claim 在 TW 15:00 後提交，順延到次日處理（多等 1 天）
-
-**串流測試策略**（適用於觀察中候選 SP）：
-- 搶先發日最近的候選 → 看一場結果
-- 好就留（轉為正式 roster），不好就 drop 換下一位候選
-- 每週 6 次異動上限需預留 1-2 次給傷兵替補
-
-### Waiver 操作規則（聯賽設定確認 2026-03-30）
+### Waiver 操作規則
 
 - **所有撿人走 FAAB**（waiver_rule: all），無即時 FA
 - **處理時間**：每日 ET 3AM（= TW 15:00）
@@ -519,6 +473,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `week-reviews.md` | 累積式週覆盤記錄 |
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
+| `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
@@ -570,8 +525,6 @@ waiver-log.md（球員追蹤唯一來源）
   - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
   - ~~finding E~~：✅ 2026-04-26 完成（commit `95c9713`，`--no-send` mode `print(advice, flush=True)`）
-- [ ] **preview 加入對手近期異動**：從 Yahoo API league transactions 過濾對手 add/drop，判斷對手 build 策略（囤 SP / 串流 / 正常）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
-- ~~**roster_sync --init 不 backfill 新欄位**~~：✅ 2026-04-26 完成（commit `1b4f4e2`，加 `_count_missing_fields` helper 把 `selected_pos`/`status` 納入 backfill 檢查 + 6 unit tests）
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
