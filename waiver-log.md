@@ -57,13 +57,6 @@
 - 05-04：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.100 品質下滑第 3 天；42% plateau；BB% P25；維持觀察（fa_scan）
 - 05-05：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.096 品質下滑第 4 天持續惡化；46% rising 3d+5；BB% P25；維持觀察（fa_scan）
 
-### Spencer Steer (CIN, 1B,LF) [mlb_id:668715] — 觀察中
-觸發：xwOBA 維持 P80+ 至 BBE 100 + 14d OPS ≥.800 持續 → 升級取代
-- 05-02：xwOBA P95 / Barrel% P95 / 球隊主力 PA-TG 3.53；14d OPS .944 + Savant Δ+0.058 上升；2025 prior P45 breakout 待驗，13% 無壓力（fa_scan）
-- 05-03：xwOBA P95 / Barrel% P95 / PA-TG 3.55 球隊主力；14d OPS .935 + Savant Δ+0.066 加速上升；2025 P45 breakout 待驗；13% 無壓力（fa_scan）
-- 05-04：xwOBA P95 / Barrel% P95 / PA-TG 3.53 球隊主力；14d OPS .977 + Savant Δ+0.085 加速上升；2025 P45 breakout 待驗；14% 無壓力（fa_scan）
-- 05-05：xwOBA P95 / Barrel% P95 / PA-TG 3.54 球隊主力；14d OPS .958 + Savant Δ+0.075 連 3 天加速上升；2025 P45 breakout 待驗；14% 無壓力（fa_scan）
-
 ### Nathaniel Lowe (CIN, 1B) [mlb_id:663993] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 70 → 升級
 - 05-02：xwOBA P95 / BB% P80 / Barrel% P80 結構全菁英；14d OPS 1.115 / 5 HR；PA-TG 1.94 嚴重上場有限 + 2025 prior 平庸 = breakout 待驗（fa_scan）
@@ -103,6 +96,9 @@
 - 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
 
 ## 已結案
+
+### Spencer Steer (CIN, 1B,LF) — 被搶（自動偵測）
+- 2026-05-05：Yahoo ownership_type=team，從觀察中移除。
 
 ### J.P. Crawford (SEA, SS) — 被搶（自動偵測）
 - 2026-05-03：Yahoo ownership_type=team，從觀察中移除。
