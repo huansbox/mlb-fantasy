@@ -1,5 +1,12 @@
 # Handoff: FA IL/NA Status Filter (2026-05-05)
 
+> **狀態（2026-05-05 更新）**：
+> - ✅ **Part 1（FA IL/NA 過濾機制）已完成 merged 至 master**
+>   - commits `87bf243`（Layer 2 hard filter）/ `e69555b`（軟 tag pipeline）/ `5113932`（Phase 6 + batter prompts）
+>   - 225 unit tests 全綠 + VPS dry-run 確認 1 IL60/NA FA 被預過濾、Phase 6 推薦 healthy 候選
+>   - Production 自 2026-05-06 cron TW 12:30 起套用
+> - ⏳ **附加 Task（`yahoo_query.py savant` 投手 v4 升級）仍待辦** — 詳見本 doc 末段
+
 ## 背景 / 為什麼
 
 **觸發案例**：2026-05-05 dry-run 推薦 `drop Ragans add Mize`，但 Mize 當下 Yahoo status = `IL15`。yesterday 的 Issue #149 也推薦同一人 — 兩天連續推薦 IL FA。**claim IL 球員無法立即上場**，等於浪費 add 名額（每週上限 6 次）+ 可能浪費 FAAB。

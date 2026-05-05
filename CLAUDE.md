@@ -441,7 +441,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
-| `docs/handoff-il-na-filter.md` | **FA IL/NA 過濾機制 handoff（2026-05-05）— 下個 session 實作（方案 A：分等級過濾 + 軟 tag）** |
+| `docs/handoff-il-na-filter.md` | FA IL/NA 過濾機制 handoff（2026-05-05）— ✅ Part 1 已完成 merged（commits `87bf243` / `e69555b` / `5113932`）；附加 Task `yahoo_query.py savant v4 SP 升級` 仍待辦 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
@@ -467,7 +467,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
-- [ ] **FA IL/NA 過濾機制**（下個 session 實作）：當前 fa_scan 無自動排除 IL/NA FA — Mize IL15 連兩天被推薦（#149 + 05-05 dry-run）。方案 A 已對齊（IL60/NA hard filter + IL10/IL15 軟 tag + Phase 6 prompt 提醒），詳見 [`docs/handoff-il-na-filter.md`](docs/handoff-il-na-filter.md)。預估 1.5-2 hour，2 commits。
+- [ ] **`yahoo_query.py savant` 投手 v4 升級**：當前對投手仍顯示 v2 退役指標（xERA / xwOBA / HH%），未顯示 v4 5-slot first-order 指標（IP/GS / Whiff% / BB/9 / GB% / xwOBACON），違反 CLAUDE.md L168 規則。詳見 [`docs/handoff-il-na-filter.md`](docs/handoff-il-na-filter.md) §附加 Task。預估 30-45 min。
 - [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
