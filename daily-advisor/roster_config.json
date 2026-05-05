@@ -19,8 +19,8 @@
         "pa": 523,
         "g": 123
       },
-      "selected_pos": "C",
-      "status": ""
+      "selected_pos": "NA",
+      "status": "NA"
     },
     {
       "name": "Christian Walker",
@@ -210,7 +210,7 @@
       "positions": [
         "CF"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -255,7 +255,7 @@
       "positions": [
         "C"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "C",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -267,6 +267,29 @@
         "pa_per_team_g": 2.86,
         "pa": 464,
         "g": 119
+      }
+    },
+    {
+      "name": "Spencer Steer",
+      "mlb_id": 668715,
+      "yahoo_player_key": "469.p.12688",
+      "team": "CIN",
+      "positions": [
+        "1B",
+        "LF"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.293,
+        "barrel_pct": 7.6,
+        "hh_pct": 33.2,
+        "bb_pct": 9.0,
+        "ops": 0.723,
+        "pa_per_team_g": 3.51,
+        "pa": 568,
+        "g": 146
       }
     }
   ],
@@ -293,8 +316,8 @@
         "gb_pct": 46.4,
         "xwobacon": 0.356
       },
-      "selected_pos": "SP",
-      "status": ""
+      "selected_pos": "IL",
+      "status": "IL15"
     },
     {
       "name": "Chris Sale",
@@ -318,7 +341,7 @@
         "gb_pct": 43.4,
         "xwobacon": 0.348
       },
-      "selected_pos": "P",
+      "selected_pos": "SP",
       "status": ""
     },
     {
@@ -368,7 +391,7 @@
         "gb_pct": 40.8,
         "xwobacon": 0.382
       },
-      "selected_pos": "SP",
+      "selected_pos": "P",
       "status": ""
     },
     {
@@ -393,7 +416,7 @@
         "gb_pct": 49.3,
         "xwobacon": 0.339
       },
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -404,8 +427,8 @@
       "positions": [
         "RP"
       ],
-      "selected_pos": "NA",
-      "status": "NA",
+      "selected_pos": "RP",
+      "status": "",
       "prior_stats": {
         "season": 2025,
         "xera": 3.46,
@@ -427,7 +450,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "SP",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -445,32 +468,6 @@
       }
     },
     {
-      "name": "Joey Cantillo",
-      "mlb_id": 676282,
-      "yahoo_player_key": "469.p.11823",
-      "team": "CLE",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "RP",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 3.71,
-        "xwoba_allowed": 0.3,
-        "hh_pct_allowed": 41.8,
-        "barrel_pct_allowed": 7.2,
-        "bbe": 251,
-        "era": 3.21,
-        "ip": 95.3,
-        "ip_per_gs": 5.2,
-        "whiff_pct": 28.4,
-        "gb_pct": 44.2,
-        "xwobacon": 0.364
-      }
-    },
-    {
       "name": "Reid Detmers",
       "mlb_id": 672282,
       "yahoo_player_key": "469.p.11926",
@@ -479,7 +476,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "RP",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -504,7 +501,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "SP",
       "status": "",
       "prior_stats": null
     },
@@ -517,7 +514,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -539,7 +536,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "SP",
       "status": "",
       "prior_stats": {
         "season": 2025,
