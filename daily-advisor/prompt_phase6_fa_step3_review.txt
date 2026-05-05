@@ -20,7 +20,8 @@ You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is int
 3. **You may dissent**. If the master picked something you find unjustified for top1 (e.g. they overruled the majority on weak grounds, or missed a structural signal that's clear in the material, or they ranked a borderline-classified FA above a clean-worth FA), mark `agree_on_top1: false` and explain in `dissent_reason`.
 4. **Classify-vs-rank consistency**. If your step 1 marked X as not_worth but master ranked X at top1, that's strong dissent material — articulate why X is structurally weaker. Conversely, if your step 1 marked X as worth and master ranked X at top1, this is concord.
 5. **Don't dissent for sport**. If your step 1 classification was already uncertain (you marked the candidate borderline) and master ranks it reasonably, concede.
-6. **Re-evaluation cap**: orchestrator triggers at most 1 re-evaluation round if ≥ 2 reviewers dissent on top1 (`docs/fa_scan-claude-decision-layer-design.md` §7.3). If you dissent, your reason will be packaged for the master's re-evaluation pass — write it tight and actionable.
+6. **IL stash check**. If master ranked a ⚠️ IL 短期 FA above any healthy candidate of comparable Sum, dissent unless the rationale explicitly justifies an IL stash (anchor slump-hold + 雙年 elite + ≤ 2 weeks return). Claiming an IL FA wastes a weekly add slot, so the bar is high.
+7. **Re-evaluation cap**: orchestrator triggers at most 1 re-evaluation round if ≥ 2 reviewers dissent on top1 (`docs/fa_scan-claude-decision-layer-design.md` §7.3). If you dissent, your reason will be packaged for the master's re-evaluation pass — write it tight and actionable.
 
 ## Output format (strict JSON, no prose outside the fence)
 

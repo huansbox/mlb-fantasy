@@ -17,7 +17,7 @@ You are NOT a vote-counter on classifications. The agents already classified; yo
 2. **§7.2 spike finding (2026-04-26)**: real data shows agents converge strongly when v4 material is rich; full agreement does NOT add information beyond what one agent says. Look for divergence and why.
 3. **Borderline gate**: if any pair of consecutive ranked positions has `sum_diff` gap < 5 in the underlying v4 data, mark `borderline_pairs` with that pair (e.g. ["top1-top2"]) so step 3 reviewers know where to scrutinize. Anchor-vs-top1 differences are NOT counted here — only intra-FA-ranking gaps.
 4. **borderline-classified FAs (1 worth + 1 not_worth + 1 borderline)** must rank at top3 or get cut from the ranking entirely if there are ≥ 3 cleanly-classified worth candidates ahead of them.
-5. **Strong warnings** (⚠️ 短局 / 上場有限 / 樣本小) on a candidate normally rank them lower despite OK Sum, because they cap weekly ceiling regardless of contact quality.
+5. **Strong warnings** (⚠️ 短局 / 上場有限 / 樣本小 / IL 短期) on a candidate normally rank them lower despite OK Sum, because they cap weekly ceiling regardless of contact quality. ⚠️ IL 短期 specifically means the FA cannot start playing immediately (claim must occupy IL slot); rank below any healthy candidate of comparable Sum unless this is a clear IL-stash case (anchor on slump-hold + FA is 雙年 elite expected back ≤ 2 weeks).
 6. **Tight rationale** — 1-2 sentences per slot. Quote specific numerics. Reference agents' arguments only when they meaningfully affected your ranking (e.g. "agent_2's xwOBACON .312 emphasis was right — top1"). Don't pad with "all agents agreed" sentences.
 
 ## Inputs you receive

@@ -17,8 +17,9 @@
 - **我方 anchor 的健康狀態（IL/BN/DTD）不影響評價** — anchor 段刻意不顯示這些狀態，純看打擊數據評估該不該 drop（IL slot 免費 / DTD 短期會回，drop 決策只看結構性 quality）
 - **FA / watch 球員的 header tag = actionability gate**（add 決策才看；不影響你對該球員 quality 的評估）：
   - `[傷:DTD-日傷觀察]` → 短期不上場，可保留 watch 但**不立即 add**，標「等回歸再評」
-  - `[傷:IL10-...]` / `[傷:IL15-...]` / `[傷:IL60-...]` → 中長期傷兵，IL slot 已有限，**強烈不建議 add**（除非為了佔 IL slot 等回歸的菁英資產）
-  - `[傷:NA-未提報]` / `[傷:SUSP-禁賽]` → 短期不可用，**不 add**
+  - `[傷:IL10-...]` / `[傷:IL15-...]` 或 `⚠️ IL 短期` 標籤 → claim 後必須佔 IL slot，**無法立即上場**。預設標「觀察」或 pass，**不要因 Sum/14d 強而推薦立即取代**。例外：anchor 在 slump-hold + 該 FA 雙年菁英 + 預期 ≤ 2 週回歸 + 我方 IL slot 有空 → 才考慮 IL stash（必須在 reasoning 明確列出四項條件全部成立）。Why：claim 浪費每週 add 名額（上限 6）+ FAAB；2026-05-05 Mize 連兩天被誤推 IL15 就是這種 lazy 推薦。
+  - `[傷:NA-未提報]` / `[傷:IL60-...]` → 已被 Layer 2 過濾，正常情況下不會出現在輸入。若仍出現代表使用 `--include-inactive` stash mode，**不 add**（除非用戶明確要求 prospect stash）。
+  - `[傷:SUSP-禁賽]` → 短期不可用，**不 add**
   - `[Waiver-FAAB需排隊]` → 不是直接 FA，FAAB claim 需排隊（多 1 層搶不到風險），標「Waiver claim 需排隊」
   - 傷 + Waiver 同時出現 → 不可立即 add，無論 quality 多高（健康 FA 會更值得花 FAAB）
   - 健康 FA（無 tag）→ 正常評估

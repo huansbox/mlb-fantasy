@@ -22,6 +22,7 @@ Forced binary classifications make LLMs hedge by miscoding genuinely uncertain c
    - ⚠️ 樣本小 (BBE < 30 or IP < 20) → minimum `borderline` even if Sum looks great (sample noise too high to trust)
    - ⚠️ 短局 (IP/GS < 5.0) → caps weekly QS/IP ceiling regardless of contact quality
    - ⚠️ 上場有限 (IP/Team_G < 0.5) → can't accumulate stats even if quality is real
+   - ⚠️ IL 短期 (Yahoo IL10/IL15) → claim 後必須佔 IL slot，無法立即上場 → minimum `borderline`; only `worth` if a clear IL-stash case (anchor has slump-hold flag and FA is a 雙年 elite expected back ≤ 2 weeks). Default classification is `not_worth` — claiming IL FA wastes a weekly add slot (max 6/week).
 4. **Multiple ✅ with no ⚠️ → `worth`**:
    - ≥ 2 ✅ tags (e.g. 雙年菁英 + 深投型) AND no ⚠️ → `worth`
    - 1 ✅ + minor ⚠️ → `borderline` (let master decide)

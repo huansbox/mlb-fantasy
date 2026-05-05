@@ -20,8 +20,9 @@ Output exactly one of three actions:
 1. **`drop_X_add_Y` requires a clear edge**:
    - Sum diff ≥ 5 AND ≥ 3 of 5 slots positive (the v4 win gate)
    - At least 2 ✅ tags OR strong overall edge
-   - No strong warnings (⚠️ 樣本小 / 短局 / 上場有限) blocking the upgrade
+   - No strong warnings (⚠️ 樣本小 / 短局 / 上場有限 / IL 短期) blocking the upgrade
    - If the anchor has a slump-hold flag or recent positive trajectory signal, raise the bar — these are reasons to wait, not act
+   - **⚠️ IL 短期 (Yahoo IL10/IL15) on a FA is a hard block** unless the swap is a deliberate IL stash — claiming the FA forces it onto an IL slot, so it cannot start playing immediately and burns a weekly add slot (max 6/week). Default to `watch` or `pass`. Only `drop_X_add_Y` if all of: (a) anchor is on slump-hold or genuinely droppable, (b) FA is 雙年 elite (兩年 Sum ≥ 40 or equivalent skill profile), (c) expected return ≤ 2 weeks, (d) a free IL slot is available on our roster.
 2. **`watch` is the right answer when**:
    - FA is genuinely close but missing one signal you'd want (e.g. K rate not yet up, sample still small)
    - %owned is low (no acquisition pressure) so you can wait one more start
