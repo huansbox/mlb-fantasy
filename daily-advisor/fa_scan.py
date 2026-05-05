@@ -3048,43 +3048,20 @@ def _run_rp_scan(access_token, config, today_str, env, args):
 def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                    changes, ref_1d, ref_3d, today_str, env, args,
                    rostered_names=None):
-    """Process one group (batter or SP) via Python compute layer + Claude text layer.
+    """Process the batter group via Python compute layer + Claude text layer.
 
-    Pipeline (Phase 5):
-        Layer 1.5: filter pure RP from FA/watch (SP only)
-        Layer 4:   fa_compute.pick_weakest + compute_urgency + compute_fa_tags
-        Layer 5:   Claude writes 定性 reason + watch change detection
+    SP runs through _process_group_sp_v4 since 2026-04-28 cutover.
+    group_type param kept (only "batter") for prompt/label plumbing.
+
+    Pipeline:
+        Layer 4: fa_compute.pick_weakest + compute_urgency + compute_fa_tags
+        Layer 5: Claude writes 定性 reason + watch change detection
     """
-    label = "打者" if group_type == "batter" else "SP"
+    assert group_type == "batter", f"_process_group only supports batter, got {group_type}"
+    label = "打者"
     try:
         fa_candidates = [p for p in enriched if p["fa_type"] == group_type]
         watch_candidates = [p for p in watch_enriched if p["fa_type"] == group_type]
-
-        # Layer 1.5: pure RP filter — drop SP,RP dual-eligible players whose
-        # 2026 starts average <3.0 IP (opener / swingman-heavy role).
-        # Uses game-log (GS=1 only) IP/GS, not naive total-IP/GS which
-        # inflates for RPs with 1-2 token starts (e.g. Bernardino 10.3 IP
-        # total / 1 GS = naive 10.3 IP/GS, but actual start was 0.7 IP).
-        if group_type == "sp":
-            def _is_real_sp(p):
-                mlb = p.get("mlb_2026") or {}
-                gs = int(mlb.get("gamesStarted", 0) or 0)
-                if gs == 0:
-                    return False
-                mlb_id = p.get("mlb_id")
-                if not mlb_id:
-                    return False  # no ID — can't verify, exclude safely
-                ip_per_gs = _ip_per_gs_from_gamelog(mlb_id, 2026)
-                if ip_per_gs is None:
-                    return False  # API fail / no GS=1 splits — exclude
-                return ip_per_gs >= 3.0
-            before = len(fa_candidates) + len(watch_candidates)
-            fa_candidates = [p for p in fa_candidates if _is_real_sp(p)]
-            watch_candidates = [p for p in watch_candidates if _is_real_sp(p)]
-            removed = before - len(fa_candidates) - len(watch_candidates)
-            if removed:
-                print(f"  Layer 1.5 ({label}): {removed} pure RP removed (GS=0 or game-log IP/GS<3.0)",
-                      file=sys.stderr)
 
         # ── Layer 4: Python compute (Sum / urgency / FA tags) ──
         print(f"  Layer 4 ({label}): computing weakest + urgency...", file=sys.stderr)
@@ -3104,9 +3081,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             return
 
         # FA rolling for compute_fa_tags recency evaluation
-        fa_rolling_type = "batter" if group_type == "batter" else "pitcher"
         fa_rolling = _fetch_fa_rolling(
-            fa_candidates, watch_candidates, today_str, player_type=fa_rolling_type,
+            fa_candidates, watch_candidates, today_str, player_type="batter",
         )
 
         # Anchor for FA tag comparison — P1 in urgency rank (fallback: first slump hold)
@@ -3150,8 +3126,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
 
         # ── Layer 5: Claude text layer ──
         print(f"  Layer 5 ({label}): Claude 文字化...", file=sys.stderr)
-        prompt_file = f"prompt_fa_scan_pass2_{'batter' if group_type == 'batter' else 'sp'}.txt"
-        prompt_path = os.path.join(SCRIPT_DIR, prompt_file)
+        prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_pass2_batter.txt")
 
         data = _build_pass2_data_v2(
             group_type, urgency_result, low_conf, fa_tagged, watch_tagged,
@@ -3193,9 +3168,6 @@ def _process_group_sp_v4(config, savant_2026, enriched, watch_enriched,
                          rostered_names=None):
     """Phase 6 multi-agent v4 SP path. Thin dispatcher to _phase6_sp.process_sp_v4.
 
-    Default since Stage F.1 cutover (2026-04-28). Set SP_FRAMEWORK_VERSION=v2
-    to fall back to legacy v2 path (_process_group("sp", ...)) — kept as
-    rollback fallback for ~1 week before Stage F.2 removes v2 SP code.
     See docs/v4-cutover-plan.md Stage D-F and
     docs/fa_scan-claude-decision-layer-design.md §4.
     """
@@ -3340,13 +3312,9 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     errors = []
     error_lock = threading.Lock()
 
-    # Default v4 since Stage F.1 cutover (2026-04-28). Set
-    # SP_FRAMEWORK_VERSION=v2 to fall back during ~1-week soak period.
-    sp_framework = os.environ.get("SP_FRAMEWORK_VERSION", "v4")
-
     def _run_group_thread(group_type):
         try:
-            if group_type == "sp" and sp_framework == "v4":
+            if group_type == "sp":
                 _process_group_sp_v4(
                     config, savant_2026, enriched, watch_enriched,
                     changes, ref_1d, ref_3d, today_str, env, args,
@@ -3367,9 +3335,8 @@ def _run_daily_scan(access_token, config, today_str, env, args):
             target=_run_group_thread, args=("batter",), name="fa_scan-batter",
         ))
     if not args.batter_only:
-        sp_label = "sp-v4" if sp_framework == "v4" else "sp"
         threads.append(threading.Thread(
-            target=_run_group_thread, args=("sp",), name=f"fa_scan-{sp_label}",
+            target=_run_group_thread, args=("sp",), name="fa_scan-sp-v4",
         ))
 
     for t in threads:
