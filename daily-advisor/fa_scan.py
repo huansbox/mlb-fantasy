@@ -2370,6 +2370,7 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
         "position": p.get("position", ""),
         "pct": p.get("pct"),
         "waiver_date": p.get("waiver_date", ""),
+        "status": p.get("status", ""),
         "savant_2026": savant,
         "prior_stats": prior_stats,
         "derived": p.get("derived_2026") or {},

@@ -287,7 +287,25 @@ def compute_urgency(
 # ── Phase 5.4: FA tags + upgrade decision ──
 # Strong warnings that force "觀察" regardless of ✅ count:
 #   - 上場有限 (CLAUDE.md 明示 "強警示")
-_STRONG_WARN_TAGS = {"⚠️ 上場有限"}
+#   - IL 短期 (IL10/IL15 — claim 後無法立即上場，必須佔 IL slot)
+_STRONG_WARN_TAGS = {"⚠️ 上場有限", "⚠️ IL 短期"}
+
+
+_SHORT_IL_STATUSES = frozenset({"IL10", "IL15"})
+
+
+def _status_warn_tag(status):
+    """Yahoo IL10/IL15 → ⚠️ IL 短期 (strong warn, deprioritize to 觀察).
+
+    IL60/NA filtered earlier in fa_scan; DTD/empty/None → no tag (player
+    is evaluable). Returns None when no warn needed.
+    """
+    if not status:
+        return None
+    s = str(status).strip().upper()
+    if s in _SHORT_IL_STATUSES:
+        return "⚠️ IL 短期"
+    return None
 
 
 def _compute_batter_add_tags(fa: dict) -> list[str]:
@@ -313,7 +331,7 @@ def _compute_batter_add_tags(fa: dict) -> list[str]:
 
 
 def _compute_batter_warn_tags(fa: dict) -> list[str]:
-    """Batter v4 thin warns — only retain PA-based ⚠️ 上場有限 gate.
+    """Batter v4 thin warns — PA-based ⚠️ 上場有限 + Yahoo IL10/IL15 短期 IL.
 
     Other warns are removed; see _compute_batter_add_tags rationale.
     """
@@ -327,6 +345,10 @@ def _compute_batter_warn_tags(fa: dict) -> list[str]:
         pa_per_tg = prior.get("pa_per_team_g")
     if pa_per_tg is not None and pa_per_tg < 2.5:
         tags.append("⚠️ 上場有限")
+
+    il_tag = _status_warn_tag(fa.get("status"))
+    if il_tag:
+        tags.append(il_tag)
 
     return tags
 
@@ -686,10 +708,14 @@ def v4_warn_tags_sp(fa: dict) -> list[str]:
         if prior_sum < 25:
             tags.append("⚠️ Breakout 待驗")
 
+    il_tag = _status_warn_tag(fa.get("status"))
+    if il_tag:
+        tags.append(il_tag)
+
     return tags
 
 
-_V4_STRONG_WARN_TAGS = {"⚠️ 樣本小", "⚠️ 短局", "⚠️ Swingman 角色"}
+_V4_STRONG_WARN_TAGS = {"⚠️ 樣本小", "⚠️ 短局", "⚠️ Swingman 角色", "⚠️ IL 短期"}
 
 
 def v4_decision_sp(sum_diff: int, breakdown_diff: dict,

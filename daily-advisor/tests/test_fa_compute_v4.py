@@ -255,6 +255,45 @@ class TestV4WarnTags:
         tags = v4_warn_tags_sp(fa)
         assert "⚠️ Swingman 角色" in tags
 
+    @pytest.mark.parametrize("status", ["IL10", "IL15"])
+    def test_short_il_warn_tag(self, status):
+        # Otherwise-strong SP profile so IL is the only signal in play.
+        fa = {"savant_v4": {"ip_gs": 6.0, "whiff_pct": 28.0, "bb9": 2.5,
+                             "gb_pct": 50.0, "xwobacon": 0.345,
+                             "xera": 3.2, "era": 3.0, "bbe": 60, "ip": 40.0},
+              "prior_stats": {"ip_gs": 6.0, "whiff_pct": 28.0, "bb9": 2.5,
+                              "gb_pct": 50.0, "xwobacon": 0.345, "ip": 150.0},
+              "rotation_gate": "✅",
+              "status": status}
+        tags = v4_warn_tags_sp(fa)
+        assert "⚠️ IL 短期" in tags
+
+    @pytest.mark.parametrize("status", ["IL60", "DTD", "", None])
+    def test_no_il_tag_for_other_status(self, status):
+        fa = {"savant_v4": {"ip_gs": 6.0, "whiff_pct": 28.0, "bb9": 2.5,
+                             "gb_pct": 50.0, "xwobacon": 0.345,
+                             "xera": 3.2, "era": 3.0, "bbe": 60, "ip": 40.0},
+              "prior_stats": {"ip_gs": 6.0, "whiff_pct": 28.0, "bb9": 2.5,
+                              "gb_pct": 50.0, "xwobacon": 0.345, "ip": 150.0},
+              "rotation_gate": "✅",
+              "status": status}
+        tags = v4_warn_tags_sp(fa)
+        assert "⚠️ IL 短期" not in tags
+
+
+class TestV4DecisionWithIlShortWarn:
+    """SP v4 decision: ⚠️ IL 短期 acts as strong warn → blocks 立即取代 → 觀察."""
+
+    def test_strong_warn_blocks_when_il_short(self):
+        # 2 ✅ adds + 0 other ⚠️ would normally → 立即取代; ⚠️ IL 短期 → 觀察.
+        decision = v4_decision_sp(
+            sum_diff=15,
+            breakdown_diff={"IP/GS": 3, "Whiff%": 4, "BB/9": 3, "GB%": 2, "xwOBACON": 3},
+            add_tags=["✅ 深投型", "✅ K 壓制"],
+            warn_tags=["⚠️ IL 短期"],
+        )
+        assert decision == "觀察"
+
 
 # ── v4 decision logic ──
 

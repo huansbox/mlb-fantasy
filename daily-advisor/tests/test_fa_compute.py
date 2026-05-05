@@ -367,3 +367,45 @@ class TestFaTagsBatter:
         assert "⚠️ 近況下滑" not in result["warn_tags"]
 
 
+class TestBatterIlShortWarn:
+    """Yahoo IL10/IL15 → ⚠️ IL 短期 warn tag → decision=觀察 (strong warn).
+
+    Rationale: claim 後必須佔 IL slot，無法立即上場。LLM 看到 tag 自動降級
+    至觀察，避免 Mize-style 兩天連推 IL FA。
+    """
+
+    def _anchor(self):
+        return {
+            "name": "Tovar",
+            "score": 11,
+            "breakdown": {"xwOBA": 7, "BB%": 1, "Barrel%": 6},
+            "savant_2026": {"xwoba": 0.320, "bb_pct": 5.0, "barrel_pct": 9.0, "bbe": 50},
+        }
+
+    def _strong_fa(self, status):
+        # Otherwise-strong FA so warn tag is the only differentiator.
+        fa = {
+            "name": "ILGuy",
+            "savant_2026": {"xwoba": 0.370, "bb_pct": 14.0, "barrel_pct": 14.0, "bbe": 80},
+            "prior_stats": {"xwoba": 0.370, "bb_pct": 14.1, "barrel_pct": 14.2},
+            "rolling_14d": None,
+            "derived": {"pa_per_tg": 3.6},
+            "status": status,
+        }
+        score, breakdown = compute_sum_score(fa["savant_2026"], "batter")
+        fa["score"] = score
+        fa["breakdown"] = breakdown
+        return fa
+
+    @pytest.mark.parametrize("status", ["IL10", "IL15"])
+    def test_short_il_tagged_and_decision_observes(self, status):
+        result = compute_fa_tags(self._strong_fa(status), self._anchor(), "batter")
+        assert "⚠️ IL 短期" in result["warn_tags"]
+        assert result["decision"] == "觀察"
+
+    @pytest.mark.parametrize("status", ["IL60", "DTD", "", None])
+    def test_no_tag_for_other_status(self, status):
+        result = compute_fa_tags(self._strong_fa(status), self._anchor(), "batter")
+        assert "⚠️ IL 短期" not in result["warn_tags"]
+
+
