@@ -409,40 +409,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 ### 系統架構
 
-```
-CLAUDE.md（策略大腦 + 評估框架唯一定義）
-  ├─ 評估框架（打者/SP/RP）+ 百分位表 + 賽季運營 SOP
-  ├─ 被讀取：所有 skill（/player-eval, /waiver-scan, /weekly-review）
-  └─ 被更新：策略調整時手動改（唯一來源，skills 引用不複製）
-
-daily_advisor.py（每日戰報）
-  ├─ 速報（TW 22:15）：隔日 lineup 建議 + H2H 態勢 + SP matchup
-  ├─ 最終報（TW 05:00，--morning）：確認 lineup + 比率更新
-  └─ 輸出：Telegram 推送 + GitHub Issue 存檔
-
-fa_scan.py（FA 市場分析唯一入口）
-  ├─ 每日：Batter + SP 並行 threading（Python compute + Claude 文字化）
-  │   └─ fa_compute.py: pick_weakest / compute_urgency / compute_fa_tags (Layer 4)
-  │   └─ Claude 只做 定性 reason + 邊界 case flag + 觀察中變化 (Layer 5)
-  ├─ 週一：--rp 模式（RP 獨立掃描；仍保留 Claude Pass 1 單階段）
-  ├─ 每日 TW 15:15：--snapshot-only（%owned 快照 + watchlist 清理）
-  ├─ 被讀取：weekly_review.py（scan_summary）
-  └─ 被更新：waiver-log.md（觀察中球員追蹤）
-
-roster_config.json（陣容唯一來源）
-  ├─ 球員名 / mlb_id / yahoo_player_key / positions / team / prior_stats
-  ├─ selected_pos（Yahoo 格位：IL/IL+/BN/NA/位置）/ status（MLB 狀態：IL10/IL60/DTD/NA/空=健康）
-  ├─ 被讀取：daily_advisor.py / fa_scan.py / roster_stats.py / weekly_review.py
-  └─ 被更新：roster_sync.py（cron TW 15:10，偵測 add/drop + 更新狀態 → auto sync + git push）
-
-waiver-log.md（球員追蹤唯一來源）
-  ├─ 觀察中（FA）/ 隊上觀察（自家球員非數據脈絡）/ 已結案
-  ├─ 被讀取：fa_scan.py / skills
-  └─ 被更新：/player-eval / /waiver-scan skill / 傷病事件時手動
-
-資料流：MLB Stats API + Yahoo Fantasy API + Baseball Savant CSV
-  → Python 腳本組裝 → claude -p 分析 → Telegram 推送 + GitHub Issue 存檔
-```
+腳本資料流圖見 [`docs/architecture.md`](docs/architecture.md)（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 之間的讀寫關係）。
 
 ### 執行環境
 
@@ -473,6 +440,7 @@ waiver-log.md（球員追蹤唯一來源）
 | `week-reviews.md` | 累積式週覆盤記錄 |
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
+| `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
