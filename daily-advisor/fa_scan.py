@@ -2362,9 +2362,15 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
     else:
         entry["rolling_14d"] = rolling_data
 
-    score, breakdown = fa_compute.compute_sum_score(savant, group_type)
-    entry["score"] = score
-    entry["breakdown"] = breakdown
+    if group_type == "batter":
+        score, breakdown = fa_compute.compute_sum_score(savant, group_type)
+        entry["score"] = score
+        entry["breakdown"] = breakdown
+    else:
+        # SP v4 path: _attach_v4_to_fa (in _phase6_sp) overwrites score/breakdown
+        # with v4 5-slot Sum. Placeholder here keeps schema stable.
+        entry["score"] = 0
+        entry["breakdown"] = {}
     return entry
 
 

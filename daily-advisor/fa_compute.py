@@ -11,42 +11,33 @@ from __future__ import annotations
 
 from typing import Literal
 
-from daily_advisor import BATTER_PCTILES, PITCHER_PCTILES
+from daily_advisor import BATTER_PCTILES
 
 PlayerType = Literal["batter", "sp"]
 
-# Metric → prior_stats key mapping (SP prior uses _allowed suffix)
+# Metric → prior_stats key mapping (batter v4 thin uses 3 indicators)
 _PRIOR_KEY_MAP = {
     "batter": {
         "xwoba": "xwoba",
         "bb_pct": "bb_pct",
         "barrel_pct": "barrel_pct",
     },
-    "sp": {
-        "xera": "xera",
-        "xwoba": "xwoba_allowed",
-        "hh_pct": "hh_pct_allowed",
-    },
 }
 
 # Human-readable breakdown labels (preserve prompt casing: "xwOBA", "BB%", ...)
 _BREAKDOWN_LABELS = {
     "batter": {"xwoba": "xwOBA", "bb_pct": "BB%", "barrel_pct": "Barrel%"},
-    "sp": {"xera": "xERA", "xwoba": "xwOBA", "hh_pct": "HH%"},
 }
 
-# Metric order for Sum (xwOBA / BB% / Barrel% for batter; xERA / xwOBA / HH% for SP)
+# Metric order for batter Sum (xwOBA / BB% / Barrel%)
 _METRIC_ORDER = {
     "batter": ("xwoba", "bb_pct", "barrel_pct"),
-    "sp": ("xera", "xwoba", "hh_pct"),
 }
 
 
 def _pctile_table(player_type: PlayerType):
     if player_type == "batter":
         return BATTER_PCTILES
-    if player_type == "sp":
-        return PITCHER_PCTILES
     raise ValueError(f"unknown player_type: {player_type}")
 
 
@@ -178,25 +169,23 @@ def pick_weakest(
     n: int = 4,
     cant_cut: set[str] | None = None,
 ) -> tuple[list[dict], list[dict]]:
-    """Pick weakest N players by Sum asc + low_confidence_excluded.
+    """Pick weakest batters (v4 thin) by Sum asc + low_confidence_excluded.
 
-    Expects each player dict to have `savant_2026` pre-attached:
-        batter: {xwoba, bb_pct, barrel_pct, bbe}
-        sp:     {xera, xwoba, hh_pct, bbe}
+    SP path uses pick_weakest_v4_sp (5-slot) — see below.
+
+    Expects each player dict to have `savant_2026` with {xwoba, bb_pct,
+    barrel_pct, bbe}.
 
     Filters applied in order:
         1. Exclude cant_cut by case-insensitive name.
-        2. SP only: BBE <30 → low_confidence_excluded (not in weakest).
-           Batter v4 thin: BBE <40 → low_confidence_excluded.
-        3. Batter v4 thin only: Sum ≥25 → strong, drop candidate excluded.
-        4. Sort remaining by Sum asc.
-           SP: take first n.
-           Batter v4 thin: return all surviving (n is ignored).
+        2. BBE <40 → low_confidence_excluded (not in weakest).
+        3. Sum ≥25 → strong, drop candidate excluded.
+        4. Sort remaining by Sum asc, return all surviving (n is ignored).
 
     Returns:
         (weakest, excluded)
         weakest: [{name, mlb_id, score, breakdown, confidence, savant_2026, ...原 player 欄位}]
-        excluded: [{name, bbe, note}] — SP BBE<30 or Batter BBE<40
+        excluded: [{name, bbe, note}] — BBE<40
     """
     cant_cut_lower = {c.lower() for c in (cant_cut or set())}
 
@@ -210,18 +199,7 @@ def pick_weakest(
         savant = p.get("savant_2026") or {}
         bbe = int(savant.get("bbe") or 0)
 
-        if player_type == "sp" and _sp_bbe_excluded(bbe):
-            excluded.append(
-                {
-                    "name": p["name"],
-                    "mlb_id": p.get("mlb_id"),
-                    "bbe": bbe,
-                    "note": "BBE 小樣本，驗證期暫不排序",
-                }
-            )
-            continue
-
-        if player_type == "batter" and _batter_bbe_excluded(bbe):
+        if _batter_bbe_excluded(bbe):
             excluded.append(
                 {
                     "name": p["name"],
@@ -235,8 +213,8 @@ def pick_weakest(
         score, breakdown = compute_sum_score(savant, player_type)
         confidence = _confidence_label(bbe, player_type)
 
-        # Batter v4 thin: hard floor — Sum ≥25 is strong, not a drop candidate.
-        if player_type == "batter" and score >= _BATTER_SUM_HARD_FLOOR:
+        # Hard floor — Sum ≥25 is strong, not a drop candidate.
+        if score >= _BATTER_SUM_HARD_FLOOR:
             continue
 
         weakest_pool.append(
@@ -250,16 +228,12 @@ def pick_weakest(
         )
 
     weakest_pool.sort(key=lambda e: e["score"])
-    if player_type == "batter":
-        return weakest_pool, excluded  # no n cap — all surviving
-    return weakest_pool[:n], excluded
+    return weakest_pool, excluded  # no n cap — all surviving
 
 
-# ── Phase 5.3: urgency four-factor computation ──
-# Prior IP <20 → too small a sample to count as prior data (per #2 bug fix).
+# Prior IP <20 → too small a sample to count as v4 SP prior data.
 # CLAUDE.md rule: "2025 Sum 雙年檢核（需 2025 IP ≥50）" for Slump hold gate,
-# but the base Sum scoring also skips on <20 IP to avoid 5-IP noise
-# (López 5 IP, 22 BBE → xera 10.73 was giving +2 结构性確認 erroneously).
+# but the base Sum scoring also skips on <20 IP to avoid 5-IP noise.
 _PRIOR_IP_MIN = 20
 _PRIOR_IP_SLUMP_HOLD_MIN = 50
 
@@ -270,347 +244,50 @@ _PRIOR_IP_SLUMP_HOLD_MIN = 50
 _LUCK_TAG_BBE_MIN = 40
 
 
-def _factor_2026_sum(sum_2026: int) -> int:
-    """Per CLAUDE.md urgency factor (1): 2026 Sum bucket.
-
-    <9=+5, 9-11=+4, 12-14=+3, 15-17=+2, 18-21=+1, ≥22=+0.
-    """
-    if sum_2026 < 9:
-        return 5
-    if sum_2026 <= 11:
-        return 4
-    if sum_2026 <= 14:
-        return 3
-    if sum_2026 <= 17:
-        return 2
-    if sum_2026 <= 21:
-        return 1
-    return 0
-
-
-def _factor_2025_sum(sum_2025: int, prior_ip: float | None, player_type: PlayerType) -> int:
-    """Per CLAUDE.md urgency factor (2): 2025 Sum (with optional IP gate for SP).
-
-    SP rules:
-        Sum ≥24 + IP ≥50 → Slump hold (handled separately, this returns +0)
-        Sum ≥24 + IP <50 → +0 (菁英但低樣本)
-        Sum 22-23 → +0 (灰色帶)
-        Sum 18-21 → +1
-        Sum <18   → +2 (結構性確認)
-
-    Batter rules: same except no IP gate (Slump hold handled separately).
-    """
-    if sum_2025 == 0:
-        return 0  # no prior (or prior IP <20 for SP, already zeroed in caller)
-    if sum_2025 >= 24:
-        return 0  # Slump hold handled by caller; low-IP also +0
-    if sum_2025 >= 22:
-        return 0  # 灰色帶
-    if sum_2025 >= 18:
-        return 1
-    return 2  # 結構性確認
-
-
-def _factor_rolling(rolling: dict | None, season_xwoba_allowed: float | None,
-                    player_type: PlayerType) -> int:
-    """Per CLAUDE.md urgency factor (3): 21d Δ xwOBA (SP) / 14d Δ xwOBA (batter).
-
-    SP direction (allowed): Δ ≤ -.050 = 🔥強回升 = -2; Δ ≥ +.050 = ❄️強劣化 = +2.
-    Batter direction: Δ ≥ +.050 = 🔥強回升 = -2; Δ ≤ -.050 = ❄️強下滑 = +2.
-
-    BBE gate: batter ≥25, SP ≥20 (per CLAUDE.md).
-    """
-    if not rolling:
-        return 0
-    bbe_gate = 25 if player_type == "batter" else 20
-    if (rolling.get("bbe") or 0) < bbe_gate:
-        return 0
-    r_xwoba = rolling.get("xwoba")
-    if r_xwoba is None or season_xwoba_allowed is None:
-        return 0
-    delta = r_xwoba - season_xwoba_allowed
-
-    if player_type == "sp":
-        # Allowed direction: lower = better, so Δ negative = improving (-urgency)
-        if delta <= -0.050:
-            return -2
-        if delta <= -0.035:
-            return -1
-        if delta >= 0.050:
-            return 2
-        if delta >= 0.035:
-            return 1
-        return 0
-    # batter: higher xwOBA = better → Δ positive = rising (-urgency)
-    if delta >= 0.050:
-        return -2
-    if delta >= 0.035:
-        return -1
-    if delta <= -0.050:
-        return 2
-    if delta <= -0.035:
-        return 1
-    return 0
-
-
-def _factor_sp_ip_per_tg(ip_per_tg: float | None) -> int:
-    """SP factor (4): 2026 IP/Team_G — active 輪值越多越拖比率."""
-    if ip_per_tg is None:
-        return 0
-    if ip_per_tg >= 1.0:
-        return 2
-    if ip_per_tg >= 0.5:
-        return 1
-    return 0
-
-
-def _factor_batter_pa_per_tg(pa_per_tg: float | None) -> int:
-    """Batter factor (4): 2026 PA/Team_G — 越主力越拖 stats."""
-    if pa_per_tg is None:
-        return 0
-    if pa_per_tg >= 3.5:
-        return 2
-    if pa_per_tg >= 3.0:
-        return 1
-    return 0
-
-
 def compute_urgency(
     weakest_n: list[dict],
     player_type: PlayerType,
 ) -> dict:
-    """Compute urgency for weakest-N players.
+    """Batter v4 thin passthrough — no factors, no Slump hold.
 
-    SP: four-factor score + Slump hold detection (per CLAUDE.md SP Step 2).
-    Batter v4 thin: passthrough — no factors, no Slump hold (handled by
-        cant_cut list per docs/batter-framework-upgrade-design.md §1.2).
-        Returns weakest entries unsorted (Sum asc from pick_weakest preserved)
-        with empty `factors` / `urgency=None` to keep schema stable for callers
-        that still iterate `weakest_ranked`.
+    SP path uses compute_urgency_v4_sp (4-factor + Slump hold). Slump hold for
+    batter is handled by cant_cut list (docs/batter-framework-upgrade-design.md §1.2).
 
     Each weakest entry should include:
         score         — 2026 Sum (from pick_weakest)
         prior_stats   — 2025 prior dict (may be empty/None)
-        rolling_21d   — SP 21d rolling {xwoba, bbe} (or None)
         rolling_14d   — batter 14d rolling (or None)
-        savant_2026   — current-season Savant (for rolling Δ base xwoba)
-        derived       — {ip_per_tg (SP) / pa_per_tg (batter)}
+        savant_2026   — current-season Savant
+        derived       — {pa_per_tg}
 
     Returns:
         {
-            "weakest_ranked": [  # SP: sorted by urgency desc; Batter: Sum asc
-                {name, urgency, factors: {...}, prior_sum, prior_ip, notes: [...],
-                 ...original weakest entry}
-            ],
-            "slump_hold": [{name, prior_sum, prior_ip}]  # SP only; batter empty
+            "weakest_ranked": [{**w, urgency=None, factors: {}, prior_sum, ...}],
+            "slump_hold": []
         }
     """
-    if player_type == "batter":
-        passthrough = []
-        for w in weakest_n:
-            prior = w.get("prior_stats") or {}
-            sum_2025, prior_breakdown = compute_2025_sum(prior, "batter")
-            passthrough.append(
-                {
-                    **w,
-                    "urgency": None,
-                    "factors": {},
-                    "prior_sum": sum_2025,
-                    "prior_ip": None,
-                    "prior_breakdown": prior_breakdown,
-                    "notes": [],
-                }
-            )
-        return {"weakest_ranked": passthrough, "slump_hold": []}
-
-    season_xwoba_key = "xwoba" if player_type == "batter" else "xwoba"
-    # For SP, Savant xwoba in 2026 data represents xwOBA allowed (same key).
-
-    ranked = []
-    slump_hold = []
-
+    passthrough = []
     for w in weakest_n:
-        name = w["name"]
-        sum_2026 = w.get("score", 0)
         prior = w.get("prior_stats") or {}
-        prior_ip = prior.get("ip") if player_type == "sp" else None
-
-        # Prior Sum — with #2 bug fix: SP prior IP <20 ⇒ treat as no prior
-        notes = []
-        effective_prior = prior
-        if player_type == "sp" and prior and prior_ip is not None and prior_ip < _PRIOR_IP_MIN:
-            effective_prior = {}
-            notes.append(
-                f"2025 prior IP {prior_ip:.1f} <{_PRIOR_IP_MIN} 無效（樣本過小），視為無 prior"
-            )
-
-        sum_2025, prior_breakdown = compute_2025_sum(effective_prior, player_type)
-
-        # Slump hold detection (BEFORE adding 2025 factor)
-        is_slump_hold = False
-        if sum_2025 >= 24:
-            if player_type == "sp":
-                if prior_ip is not None and prior_ip >= _PRIOR_IP_SLUMP_HOLD_MIN:
-                    is_slump_hold = True
-            else:
-                is_slump_hold = True  # batter: no IP gate
-
-        if is_slump_hold:
-            slump_hold.append(
-                {
-                    "name": name,
-                    "mlb_id": w.get("mlb_id"),
-                    "prior_sum": sum_2025,
-                    "prior_ip": prior_ip,
-                    "prior_breakdown": prior_breakdown,
-                    "sum_2026": sum_2026,
-                    "note": "菁英底，slump 候選",
-                }
-            )
-            continue
-
-        # Four factors
-        f_2026 = _factor_2026_sum(sum_2026)
-        f_2025 = _factor_2025_sum(sum_2025, prior_ip, player_type)
-
-        # Rolling Δ base: season xwOBA (allowed for SP; batting for batter)
-        season_savant = w.get("savant_2026") or {}
-        season_xwoba = season_savant.get(season_xwoba_key)
-
-        if player_type == "sp":
-            rolling = w.get("rolling_21d")
-            f_rolling = _factor_rolling(rolling, season_xwoba, "sp")
-            ip_per_tg = (w.get("derived") or {}).get("ip_per_tg")
-            f_production = _factor_sp_ip_per_tg(ip_per_tg)
-        else:
-            rolling = w.get("rolling_14d")
-            f_rolling = _factor_rolling(rolling, season_xwoba, "batter")
-            pa_per_tg = (w.get("derived") or {}).get("pa_per_tg")
-            f_production = _factor_batter_pa_per_tg(pa_per_tg)
-
-        urgency = f_2026 + f_2025 + f_rolling + f_production
-
-        entry = {
-            **w,
-            "urgency": urgency,
-            "factors": {
-                "sum_2026": f_2026,
-                "sum_2025": f_2025,
-                "rolling": f_rolling,
-                "ip_per_tg" if player_type == "sp" else "pa_per_tg": f_production,
-            },
-            "prior_sum": sum_2025,
-            "prior_ip": prior_ip,
-            "prior_breakdown": prior_breakdown,
-            "notes": notes,
-        }
-        ranked.append(entry)
-
-    ranked.sort(key=lambda e: e["urgency"], reverse=True)
-
-    return {
-        "weakest_ranked": ranked,
-        "slump_hold": slump_hold,
-    }
+        sum_2025, prior_breakdown = compute_2025_sum(prior, "batter")
+        passthrough.append(
+            {
+                **w,
+                "urgency": None,
+                "factors": {},
+                "prior_sum": sum_2025,
+                "prior_ip": None,
+                "prior_breakdown": prior_breakdown,
+                "notes": [],
+            }
+        )
+    return {"weakest_ranked": passthrough, "slump_hold": []}
 
 
 # ── Phase 5.4: FA tags + upgrade decision ──
 # Strong warnings that force "觀察" regardless of ✅ count:
-#   - 短局 / 上場有限 (CLAUDE.md 明示 "強警示")
-#   - 樣本小 (confidence blocker; CLAUDE.md 未標但 fixture 要求 — BBE <30 意義等同
-#             pick_weakest 的排除門檻，不應單純視為一般警示)
-_STRONG_WARN_TAGS = {"⚠️ 短局", "⚠️ 上場有限", "⚠️ 樣本小"}
-
-
-def _compute_sp_add_tags(fa: dict) -> list[str]:
-    tags = []
-    prior = fa.get("prior_stats") or {}
-    prior_ip = prior.get("ip")
-    derived = fa.get("derived") or {}
-    savant = fa.get("savant_2026") or {}
-    rolling = fa.get("rolling_21d")
-
-    # ✅ 雙年菁英 — 2025 Sum ≥24 且 IP ≥50
-    # (Use effective prior — IP <20 zeroes out.)
-    if prior_ip is not None and prior_ip >= _PRIOR_IP_MIN:
-        prior_sum, _ = compute_2025_sum(prior, "sp")
-        if prior_sum >= 24 and prior_ip >= _PRIOR_IP_SLUMP_HOLD_MIN:
-            tags.append("✅ 雙年菁英")
-
-    # ✅ 深投型 — IP/GS >5.7
-    ip_per_gs = derived.get("ip_per_gs")
-    if ip_per_gs is not None and ip_per_gs > 5.7:
-        tags.append("✅ 深投型")
-
-    # ✅ 球隊主力 — 2026 IP/Team_G ≥1.0
-    ip_per_tg = derived.get("ip_per_tg")
-    if ip_per_tg is not None and ip_per_tg >= 1.0:
-        tags.append("✅ 球隊主力")
-
-    # ✅ 近況確認 — 21d Δ xwOBA ≤ -0.035
-    if rolling and (rolling.get("bbe") or 0) >= 20:
-        r_x = rolling.get("xwoba")
-        s_x = savant.get("xwoba")
-        if r_x is not None and s_x is not None:
-            if (r_x - s_x) <= -0.035:
-                tags.append("✅ 近況確認")
-
-    # ✅ 撿便宜運氣 — xERA-ERA ≤ -0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
-    era_diff = derived.get("era_diff")
-    bbe_2026 = int(savant.get("bbe") or 0)
-    if era_diff is not None and era_diff <= -0.81 and bbe_2026 >= _LUCK_TAG_BBE_MIN:
-        tags.append("✅ 撿便宜運氣")
-
-    return tags
-
-
-def _compute_sp_warn_tags(fa: dict) -> list[str]:
-    tags = []
-    prior = fa.get("prior_stats") or {}
-    prior_ip = prior.get("ip")
-    derived = fa.get("derived") or {}
-    savant = fa.get("savant_2026") or {}
-    rolling = fa.get("rolling_21d")
-    bbe = int(savant.get("bbe") or 0)
-
-    ip_per_gs = derived.get("ip_per_gs")
-    ip_per_tg = derived.get("ip_per_tg")
-    era_diff = derived.get("era_diff")
-
-    # ⚠️ 短局 (強) — IP/GS <5.0
-    if ip_per_gs is not None and ip_per_gs < 5.0:
-        tags.append("⚠️ 短局")
-
-    # ⚠️ 上場有限 (強) — IP/TG <0.5
-    if ip_per_tg is not None and ip_per_tg < 0.5:
-        tags.append("⚠️ 上場有限")
-
-    # ⚠️ 樣本小 — BBE <30 或 IP <20 (prior IP 缺值不觸發此警示)
-    prior_low_ip = prior_ip is not None and prior_ip < _PRIOR_IP_MIN
-    if bbe < 30 or prior_low_ip:
-        tags.append("⚠️ 樣本小")
-
-    # ⚠️ Breakout 待驗 — 2025 Sum <18 或無 prior
-    if not prior or (prior_ip is not None and prior_ip < _PRIOR_IP_MIN):
-        tags.append("⚠️ Breakout 待驗")
-    else:
-        prior_sum, _ = compute_2025_sum(prior, "sp")
-        if prior_sum < 18:
-            tags.append("⚠️ Breakout 待驗")
-
-    # ⚠️ 賣高運氣 — xERA-ERA ≥ +0.81 (BBE ≥ 40，避免崩盤中誤判為運氣加持)
-    if era_diff is not None and era_diff >= 0.81 and bbe >= _LUCK_TAG_BBE_MIN:
-        tags.append("⚠️ 賣高運氣")
-
-    # ⚠️ 近況下滑 — 21d Δ xwOBA ≥ +0.035
-    if rolling and (rolling.get("bbe") or 0) >= 20:
-        r_x = rolling.get("xwoba")
-        s_x = savant.get("xwoba")
-        if r_x is not None and s_x is not None:
-            if (r_x - s_x) >= 0.035:
-                tags.append("⚠️ 近況下滑")
-
-    return tags
+#   - 上場有限 (CLAUDE.md 明示 "強警示")
+_STRONG_WARN_TAGS = {"⚠️ 上場有限"}
 
 
 def _compute_batter_add_tags(fa: dict) -> list[str]:
@@ -672,13 +349,15 @@ def _decision_from_tags(add_tags: list[str], warn_tags: list[str]) -> str:
 
 
 def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerType) -> dict:
-    """Compute Sum diff + ✅⚠️ tags + upgrade decision for one FA candidate.
+    """Compute Sum diff + ✅⚠️ tags + upgrade decision for one batter FA candidate.
+
+    SP path uses compute_fa_tags_v4_sp (5-slot v4).
 
     Args:
         fa_player: FA candidate with {name, score, breakdown, savant_2026,
-                   prior_stats, rolling_21d/14d, derived}
+                   prior_stats, rolling_14d, derived}
         anchor_player: weakest player to compare (with {name, score, breakdown})
-        player_type: "batter" or "sp"
+        player_type: must be "batter" (kept for signature compat).
 
     Returns:
         {
@@ -711,12 +390,8 @@ def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerTyp
             "anchor_name": anchor_player["name"],
         }
 
-    if player_type == "sp":
-        add_tags = _compute_sp_add_tags(fa_player)
-        warn_tags = _compute_sp_warn_tags(fa_player)
-    else:
-        add_tags = _compute_batter_add_tags(fa_player)
-        warn_tags = _compute_batter_warn_tags(fa_player)
+    add_tags = _compute_batter_add_tags(fa_player)
+    warn_tags = _compute_batter_warn_tags(fa_player)
 
     decision = _decision_from_tags(add_tags, warn_tags)
 
@@ -732,16 +407,12 @@ def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerTyp
 
 
 def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple[int, dict]:
-    """Same as compute_sum_score but tolerates two prior schemas.
+    """Batter prior Sum from roster_config / Savant prior_stats.
 
-    Accepts:
-      - Config schema (roster_config prior_stats): SP uses ``xwoba_allowed`` /
-        ``hh_pct_allowed`` keys.
-      - Raw Savant schema (from Savant CSV extraction): SP uses plain ``xwoba``
-        / ``hh_pct`` keys (same field names as batter, disambiguated by role).
+    SP path uses compute_sum_score_v4_sp directly (5-slot v4 prior).
 
     Args:
-        prior_stats: prior dict in either schema, or None for no prior.
+        prior_stats: batter prior dict {xwoba, bb_pct, barrel_pct} or None.
 
     Returns:
         (sum_score, breakdown). Returns (0, zero-filled breakdown) if prior is
@@ -751,22 +422,14 @@ def compute_2025_sum(prior_stats: dict | None, player_type: PlayerType) -> tuple
         labels = _BREAKDOWN_LABELS[player_type]
         return 0, {label: 0 for label in labels.values()}
 
-    if player_type == "sp":
-        metrics = {
-            "xera": prior_stats.get("xera"),
-            "xwoba": prior_stats.get("xwoba_allowed") or prior_stats.get("xwoba"),
-            "hh_pct": prior_stats.get("hh_pct_allowed") or prior_stats.get("hh_pct"),
-        }
-    else:
-        key_map = _PRIOR_KEY_MAP["batter"]
-        metrics = {metric: prior_stats.get(prior_key) for metric, prior_key in key_map.items()}
+    key_map = _PRIOR_KEY_MAP["batter"]
+    metrics = {metric: prior_stats.get(prior_key) for metric, prior_key in key_map.items()}
     return compute_sum_score(metrics, player_type)
 
 
 # ═════════════════════════════════════════════════════════════════════════
 # v4 SP framework (2026-04-24 defined in docs/sp-framework-v4-balanced.md)
-# Parallel to v2 above — v2 stays live for batter + existing cron safety.
-# v4 applies to SP only. Batters still use v2 (no user request to change).
+# Production since 2026-04-28 cutover.
 # ═════════════════════════════════════════════════════════════════════════
 
 # 2025 MLB SP percentile bands, computed by calc_v4_percentiles.py (n=178/115).
@@ -1116,18 +779,13 @@ def compute_fa_tags_v4_sp(fa_player: dict, anchor_player: dict) -> dict:
     }
 
 
-# ── Phase 6 / v4 cutover Stage D: picker + urgency for SP v4 ──
-# v4 SP framework moves from v2 (3 indicators × 0-30 Sum) to v4 (5 indicators
-# × 0-50 Sum). The v2 pick_weakest / compute_urgency functions assume v2
-# Sum thresholds and v2 BBE rules; v4 needs its own picker + urgency that
-# 1) sorts by v4 Sum (not v2 Sum)
-# 2) keeps the same BBE<30 low_confidence_excluded gate (Savant signal stability)
-# 3) uses v4 Sum bucket thresholds (0-50 not 0-30) for urgency factor 1
-# 4) uses v4 prior Sum thresholds for urgency factor 2 (slump-hold = ≥40+IP≥50)
-# 5) returns 0 for urgency factor 3 (21d Δ xwOBACON — Python doesn't score, see
-#    docs/sp-framework-v4-balanced.md decision 1/4 & CLAUDE.md TODO)
-# 6) replaces v2 IP/Team_G factor with luck-regression (xera-era ± 0.81, BBE≥40)
-#    per docs/sp-framework-v4-balanced.md decision 4 (Lopez triview teaching)
+# ── SP v4 picker + urgency (5 indicators × 0-50 Sum) ──
+# Urgency factors (per docs/sp-framework-v4-balanced.md §「Step 2 — Urgency 排序」):
+#   1. 2026 v4 Sum bucket (_factor_2026_sum_v4)
+#   2. 2025 prior v4 Sum bucket + slump-hold gate (Sum≥40 + IP≥50)
+#   3. 21d Δ xwOBACON — returns 0 (Python doesn't score; see CLAUDE.md TODO)
+#   4. Luck regression (xera-era ± 0.81, BBE≥40) — _factor_luck_regression_v4
+# Same BBE<30 low_confidence_excluded gate as before (Savant signal stability).
 
 
 def _factor_2026_sum_v4(sum_2026: int) -> int:
