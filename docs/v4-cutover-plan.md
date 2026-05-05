@@ -227,9 +227,9 @@ else:
 
 ## 6. Stage E — Feature flag 並行驗證
 
-### E.1 並行模式
+### E.1 並行模式（歷史記錄；2026-05-05 後 SP_FRAMEWORK_VERSION env flag 已移除）
 
-VPS cron 加第二份 fa_scan：
+並行期間 VPS cron 加第二份 fa_scan：
 
 ```cron
 # /etc/cron.d/daily-advisor
@@ -241,6 +241,7 @@ VPS cron 加第二份 fa_scan：
 ```
 
 ⚠️ **注意**：`--no-issue` / `--no-waiver-log` 需要實作（目前 fa_scan.py 只有 `--no-send`）— 加進 Stage D。
+⚠️ **2026-05-05 後失效**：`SP_FRAMEWORK_VERSION` env flag 已移除，cutover 完成後不再支援 parallel run；此 cron 範例僅留作歷史記錄。
 
 ### E.2 並行期間（1-2 週）每天人工對照
 

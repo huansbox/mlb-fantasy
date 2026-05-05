@@ -841,7 +841,7 @@ Final:
 - `daily-advisor/prompt_phase6_batter_final_decision.txt` — step 6 action（含雙候選 surface 規則）
 
 **改動**：
-- `daily-advisor/fa_scan.py` — 加 `BATTER_FRAMEWORK_VERSION` env var dispatch（同 SP_FRAMEWORK_VERSION 模式）
+- `daily-advisor/fa_scan.py` — 加 `BATTER_FRAMEWORK_VERSION` env var dispatch（cutover 期間用，cutover 完成後移除；參考 SP 過去用過的 `SP_FRAMEWORK_VERSION` 模式 — 已於 2026-05-05 移除）
 
 ### 7.3 複用度
 
