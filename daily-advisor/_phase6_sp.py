@@ -1,11 +1,9 @@
 """_phase6_sp — Phase 6 multi-agent SP orchestrator (v4 framework).
 
-Entry point: process_sp_v4(...). Called from fa_scan._process_group_sp_v4
-when SP_FRAMEWORK_VERSION=v4. Mirrors v2 _process_group("sp") top-level
-structure but Layer 5 is an 8-step multi-agent flow.
+Entry point: process_sp_v4(...). Called from fa_scan._process_group_sp_v4.
 
 Pipeline:
-  Layer 1.5: filter pure-RP from FA pool (game-log GS=1 IP/GS gate, reuse v2)
+  Layer 1.5: filter pure-RP from FA pool (game-log GS=1 IP/GS gate)
   Layer 4:   v4 mechanical (pick_weakest_v4_sp + compute_urgency_v4_sp +
              compute_fa_tags_v4_sp) — no Python decision
   Layer 5:   8-step multi-agent
