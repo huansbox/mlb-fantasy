@@ -134,3 +134,73 @@ def _status_warn_tag(status: str | None) -> str | None:
 - `daily-advisor/prompt_fa_scan_pass2_batter.txt` — batter v4 thin prompt
 - 觸發案例 GitHub Issue：#149 (yesterday) + 今日 dry-run（VPS `/tmp/fa_scan_dryrun.log`，僅本地）
 - 設計討論：本 session（2026-05-05）user + AI 對齊定稿
+
+---
+
+## 附加 Task：`yahoo_query.py savant` 投手 v4 升級
+
+### 為什麼
+
+2026-05-05 v2 SP cleanup 完成後，`yahoo_query.py savant` **沒有同步升級**。當前對投手仍顯示 v2 退役指標（xERA / xwOBA allowed / HH% allowed / Barrel% allowed），不顯示 v4 5-slot first-order 指標（IP/GS / Whiff% / BB/9 / GB% / xwOBACON）。
+
+違反 CLAUDE.md L168 規則「SP 評估必用 v4 5-slot... 任何不在 5-slot 的百分位只是 context，不是 first-order signal」。
+
+### 現況觸發案例
+
+2026-05-05 session 評估 Povich 時：
+- `yahoo_query.py savant 'Cade Povich'` 顯示 xERA 4.94 P25-40 / xwOBA .348 P25-40 → 看起來 borderline
+- 但手動跑 `fa_scan_v4.assemble_data` 補 v4 5-slot 後，發現 **Whiff% 29.7 P80-90** = breakout signal
+- **沒跑 v4 補資料的人會直接被 v2 顯示誤導**
+
+### 改動
+
+**檔案**：`daily-advisor/yahoo_query.py`（找 `savant` 子命令的 fetch + format 邏輯）
+
+**目標輸出**：
+```
+=== Cade Povich — Statcast (v4 SP) ===
+  本季 (2026):
+    IP/GS: 5.33 (P40-50) | Whiff%: 29.7% (P80-90) | BB/9: 2.76 (P55-60)
+    GB%: 44.2 (P55-60) | xwOBACON: .388 (<P25)
+    [運氣] xERA 4.94 / ERA 4.41 (Δ +0.53, 中性)
+    GS/G: 2/3 | IP: 16.3 | BBE: 52
+  2025:
+    IP/GS: ... (or "no data" for rookies)
+```
+
+**保留 v2 指標**作 context（lower priority 顯示）：
+```
+  輔助 (context only, NOT first-order)：
+    xwOBA allowed .348 (P25-40) | HH% allowed 44.2% (P25-40) | Barrel% allowed 9.6% (P25-40)
+```
+
+或完全移除（更乾淨，但可能漏掉某些情境用戶想看）。**建議：保留 + 標記「context only」**。
+
+### 實作骨架
+
+1. 找到 `yahoo_query.py` 投手 savant 路徑（grep `is_pitcher` 或 `pitcher` 關鍵字）
+2. 新增 v4 5-slot fetch — **複用** `fa_scan_v4.assemble_data`（已存在，本機 + VPS 皆可跑）
+3. format 改寫，主表 v4 5-slot + 運氣訊號，副表 v2 context
+
+### 為什麼是 follow-up 不在 v2 cleanup session 做
+
+- 本 session（2026-05-05）v2 cleanup 範圍鎖定在 `fa_compute.py` + `fa_scan.py` + `_phase6_sp.py` + tests + tools
+- `yahoo_query.py` 是獨立 player-eval 查詢工具，**不在 fa_scan 機制鏈上**，當時沒被 reviewer flag
+- 升級它需要對齊 v4 5-slot 顯示格式（小設計），跟 IL/NA filter 是不同任務但**相同精神**（v4 cutover 完整化）
+
+### 預估工時
+
+~30-45 min。Fetch 邏輯複用 `assemble_data` 簡單，主要工作量在 format 設計 + 確認 batter 端不被波及。
+
+### 待決問題
+
+1. **2025 prior 怎麼處理**：v4 5-slot 對 2025 年也要顯示嗎？`backfill_prior_stats_v4.py` 已把 roster 內的 SP 補 v4 prior 進 roster_config，但 FA / 觀察中球員的 2025 v4 prior 要動態抓（可能慢）。建議先只顯示 2026 v4 + 2025 v2 context（minimal scope），future 再升 2025 v4。
+
+2. **打者端要不要動**：打者已是 v4 thin（CLAUDE.md「打者評估」），但 `yahoo_query.py savant` 對打者的輸出仍是 xwOBA / HH% / Barrel% / BBE — 這些**剛好是 v4 thin 核心 3 指標**，所以打者端不需要動。確認一下避免改錯。
+
+3. **`yahoo_query.py savant` 目前 batter 也可能有 v2 殘留**：BB% 是 v4 thin 第 2 核心指標，當前輸出有顯示嗎？查一下，沒的話順便加。
+
+### 風險
+
+- 改 format 可能破壞其他依賴此輸出 grep 的下游工具 — 跑 `grep -rn 'yahoo_query.py savant' daily-advisor/` 確認沒人 parse 它的 stdout 結構
+- player-eval skill 文件可能需同步更新（`.claude/commands/player-eval.md` 看 Step 1.1 說明）
