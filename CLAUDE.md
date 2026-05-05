@@ -441,6 +441,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
+| `docs/handoff-il-na-filter.md` | **FA IL/NA 過濾機制 handoff（2026-05-05）— 下個 session 實作（方案 A：分等級過濾 + 軟 tag）** |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
@@ -466,7 +467,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
-- [ ] **CLAUDE.md cleanup handoff Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook（同串流 SP 模式 — 系統架構資料流圖、檔案索引表、待辦完成 archive 等）。Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成（4 commits，-1500 lines）。Task 2 候選清單見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
+- [ ] **FA IL/NA 過濾機制**（下個 session 實作）：當前 fa_scan 無自動排除 IL/NA FA — Mize IL15 連兩天被推薦（#149 + 05-05 dry-run）。方案 A 已對齊（IL60/NA hard filter + IL10/IL15 軟 tag + Phase 6 prompt 提醒），詳見 [`docs/handoff-il-na-filter.md`](docs/handoff-il-na-filter.md)。預估 1.5-2 hour，2 commits。
+- [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Phase 6 reason 中文化驗證**（2026-05-02 改完，明天 cron 第一天看效果）：commit `c63f13c` 改 `prompt_phase6_final_decision.txt` 強制 reason / watch_triggers / waiver_log_updates.note / telegram_summary 輸出繁體中文（player names + 技術術語保留英文）。明天 12:30 cron 跑出 #140 SP-v4 報告後驗收 Telegram 推送語言；若仍英文，prompt 需加強指令位置或前置 system 提示
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
