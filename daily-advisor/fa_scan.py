@@ -541,6 +541,23 @@ RP_QUERIES = [
     ("RP-BW", "status=A;position=RP;sort=AR;sort_type=biweekly;count=10", "biweekly"),
 ]
 
+# Yahoo status values for FA we hard-exclude by default. IL10/IL15/DTD/empty
+# stay in the pool — IL10/IL15 get a soft warn tag downstream (fa_compute).
+_INACTIVE_STATUS = frozenset({"IL60", "NA"})
+
+
+def is_inactive_fa(player, include_inactive=False):
+    """Return True when this FA should be hard-filtered (long-term unavailable).
+
+    IL60 / NA = ≥2 months unusable; claiming wastes weekly add slots and FAAB
+    while occupying IL/NA space. Pass include_inactive=True (CLI --include-inactive)
+    when explicitly stashing prospects.
+    """
+    if include_inactive:
+        return False
+    status = (player.get("status") or "").strip().upper()
+    return status in _INACTIVE_STATUS
+
 # ── Layer 2: Quality thresholds ──
 
 # Batter: Sum scoring (3 metrics × percentile → 1-10 each, total 3-30)
@@ -3260,6 +3277,19 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     watch_names = {w["name"] for w in watchlist}
     snapshot_no_watch = {k: v for k, v in snapshot.items() if k not in watch_names}
 
+    # Hard-exclude IL60 / NA — claiming wastes weekly add slot + FAAB.
+    # IL10/IL15 stay (downstream fa_compute soft-tags them as 觀察).
+    if not args.include_inactive:
+        before = len(snapshot_no_watch)
+        snapshot_no_watch = {
+            n: info for n, info in snapshot_no_watch.items()
+            if not is_inactive_fa(info)
+        }
+        skipped = before - len(snapshot_no_watch)
+        if skipped:
+            print(f"  Layer 2 pre-filter: skipped {skipped} IL60/NA FA "
+                  f"(use --include-inactive to keep)", file=sys.stderr)
+
     # ── Layer 2: filter ──
     filtered = filter_by_savant(snapshot_no_watch, savant_2026)
 
@@ -3365,6 +3395,8 @@ def main():
     parser.add_argument("--sp-only", action="store_true", help="Skip batter group (SP smoke test)")
     parser.add_argument("--batter-only", action="store_true", help="Skip SP group")
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
+    parser.add_argument("--include-inactive", action="store_true",
+                        help="Stash mode: keep IL60/NA FA candidates (default: hard-filter)")
     args = parser.parse_args()
 
     env = load_env()
