@@ -11,6 +11,7 @@
 - 05-03：xwOBA P95 / 14d OPS .956 持續火燙；PA-TG 2.64 連 5 天未達 3.0；31% plateau — 降低門檻：PA-TG ≥2.8 連 3 天即可行動（原 3.0 連 7 天過嚴）（fa_scan）
 - 05-04：xwOBA P80 / 14d OPS .926 / K% 12.5 控 K 極佳；PA-TG 2.71 連 6 天未達降低後門檻 2.8；31% plateau 窗口收窄中（fa_scan）
 - 05-05：xwOBA P95 / 14d OPS .875 / K% 10.0 控 K 極佳；PA-TG 2.74 連 6 天未達降低後門檻 2.8；40% rising 3d+9 窗口持續收窄（fa_scan）
+- 05-06：PA-TG 2.69 連 8 天未達 2.8 門檻；14d OPS .895 / K% 10.2 控 K 極佳；42% explosive +11 搶人潮加劇窗口收窄中（fa_scan）
 
 ### Austin Martin (MIN, 2B,LF,CF) [mlb_id:668885] — 觀察中
 觸發：BBE 達 60 + xwOBA 維持 P80+ + PA-TG ≥3.0 → 升級取代
@@ -31,6 +32,7 @@
 - 05-03：xwOBA P70 / BB% P70 穩健；14d Savant Δ+0.015 平穩；仍等 Stanton 觸發條件（fa_scan）
 - 05-04：xwOBA P60 / BB% P80 穩健；14d OPS .777 平穩；仍等 Stanton 觸發條件（fa_scan）
 - 05-05：xwOBA P60 / BB% P80 穩健；14d OPS .764 平穩；37% dropping 3d-3；仍等 Stanton 觸發條件（fa_scan）
+- 05-06：14d OPS .602 / K% 31.6 冷卻中；37% dropping；仍等 Stanton 觸發條件（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：PA-TG ≥3.2 連 7 天 + xwOBA 維持 P80+ → 升級取代
@@ -40,6 +42,7 @@
 - 05-03：xwOBA P95 / BB% P95 / Barrel% P70；14d Savant Δ+0.023 上升；PA-TG 2.82 仍未達 3.2；3% 零壓力（fa_scan）
 - 05-04：xwOBA P95 / BB% P95 / Barrel% P70 雙年確認；14d 9 BB；PA-TG 2.89 仍未達 3.2；3% 零壓力（fa_scan）
 - 05-05：xwOBA P95 / BB% P95 雙年確認；14d OPS .787 + 9 BB；PA-TG 2.83 連 6 天未達 3.2；3% 零壓力（fa_scan）
+- 05-06：PA-TG 2.83 連 7 天未達 3.2；14d OPS .787 + 8 BB；xwOBA P95 結構不變；3% 零壓力（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 80 → 升級取代
@@ -48,6 +51,7 @@
 - 05-03：xwOBA P95 / BB% P95 結構菁英但 14d Savant Δ-0.140 品質暴跌；PA-TG 2.79 接近 3.0；.957 OPS 靠 BABIP 撐；7% 無壓力（fa_scan）
 - 05-04：xwOBA P95 結構仍菁英但 14d Savant Δ-0.110 品質暴跌；OPS .911 靠 BABIP；PA-TG 2.82；需警惕下修（fa_scan）
 - 05-05：xwOBA P95 結構仍菁英但 14d Savant Δ-0.105 品質暴跌第 3 天加劇；OPS .877 靠 BABIP；PA-TG 2.86 接近 3.0 但下修風險升高（fa_scan）
+- 05-06：14d Savant Δ-0.116 品質暴跌第 4 天加劇（季最差）；OPS .877 靠 BABIP 撐；PA-TG 2.78 仍未達 3.0；下修風險升級（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:693307] — 觀察中
 觸發：Buxton 14d OPS 連跌 <.700 + xwOBA 未回 P70 → 升級取代 Buxton
@@ -56,6 +60,7 @@
 - 05-03：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.073 品質下滑持續；41% plateau；BB% P25 不填 BB 缺口；維持觀察（fa_scan）
 - 05-04：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.100 品質下滑第 3 天；42% plateau；BB% P25；維持觀察（fa_scan）
 - 05-05：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.096 品質下滑第 4 天持續惡化；46% rising 3d+5；BB% P25；維持觀察（fa_scan）
+- 05-06：14d Savant Δ-0.068 品質下滑第 5 天；14d RBI 12 counting 仍有產量；50% rising 3d+9 窗口收窄；BB% P0 結構缺陷不變（fa_scan）
 
 ### Nathaniel Lowe (CIN, 1B) [mlb_id:663993] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 70 → 升級
@@ -69,15 +74,18 @@
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
 - 05-04：xwOBA P55 / BB% P0 雙年確認；14d OPS .820 / 4 HR / Savant Δ+0.062 上升；但結構弱點未改（BB% P0）；等 Nootbaar 回歸後 PT 觀察（fa_scan）
 - 05-05：xwOBA P60 / BB% P0 雙年確認；14d OPS .839 / 4 HR / Savant Δ+0.063 power 上升；PA-TG 3.09 但 Nootbaar 5/24 回歸 PT 縮減風險；結構弱點（BB% P0）未改（fa_scan）
+- 05-06：14d Savant Δ+0.062 品質上升 / 4 HR power 持續；PA-TG 3.09 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
 
 ### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
 觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
 - 05-04：xwOBA P80 / BB% P70 / HH% P80 均衡；14d OPS 1.009 + Savant Δ+0.086 品質急升；PA-TG 2.94 接近主力；2025 prior P40/P0 breakout 待驗（fa_scan）
 - 05-05：xwOBA P70 / BB% P70 / HH% P70 均衡；14d OPS .829 + Savant Δ-0.009 微降；PA-TG 2.97 接近 3.0；2025 prior P40/P0 breakout 待驗（fa_scan）
+- 05-06：14d OPS 1.017 / Savant Δ-0.036 微降；PA-TG 3.00 剛達門檻；xwOBA P60 從 P80 回落；breakout 驗證尚早（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
 - 05-05：xwOBA P80 / BB% P95 雙年菁英確認（prior P95/P95）；14d 12 BB / 62 PA；PA-TG 4.00 全職；vs Albies 三項全勝（結構差距 50 百分位點 BB%）；等 Albies 14d 冷卻（fa_scan）
+- 05-06：DTD 持續；xwOBA P80 / BB% P95 雙年菁英；14d 12 BB / OPS .753；等回歸 active + Albies 冷卻（fa_scan）
 
 ## 隊上觀察
 
@@ -105,6 +113,7 @@
 
 ### Dansby Swanson (CHC, SS) — 被搶（自動偵測）
 - 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
+- 05-06：xwOBA P95 / BB% P95 / Barrel% P70 雙年確認（2025 P80/P40/P70）；86% owned 結構全面碾壓 Altuve；立即 FAAB claim（fa_scan）
 
 ### Cole Young (SEA, 2B) — 被搶（自動偵測）
 - 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
