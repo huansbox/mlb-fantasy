@@ -459,6 +459,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫 + 結果（2026-04-25 plan / 04-26 跑完）— P1 共識 100%，§7.2 放寬為「P1 match 即收斂」（borderline gate Sum 差 <5 才強制 step 3 review） |
 | `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— v4 cutover 後 1-2 月觸發實作 |
 | `docs/savant-smoke-test-design.md` | Savant 端點 daily smoke test design（2026-04-25）— v4 cutover 前後實作 |
+| `docs/sp-b1-cutover-design.md` | **SP B1 cutover 設計定稿**（2026-05-06 grill-me 對齊）— Phase 6 對齊 Batter v4 thin（拿掉 Sum/urgency/evaluation tags 暴露 + master borderline LLM 自判 + 加 SP Sum≥40 排除 + dissent monitoring + retreat threshold + G1 fallback） |
+| `issues/prd.md` + `issues/001-009-*.md` | **B1 cutover PRD + 9 個 vertical slice issues**（2026-05-06 prd-to-issues 拆出）— day-1 可並行：001 / 002 / 003 / 004（無 blocker）；critical path：002 → 005+006 → 008 → 009 |
 
 ## 待辦
 
@@ -472,9 +474,15 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
-- [ ] **fa_scan_v4.py CLI 命運**（v4 cutover 完成後仍待決）：退役 / ad-hoc 偵錯 / Phase 6 manual frontend 三選一。v4 cutover Stage A-F 全完成（2026-04-26 ~ 2026-05-05；Phase 6 §7.1-7.7 設計鎖定見 `docs/fa_scan-claude-decision-layer-design.md` §7；歷史 commits 見 git log + `docs/v4-cutover-plan.md`）。
-- [ ] **SP / Batter 框架對稱性檢視**（batter Phase 6 multi-agent 上線時觸發）：目前 SP（v4 + Phase 6）與 Batter（v4 thin + single LLM）機械層厚度不一致 — SP 機械層算 urgency 4-factor + ✅⚠️ data-based tags + Sum 暴露給 LLM，Batter 機械層只 hard filter 不算 urgency / 不打 data-based tag / Sum 不暴露。差異有 intentional 部分（樣本門檻 BBE <40 vs <30、slump hold 機械 vs LLM、14d vs 21d 趨勢視窗 — 投打打數累積與時間尺度不同）也有「演化未完」部分（urgency / tags / Sum 暴露三項可能該下放給 multi-agent 自由 reasoning）。Batter Phase 6 multi-agent 上線後重評 SP 是否拆薄（option X：對齊 batter / option Y：保留 SP anchor）。詳見 2026-04-29 session 對照表。
-- [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（用戶觀察 2026-05-04）：當前 SP v4 Phase 6 prompt 暴露 Sum 給 LLM（fa-scan #149 三 agent 直接寫「Sum 14 / Sum 19」），lazy 引用 Sum 數字而非從 raw + percentile 自由 reasoning。Batter v4 thin 已把 Sum 內部當 ≥25 filter 不暴露（CLAUDE.md「打者評估」段），SP 應對齊。改 5 個 `prompt_phase6_sp_*.txt` 拿掉 Sum，只給 raw + percentile + 5-slot 訊號。Sum 1-10 分桶失真（P89 vs P91 跳 1 分而 P79.5 vs P75 同分），加總喪失 dimension（哪個 slot 強看不到）。「框架對稱性檢視」的具體 actionable 子項。
+- [ ] **B1 cutover 進行中**（2026-05-06 啟動，9 個 issues 拆完）：SP Phase 6 對齊 Batter v4 thin。完整脈絡見 `docs/sp-b1-cutover-design.md`，工作隊列 `issues/001-009-*.md`，PRD `issues/prd.md`。
+  - **動 SP / Phase 6 / fa_compute / _phase6_sp / 5 個 sp prompt / fa_scan_v4 之前**：先讀 `issues/` 看是否有相關 in-flight slice，避免衝突
+  - **Day-1 可並行起跑**：001（SP Sum≥40 hard filter）/ 002（payload_slimmer 抽深模組）/ 003（metrics_emitter）/ 004（fa_scan_v4.py 退役）— 4 個無 blocker
+  - **Critical path**：002 → 005+006（SP/FA prompt B1）→ 008（spike fixture baseline）→ 009（production cutover）
+  - **HITL slice**（需用戶看品質）：005 / 006 / 008 / 009
+  - **Cutover 完成後**：移除以下 3 條被涵蓋的 TODO：①「fa_scan_v4.py CLI 命運」②「SP / Batter 框架對稱性檢視」③「SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin」（暫保留以便檢索；issue 009 acceptance 含移除 ① ③ + 重評 ②）
+- [ ] **fa_scan_v4.py CLI 命運**（被 issue 004 涵蓋，cutover 完成才移除）：退役 / ad-hoc 偵錯 / Phase 6 manual frontend 三選一 → 2026-05-06 grill-me 決定為「退役」。
+- [ ] **SP / Batter 框架對稱性檢視**（部分被 B1 cutover 涵蓋）：原 batter Phase 6 multi-agent 上線時觸發 → 2026-05-06 倒序執行先動 SP（基於 lazy 引用 Sum 觀察）。Batter Phase 6 上線時要重評是否仍按原計畫升 batter，或 batter 留 thin（已對稱無需動）。
+- [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（被 issue 005 + 006 涵蓋，cutover 完成才移除）：5 個 prompt 改寫拿掉 Sum + urgency + evaluation tags 引用，master borderline 改 LLM 自判（H3）。詳見 `docs/sp-b1-cutover-design.md` §LLM 層。
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
   - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
