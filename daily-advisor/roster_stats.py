@@ -177,9 +177,9 @@ def main():
     pitcher_savant = fetch_savant_for_pitchers(pitcher_ids, season)
 
     print(f"\n=== 投手（{season} 本季 + {season-1} 基準）===\n")
-    header = f"| 球員 | 隊伍 | Type | GS | IP | ERA | WHIP | K | W | QS | xERA | xwOBA | HH% | Barrel% | BBE | xERA({season-1}) | HH%({season-1}) |"
+    header = f"| 球員 | 隊伍 | Type | GS | IP | ERA | WHIP | K | W | QS | IP/GS | Whiff% | BB/9 | GB% | xwOBACON | BBE | xwOBACON({season-1}) | Whiff%({season-1}) |"
     print(header)
-    print("|------|------|------|----|----|-----|------|---|---|----|------|-------|------|---------|-----|-----------|---------|")
+    print("|------|------|------|----|----|-----|------|---|---|----|-------|--------|------|-----|----------|-----|----------------|---------------|")
 
     print("Fetching pitcher stats...", file=sys.stderr)
     for p in pitchers:
@@ -189,23 +189,26 @@ def main():
         d = fetch_pitcher_full(mid, season)
         sv_cur = (pitcher_savant.get(mid) or {}).get("current") or {}
         sv_pri = (pitcher_savant.get(mid) or {}).get("prior") or {}
-        # Format pitcher Savant values with percentile tags
-        xe_v = sv_cur.get("xera")
-        xera = f"{xe_v:.2f} {pctile_tag(xe_v, 'xera', 'pitcher')}" if xe_v is not None else "—"
-        xw_v = sv_cur.get("xwoba")
-        xwoba = f"{xw_v:.3f} {pctile_tag(xw_v, 'xwoba', 'pitcher')}" if xw_v is not None else "—"
-        hh_v = sv_cur.get("hh_pct")
-        hh = f"{hh_v:.1f}% {pctile_tag(hh_v, 'hh_pct', 'pitcher')}" if hh_v is not None else "—"
-        brl_v = sv_cur.get("barrel_pct")
-        barrel = f"{brl_v:.1f}% {pctile_tag(brl_v, 'barrel_pct', 'pitcher')}" if brl_v is not None else "—"
+        # Format pitcher v4 5-slot values with percentile tags (sp_v4 category)
+        ipgs_v = sv_cur.get("ip_gs")
+        ip_gs = f"{ipgs_v:.2f} {pctile_tag(ipgs_v, 'ip_gs', 'sp_v4')}" if ipgs_v is not None else "—"
+        wf_v = sv_cur.get("whiff_pct")
+        whiff = f"{wf_v:.1f}% {pctile_tag(wf_v, 'whiff_pct', 'sp_v4')}" if wf_v is not None else "—"
+        bb9_v = sv_cur.get("bb9")
+        bb9 = f"{bb9_v:.2f} {pctile_tag(bb9_v, 'bb9', 'sp_v4')}" if bb9_v is not None else "—"
+        gb_v = sv_cur.get("gb_pct")
+        gb = f"{gb_v:.1f}% {pctile_tag(gb_v, 'gb_pct', 'sp_v4')}" if gb_v is not None else "—"
+        xwc_v = sv_cur.get("xwobacon")
+        xwobacon = f"{xwc_v:.3f} {pctile_tag(xwc_v, 'xwobacon', 'sp_v4')}" if xwc_v is not None else "—"
         bbe = sv_cur.get("bbe", 0) or "—"
-        xera_pri = fmt(sv_pri.get("xera"), ".2f")
-        hh_pri = f"{sv_pri['hh_pct']:.1f}%" if sv_pri.get("hh_pct") is not None else "—"
+        # Prior year: gb_pct missing (Savant batted-ball ignores year param), so only xwOBACON + Whiff%
+        xwobacon_pri = fmt(sv_pri.get("xwobacon"), ".3f")
+        whiff_pri = f"{sv_pri['whiff_pct']:.1f}%" if sv_pri.get("whiff_pct") is not None else "—"
         p_type = pitcher_type(p) or "P"
         if not d:
-            print(f"| {p['name']} | {p['team']} | {p_type} | — | — | — | — | — | — | — | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
+            print(f"| {p['name']} | {p['team']} | {p_type} | — | — | — | — | — | — | — | {ip_gs} | {whiff} | {bb9} | {gb} | {xwobacon} | {bbe} | {xwobacon_pri} | {whiff_pri} |")
             continue
-        print(f"| {p['name']} | {p['team']} | {p_type} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {xera} | {xwoba} | {hh} | {barrel} | {bbe} | {xera_pri} | {hh_pri} |")
+        print(f"| {p['name']} | {p['team']} | {p_type} | {d['gs']} | {d['ip']} | {d['era']} | {d['whip']} | {d['k']} | {d['w']} | {d['qs']} | {ip_gs} | {whiff} | {bb9} | {gb} | {xwobacon} | {bbe} | {xwobacon_pri} | {whiff_pri} |")
 
 
 if __name__ == "__main__":
