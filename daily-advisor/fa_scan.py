@@ -785,6 +785,8 @@ def _calc_sp_v4_sum_4slot(v4):
     backfilled it from MLB stats — when None the slot scores 0 and the
     overall Sum is just under-counted (no false acceptance).
     """
+    if not v4:
+        return 0
     return (
         fa_compute.v4_metric_to_score(v4.get("whiff_pct"), "whiff_pct")
         + fa_compute.v4_metric_to_score(v4.get("bb9"), "bb9")
@@ -1169,10 +1171,20 @@ def build_roster_summary(config, savant_2026=None):
         return b.get("prior_stats", {}).get("xwoba", 0)
 
     def _get_sort_key_sp(p):
-        s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
-        if s26 and s26.get("xera"):
-            return s26["xera"]
-        return p.get("prior_stats", {}).get("xera", 99)
+        """SP rank by v4 4-slot Sum ascending (weakest first).
+
+        Layer 2 / Phase 6 already speaks v4; matching the same lens here
+        keeps the "weakest SP" ranking consistent with what the multi-agent
+        review actually evaluates. 2026 live league CSVs first, fall back
+        to 2025 prior_stats backfill for SPs without 2026 sample.
+        """
+        v4 = None
+        if savant_2026 and p.get("mlb_id"):
+            v4 = _extract_v4_sp_data(p["mlb_id"], savant_2026)
+        if v4 and any(v4.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon")):
+            return _calc_sp_v4_sum_4slot(v4)
+        # 2025 fallback — prior_stats already backfilled by backfill_prior_stats_v4.py
+        return _calc_sp_v4_sum_4slot(p.get("prior_stats") or {})
 
     # Batters: sort by xwOBA ascending, hide top 5
     batters = sorted(config["batters"], key=_get_sort_key_batter)
@@ -1182,9 +1194,9 @@ def build_roster_summary(config, savant_2026=None):
         for b in batters[:show_b]:
             lines.append(_fmt_roster_batter(b, savant_2026))
 
-    # SP: sort by xERA descending (worst first), hide top 3
+    # SP: sort by v4 4-slot Sum ascending (weakest first), hide top 3 strongest
     sps = [p for p in config["pitchers"] if "SP" in p.get("positions", [])]
-    sps.sort(key=_get_sort_key_sp, reverse=True)
+    sps.sort(key=_get_sort_key_sp)
     show_sp = max(len(sps) - 3, 0)
     if show_sp:
         lines.append("[SP]")
@@ -1254,9 +1266,89 @@ def _fmt_roster_batter(b, savant_2026=None):
 
 
 def _fmt_roster_pitcher(p, pt, savant_2026=None):
-    """Format roster pitcher (SP or RP). pt = 'pitcher' or 'rp'."""
-    ps = p.get("prior_stats", {})
+    """Format roster pitcher. pt = 'pitcher' (SP, v4 5-slot) or 'rp' (v2)."""
+    if pt == "rp":
+        return _fmt_roster_pitcher_rp(p, savant_2026)
+    return _fmt_roster_pitcher_sp_v4(p, savant_2026)
+
+
+def _fmt_roster_pitcher_sp_v4(p, savant_2026=None):
+    """SP v4 5-slot display: 2026 live league CSV primary, 2025 prior fallback.
+
+    BB/9 is shown only when present (live CSV doesn't carry it; prior_stats
+    only has it if backfilled). Same for IP/GS — present in 2025 prior but
+    not in live league CSV. Layer 3 enrichment surfaces 2026 IP/GS to
+    Phase 6 separately.
+    """
+    ps = p.get("prior_stats") or {}
+    v4_2026 = _extract_v4_sp_data(p.get("mlb_id"), savant_2026) if savant_2026 else {}
+    has_2026 = any(v4_2026.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon"))
+
+    if has_2026:
+        bbe = v4_2026.get("bbe", 0)
+        parts = [f"[2026 BBE {bbe}]"]
+        parts.extend(_fmt_v4_sp_metric_parts(v4_2026))
+        line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
+        y25 = _fmt_v4_sp_prior_summary(ps)
+        if y25:
+            line += f"\n    2025: {y25}"
+        return line
+
+    # Fallback: 2025 prior only
+    parts = _fmt_v4_sp_metric_parts(ps, prior=True)
+    return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}" if parts else \
+        f"  {p['name']}({p['team']}) — [no v4 data]"
+
+
+def _fmt_v4_sp_metric_parts(d, prior=False):
+    """Render the v4 5-slot metric items from a dict (live or prior shape).
+
+    prior dict uses ip_per_gs (v2 backfill key), live uses ip_gs (v4 fetcher
+    key). Other keys (whiff_pct/bb9/gb_pct/xwobacon) are aligned across both.
+    """
+    parts = []
+    ip_gs = d.get("ip_per_gs") if prior else d.get("ip_gs")
+    if ip_gs is not None:
+        parts.append(f"IP/GS {ip_gs:.2f} {pctile_tag(ip_gs, 'ip_gs', 'sp_v4')}")
+    if d.get("whiff_pct") is not None:
+        parts.append(f"Whiff% {d['whiff_pct']:.1f}% {pctile_tag(d['whiff_pct'], 'whiff_pct', 'sp_v4')}")
+    if d.get("bb9") is not None:
+        parts.append(f"BB/9 {d['bb9']:.2f} {pctile_tag(d['bb9'], 'bb9', 'sp_v4')}")
+    if d.get("gb_pct") is not None:
+        parts.append(f"GB% {d['gb_pct']:.1f} {pctile_tag(d['gb_pct'], 'gb_pct', 'sp_v4')}")
+    if d.get("xwobacon") is not None:
+        parts.append(f"xwOBACON {d['xwobacon']:.3f} {pctile_tag(d['xwobacon'], 'xwobacon', 'sp_v4')}")
+    # xera-era luck signal
+    xera = d.get("xera")
+    era = d.get("era")
+    if xera is not None and era is not None:
+        diff = xera - era
+        if abs(diff) >= 0.81:
+            direction = "賣高" if diff > 0 else "buy-low"
+            sign = "+" if diff > 0 else ""
+            parts.append(f"[Δ {sign}{diff:.2f} {direction}]")
+    return parts
+
+
+def _fmt_v4_sp_prior_summary(ps):
+    """One-line 2025 prior v4 summary (auxiliary line below 2026 primary)."""
+    bits = []
+    if ps.get("ip_per_gs") is not None:
+        bits.append(f"IP/GS {ps['ip_per_gs']:.2f}")
+    if ps.get("whiff_pct") is not None:
+        bits.append(f"Whiff% {ps['whiff_pct']:.1f}%")
+    if ps.get("gb_pct") is not None:
+        bits.append(f"GB% {ps['gb_pct']:.1f}")
+    if ps.get("xwobacon") is not None:
+        bits.append(f"xwOBACON {ps['xwobacon']:.3f}")
+    return " | ".join(bits)
+
+
+def _fmt_roster_pitcher_rp(p, savant_2026=None):
+    """RP v2 display path — unchanged. RP framework v4 upgrade pending."""
+    ps = p.get("prior_stats") or {}
     s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
+    pt = "rp"
 
     # Primary: 2026 if available
     if s26 and (s26.get("xera") is not None or s26.get("xwoba") is not None):
@@ -1268,10 +1360,9 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
             parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
         if s26.get("hh_pct") is not None:
             parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
-        if pt == "rp" and ps.get("k_per_9") is not None:
+        if ps.get("k_per_9") is not None:
             parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
         line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
-        # Auxiliary: 2025 one-liner
         y25 = []
         if ps.get("xera") is not None:
             y25.append(f"xERA {ps['xera']:.2f}")
@@ -1295,15 +1386,10 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
         parts.append(f"Barrel% {ps['barrel_pct_allowed']:.1f}%")
     if ps.get("era") is not None:
         parts.append(f"ERA {ps['era']:.2f}")
-    if pt == "rp":
-        if ps.get("k_per_9") is not None:
-            parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
-        if ps.get("ip_per_team_g") is not None:
-            parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
-    else:
-        if ps.get("ip_per_gs") is not None:
-            tier = " [深投]" if ps["ip_per_gs"] > 5.7 else (" [短局]" if ps["ip_per_gs"] < 5.3 else "")
-            parts.append(f"IP/GS {ps['ip_per_gs']:.1f}{tier}")
+    if ps.get("k_per_9") is not None:
+        parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
+    if ps.get("ip_per_team_g") is not None:
+        parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
     return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}"
 
 
