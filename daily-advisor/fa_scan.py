@@ -582,8 +582,8 @@ BATTER_SUM_THRESHOLD = 21
 #
 # Threshold 16 ≈ 4-slot mean P40 (4×4=16, P40-bin score=5 so this is slightly
 # below P40 mean). Approximates v2 gate width "2-of-3 P40" but lets one weaker
-# slot through if compensated. PLACEHOLDER — calibrate via dry-run comparison
-# of pre/post pool composition (see handoff-sp-v4-cutover-completion P2 待決 1).
+# slot through if compensated. Validated 2026-05-06 VPS dry-run: 21 SP pass
+# (vs 27 on v2 master, -22%, within ±50% tolerance).
 SP_V4_SUM_THRESHOLD = 16
 
 # RP: filtered by biweekly SV+H >= 2 + optional xERA < P50 (4.33) in filter_by_savant
