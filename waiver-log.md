@@ -13,16 +13,6 @@
 - 05-05：xwOBA P95 / 14d OPS .875 / K% 10.0 控 K 極佳；PA-TG 2.74 連 6 天未達降低後門檻 2.8；40% rising 3d+9 窗口持續收窄（fa_scan）
 - 05-06：PA-TG 2.69 連 8 天未達 2.8 門檻；14d OPS .895 / K% 10.2 控 K 極佳；42% explosive +11 搶人潮加劇窗口收窄中（fa_scan）
 
-### Austin Martin (MIN, 2B,LF,CF) [mlb_id:668885] — 觀察中
-觸發：BBE 達 60 + xwOBA 維持 P80+ + PA-TG ≥3.0 → 升級取代
-- 04-29：xwOBA P95 / BB% P95 完美填 BB 缺口；Barrel% P25 雙年確認無 power；BBE 43 信心仍低，3% owned 無人搶（fa_scan）
-- 04-30：維持觀察；BB% P95 但 Barrel% P0 雙年確認，Swanson 優先填 BB 缺口使 Martin 優先度下降（fa_scan）
-- 05-01：BB% P95 持續但 Barrel% P0 雙年確認無 power；PA-TG 2.69；排序在 Ballesteros / Carson Kelly 之後（fa_scan）
-- 05-02：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .982 靠 AVG .359 非 power；排序落後 Ballesteros / Carson Kelly / Julien（fa_scan）
-- 05-03：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .982 靠 AVG .359；PA-TG 2.68；Crawford 結構更優且 BB% 同等 → Martin 優先度再降（fa_scan）
-- 05-04：BB% P95 持續但 Barrel% P0 雙年確認；14d OPS .979 靠 AVG .368；Julien 結構更優使 Martin 優先度持續下降（fa_scan）
-- 05-05：BB% P95 持續但 Barrel% P0 雙年確認；Torres 結構更優且 BB% 同等 + 雙年確認 → Martin 定位被完全取代，優先度降至最低（fa_scan）
-
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：Stanton BB% 持續 <P40 至 Week 7 + 14d OPS 未回 .750 → 升級取代
 - 04-29：2025 全 P95 雙年菁英底；xwOBA P80 / BB% P70 穩健；vs Stanton 的 BB 升級明確但時機未到（fa_scan）
@@ -62,13 +52,6 @@
 - 05-05：xwOBA P95 / Barrel% P95 但 14d Savant Δ-0.096 品質下滑第 4 天持續惡化；46% rising 3d+5；BB% P25；維持觀察（fa_scan）
 - 05-06：14d Savant Δ-0.068 品質下滑第 5 天；14d RBI 12 counting 仍有產量；50% rising 3d+9 窗口收窄；BB% P0 結構缺陷不變（fa_scan）
 
-### Nathaniel Lowe (CIN, 1B) [mlb_id:663993] — 觀察中
-觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 70 → 升級
-- 05-02：xwOBA P95 / BB% P80 / Barrel% P80 結構全菁英；14d OPS 1.115 / 5 HR；PA-TG 1.94 嚴重上場有限 + 2025 prior 平庸 = breakout 待驗（fa_scan）
-- 05-03：xwOBA P95 / BB% P70 / Barrel% P80 全菁英；14d OPS 1.125 / 5 HR 爆量；PA-TG 2.00 嚴重限制；3d +3 rising 6%；breakout 待驗（fa_scan）
-- 05-04：xwOBA P95 / Barrel% P95 全菁英；14d OPS 1.085 / 5 HR；PA-TG 2.03 嚴重限制；3d +4 / 7d +7 rising 8%；breakout 待驗（fa_scan）
-- 05-05：xwOBA P95 / Barrel% P95 全菁英；14d OPS 1.014 / 5 HR；PA-TG 2.09 嚴重限制；3d+3 / 7d+8 rising 9%；breakout 待驗（fa_scan）
-
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；但 season Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低 + 2025 prior xwOBA <P25 breakout 待驗）；我隊 OF 飽和無 drop 對象；Nootbaar ~5/26 回歸 PT 縮減風險；結論不換，等 5/24 後 PT 樣本（player-eval）
@@ -104,6 +87,12 @@
 - 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
 
 ## 已結案
+
+### Austin Martin (MIN, 2B,LF,CF) — 被搶（自動偵測）
+- 2026-05-06：Yahoo ownership_type=team，從觀察中移除。
+
+### Nathaniel Lowe (CIN, 1B) — 被搶（自動偵測）
+- 2026-05-06：Yahoo ownership_type=team，從觀察中移除。
 
 ### Spencer Steer (CIN, 1B,LF) — 被搶（自動偵測）
 - 2026-05-05：Yahoo ownership_type=team，從觀察中移除。

@@ -39,6 +39,11 @@ from roster_sync import (
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
 )
 import fa_compute
+from _savant_v4_fetch import (
+    fetch_pitchers_custom_bulk,
+    fetch_pitchers_batted_ball_bulk,
+    fetch_pitchers_arsenal_whiff_bulk,
+)
 
 SUMMARY_FILE = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
 FULL_SEASON_GAMES = 162
@@ -342,6 +347,10 @@ def enrich_watch_players(watchlist, savant_2026, config):
         # 2025 prior (cached)
         p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025_csvs)
         p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+        if fa_type == "sp":
+            p["savant_v4_2025"] = _extract_v4_sp_data(mlb_id, savant_2025_csvs, year=2025)
+        else:
+            p["savant_v4_2025"] = None
 
         # Derived metrics
         s26 = p.get("savant_2026")
@@ -565,11 +574,18 @@ def is_inactive_fa(player, include_inactive=False):
 # weakest 4 (Albies 9 / Tovar 16 → FA need ≥12/19 to upgrade; ≥21 ensures both)
 BATTER_SUM_THRESHOLD = 21
 
-SP_THRESHOLDS = [
-    ("xera", 4.64, False),        # P40
-    ("xwoba", 0.332, False),      # P40 (xwOBA allowed)
-    ("hh_pct", 42.2, False),      # P40
-]
+# SP v4 4-slot Layer 2 Sum gate (whiff_pct + bb9 + gb_pct + xwobacon).
+# IP/GS is the 5th v4 slot but requires per-pid game log fetch — Layer 3
+# enrichment (_compute_derived_pitcher) covers it for the FA pool that survives
+# Layer 2. So Layer 2 Sum is 4-slot (range 0-40), 5-slot Sum (with IP/GS) is
+# computed downstream in Phase 6 prep.
+#
+# Threshold 16 ≈ 4-slot mean P40 (4×4=16, P40-bin score=5 so this is slightly
+# below P40 mean). Approximates v2 gate width "2-of-3 P40" but lets one weaker
+# slot through if compensated. Validated 2026-05-06 VPS dry-run: 21 SP pass
+# (vs 27 on v2 master, -22%, within ±50% tolerance).
+SP_V4_SUM_THRESHOLD = 16
+
 # RP: filtered by biweekly SV+H >= 2 + optional xERA < P50 (4.33) in filter_by_savant
 
 
@@ -577,7 +593,19 @@ SP_THRESHOLDS = [
 
 
 def download_savant_csvs(year):
-    """Download 4 Savant CSVs for a year. Returns dict of (name_idx, id_idx). Cached."""
+    """Download 4 v2 Savant CSVs (batter+pitcher × statcast+expected) plus
+    3 v4 SP CSVs (custom / batted-ball / pitch-arsenal). Returns dict mixing
+    v2 indexes and v4 pid-keyed dicts. Cached.
+
+    v2 keys (existing): batter_sc / batter_ex / pitcher_sc / pitcher_ex
+        — each value is (name_idx, id_idx) tuple from _build_savant_indexes.
+    v4 keys (new): pitcher_v4_custom / pitcher_v4_bb / pitcher_v4_arsenal
+        — each value is {pid: {...}} dict from league-bulk fetcher.
+
+    Past years (year < current): v4 batted-ball is fetched but the Savant
+    endpoint silently returns current-season data; callers are responsible
+    for skipping it for non-current seasons.
+    """
     if year in _savant_csv_cache:
         return _savant_csv_cache[year]
     csvs = {}
@@ -595,6 +623,25 @@ def download_savant_csvs(year):
         except Exception as e:
             print(f"  Savant {key} {year} failed: {e}", file=sys.stderr)
             csvs[key] = ({}, {})
+    # v4 SP league-bulk
+    try:
+        csvs["pitcher_v4_custom"] = fetch_pitchers_custom_bulk(year)
+        print(f"  Savant pitcher_v4_custom {year}: {len(csvs['pitcher_v4_custom'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_custom {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_custom"] = {}
+    try:
+        csvs["pitcher_v4_bb"] = fetch_pitchers_batted_ball_bulk(year)
+        print(f"  Savant pitcher_v4_bb {year}: {len(csvs['pitcher_v4_bb'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_bb {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_bb"] = {}
+    try:
+        csvs["pitcher_v4_arsenal"] = fetch_pitchers_arsenal_whiff_bulk(year)
+        print(f"  Savant pitcher_v4_arsenal {year}: {len(csvs['pitcher_v4_arsenal'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_arsenal {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_arsenal"] = {}
     _savant_csv_cache[year] = csvs
     return csvs
 
@@ -676,18 +723,6 @@ def _classify_fa_type(position_str):
     return "batter"
 
 
-def _check_thresholds(metrics, thresholds):
-    """Count how many of 3 threshold conditions pass (used for SP/RP)."""
-    passed = 0
-    for metric, threshold, higher_better in thresholds:
-        val = metrics.get(metric)
-        if val is None:
-            continue
-        if (higher_better and val >= threshold) or (not higher_better and val <= threshold):
-            passed += 1
-    return passed
-
-
 def _metric_to_score(value, metric):
     """Convert metric value to 1-10 score per CLAUDE.md Sum 打分表.
 
@@ -720,6 +755,55 @@ def _calc_batter_sum(metrics):
         _metric_to_score(metrics.get("xwoba"), "xwoba")
         + _metric_to_score(metrics.get("bb_pct"), "bb_pct")
         + _metric_to_score(metrics.get("barrel_pct"), "barrel_pct")
+    )
+
+
+def _extract_v4_sp_data(mlb_id, savant_csvs, year=None):
+    """Pull v4 4-slot fields (whiff/bb9-pending/gb%/xwobacon) for one SP from
+    league-bulk v4 CSVs. BB/9 is missing here (needs MLB API season stats);
+    Layer 3 enrichment fills it for the surviving pool. Returns dict with
+    whatever fields were found + xera/era/bbe context.
+
+    year: pass when the savant_csvs are for a specific year. Past-year
+    batted-ball data (gb_pct/bbe) is suppressed because Savant's batted-ball
+    endpoint silently returns current-season data regardless of the year
+    query param — using it would attribute current numbers to the prior
+    year. None → assumed current; non-current → gb_pct/bbe = None.
+    """
+    if not mlb_id:
+        return {}
+    custom = savant_csvs.get("pitcher_v4_custom", {}).get(mlb_id, {})
+    bb = savant_csvs.get("pitcher_v4_bb", {}).get(mlb_id, {})
+    arsenal = savant_csvs.get("pitcher_v4_arsenal", {}).get(mlb_id, {})
+    import datetime
+    is_past_year = year is not None and year < datetime.datetime.now().year
+    return {
+        "whiff_pct": arsenal.get("whiff_pct"),
+        "gb_pct": None if is_past_year else bb.get("gb_pct"),
+        "xwobacon": custom.get("xwobacon"),
+        "xera": custom.get("xera"),
+        "era": custom.get("era"),
+        "bbe": 0 if is_past_year else bb.get("bbe", 0),
+        "xwoba_allowed": custom.get("xwoba_allowed"),
+        "arsenal_pitches": arsenal.get("arsenal_pitches", 0),
+    }
+
+
+def _calc_sp_v4_sum_4slot(v4):
+    """4-slot v4 Sum (Whiff% + BB/9 + GB% + xwOBACON). Range 0-40.
+
+    Layer 2 gate uses 4-slot because IP/GS requires per-pid game log
+    (delegated to Layer 3 enrichment). BB/9 is None here unless callers
+    backfilled it from MLB stats — when None the slot scores 0 and the
+    overall Sum is just under-counted (no false acceptance).
+    """
+    if not v4:
+        return 0
+    return (
+        fa_compute.v4_metric_to_score(v4.get("whiff_pct"), "whiff_pct")
+        + fa_compute.v4_metric_to_score(v4.get("bb9"), "bb9")
+        + fa_compute.v4_metric_to_score(v4.get("gb_pct"), "gb_pct")
+        + fa_compute.v4_metric_to_score(v4.get("xwobacon"), "xwobacon")
     )
 
 
@@ -775,7 +859,7 @@ def filter_by_savant(snapshot, savant_2026):
             })
             continue
 
-        # ── Batters / SP: Statcast quality filter (existing logic) ──
+        # ── Batters / SP: Statcast quality filter ──
         metrics = {
             "xwoba": savant.get("xwoba") or None,
             "hh_pct": savant.get("hh_pct") or None,
@@ -793,12 +877,14 @@ def filter_by_savant(snapshot, savant_2026):
         if (savant.get("bbe") or 0) < 15:
             continue
 
-        # Quality filter — batter uses Sum scoring, SP keeps 2-of-3 P40
+        # Quality filter — batter uses 3-metric Sum, SP uses v4 4-slot Sum
+        v4_sp_data = None
         if fa_type == "batter":
             if _calc_batter_sum(metrics) < BATTER_SUM_THRESHOLD:
                 continue
-        else:  # sp
-            if _check_thresholds(metrics, SP_THRESHOLDS) < 2:
+        else:  # sp — v4 4-slot Sum (Whiff/BB9/GB/xwOBACON; IP/GS in Layer 3)
+            v4_sp_data = _extract_v4_sp_data(mlb_id, savant_2026)
+            if _calc_sp_v4_sum_4slot(v4_sp_data) < SP_V4_SUM_THRESHOLD:
                 continue
 
         results.append({
@@ -812,6 +898,7 @@ def filter_by_savant(snapshot, savant_2026):
             "ownership_type": info.get("ownership_type", ""),
             "fa_type": fa_type,
             "savant_2026": savant,
+            "savant_v4_2026": v4_sp_data,  # SP only; None for batters
             "mlb_id": mlb_id,
             "bbe": savant.get("bbe", 0),
         })
@@ -821,7 +908,7 @@ def filter_by_savant(snapshot, savant_2026):
     rps = sum(1 for r in results if r["fa_type"] == "rp")
     print(f"  Layer 2: {total} FA → {matched} name-matched + {fallback} fallback "
           f"→ {len(results)} passed ({batters} bat Sum≥{BATTER_SUM_THRESHOLD} / "
-          f"{sps} SP P40×2 / {rps} RP)", file=sys.stderr)
+          f"{sps} SP v4 4-slot Sum≥{SP_V4_SUM_THRESHOLD} / {rps} RP)", file=sys.stderr)
     return results
 
 
@@ -951,9 +1038,17 @@ def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
         if savant_prior:
             p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
             p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+            # SP also gets v4 prior fields (whiff/xwobacon from league CSVs;
+            # gb_pct stays None because Savant batted-ball endpoint ignores
+            # the year param — see _extract_v4_sp_data docstring).
+            if fa_type == "sp":
+                p["savant_v4_2025"] = _extract_v4_sp_data(mlb_id, savant_2025, year=2025)
+            else:
+                p["savant_v4_2025"] = None
         else:
             p["savant_2025"] = None
             p["mlb_2025"] = None
+            p["savant_v4_2025"] = None
 
         # Derived metrics
         s26 = p.get("savant_2026")
@@ -1096,10 +1191,20 @@ def build_roster_summary(config, savant_2026=None):
         return b.get("prior_stats", {}).get("xwoba", 0)
 
     def _get_sort_key_sp(p):
-        s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
-        if s26 and s26.get("xera"):
-            return s26["xera"]
-        return p.get("prior_stats", {}).get("xera", 99)
+        """SP rank by v4 4-slot Sum ascending (weakest first).
+
+        Layer 2 / Phase 6 already speaks v4; matching the same lens here
+        keeps the "weakest SP" ranking consistent with what the multi-agent
+        review actually evaluates. 2026 live league CSVs first, fall back
+        to 2025 prior_stats backfill for SPs without 2026 sample.
+        """
+        v4 = None
+        if savant_2026 and p.get("mlb_id"):
+            v4 = _extract_v4_sp_data(p["mlb_id"], savant_2026)
+        if v4 and any(v4.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon")):
+            return _calc_sp_v4_sum_4slot(v4)
+        # 2025 fallback — prior_stats already backfilled by backfill_prior_stats_v4.py
+        return _calc_sp_v4_sum_4slot(p.get("prior_stats") or {})
 
     # Batters: sort by xwOBA ascending, hide top 5
     batters = sorted(config["batters"], key=_get_sort_key_batter)
@@ -1109,9 +1214,9 @@ def build_roster_summary(config, savant_2026=None):
         for b in batters[:show_b]:
             lines.append(_fmt_roster_batter(b, savant_2026))
 
-    # SP: sort by xERA descending (worst first), hide top 3
+    # SP: sort by v4 4-slot Sum ascending (weakest first), hide top 3 strongest
     sps = [p for p in config["pitchers"] if "SP" in p.get("positions", [])]
-    sps.sort(key=_get_sort_key_sp, reverse=True)
+    sps.sort(key=_get_sort_key_sp)
     show_sp = max(len(sps) - 3, 0)
     if show_sp:
         lines.append("[SP]")
@@ -1181,9 +1286,89 @@ def _fmt_roster_batter(b, savant_2026=None):
 
 
 def _fmt_roster_pitcher(p, pt, savant_2026=None):
-    """Format roster pitcher (SP or RP). pt = 'pitcher' or 'rp'."""
-    ps = p.get("prior_stats", {})
+    """Format roster pitcher. pt = 'pitcher' (SP, v4 5-slot) or 'rp' (v2)."""
+    if pt == "rp":
+        return _fmt_roster_pitcher_rp(p, savant_2026)
+    return _fmt_roster_pitcher_sp_v4(p, savant_2026)
+
+
+def _fmt_roster_pitcher_sp_v4(p, savant_2026=None):
+    """SP v4 5-slot display: 2026 live league CSV primary, 2025 prior fallback.
+
+    BB/9 is shown only when present (live CSV doesn't carry it; prior_stats
+    only has it if backfilled). Same for IP/GS — present in 2025 prior but
+    not in live league CSV. Layer 3 enrichment surfaces 2026 IP/GS to
+    Phase 6 separately.
+    """
+    ps = p.get("prior_stats") or {}
+    v4_2026 = _extract_v4_sp_data(p.get("mlb_id"), savant_2026) if savant_2026 else {}
+    has_2026 = any(v4_2026.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon"))
+
+    if has_2026:
+        bbe = v4_2026.get("bbe", 0)
+        parts = [f"[2026 BBE {bbe}]"]
+        parts.extend(_fmt_v4_sp_metric_parts(v4_2026))
+        line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
+        y25 = _fmt_v4_sp_prior_summary(ps)
+        if y25:
+            line += f"\n    2025: {y25}"
+        return line
+
+    # Fallback: 2025 prior only
+    parts = _fmt_v4_sp_metric_parts(ps, prior=True)
+    return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}" if parts else \
+        f"  {p['name']}({p['team']}) — [no v4 data]"
+
+
+def _fmt_v4_sp_metric_parts(d, prior=False):
+    """Render the v4 5-slot metric items from a dict (live or prior shape).
+
+    prior dict uses ip_per_gs (v2 backfill key), live uses ip_gs (v4 fetcher
+    key). Other keys (whiff_pct/bb9/gb_pct/xwobacon) are aligned across both.
+    """
+    parts = []
+    ip_gs = d.get("ip_per_gs") if prior else d.get("ip_gs")
+    if ip_gs is not None:
+        parts.append(f"IP/GS {ip_gs:.2f} {pctile_tag(ip_gs, 'ip_gs', 'sp_v4')}")
+    if d.get("whiff_pct") is not None:
+        parts.append(f"Whiff% {d['whiff_pct']:.1f}% {pctile_tag(d['whiff_pct'], 'whiff_pct', 'sp_v4')}")
+    if d.get("bb9") is not None:
+        parts.append(f"BB/9 {d['bb9']:.2f} {pctile_tag(d['bb9'], 'bb9', 'sp_v4')}")
+    if d.get("gb_pct") is not None:
+        parts.append(f"GB% {d['gb_pct']:.1f} {pctile_tag(d['gb_pct'], 'gb_pct', 'sp_v4')}")
+    if d.get("xwobacon") is not None:
+        parts.append(f"xwOBACON {d['xwobacon']:.3f} {pctile_tag(d['xwobacon'], 'xwobacon', 'sp_v4')}")
+    # xera-era luck signal
+    xera = d.get("xera")
+    era = d.get("era")
+    if xera is not None and era is not None:
+        diff = xera - era
+        if abs(diff) >= 0.81:
+            direction = "賣高" if diff > 0 else "buy-low"
+            sign = "+" if diff > 0 else ""
+            parts.append(f"[Δ {sign}{diff:.2f} {direction}]")
+    return parts
+
+
+def _fmt_v4_sp_prior_summary(ps):
+    """One-line 2025 prior v4 summary (auxiliary line below 2026 primary)."""
+    bits = []
+    if ps.get("ip_per_gs") is not None:
+        bits.append(f"IP/GS {ps['ip_per_gs']:.2f}")
+    if ps.get("whiff_pct") is not None:
+        bits.append(f"Whiff% {ps['whiff_pct']:.1f}%")
+    if ps.get("gb_pct") is not None:
+        bits.append(f"GB% {ps['gb_pct']:.1f}")
+    if ps.get("xwobacon") is not None:
+        bits.append(f"xwOBACON {ps['xwobacon']:.3f}")
+    return " | ".join(bits)
+
+
+def _fmt_roster_pitcher_rp(p, savant_2026=None):
+    """RP v2 display path — unchanged. RP framework v4 upgrade pending."""
+    ps = p.get("prior_stats") or {}
     s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
+    pt = "rp"
 
     # Primary: 2026 if available
     if s26 and (s26.get("xera") is not None or s26.get("xwoba") is not None):
@@ -1195,10 +1380,9 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
             parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
         if s26.get("hh_pct") is not None:
             parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
-        if pt == "rp" and ps.get("k_per_9") is not None:
+        if ps.get("k_per_9") is not None:
             parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
         line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
-        # Auxiliary: 2025 one-liner
         y25 = []
         if ps.get("xera") is not None:
             y25.append(f"xERA {ps['xera']:.2f}")
@@ -1222,15 +1406,10 @@ def _fmt_roster_pitcher(p, pt, savant_2026=None):
         parts.append(f"Barrel% {ps['barrel_pct_allowed']:.1f}%")
     if ps.get("era") is not None:
         parts.append(f"ERA {ps['era']:.2f}")
-    if pt == "rp":
-        if ps.get("k_per_9") is not None:
-            parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
-        if ps.get("ip_per_team_g") is not None:
-            parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
-    else:
-        if ps.get("ip_per_gs") is not None:
-            tier = " [深投]" if ps["ip_per_gs"] > 5.7 else (" [短局]" if ps["ip_per_gs"] < 5.3 else "")
-            parts.append(f"IP/GS {ps['ip_per_gs']:.1f}{tier}")
+    if ps.get("k_per_9") is not None:
+        parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
+    if ps.get("ip_per_team_g") is not None:
+        parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
     return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}"
 
 
@@ -2340,12 +2519,20 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
             prior_ip = 0.0
             if mlb_25:
                 prior_ip = _parse_ip(mlb_25.get("inningsPitched", "0"))
+            # v2 fields kept for fallback / RP path / display compatibility
             prior_stats = {
                 "xera": savant_25.get("xera"),
                 "xwoba_allowed": savant_25.get("xwoba"),
                 "hh_pct_allowed": savant_25.get("hh_pct"),
                 "ip": prior_ip,
             }
+            # v4 fields (whiff/xwobacon from league CSVs; gb_pct stays None
+            # because Savant batted-ball endpoint ignores year — see
+            # _extract_v4_sp_data docstring).
+            v4_25 = p.get("savant_v4_2025") or {}
+            prior_stats["whiff_pct"] = v4_25.get("whiff_pct")
+            prior_stats["gb_pct"] = v4_25.get("gb_pct")  # likely None for past year
+            prior_stats["xwobacon"] = v4_25.get("xwobacon")
     else:
         if savant_25:
             prior_bb_pct = None
