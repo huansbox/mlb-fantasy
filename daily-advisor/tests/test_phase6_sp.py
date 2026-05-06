@@ -17,10 +17,14 @@ fa_compute computations on real data.
 """
 
 import json
+import re
 import subprocess
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+from _multi_agent import AgentResult
+from metrics_emitter import emit_metric_block
 
 # Canned responses for each Claude step (happy path: no borderline, no dissent)
 _FAKE_STEP1 = lambda agent_id: '```json\n' + json.dumps({
@@ -76,6 +80,24 @@ def _make_completed(stdout, returncode=0):
     m.stderr = ""
     m.returncode = returncode
     return m
+
+
+def _agent_result(parsed, agent_id="agent_x"):
+    return AgentResult(
+        agent_id=agent_id,
+        stdout="",
+        stderr="",
+        latency_s=0.1,
+        exit_code=0,
+        error=None,
+        parsed=parsed,
+    )
+
+
+def _parse_metric_block(body):
+    match = re.search(r"<!-- phase6_metrics:\s*(\{.*?\})\s*-->", body, re.DOTALL)
+    assert match, f"metric block missing from body:\n{body}"
+    return json.loads(match.group(1))
 
 
 def _route_subprocess(*args, **kwargs):
@@ -186,7 +208,10 @@ class TestPhase6OrchestratorHappyPath:
 
         def fake_publish(today_str, scan_type, advice_tg, advice_issue, raw, env, args):
             publish_calls.append({
-                "scan_type": scan_type, "advice_tg": advice_tg, "raw": raw,
+                "scan_type": scan_type,
+                "advice_tg": advice_tg,
+                "advice_issue": advice_issue,
+                "raw": raw,
             })
 
         def fake_update_waiver_log(advice, today_str, env=None):
@@ -247,6 +272,17 @@ class TestPhase6OrchestratorHappyPath:
         publish = publish_calls[0]
         assert publish["scan_type"] == "SP-v4"
         assert "drop Nola add Pfaadt" in publish["advice_tg"]
+        assert "phase6_metrics" not in publish["advice_tg"]
+        metrics = _parse_metric_block(publish["advice_issue"])
+        assert metrics == {
+            "date": "2026-04-27",
+            "sp_p1_match": True,
+            "sp_review_triggered": False,
+            "sp_anchor_name": "Nola",
+            "fa_p1_match": True,
+            "fa_review_triggered": False,
+            "fa_top_name": "Pfaadt",
+        }
 
         # Verify waiver-log update triggered (2 UPDATE entries from final response)
         assert len(update_waiver_calls) == 1, \
@@ -258,3 +294,142 @@ class TestPhase6OrchestratorHappyPath:
 
         # No degrade notifications expected on happy path
         assert not notify_calls, f"Unexpected notify calls: {notify_calls}"
+
+
+class TestMetricsEmitter:
+    def test_emit_metric_block_parseable_json(self):
+        block = emit_metric_block(
+            "2026-05-06",
+            [
+                _agent_result({"ranking": ["Detmers", "Nola"]}, "agent_1"),
+                _agent_result({"ranking": ["Detmers", "Ragans"]}, "agent_2"),
+                _agent_result({"ranking": ["Detmers", "Kelly"]}, "agent_3"),
+            ],
+            {"borderline_pairs": []},
+            [
+                _agent_result({"classifications": [{"name": "Junk", "verdict": "worth"}]}, "agent_1"),
+                _agent_result({"classifications": [{"name": "Junk", "verdict": "worth"}]}, "agent_2"),
+                _agent_result({"classifications": [{"name": "Junk", "verdict": "worth"}]}, "agent_3"),
+            ],
+            {"borderline_pairs": []},
+            {"name": "Detmers"},
+            {"name": "Junk"},
+        )
+
+        assert block.startswith("<!-- phase6_metrics:\n")
+        assert block.endswith("\n-->")
+        metrics = _parse_metric_block(block)
+        assert set(metrics) == {
+            "date",
+            "sp_p1_match",
+            "sp_review_triggered",
+            "sp_anchor_name",
+            "fa_p1_match",
+            "fa_review_triggered",
+            "fa_top_name",
+        }
+        assert metrics == {
+            "date": "2026-05-06",
+            "sp_p1_match": True,
+            "sp_review_triggered": False,
+            "sp_anchor_name": "Detmers",
+            "fa_p1_match": True,
+            "fa_review_triggered": False,
+            "fa_top_name": "Junk",
+        }
+
+    def test_emit_metric_block_records_dissent_and_reviews(self):
+        metrics = _parse_metric_block(emit_metric_block(
+            "2026-05-06",
+            [
+                {"ranking": ["Detmers"]},
+                {"ranking": ["Nola"]},
+                {"ranking": ["Detmers"]},
+            ],
+            {"borderline_pairs": [["Detmers", "Nola"]]},
+            [
+                {"classifications": [{"name": "Junk", "verdict": "worth"}]},
+                {"classifications": [{"name": "Junk", "verdict": "borderline"}]},
+                {"classifications": [{"name": "Junk", "verdict": "worth"}]},
+            ],
+            {"borderline_pairs": [{"a": "Junk", "b": "Meyer"}]},
+            {"name": "Detmers"},
+            {"name": "Junk"},
+        ))
+
+        assert metrics["sp_p1_match"] is False
+        assert metrics["sp_review_triggered"] is True
+        assert metrics["fa_p1_match"] is False
+        assert metrics["fa_review_triggered"] is True
+
+    def test_emit_metric_block_pass_path_classify_maps_match_without_fa_top(self):
+        metrics = _parse_metric_block(emit_metric_block(
+            "2026-05-06",
+            [{"ranking": ["Nola"]}, {"ranking": ["Nola"]}, {"ranking": ["Nola"]}],
+            {"borderline_pairs": []},
+            [
+                {"classifications": [
+                    {"name": "Junk", "verdict": "not_worth"},
+                    {"name": "Meyer", "verdict": "not_worth"},
+                ]},
+                {"classifications": [
+                    {"name": "Meyer", "verdict": "not_worth"},
+                    {"name": "Junk", "verdict": "not_worth"},
+                ]},
+                {"classifications": [
+                    {"name": "Junk", "verdict": "not_worth"},
+                    {"name": "Meyer", "verdict": "not_worth"},
+                ]},
+            ],
+            None,
+            {"name": "Nola"},
+            None,
+        ))
+
+        assert metrics["fa_p1_match"] is True
+        assert metrics["fa_top_name"] is None
+
+
+class TestPhase6Emitters:
+    def test_emit_pass_appends_metric_block_to_issue_body_only(self):
+        from _phase6_sp import _emit_pass
+
+        publish_calls = []
+
+        def fake_publish(today_str, scan_type, advice_tg, advice_issue, raw, env, args):
+            publish_calls.append({
+                "advice_tg": advice_tg,
+                "advice_issue": advice_issue,
+                "raw": raw,
+            })
+
+        _emit_pass(
+            "SP-v4",
+            {"name": "Nola"},
+            None,
+            [],
+            {"Junk": "not_worth"},
+            "FA classify 全 not_worth",
+            "2026-05-06",
+            {},
+            MagicMock(),
+            {"publish": fake_publish},
+            sp_step1_results=[
+                {"ranking": ["Nola"]},
+                {"ranking": ["Nola"]},
+                {"ranking": ["Nola"]},
+            ],
+            sp_master={"borderline_pairs": []},
+            fa_classify_results=[
+                {"classifications": [{"name": "Junk", "verdict": "not_worth"}]},
+                {"classifications": [{"name": "Junk", "verdict": "not_worth"}]},
+                {"classifications": [{"name": "Junk", "verdict": "not_worth"}]},
+            ],
+        )
+
+        assert len(publish_calls) == 1
+        assert "phase6_metrics" not in publish_calls[0]["advice_tg"]
+        assert publish_calls[0]["raw"] == publish_calls[0]["advice_tg"]
+        metrics = _parse_metric_block(publish_calls[0]["advice_issue"])
+        assert metrics["sp_anchor_name"] == "Nola"
+        assert metrics["fa_top_name"] is None

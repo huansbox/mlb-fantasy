@@ -37,6 +37,7 @@ from _multi_agent import (
     run_parallel_agents,
     run_single_agent,
 )
+from metrics_emitter import emit_metric_block
 
 # Module dir (where prompt files live alongside this module + fa_scan.py)
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -405,7 +406,10 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
         survivors = [f for f in fa_tagged if aggregated[f["name"]] in ("worth", "borderline")]
         if not survivors:
             return _emit_pass(label, anchor_entry, anchor_flag, fa_tagged, aggregated,
-                              "FA classify 全 not_worth", today_str, env, args, h)
+                              "FA classify 全 not_worth", today_str, env, args, h,
+                              sp_step1_results=step1_results,
+                              sp_master=master_v1.parsed,
+                              fa_classify_results=fa_classify_results)
 
         print(f"  Layer 5 ({label}): step 5 — FA master rank (1 call, "
               f"{len(survivors)} survivors)...", file=sys.stderr)
@@ -479,10 +483,21 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
             return _degrade(label, "final decision parse failed", [final_result], env, args, h)
 
         # Publish
+        ranked_top = fa_master_p.get("ranked_top") or []
+        fa_top = None
+        if ranked_top:
+            fa_top_name = ranked_top[0].get("name")
+            fa_top = survivors_by_name.get(fa_top_name) or ranked_top[0]
+
         _emit_final(label, final_result.parsed, anchor_flag, fa_top_flag,
                     today_str, env, args, h,
                     anchor_entry=anchor_entry,
                     survivors_by_name=survivors_by_name,
+                    sp_step1_results=step1_results,
+                    sp_master=master_v1.parsed,
+                    fa_classify_results=fa_classify_results,
+                    fa_master=fa_master_v1.parsed,
+                    fa_top=fa_top,
                     debug_dump={
                         "step1": [r.parsed for r in step1_results],
                         "step2": master_v1.parsed,
@@ -539,16 +554,23 @@ def _build_reeval_payload(original_payload: str, review_results: list) -> str:
 
 
 def _emit_pass(label, anchor, anchor_flag, fa_tagged, aggregated,
-               reason, today_str, env, args, h):
+               reason, today_str, env, args, h,
+               sp_step1_results=None, sp_master=None, fa_classify_results=None):
     """No FA worth pursuing → emit pass action."""
     msg = f"[FA Scan {label}] {reason}\n\nAnchor (隊上最該觀察 SP): {anchor['name']}"
     if anchor_flag:
         msg = f"{anchor_flag}\n\n" + msg
-    h["publish"](today_str, label, msg, msg, msg, env, args)
+    metric_block = emit_metric_block(
+        today_str, sp_step1_results, sp_master, fa_classify_results,
+        None, anchor, None,
+    )
+    h["publish"](today_str, label, msg, f"{msg}\n\n{metric_block}", msg, env, args)
 
 
 def _emit_final(label, final_parsed, anchor_flag, fa_top_flag,
                 today_str, env, args, h, anchor_entry=None, survivors_by_name=None,
+                sp_step1_results=None, sp_master=None,
+                fa_classify_results=None, fa_master=None, fa_top=None,
                 debug_dump=None):
     """Publish final action (drop_X_add_Y / watch / pass) to Telegram + Issue + waiver-log.
 
@@ -591,7 +613,11 @@ def _emit_final(label, final_parsed, anchor_flag, fa_top_flag,
         waiver_block = "\n\n```waiver-log\n" + "\n".join(waiver_block_lines) + "\n```\n"
 
     advice_full = advice_telegram + waiver_block
-    advice_issue = advice_telegram  # Issue body skips waiver-log block
+    metric_block = emit_metric_block(
+        today_str, sp_step1_results, sp_master, fa_classify_results,
+        fa_master, anchor_entry, fa_top,
+    )
+    advice_issue = f"{advice_telegram}\n\n{metric_block}"  # Issue body skips waiver-log block
 
     full_raw_parts = [
         f"=== Phase 6 Final Decision ({label}) ===",
