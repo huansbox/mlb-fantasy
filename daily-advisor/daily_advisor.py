@@ -1179,7 +1179,7 @@ def analyze(config, target_date, env=None, morning=False):
                 stat_str = format_pitcher_stats(st)
                 if stat_str:
                     sp_label += f" — {stat_str}"
-                # Opponent SP Savant (HH%/Barrel% allowed)
+                # Opponent SP Savant (v4 5-slot)
                 opp_sp_id = sp_info.get("id")
                 opp_savant_str = format_opp_sp_savant(pitcher_savant_cache.get(opp_sp_id)) if opp_sp_id else ""
                 if opp_savant_str:
@@ -1229,7 +1229,7 @@ def analyze(config, target_date, env=None, morning=False):
                 stat_str = format_pitcher_stats(sp_own_stats)
                 if stat_str:
                     lines.append(f"    {stat_str}")
-                # Line 2b: SP's Savant stats (xERA, xwOBA allowed, HH%, Barrel%)
+                # Line 2b: SP's Savant stats (v4 5-slot + xERA-ERA luck signal)
                 sp_savant = pitcher_savant_cache.get(mlb_id)
                 sp_savant_str = format_pitcher_savant(sp_savant)
                 if sp_savant_str:
