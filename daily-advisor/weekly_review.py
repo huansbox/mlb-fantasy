@@ -746,22 +746,39 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
         # Season totals (MLB API)
         season_mlb = fetch_pitcher_full(mid, season)
 
-        # Savant data — fetch_savant_for_pitchers returns 0 (not None) as default,
-        # so use `or None` to normalize falsy-zero to None for pctile guard
+        # Savant data — fetch_savant_for_pitchers (P1) returns v4 5-slot dict.
         sv = (pit_savant.get(mid) or {}).get("current") or {}
-        xera = sv.get("xera") or None
-        xwoba_a = sv.get("xwoba") or None
-        hh_pct_a = sv.get("hh_pct") or None
-        barrel_pct_a = sv.get("barrel_pct") or None
-        bbe = sv.get("bbe", 0)
+        xera = sv.get("xera")
+        era = sv.get("era")
+        xwoba_a = sv.get("xwoba_allowed")
+        bbe = sv.get("bbe") or 0
+
+        # v4 5-slot (SP) — RP entries get whiff_pct + xwobacon (xera) too
+        # but their framework eval still goes through v2 lens elsewhere.
+        ip_gs = sv.get("ip_gs")
+        whiff_pct = sv.get("whiff_pct")
+        bb9 = sv.get("bb9")
+        gb_pct = sv.get("gb_pct")
+        xwobacon = sv.get("xwobacon")
 
         pctiles = {}
+        # v4 percentile tags for SP (consumed by Phase 6 prompt + reports)
+        if ptype == "SP":
+            if ip_gs is not None:
+                pctiles["ip_gs"] = pctile_tag(ip_gs, "ip_gs", "sp_v4")
+            if whiff_pct is not None:
+                pctiles["whiff_pct"] = pctile_tag(whiff_pct, "whiff_pct", "sp_v4")
+            if bb9 is not None:
+                pctiles["bb9"] = pctile_tag(bb9, "bb9", "sp_v4")
+            if gb_pct is not None:
+                pctiles["gb_pct"] = pctile_tag(gb_pct, "gb_pct", "sp_v4")
+            if xwobacon is not None:
+                pctiles["xwobacon"] = pctile_tag(xwobacon, "xwobacon", "sp_v4")
+        # RP / luck context — RP pctile lens still v2 (RP framework v4 pending)
         if xera is not None:
             pctiles["xera"] = pctile_tag(xera, "xera", "pitcher")
-        if xwoba_a is not None:
+        if xwoba_a is not None and ptype == "RP":
             pctiles["xwoba_allowed"] = pctile_tag(xwoba_a, "xwoba", "pitcher")
-        if hh_pct_a is not None:
-            pctiles["hh_pct_allowed"] = pctile_tag(hh_pct_a, "hh_pct", "pitcher")
 
         entry = {
             "name": p["name"],
@@ -771,10 +788,16 @@ def compute_roster_performance(config, prev_week_start, prev_week_end, season):
             "weekly": weekly,
             "season": {
                 **(season_mlb or {}),
+                # v4 5-slot — primary signal for SP, context for RP
+                "ip_gs": ip_gs,
+                "whiff_pct": whiff_pct,
+                "bb9": bb9,
+                "gb_pct": gb_pct,
+                "xwobacon": xwobacon,
+                # luck signal + RP framework (v2)
                 "xera": xera,
+                "era": era,
                 "xwoba_allowed": xwoba_a,
-                "hh_pct_allowed": hh_pct_a,
-                "barrel_pct_allowed": barrel_pct_a,
                 "bbe": bbe,
             },
             "pctiles": pctiles,
