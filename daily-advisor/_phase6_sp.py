@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 import fa_compute
+import payload_slimmer
 from _multi_agent import (
     aggregate_classifications,
     all_parsed,
@@ -108,74 +109,11 @@ def _attach_v4_to_fa(fa_entries: list[dict]) -> None:
 # ── Payload builders (Python → prompt input JSON) ──
 
 def _slim_my_team_entry(entry: dict) -> dict:
-    """Reduce my-team weakest entry to fields Claude needs (drops MLB API blobs)."""
-    sv4 = entry.get("savant_v4") or {}
-    return {
-        "name": entry["name"],
-        "team": entry.get("team"),
-        "score": entry.get("score"),  # v4 Sum 0-50
-        "breakdown": entry.get("breakdown"),
-        "savant_v4": {
-            "ip_gs": sv4.get("ip_gs"),
-            "whiff_pct": sv4.get("whiff_pct"),
-            "bb9": sv4.get("bb9"),
-            "gb_pct": sv4.get("gb_pct"),
-            "xwobacon": sv4.get("xwobacon"),
-            "xera": sv4.get("xera"),
-            "era": sv4.get("era"),
-            "bbe": sv4.get("bbe"),
-            "ip": sv4.get("ip"),
-            "g": sv4.get("g"),
-            "gs": sv4.get("gs"),
-            "k9": sv4.get("k9"),
-            "whip": sv4.get("whip"),
-        },
-        "prior_stats": entry.get("prior_stats") or {},
-        "prior_sum": entry.get("prior_sum"),
-        "prior_ip": entry.get("prior_ip"),
-        "prior_breakdown": entry.get("prior_breakdown"),
-        "rolling_delta_xwobacon": entry.get("rolling_delta_xwobacon"),
-        "rolling_bbe": entry.get("rolling_bbe"),
-        "rolling_21d_xwobacon": (entry.get("rolling_21d") or {}).get("xwobacon"),
-        "urgency": entry.get("urgency"),
-        "factors": entry.get("factors"),
-        "selected_pos": entry.get("selected_pos"),
-        "status": entry.get("status"),
-        "notes": entry.get("notes") or [],
-    }
+    return payload_slimmer.slim_entry(entry, "my_team")
 
 
 def _slim_fa_entry(entry: dict) -> dict:
-    """Reduce FA entry to fields Claude needs."""
-    sv4 = entry.get("savant_v4") or {}
-    return {
-        "name": entry["name"],
-        "team": entry.get("team"),
-        "position": entry.get("position"),
-        "pct": entry.get("pct"),
-        "score": entry.get("score"),
-        "breakdown": entry.get("breakdown"),
-        "savant_v4": {
-            "ip_gs": sv4.get("ip_gs"),
-            "whiff_pct": sv4.get("whiff_pct"),
-            "bb9": sv4.get("bb9"),
-            "gb_pct": sv4.get("gb_pct"),
-            "xwobacon": sv4.get("xwobacon"),
-            "xera": sv4.get("xera"),
-            "era": sv4.get("era"),
-            "bbe": sv4.get("bbe"),
-            "ip": sv4.get("ip"),
-            "g": sv4.get("g"),
-            "gs": sv4.get("gs"),
-            "k9": sv4.get("k9"),
-            "whip": sv4.get("whip"),
-        },
-        "rolling_21d_xwobacon": (entry.get("rolling_21d") or {}).get("xwobacon"),
-        "rolling_21d_bbe": (entry.get("rolling_21d") or {}).get("bbe"),
-        "d1": entry.get("d1"),  # %owned 1d delta
-        "d3": entry.get("d3"),
-        "waiver_date": entry.get("waiver_date"),
-    }
+    return payload_slimmer.slim_entry(entry, "fa")
 
 
 def _build_step1_payload(urgency_result: dict, low_conf: list[dict]) -> str:
@@ -184,8 +122,7 @@ def _build_step1_payload(urgency_result: dict, low_conf: list[dict]) -> str:
     payload = {
         "candidates": candidates,
         "slump_hold_excluded": [
-            {"name": s["name"], "prior_sum": s["prior_sum"], "prior_ip": s["prior_ip"],
-             "sum_2026": s["sum_2026"], "note": s["note"]}
+            {"name": s["name"], "prior_ip": s["prior_ip"], "note": s["note"]}
             for s in urgency_result.get("slump_hold", [])
         ],
         "low_confidence_excluded": low_conf,
@@ -203,7 +140,10 @@ def _build_step2_payload(step1_results: list, urgency_result: dict,
         ],
         "material": {
             "candidates": [_slim_my_team_entry(e) for e in urgency_result["weakest_ranked"]],
-            "slump_hold_excluded": urgency_result.get("slump_hold", []),
+            "slump_hold_excluded": [
+                {"name": s["name"], "prior_ip": s["prior_ip"], "note": s["note"]}
+                for s in urgency_result.get("slump_hold", [])
+            ],
             "low_confidence_excluded": low_conf,
         },
     }
@@ -218,7 +158,10 @@ def _build_step3_review_payload(master: dict, step1_results: list,
         "your_step1": my_agent_step1,
         "material": {
             "candidates": [_slim_my_team_entry(e) for e in urgency_result["weakest_ranked"]],
-            "slump_hold_excluded": urgency_result.get("slump_hold", []),
+            "slump_hold_excluded": [
+                {"name": s["name"], "prior_ip": s["prior_ip"], "note": s["note"]}
+                for s in urgency_result.get("slump_hold", [])
+            ],
         },
     }
     return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
@@ -227,16 +170,7 @@ def _build_step3_review_payload(master: dict, step1_results: list,
 def _build_fa_classify_payload(anchor: dict, fa_tagged: list[dict]) -> str:
     payload = {
         "anchor": _slim_my_team_entry(anchor),
-        "fa_candidates": [
-            {**_slim_fa_entry(f),
-             "sum_diff": f.get("sum_diff"),
-             "breakdown_diff": f.get("breakdown_diff"),
-             "win_gate_passed": f.get("win_gate_passed"),
-             "add_tags": f.get("add_tags") or [],
-             "warn_tags": f.get("warn_tags") or [],
-             "anchor_name": f.get("anchor_name")}
-            for f in fa_tagged
-        ],
+        "fa_candidates": [_slim_fa_entry(f) for f in fa_tagged],
     }
     return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
 
@@ -250,14 +184,7 @@ def _build_fa_rank_payload(anchor: dict, fa_survivors: list[dict],
         ],
         "aggregated_verdicts": aggregated,
         "anchor": _slim_my_team_entry(anchor),
-        "fa_survivors": [
-            {**_slim_fa_entry(f),
-             "sum_diff": f.get("sum_diff"),
-             "win_gate_passed": f.get("win_gate_passed"),
-             "add_tags": f.get("add_tags") or [],
-             "warn_tags": f.get("warn_tags") or []}
-            for f in fa_survivors
-        ],
+        "fa_survivors": [_slim_fa_entry(f) for f in fa_survivors],
     }
     return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
 
@@ -282,7 +209,7 @@ def _build_final_payload(anchor: dict, fa_master_final: dict,
                          non_data_context: dict) -> str:
     """JSON for final decision prompt.
 
-    fa_master_final.parsed["ranked_top"] is a list of {name, rank, sum_diff,
+    fa_master_final.parsed["ranked_top"] is a list of {name, rank,
     classify_verdict, rationale}. We hydrate each with full v4 material.
     """
     ranked_top_full = []
@@ -293,11 +220,8 @@ def _build_final_payload(anchor: dict, fa_master_final: dict,
             ranked_top_full.append({
                 **_slim_fa_entry(full),
                 "rank": entry.get("rank"),
-                "sum_diff": entry.get("sum_diff"),
                 "classify_verdict": entry.get("classify_verdict"),
                 "master_rationale": entry.get("rationale"),
-                "add_tags": full.get("add_tags") or [],
-                "warn_tags": full.get("warn_tags") or [],
             })
 
     payload = {
