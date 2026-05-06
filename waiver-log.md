@@ -127,3 +127,9 @@
 ### Trey Gibson (BAL, SP) [mlb_id:694346] — Pass
 - 2026-05-04：[stream-eval] 5/3 新秀首登 @ NYY 評估；AAA 4.01 ERA / K9 9.1 / BB9 4.4 / 球速 93.6 + plus death ball stuff，對位最差（NYY elite 打線 + Yankee Stadium 左打天堂 + 客場新秀首登）。Yahoo 系統 NA 狀態（撿了若 24h 內未升級成 SP，stats 不算 = 浪費 acquisition）。預期 4-5 IP / 4-6 K / WHIP 1.7+，K upside 被 NA 風險吃掉後跟 Kay 差不多但 WHIP 更傷。Kay > Gibson > 不撿（Kay vs Gibson Yahoo NA 風險 + 對位差是 deal-breaker）
 
+### Martín Pérez (ATL, SP) [mlb_id:527048] — Pass
+- 2026-05-06：[stream-eval] 5/6 @ SEA vs Woo 串流評估；v4 Sum 21 + xwOBACON .355 (s=8) 結構優於 Corbin，**但 4/26 已被 ATL DFA 改簽 MiLB 合約**，5/6 schedule 顯示先發極可能過時資料（ATL 已換 Dylan Dodd 上來）。撿了會浪費 FAAB + acquisition。即使排除身分問題：xERA 4.46 / xERA-ERA −2.24 賣高運氣極端，撿來預期 ERA 大幅回升拉爛我隊 1.96 ERA。
+
+### Patrick Corbin (TOR, SP) [mlb_id:571578] — Pass
+- 2026-05-06：[stream-eval] 5/6 @ TB vs McClanahan 串流評估；v4 Sum 13（5 項 ⚠️）/ xwOBACON **.426 (s=1) 極端差** / xERA 5.69 / Whiff% 20.7 / IP/GS 4.93 全方位結構崩盤；3.65 ERA 是運氣加持（xERA-ERA −2.04 賣高極端）。對 McClanahan W 機率低，預期 5 IP / 2 K / 4 ER 拉爛 ERA。我隊 ERA 1.96 已聯盟前段 + IP 23/40 路徑安全 + 10 SP 在隊上，無 contested 觸發訊號。
+
