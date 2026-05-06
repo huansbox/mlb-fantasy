@@ -157,6 +157,7 @@ def _sp_bbe_excluded(bbe: int) -> bool:
 # docs/batter-framework-upgrade-design.md §3.1.
 _BATTER_BBE_MIN = 40
 _BATTER_SUM_HARD_FLOOR = 25  # Sum >=25 → strong, not a drop candidate
+_SP_SUM_HARD_FLOOR = 40  # Sum >=40 → strong, not a drop candidate (B1 default)
 
 
 def _batter_bbe_excluded(bbe: int) -> bool:
@@ -893,6 +894,7 @@ def pick_weakest_v4_sp(
     - Reads savant_v4 dict (ip_gs/whiff_pct/bb9/gb_pct/xwobacon) instead of
       savant_2026 (xera/xwoba/hh_pct/barrel_pct)
     - Same BBE<30 gate as v2 (signal stability not framework-specific)
+    - Sum >=40 hard floor excludes strong SPs from drop-candidate pool
     - SP-only (no batter line)
 
     Args:
@@ -930,6 +932,10 @@ def pick_weakest_v4_sp(
         savant_v4 = p.get("savant_v4") or {}
         score, breakdown = compute_sum_score_v4_sp(savant_v4)
         confidence = _confidence_label(bbe, "sp")
+
+        # Hard floor — Sum ≥40 is strong, not a drop candidate.
+        if score >= _SP_SUM_HARD_FLOOR:
+            continue
 
         pool.append({
             **p,

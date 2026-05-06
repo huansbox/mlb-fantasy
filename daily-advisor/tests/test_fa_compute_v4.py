@@ -12,6 +12,7 @@ from fa_compute import (
     PITCHER_V4_PCTILES,
     compute_sum_score_v4_sp,
     luck_tag_v4,
+    pick_weakest_v4_sp,
     rotation_gate_v4,
     v4_add_tags_sp,
     v4_decision_sp,
@@ -128,6 +129,77 @@ class TestV4SumSP:
         # GB% None → 0
         # xwOBACON .298 ≤ P90 .341 → 10
         assert total == 1 + 1 + 7 + 0 + 10
+
+
+# ── pick_weakest_v4_sp hard filters ──
+
+class TestPickWeakestV4SP:
+    @staticmethod
+    def _sp(name, savant_v4, bbe=60, **extras):
+        return {
+            "name": name,
+            "mlb_id": extras.pop("mlb_id", None),
+            "savant_v4": savant_v4,
+            "savant_2026": {"bbe": bbe},
+            **extras,
+        }
+
+    @staticmethod
+    def _profile_for_sum(sum_score):
+        profiles = {
+            # 8 + 8 + 8 + 8 + 7 = 39
+            39: {"ip_gs": 5.73, "whiff_pct": 26.5, "bb9": 2.38,
+                 "gb_pct": 46.7, "xwobacon": 0.364},
+            # 8 * 5 = 40
+            40: {"ip_gs": 5.73, "whiff_pct": 26.5, "bb9": 2.38,
+                 "gb_pct": 46.7, "xwobacon": 0.356},
+            # 9 + 8 + 8 + 8 + 8 = 41
+            41: {"ip_gs": 5.89, "whiff_pct": 26.5, "bb9": 2.38,
+                 "gb_pct": 46.7, "xwobacon": 0.356},
+        }
+        profile = profiles[sum_score]
+        actual, _ = compute_sum_score_v4_sp(profile)
+        assert actual == sum_score
+        return profile
+
+    def test_sum_hard_floor_boundary(self):
+        players = [
+            self._sp("Sum39", self._profile_for_sum(39)),
+            self._sp("Sum40", self._profile_for_sum(40)),
+            self._sp("Sum41", self._profile_for_sum(41)),
+        ]
+        weakest, excluded = pick_weakest_v4_sp(players, n=4)
+
+        assert [p["name"] for p in weakest] == ["Sum39"]
+        assert weakest[0]["score"] == 39
+        assert excluded == []
+
+    def test_cant_cut_precedes_sum_filter(self):
+        player = self._sp(
+            "Protected Low Sum",
+            {"ip_gs": 5.33, "whiff_pct": 26.5, "bb9": 3.38,
+             "gb_pct": 40.8, "xwobacon": 0.424},
+        )
+        weakest, excluded = pick_weakest_v4_sp(
+            [player],
+            n=4,
+            cant_cut={"protected low sum"},
+        )
+
+        assert weakest == []
+        assert excluded == []
+
+    def test_bbe_filter_precedes_sum_filter(self):
+        player = self._sp("Low BBE High Sum", self._profile_for_sum(41), bbe=29)
+        weakest, excluded = pick_weakest_v4_sp([player], n=4)
+
+        assert weakest == []
+        assert excluded == [{
+            "name": "Low BBE High Sum",
+            "mlb_id": None,
+            "bbe": 29,
+            "note": "BBE 小樣本，驗證期暫不排序",
+        }]
 
 
 # ── rotation_gate_v4 ──
