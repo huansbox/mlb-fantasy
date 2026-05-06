@@ -347,6 +347,10 @@ def enrich_watch_players(watchlist, savant_2026, config):
         # 2025 prior (cached)
         p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025_csvs)
         p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+        if fa_type == "sp":
+            p["savant_v4_2025"] = _extract_v4_sp_data(mlb_id, savant_2025_csvs, year=2025)
+        else:
+            p["savant_v4_2025"] = None
 
         # Derived metrics
         s26 = p.get("savant_2026")
@@ -754,24 +758,32 @@ def _calc_batter_sum(metrics):
     )
 
 
-def _extract_v4_sp_data(mlb_id, savant_csvs):
+def _extract_v4_sp_data(mlb_id, savant_csvs, year=None):
     """Pull v4 4-slot fields (whiff/bb9-pending/gb%/xwobacon) for one SP from
     league-bulk v4 CSVs. BB/9 is missing here (needs MLB API season stats);
     Layer 3 enrichment fills it for the surviving pool. Returns dict with
     whatever fields were found + xera/era/bbe context.
+
+    year: pass when the savant_csvs are for a specific year. Past-year
+    batted-ball data (gb_pct/bbe) is suppressed because Savant's batted-ball
+    endpoint silently returns current-season data regardless of the year
+    query param — using it would attribute current numbers to the prior
+    year. None → assumed current; non-current → gb_pct/bbe = None.
     """
     if not mlb_id:
         return {}
     custom = savant_csvs.get("pitcher_v4_custom", {}).get(mlb_id, {})
     bb = savant_csvs.get("pitcher_v4_bb", {}).get(mlb_id, {})
     arsenal = savant_csvs.get("pitcher_v4_arsenal", {}).get(mlb_id, {})
+    import datetime
+    is_past_year = year is not None and year < datetime.datetime.now().year
     return {
         "whiff_pct": arsenal.get("whiff_pct"),
-        "gb_pct": bb.get("gb_pct"),
+        "gb_pct": None if is_past_year else bb.get("gb_pct"),
         "xwobacon": custom.get("xwobacon"),
         "xera": custom.get("xera"),
         "era": custom.get("era"),
-        "bbe": bb.get("bbe", 0),
+        "bbe": 0 if is_past_year else bb.get("bbe", 0),
         "xwoba_allowed": custom.get("xwoba_allowed"),
         "arsenal_pitches": arsenal.get("arsenal_pitches", 0),
     }
@@ -1026,9 +1038,17 @@ def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
         if savant_prior:
             p["savant_2025"] = _extract_savant_by_id(mlb_id, fa_type, savant_2025)
             p["mlb_2025"] = fetch_mlb_season_stats(mlb_id, 2025, group)
+            # SP also gets v4 prior fields (whiff/xwobacon from league CSVs;
+            # gb_pct stays None because Savant batted-ball endpoint ignores
+            # the year param — see _extract_v4_sp_data docstring).
+            if fa_type == "sp":
+                p["savant_v4_2025"] = _extract_v4_sp_data(mlb_id, savant_2025, year=2025)
+            else:
+                p["savant_v4_2025"] = None
         else:
             p["savant_2025"] = None
             p["mlb_2025"] = None
+            p["savant_v4_2025"] = None
 
         # Derived metrics
         s26 = p.get("savant_2026")
@@ -2499,12 +2519,20 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
             prior_ip = 0.0
             if mlb_25:
                 prior_ip = _parse_ip(mlb_25.get("inningsPitched", "0"))
+            # v2 fields kept for fallback / RP path / display compatibility
             prior_stats = {
                 "xera": savant_25.get("xera"),
                 "xwoba_allowed": savant_25.get("xwoba"),
                 "hh_pct_allowed": savant_25.get("hh_pct"),
                 "ip": prior_ip,
             }
+            # v4 fields (whiff/xwobacon from league CSVs; gb_pct stays None
+            # because Savant batted-ball endpoint ignores year — see
+            # _extract_v4_sp_data docstring).
+            v4_25 = p.get("savant_v4_2025") or {}
+            prior_stats["whiff_pct"] = v4_25.get("whiff_pct")
+            prior_stats["gb_pct"] = v4_25.get("gb_pct")  # likely None for past year
+            prior_stats["xwobacon"] = v4_25.get("xwobacon")
     else:
         if savant_25:
             prior_bb_pct = None
