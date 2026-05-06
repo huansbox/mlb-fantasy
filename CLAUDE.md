@@ -467,7 +467,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
-- [ ] **`yahoo_query.py savant` 投手 v4 升級**：當前對投手仍顯示 v2 退役指標（xERA / xwOBA / HH%），未顯示 v4 5-slot first-order 指標（IP/GS / Whiff% / BB/9 / GB% / xwOBACON），違反 CLAUDE.md L168 規則。詳見 [`docs/handoff-il-na-filter.md`](docs/handoff-il-na-filter.md) §附加 Task。預估 30-45 min。
+- [ ] **RP 框架 v4 升級**（SP v4 觀察期 1-2 個月後啟動）：當前 RP 仍走 v2 指標（xERA / xwOBA allowed / HH% allowed / Barrel% allowed），SP 已 cutover 至 v4 5-slot。RP 升級**不是換指標**，是框架重設計：(a) IP/GS 對 RP 無意義，要重決定 5-slot 第 5 軸；(b) `calc_v4_percentiles.py` 要重跑 RP n=284 的百分位（RP Whiff% 分布通常高於 SP）；(c) RP 目前無 Phase 6 / urgency / Sum，整套決策邏輯要設計。同步更新 `yahoo_query.py savant` RP path（已留 TODO comment）+ CLAUDE.md「RP 評估」段 + `prompt_*_rp.txt`（若有）。預估 1-2 週工作量。
 - [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配

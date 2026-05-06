@@ -62,7 +62,8 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 python daily-advisor/yahoo_query.py savant "{球員名}"
 ```
 
-> 回傳 2025 + 2026 的 xwOBA / HH% / Barrel% / BBE，不需 Yahoo auth。
+> 回傳 2025 + 2026 的 xwOBA / **BB%** / HH% / Barrel% / BBE，不需 Yahoo auth。
+> BB% 從 MLB Stats API 抓（Savant CSV 無此欄位），fetch 失敗顯示 `—`。
 > 名字支援模糊匹配（Jesús = Jesus）。
 
 **Step 1.1a：14d Rolling 數據**（urgency 第 3 因子用）
@@ -105,7 +106,10 @@ WebSearch: "{球員名} {今年} news injury role lineup"
 python daily-advisor/yahoo_query.py savant "{球員名}"
 ```
 
-> 自動偵測投手，回傳 2025 + 2026 的 xERA / xwOBA allowed / HH% allowed / Barrel% allowed / BBE。
+> 投手自動分流：
+> - **GS ≥ 3 → SP v4 5-slot**：IP/GS / Whiff% / BB/9 / GB% / xwOBACON + xERA-ERA Δ 運氣訊號 + GS/IP/BBE context
+> - **GS < 3 → RP v2**：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / BBE（RP 框架 v4 升級時對齊）
+> 2025 prior：custom + arsenal + MLB API 都對歷史年份有效，但 **Savant batted-ball endpoint 對歷史年份失效** → 過去年份的 GB% / BBE 顯示 `—`（誠實標註，非 fetch 失敗）。
 
 **Step 1.1b：近期新聞（必做，非補充）**
 
@@ -120,7 +124,9 @@ WebSearch: "{球員名} {今年} news injury rotation role"
 
 1. `{球員名} {去年} stats ERA WHIP strikeouts innings` → 完整投球數據
 
-**必須取得**：xERA、xwOBA allowed、HH% allowed、ERA、WHIP、K/9、IP（全季 + IP/GS）、球隊名（判斷 W 支援）、BBE（樣本量）
+**必須取得**：
+- **SP**：v4 5-slot（IP/GS / Whiff% / BB/9 / GB% / xwOBACON）+ xERA / ERA / WHIP / K/9 / 球隊名（判斷 W 支援）/ BBE（樣本量）
+- **RP**：xERA / xwOBA allowed / HH% allowed / Barrel% allowed / K/9 / IP/Team_G / SV+H / BBE
 
 ### WebSearch 年份驗證（打者 / 投手通用）
 

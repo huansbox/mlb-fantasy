@@ -1,11 +1,17 @@
 # Handoff: FA IL/NA Status Filter (2026-05-05)
 
-> **狀態（2026-05-05 更新）**：
+> **狀態（2026-05-06 更新）**：
 > - ✅ **Part 1（FA IL/NA 過濾機制）已完成 merged 至 master**
 >   - commits `87bf243`（Layer 2 hard filter）/ `e69555b`（軟 tag pipeline）/ `5113932`（Phase 6 + batter prompts）
 >   - 225 unit tests 全綠 + VPS dry-run 確認 1 IL60/NA FA 被預過濾、Phase 6 推薦 healthy 候選
 >   - Production 自 2026-05-06 cron TW 12:30 起套用
-> - ⏳ **附加 Task（`yahoo_query.py savant` 投手 v4 升級）仍待辦** — 詳見本 doc 末段
+> - ✅ **Part 2（`yahoo_query.py savant` 投手 v4 升級 + 打者 BB% 補上）已完成**（2026-05-06）
+>   - daily_advisor.py 加 `PITCHER_V4_PCTILES` + `pctile_tag` 支援 `sp_v4` player_type
+>   - yahoo_query.py SP 分流：`GS ≥ 3` → v4 5-slot；否則 → RP v2（保留現狀，TODO 註記未來框架升級時對齊）
+>   - 打者補 BB%（從 MLB Stats API walks/PA 算，fetch 失敗顯示 `—`）
+>   - **發現 Savant batted-ball endpoint 對歷史年份失效**（year 參數被忽略）：過去年份 GB% / BBE 顯示 `—`，避免顯示錯誤的當前季資料
+>   - 225 unit tests 全綠；smoke test Skubal SP / Machado batter / Ashcraft RP 三路徑驗證
+>   - 連帶觸發新待辦：「RP 框架 v4 升級」進 CLAUDE.md TODO（1-2 週工作量，SP v4 觀察期後啟動）
 
 ## 背景 / 為什麼
 
