@@ -16,6 +16,8 @@ from zoneinfo import ZoneInfo
 ET = ZoneInfo("America/New_York")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+from _savant_v4_fetch import fetch_pitcher_v4  # noqa: E402
 
 # ── 2025 MLB Statcast percentile breakpoints (P90 = elite for both) ──
 # Batters: higher value = better
@@ -584,34 +586,68 @@ def fetch_savant_expected(year, roster_ids, player_type="batter"):
 
 
 def fetch_savant_for_pitchers(pitcher_ids, season):
-    """Fetch Savant data for pitchers: current + prior year.
+    """Fetch SP v4 5-slot for pitchers: current + prior year.
 
-    Returns dict: player_id → {current: {hh_pct, barrel_pct, bbe, xwoba, xera},
-                                prior: {...}}
+    Returns dict: player_id → {current: v4_dict, prior: v4_dict}
+    where v4_dict has ip_gs / whiff_pct / bb9 / gb_pct / xwobacon
+    + context xera / era / bbe / gs / ip (gb_pct/bbe missing for prior years
+    because Savant batted-ball endpoint ignores the year param).
+
+    RP path is unaffected: opposing SP / own SP both go through v4 here. Pure
+    RP (gs=0) downstream still gets v4 fields populated where possible (whiff%
+    / xwobacon / xera) but display layer can branch on gs to skip SP-only
+    output.
     """
     result = {}
-    for year in [season, season - 1]:
-        label = "current" if year == season else "prior"
-        sc = fetch_savant_statcast(year, pitcher_ids, player_type="pitcher")
-        ex = fetch_savant_expected(year, pitcher_ids, player_type="pitcher")
-        for pid in pitcher_ids:
-            if pid not in result:
-                result[pid] = {}
-            s = sc.get(pid, {})
-            e = ex.get(pid, {})
-            if s or e:
-                result[pid][label] = {
-                    "hh_pct": s.get("hh_pct", 0),
-                    "barrel_pct": s.get("barrel_pct", 0),
-                    "bbe": s.get("bbe", 0),
-                    "xwoba": e.get("xwoba", 0),
-                    "xera": e.get("xera", 0),
-                }
+    for pid in pitcher_ids:
+        result[pid] = {}
+        for year in [season, season - 1]:
+            label = "current" if year == season else "prior"
+            data = fetch_pitcher_v4(pid, year)
+            # Keep entry only when at least one v4 metric or luck-context xera/era surfaced
+            v4_keys = ("ip_gs", "whiff_pct", "bb9", "gb_pct", "xwobacon", "xera", "era")
+            if any(data.get(k) is not None for k in v4_keys):
+                result[pid][label] = data
     return result
 
 
+def _luck_signal(d):
+    """Return [Δ ±X.XX] signal string from xera/era, or '' if neither side strong."""
+    xera = d.get("xera")
+    era = d.get("era")
+    if xera is None or era is None:
+        return ""
+    diff = xera - era
+    sign = "+" if diff >= 0 else ""
+    if abs(diff) >= 0.81:  # P70 threshold per CLAUDE.md
+        direction = "賣高" if diff > 0 else "buy-low"
+        return f"[Δ {sign}{diff:.2f} {direction}]"
+    return f"[Δ {sign}{diff:.2f}]"
+
+
+def _format_v4_metrics(d):
+    """Format the v4 5-slot metrics line (one year). Skip metrics that are None."""
+    items = []
+    if d.get("ip_gs") is not None:
+        items.append(f"IP/GS {d['ip_gs']:.2f} {pctile_tag(d['ip_gs'], 'ip_gs', 'sp_v4')}")
+    if d.get("whiff_pct") is not None:
+        items.append(f"Whiff% {d['whiff_pct']:.1f}% {pctile_tag(d['whiff_pct'], 'whiff_pct', 'sp_v4')}")
+    if d.get("bb9") is not None:
+        items.append(f"BB/9 {d['bb9']:.2f} {pctile_tag(d['bb9'], 'bb9', 'sp_v4')}")
+    if d.get("gb_pct") is not None:
+        items.append(f"GB% {d['gb_pct']:.1f} {pctile_tag(d['gb_pct'], 'gb_pct', 'sp_v4')}")
+    if d.get("xwobacon") is not None:
+        items.append(f"xwOBACON {d['xwobacon']:.3f} {pctile_tag(d['xwobacon'], 'xwobacon', 'sp_v4')}")
+    luck = _luck_signal(d)
+    if luck:
+        items.append(luck)
+    if d.get("bbe"):
+        items.append(f"{d['bbe']} BBE")
+    return " / ".join(items)
+
+
 def format_pitcher_savant(savant_data):
-    """Format my SP's Savant stats with percentile tags."""
+    """Format my SP's v4 5-slot stats across prior + current year."""
     if not savant_data:
         return ""
     parts = []
@@ -619,43 +655,23 @@ def format_pitcher_savant(savant_data):
         d = savant_data.get(key)
         if not d:
             continue
-        items = []
-        if d.get("xera") is not None:
-            items.append(f"{d['xera']:.2f} xERA {pctile_tag(d['xera'], 'xera', 'pitcher')}")
-        if d.get("xwoba") is not None:
-            items.append(f"{d['xwoba']:.3f} xwOBA {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
-        if d.get("hh_pct") is not None:
-            items.append(f"{d['hh_pct']:.0f}% HH {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
-        if d.get("barrel_pct") is not None:
-            items.append(f"{d['barrel_pct']:.1f}% Barrel {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
-        if d.get("bbe"):
-            items.append(f"{d['bbe']} BBE")
-        if items:
-            parts.append(f"{label}: {' / '.join(items)}")
+        line = _format_v4_metrics(d)
+        if line:
+            parts.append(f"{label}: {line}")
     return " | ".join(parts)
 
 
 def format_opp_sp_savant(savant_data):
-    """Format opponent SP's Savant stats with percentile tags (aligned with CLAUDE.md framework)."""
+    """Format opponent SP's v4 5-slot stats (single year, prefer current)."""
     if not savant_data:
         return ""
     d = savant_data.get("current")
-    if not d or (d.get("hh_pct") is None and d.get("xera") is None):
+    v4_keys = ("ip_gs", "whiff_pct", "bb9", "gb_pct", "xwobacon")
+    if not d or not any(d.get(k) is not None for k in v4_keys):
         d = savant_data.get("prior")
     if not d:
         return ""
-    items = []
-    if d.get("xera") is not None:
-        items.append(f"xERA {d['xera']:.2f} {pctile_tag(d['xera'], 'xera', 'pitcher')}")
-    if d.get("xwoba") is not None:
-        items.append(f"xwOBA {d['xwoba']:.3f} {pctile_tag(d['xwoba'], 'xwoba', 'pitcher')}")
-    if d.get("hh_pct") is not None:
-        items.append(f"HH% {d['hh_pct']:.0f}% {pctile_tag(d['hh_pct'], 'hh_pct', 'pitcher')}")
-    if d.get("barrel_pct") is not None:
-        items.append(f"Barrel% {d['barrel_pct']:.1f}% {pctile_tag(d['barrel_pct'], 'barrel_pct', 'pitcher')}")
-    if d.get("bbe"):
-        items.append(f"{d['bbe']} BBE")
-    return " / ".join(items) if items else ""
+    return _format_v4_metrics(d)
 
 
 def fetch_savant_for_roster(roster_ids, season):
