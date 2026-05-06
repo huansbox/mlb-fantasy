@@ -42,6 +42,99 @@ def _ip_str_to_real(ip_str) -> float:
     return int(v) + (v - int(v)) * 10 / 3
 
 
+def fetch_pitchers_custom_bulk(year: int) -> dict:
+    """League-wide pitcher xwOBACON / xERA / xwOBA-allowed / ERA from Savant custom CSV.
+
+    Returns {pid: {xwoba_allowed, xwobacon, xera, era}}.
+    """
+    url = (
+        "https://baseballsavant.mlb.com/leaderboard/custom"
+        f"?year={year}&type=pitcher&filter=&min=1"
+        "&selections=pa,bip,xwoba,xwobacon,xera,era&csv=true"
+    )
+    out = {}
+    try:
+        text = _fetch_savant_csv(url)
+        for row in csv.DictReader(io.StringIO(text)):
+            pid = int(_safe_float(row.get("player_id"), 0) or 0)
+            if not pid:
+                continue
+            out[pid] = {
+                "xwoba_allowed": _safe_float(row.get("xwoba")),
+                "xwobacon": _safe_float(row.get("xwobacon")),
+                "xera": _safe_float(row.get("xera")),
+                "era": _safe_float(row.get("era")),
+            }
+    except Exception as e:
+        print(f"  Savant custom bulk error ({year}): {e}", file=sys.stderr)
+    return out
+
+
+def fetch_pitchers_batted_ball_bulk(year: int) -> dict:
+    """League-wide pitcher GB% / BBE from Savant batted-ball CSV.
+
+    Returns {pid: {gb_pct, bbe}}. Endpoint ignores year (always returns
+    current-season data); caller decides whether to use for past years.
+    """
+    url = (
+        "https://baseballsavant.mlb.com/leaderboard/batted-ball"
+        f"?year={year}&type=pitcher&min=1&csv=true"
+    )
+    out = {}
+    try:
+        text = _fetch_savant_csv(url)
+        for row in csv.DictReader(io.StringIO(text)):
+            pid = int(_safe_float(row.get("id"), 0) or 0)
+            if not pid:
+                continue
+            bbe = int(_safe_float(row.get("bbe"), 0) or 0)
+            gb_rate = _safe_float(row.get("gb_rate"))
+            out[pid] = {
+                "bbe": bbe,
+                "gb_pct": gb_rate * 100 if gb_rate is not None else None,
+            }
+    except Exception as e:
+        print(f"  Savant batted-ball bulk error ({year}): {e}", file=sys.stderr)
+    return out
+
+
+def fetch_pitchers_arsenal_whiff_bulk(year: int) -> dict:
+    """League-wide pitch-weighted Whiff% from Savant arsenal CSV.
+
+    Returns {pid: {whiff_pct, arsenal_pitches}}. Aggregates multiple pitch-type
+    rows per pitcher into a single pitches-weighted average.
+    """
+    url = (
+        "https://baseballsavant.mlb.com/leaderboard/pitch-arsenal-stats"
+        f"?type=pitcher&year={year}&min=1&csv=true"
+    )
+    agg = {}
+    try:
+        text = _fetch_savant_csv(url)
+        for row in csv.DictReader(io.StringIO(text)):
+            pid = int(_safe_float(row.get("player_id"), 0) or 0)
+            if not pid:
+                continue
+            pitches = int(_safe_float(row.get("pitches"), 0) or 0)
+            whiff = _safe_float(row.get("whiff_percent"))
+            if not pitches or whiff is None:
+                continue
+            if pid not in agg:
+                agg[pid] = {"pitches": 0, "wsum": 0.0}
+            agg[pid]["pitches"] += pitches
+            agg[pid]["wsum"] += whiff * pitches
+    except Exception as e:
+        print(f"  Savant arsenal bulk error ({year}): {e}", file=sys.stderr)
+    return {
+        pid: {
+            "whiff_pct": a["wsum"] / a["pitches"],
+            "arsenal_pitches": a["pitches"],
+        }
+        for pid, a in agg.items()
+        if a["pitches"] > 0
+    }
+
+
 def fetch_pitcher_v4(pid: int, year: int) -> dict:
     """Fetch SP v4 5-slot for a single pitcher.
 

@@ -39,6 +39,11 @@ from roster_sync import (
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
 )
 import fa_compute
+from _savant_v4_fetch import (
+    fetch_pitchers_custom_bulk,
+    fetch_pitchers_batted_ball_bulk,
+    fetch_pitchers_arsenal_whiff_bulk,
+)
 
 SUMMARY_FILE = os.path.join(SCRIPT_DIR, "weekly_scan_summary.txt")
 FULL_SEASON_GAMES = 162
@@ -565,11 +570,18 @@ def is_inactive_fa(player, include_inactive=False):
 # weakest 4 (Albies 9 / Tovar 16 → FA need ≥12/19 to upgrade; ≥21 ensures both)
 BATTER_SUM_THRESHOLD = 21
 
-SP_THRESHOLDS = [
-    ("xera", 4.64, False),        # P40
-    ("xwoba", 0.332, False),      # P40 (xwOBA allowed)
-    ("hh_pct", 42.2, False),      # P40
-]
+# SP v4 4-slot Layer 2 Sum gate (whiff_pct + bb9 + gb_pct + xwobacon).
+# IP/GS is the 5th v4 slot but requires per-pid game log fetch — Layer 3
+# enrichment (_compute_derived_pitcher) covers it for the FA pool that survives
+# Layer 2. So Layer 2 Sum is 4-slot (range 0-40), 5-slot Sum (with IP/GS) is
+# computed downstream in Phase 6 prep.
+#
+# Threshold 16 ≈ 4-slot mean P40 (4×4=16, P40-bin score=5 so this is slightly
+# below P40 mean). Approximates v2 gate width "2-of-3 P40" but lets one weaker
+# slot through if compensated. PLACEHOLDER — calibrate via dry-run comparison
+# of pre/post pool composition (see handoff-sp-v4-cutover-completion P2 待決 1).
+SP_V4_SUM_THRESHOLD = 16
+
 # RP: filtered by biweekly SV+H >= 2 + optional xERA < P50 (4.33) in filter_by_savant
 
 
@@ -577,7 +589,19 @@ SP_THRESHOLDS = [
 
 
 def download_savant_csvs(year):
-    """Download 4 Savant CSVs for a year. Returns dict of (name_idx, id_idx). Cached."""
+    """Download 4 v2 Savant CSVs (batter+pitcher × statcast+expected) plus
+    3 v4 SP CSVs (custom / batted-ball / pitch-arsenal). Returns dict mixing
+    v2 indexes and v4 pid-keyed dicts. Cached.
+
+    v2 keys (existing): batter_sc / batter_ex / pitcher_sc / pitcher_ex
+        — each value is (name_idx, id_idx) tuple from _build_savant_indexes.
+    v4 keys (new): pitcher_v4_custom / pitcher_v4_bb / pitcher_v4_arsenal
+        — each value is {pid: {...}} dict from league-bulk fetcher.
+
+    Past years (year < current): v4 batted-ball is fetched but the Savant
+    endpoint silently returns current-season data; callers are responsible
+    for skipping it for non-current seasons.
+    """
     if year in _savant_csv_cache:
         return _savant_csv_cache[year]
     csvs = {}
@@ -595,6 +619,25 @@ def download_savant_csvs(year):
         except Exception as e:
             print(f"  Savant {key} {year} failed: {e}", file=sys.stderr)
             csvs[key] = ({}, {})
+    # v4 SP league-bulk
+    try:
+        csvs["pitcher_v4_custom"] = fetch_pitchers_custom_bulk(year)
+        print(f"  Savant pitcher_v4_custom {year}: {len(csvs['pitcher_v4_custom'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_custom {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_custom"] = {}
+    try:
+        csvs["pitcher_v4_bb"] = fetch_pitchers_batted_ball_bulk(year)
+        print(f"  Savant pitcher_v4_bb {year}: {len(csvs['pitcher_v4_bb'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_bb {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_bb"] = {}
+    try:
+        csvs["pitcher_v4_arsenal"] = fetch_pitchers_arsenal_whiff_bulk(year)
+        print(f"  Savant pitcher_v4_arsenal {year}: {len(csvs['pitcher_v4_arsenal'])} rows", file=sys.stderr)
+    except Exception as e:
+        print(f"  Savant pitcher_v4_arsenal {year} failed: {e}", file=sys.stderr)
+        csvs["pitcher_v4_arsenal"] = {}
     _savant_csv_cache[year] = csvs
     return csvs
 
@@ -676,18 +719,6 @@ def _classify_fa_type(position_str):
     return "batter"
 
 
-def _check_thresholds(metrics, thresholds):
-    """Count how many of 3 threshold conditions pass (used for SP/RP)."""
-    passed = 0
-    for metric, threshold, higher_better in thresholds:
-        val = metrics.get(metric)
-        if val is None:
-            continue
-        if (higher_better and val >= threshold) or (not higher_better and val <= threshold):
-            passed += 1
-    return passed
-
-
 def _metric_to_score(value, metric):
     """Convert metric value to 1-10 score per CLAUDE.md Sum 打分表.
 
@@ -720,6 +751,45 @@ def _calc_batter_sum(metrics):
         _metric_to_score(metrics.get("xwoba"), "xwoba")
         + _metric_to_score(metrics.get("bb_pct"), "bb_pct")
         + _metric_to_score(metrics.get("barrel_pct"), "barrel_pct")
+    )
+
+
+def _extract_v4_sp_data(mlb_id, savant_csvs):
+    """Pull v4 4-slot fields (whiff/bb9-pending/gb%/xwobacon) for one SP from
+    league-bulk v4 CSVs. BB/9 is missing here (needs MLB API season stats);
+    Layer 3 enrichment fills it for the surviving pool. Returns dict with
+    whatever fields were found + xera/era/bbe context.
+    """
+    if not mlb_id:
+        return {}
+    custom = savant_csvs.get("pitcher_v4_custom", {}).get(mlb_id, {})
+    bb = savant_csvs.get("pitcher_v4_bb", {}).get(mlb_id, {})
+    arsenal = savant_csvs.get("pitcher_v4_arsenal", {}).get(mlb_id, {})
+    return {
+        "whiff_pct": arsenal.get("whiff_pct"),
+        "gb_pct": bb.get("gb_pct"),
+        "xwobacon": custom.get("xwobacon"),
+        "xera": custom.get("xera"),
+        "era": custom.get("era"),
+        "bbe": bb.get("bbe", 0),
+        "xwoba_allowed": custom.get("xwoba_allowed"),
+        "arsenal_pitches": arsenal.get("arsenal_pitches", 0),
+    }
+
+
+def _calc_sp_v4_sum_4slot(v4):
+    """4-slot v4 Sum (Whiff% + BB/9 + GB% + xwOBACON). Range 0-40.
+
+    Layer 2 gate uses 4-slot because IP/GS requires per-pid game log
+    (delegated to Layer 3 enrichment). BB/9 is None here unless callers
+    backfilled it from MLB stats — when None the slot scores 0 and the
+    overall Sum is just under-counted (no false acceptance).
+    """
+    return (
+        fa_compute.v4_metric_to_score(v4.get("whiff_pct"), "whiff_pct")
+        + fa_compute.v4_metric_to_score(v4.get("bb9"), "bb9")
+        + fa_compute.v4_metric_to_score(v4.get("gb_pct"), "gb_pct")
+        + fa_compute.v4_metric_to_score(v4.get("xwobacon"), "xwobacon")
     )
 
 
@@ -775,7 +845,7 @@ def filter_by_savant(snapshot, savant_2026):
             })
             continue
 
-        # ── Batters / SP: Statcast quality filter (existing logic) ──
+        # ── Batters / SP: Statcast quality filter ──
         metrics = {
             "xwoba": savant.get("xwoba") or None,
             "hh_pct": savant.get("hh_pct") or None,
@@ -793,12 +863,14 @@ def filter_by_savant(snapshot, savant_2026):
         if (savant.get("bbe") or 0) < 15:
             continue
 
-        # Quality filter — batter uses Sum scoring, SP keeps 2-of-3 P40
+        # Quality filter — batter uses 3-metric Sum, SP uses v4 4-slot Sum
+        v4_sp_data = None
         if fa_type == "batter":
             if _calc_batter_sum(metrics) < BATTER_SUM_THRESHOLD:
                 continue
-        else:  # sp
-            if _check_thresholds(metrics, SP_THRESHOLDS) < 2:
+        else:  # sp — v4 4-slot Sum (Whiff/BB9/GB/xwOBACON; IP/GS in Layer 3)
+            v4_sp_data = _extract_v4_sp_data(mlb_id, savant_2026)
+            if _calc_sp_v4_sum_4slot(v4_sp_data) < SP_V4_SUM_THRESHOLD:
                 continue
 
         results.append({
@@ -812,6 +884,7 @@ def filter_by_savant(snapshot, savant_2026):
             "ownership_type": info.get("ownership_type", ""),
             "fa_type": fa_type,
             "savant_2026": savant,
+            "savant_v4_2026": v4_sp_data,  # SP only; None for batters
             "mlb_id": mlb_id,
             "bbe": savant.get("bbe", 0),
         })
@@ -821,7 +894,7 @@ def filter_by_savant(snapshot, savant_2026):
     rps = sum(1 for r in results if r["fa_type"] == "rp")
     print(f"  Layer 2: {total} FA → {matched} name-matched + {fallback} fallback "
           f"→ {len(results)} passed ({batters} bat Sum≥{BATTER_SUM_THRESHOLD} / "
-          f"{sps} SP P40×2 / {rps} RP)", file=sys.stderr)
+          f"{sps} SP v4 4-slot Sum≥{SP_V4_SUM_THRESHOLD} / {rps} RP)", file=sys.stderr)
     return results
 
 
