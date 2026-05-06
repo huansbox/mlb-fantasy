@@ -42,6 +42,17 @@ RP_PCTILES = {
     "ip_per_tg":  [(25,0.24),(40,0.29),(45,0.31),(50,0.34),(55,0.35),(60,0.37),(70,0.40),(80,0.42),(90,0.45)],
     "era_diff":   [(25,0.28),(40,0.43),(45,0.52),(50,0.57),(55,0.63),(60,0.72),(70,0.88),(80,1.06),(90,1.24)],
 }
+# SP v4 5-slot framework. Mirror of fa_compute.PITCHER_V4_PCTILES — keep in sync
+# when 2025 baseline is recomputed via calc_v4_percentiles.py. Duplicated here
+# (instead of importing) because fa_compute already imports BATTER_PCTILES from
+# this module → would create circular import.
+PITCHER_V4_PCTILES = {
+    "ip_gs":     [(25,5.21),(40,5.35),(45,5.41),(50,5.46),(55,5.55),(60,5.61),(70,5.73),(80,5.89),(90,6.11)],
+    "whiff_pct": [(25,21.3),(40,23.1),(45,23.5),(50,24.0),(55,24.6),(60,25.1),(70,26.5),(80,27.9),(90,30.0)],
+    "bb9":       [(25,3.47),(40,3.17),(45,3.06),(50,2.95),(55,2.83),(60,2.73),(70,2.38),(80,2.18),(90,1.96)],
+    "gb_pct":    [(25,38.3),(40,40.5),(45,41.4),(50,43.2),(55,44.1),(60,44.7),(70,46.7),(80,51.4),(90,54.6)],
+    "xwobacon":  [(25,0.386),(40,0.375),(45,0.374),(50,0.370),(55,0.367),(60,0.364),(70,0.356),(80,0.350),(90,0.341)],
+}
 
 # Yahoo slot codes that mean "not in active lineup pool"
 # Mirror of yahoo_query.INACTIVE_SLOTS — kept here to avoid circular import.
@@ -67,6 +78,8 @@ def pctile_tag(value, metric, player_type="batter"):
         table = BATTER_PCTILES
     elif player_type == "rp":
         table = {**PITCHER_PCTILES, **RP_PCTILES}
+    elif player_type == "sp_v4":
+        table = PITCHER_V4_PCTILES
     else:
         table = PITCHER_PCTILES
     bp = table.get(metric)

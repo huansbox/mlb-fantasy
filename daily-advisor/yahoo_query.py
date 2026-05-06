@@ -412,11 +412,29 @@ def _normalize(name):
     ).lower()
 
 
+MLB_API_BASE = "https://statsapi.mlb.com/api/v1"
+
+
 def _fetch_savant_csv(url):
     """Fetch a Baseball Savant CSV leaderboard."""
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     resp = urllib.request.urlopen(req, timeout=20)
     return resp.read().decode("utf-8-sig")
+
+
+def _safe_float(v, default=None):
+    if v in (None, "", "null", "None", "-", "--", "-.--"):
+        return default
+    try:
+        return float(v)
+    except (ValueError, TypeError):
+        return default
+
+
+def _ip_str_to_real(ip_str) -> float:
+    """Convert MLB IP notation (5.1 = 5⅓, 5.2 = 5⅔) to real innings."""
+    v = _safe_float(ip_str, 0.0) or 0.0
+    return int(v) + (v - int(v)) * 10 / 3
 
 
 def _match_player(rows, query):
@@ -449,7 +467,7 @@ def _match_player(rows, query):
 def _savant_lookup(query, year, player_type):
     """Fetch Savant data for a single player from CSV.
 
-    Returns dict with found data, or None if player not found.
+    Returns dict with found data (incl. player_id), or None if player not found.
     """
     sc_url = (
         f"https://baseballsavant.mlb.com/leaderboard/statcast"
@@ -461,6 +479,7 @@ def _savant_lookup(query, year, player_type):
     )
 
     hh_pct = barrel_pct = bbe = xwoba = xera = None
+    player_id = None
 
     try:
         sc_text = _fetch_savant_csv(sc_url)
@@ -470,6 +489,7 @@ def _savant_lookup(query, year, player_type):
             hh_pct = float(sc_match.get("ev95percent", 0) or 0)
             barrel_pct = float(sc_match.get("brl_percent", 0) or 0)
             bbe = int(sc_match.get("attempts", 0) or 0)
+            player_id = int(sc_match.get("player_id", 0) or 0) or None
     except Exception as e:
         print(f"  Statcast CSV error ({year}): {e}", file=sys.stderr)
 
@@ -481,6 +501,8 @@ def _savant_lookup(query, year, player_type):
             xwoba = float(ex_match.get("est_woba", 0) or 0)
             if bbe is None:
                 bbe = int(ex_match.get("bip", 0) or 0)
+            if player_id is None:
+                player_id = int(ex_match.get("player_id", 0) or 0) or None
             if player_type == "pitcher":
                 raw = ex_match.get("xera")
                 xera = float(raw) if raw and raw.strip() else None
@@ -492,7 +514,210 @@ def _savant_lookup(query, year, player_type):
     return {
         "hh_pct": hh_pct, "barrel_pct": barrel_pct,
         "bbe": bbe, "xwoba": xwoba, "xera": xera,
+        "player_id": player_id,
     }
+
+
+def _fetch_pitcher_v4(pid: int, year: int) -> dict:
+    """Fetch SP v4 5-slot for a single pitcher (single-player path, not full league).
+
+    Each metric independently degrades to None if its source fails — caller
+    displays '—' for missing fields rather than aborting the whole report.
+    Returns dict with v4 fields (ip_gs / whiff_pct / bb9 / gb_pct / xwobacon)
+    + context (g / gs / ip / bbe / xera / era).
+
+    Note: Savant batted-ball leaderboard ignores the `year` query param and
+    always returns current-season data. For past years we skip that fetch
+    rather than display misleading current-year GB%/BBE attributed to 2025.
+    """
+    import datetime
+    current_year = datetime.datetime.now().year
+
+    out = {
+        "ip_gs": None, "whiff_pct": None, "bb9": None,
+        "gb_pct": None, "xwobacon": None,
+        "g": 0, "gs": 0, "ip": 0.0, "bbe": None,
+        "xera": None, "era": None,
+    }
+
+    # 1. Savant custom — xwOBACON, xERA (year-aware)
+    try:
+        url = (
+            "https://baseballsavant.mlb.com/leaderboard/custom"
+            f"?year={year}&type=pitcher&filter=&min=1"
+            "&selections=pa,bip,xwoba,xwobacon,xera,era&csv=true"
+        )
+        text = _fetch_savant_csv(url)
+        for row in csv.DictReader(io.StringIO(text)):
+            if int(row.get("player_id", 0) or 0) == pid:
+                out["xwobacon"] = _safe_float(row.get("xwobacon"))
+                out["xera"] = _safe_float(row.get("xera"))
+                break
+    except Exception as e:
+        print(f"  Savant custom error ({year}): {e}", file=sys.stderr)
+
+    # 2. Savant batted-ball — GB%, BBE (current-year only; endpoint ignores year)
+    if year == current_year:
+        try:
+            url = (
+                "https://baseballsavant.mlb.com/leaderboard/batted-ball"
+                f"?year={year}&type=pitcher&min=1&csv=true"
+            )
+            text = _fetch_savant_csv(url)
+            for row in csv.DictReader(io.StringIO(text)):
+                if int(row.get("id", 0) or 0) == pid:
+                    gb_rate = _safe_float(row.get("gb_rate"))
+                    out["gb_pct"] = gb_rate * 100 if gb_rate is not None else None
+                    out["bbe"] = int(_safe_float(row.get("bbe"), 0) or 0)
+                    break
+        except Exception as e:
+            print(f"  Savant batted-ball error ({year}): {e}", file=sys.stderr)
+
+    # 3. Savant pitch-arsenal — Whiff% weighted by pitch usage
+    try:
+        url = (
+            "https://baseballsavant.mlb.com/leaderboard/pitch-arsenal-stats"
+            f"?type=pitcher&year={year}&min=1&csv=true"
+        )
+        text = _fetch_savant_csv(url)
+        wsum = 0.0
+        pitches_total = 0
+        for row in csv.DictReader(io.StringIO(text)):
+            if int(row.get("player_id", 0) or 0) == pid:
+                p = int(_safe_float(row.get("pitches"), 0) or 0)
+                w = _safe_float(row.get("whiff_percent"))
+                if p and w is not None:
+                    pitches_total += p
+                    wsum += w * p
+        if pitches_total > 0:
+            out["whiff_pct"] = wsum / pitches_total
+    except Exception as e:
+        print(f"  Savant pitch-arsenal error ({year}): {e}", file=sys.stderr)
+
+    # 4. MLB API season stats — G, GS, IP, BB, ERA
+    try:
+        url = (
+            f"{MLB_API_BASE}/people?personIds={pid}"
+            f"&hydrate=stats(group=[pitching],type=[season],season={year})"
+        )
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        data = json.loads(urllib.request.urlopen(req, timeout=20).read().decode("utf-8"))
+        for person in data.get("people", []):
+            for sg in person.get("stats", []):
+                splits = sg.get("splits", [])
+                if not splits:
+                    continue
+                stat = splits[0].get("stat", {})
+                out["g"] = int(stat.get("gamesPlayed", 0) or 0)
+                out["gs"] = int(stat.get("gamesStarted", 0) or 0)
+                ip_real = _ip_str_to_real(stat.get("inningsPitched", "0"))
+                out["ip"] = ip_real
+                bb = int(_safe_float(stat.get("baseOnBalls"), 0) or 0)
+                if ip_real:
+                    out["bb9"] = 9 * bb / ip_real
+                out["era"] = _safe_float(stat.get("era"))
+                break
+    except Exception as e:
+        print(f"  MLB season stats error ({year}): {e}", file=sys.stderr)
+
+    # 5. IP/GS from per-start game log (excludes relief outings)
+    if out["gs"] >= 1:
+        try:
+            url = (
+                f"{MLB_API_BASE}/people/{pid}/stats"
+                f"?stats=gameLog&season={year}&group=pitching"
+            )
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            data = json.loads(urllib.request.urlopen(req, timeout=20).read().decode("utf-8"))
+            splits = (data.get("stats") or [{}])[0].get("splits", []) or []
+            starts = [s for s in splits
+                      if int(s.get("stat", {}).get("gamesStarted", 0)) == 1]
+            if starts:
+                total_ip = sum(_ip_str_to_real(s["stat"].get("inningsPitched", "0"))
+                               for s in starts)
+                out["ip_gs"] = round(total_ip / len(starts), 2)
+        except Exception as e:
+            print(f"  Game log error ({year}): {e}", file=sys.stderr)
+
+    return out
+
+
+def _fetch_batter_bb_pct(pid: int, year: int):
+    """Fetch BB% (walks / PA) for a single batter via MLB Stats API.
+
+    Savant statcast/expected leaderboards do not expose BB%, but BB% is one of
+    the v4 thin core 3 batter signals. Returns float (e.g. 13.7) or None on
+    failure / missing data.
+    """
+    try:
+        url = (
+            f"{MLB_API_BASE}/people/{pid}/stats"
+            f"?stats=season&season={year}&group=hitting"
+        )
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        data = json.loads(urllib.request.urlopen(req, timeout=20).read().decode("utf-8"))
+        splits = (data.get("stats") or [{}])[0].get("splits", []) or []
+        if not splits:
+            return None
+        stat = splits[0].get("stat", {})
+        bb = _safe_float(stat.get("baseOnBalls"))
+        pa = _safe_float(stat.get("plateAppearances"))
+        if bb is None or not pa:
+            return None
+        return 100.0 * bb / pa
+    except Exception as e:
+        print(f"  Batter BB% fetch error ({year}): {e}", file=sys.stderr)
+        return None
+
+
+def _fmt_pct(value, fmt: str) -> str:
+    """Format a numeric metric with given fmt string, dash if None."""
+    if value is None:
+        return "—"
+    return fmt.format(value)
+
+
+def _print_pitcher_v4_line(label: str, d: dict) -> None:
+    """Print one year's SP v4 5-slot output with luck signal + context."""
+    if d is None or not any(d.get(k) is not None
+                            for k in ("ip_gs", "whiff_pct", "bb9", "gb_pct", "xwobacon")):
+        print(f"  {label}: no data found")
+        return
+
+    ip_gs = d.get("ip_gs")
+    whiff = d.get("whiff_pct")
+    bb9 = d.get("bb9")
+    gb = d.get("gb_pct")
+    xwc = d.get("xwobacon")
+
+    line1 = (
+        f"IP/GS {_fmt_pct(ip_gs, '{:.2f}')} {pctile_tag(ip_gs, 'ip_gs', 'sp_v4')} | "
+        f"Whiff% {_fmt_pct(whiff, '{:.1f}%')} {pctile_tag(whiff, 'whiff_pct', 'sp_v4')} | "
+        f"BB/9 {_fmt_pct(bb9, '{:.2f}')} {pctile_tag(bb9, 'bb9', 'sp_v4')}"
+    )
+    line2 = (
+        f"GB% {_fmt_pct(gb, '{:.1f}')} {pctile_tag(gb, 'gb_pct', 'sp_v4')} | "
+        f"xwOBACON {_fmt_pct(xwc, '{:.3f}')} {pctile_tag(xwc, 'xwobacon', 'sp_v4')}"
+    )
+    print(f"  {label}:")
+    print(f"    {line1}")
+    print(f"    {line2}")
+
+    # Luck signal: |xERA - ERA| ≥ 0.81 (P70 threshold) is significant
+    xera = d.get("xera")
+    era = d.get("era")
+    if xera is not None and era is not None:
+        diff = xera - era
+        if abs(diff) >= 0.81:
+            direction = "賣高" if diff > 0 else "buy-low"
+            sign = "+" if diff > 0 else ""
+            print(f"    [運氣] xERA {xera:.2f} / ERA {era:.2f} (Δ {sign}{diff:.2f}, {direction})")
+        else:
+            print(f"    [運氣] xERA {_fmt_pct(xera, '{:.2f}')} / ERA {_fmt_pct(era, '{:.2f}')} (Δ {diff:+.2f}, 中性)")
+
+    bbe = d.get("bbe")
+    bbe_str = str(bbe) if bbe is not None else "—"
+    print(f"    GS/G: {d.get('gs', 0)}/{d.get('g', 0)} | IP: {d.get('ip', 0):.1f} | BBE: {bbe_str}")
 
 
 def _print_savant_line(label, data, player_type):
@@ -503,6 +728,12 @@ def _print_savant_line(label, data, player_type):
     if data.get("xwoba") is not None:
         tag = "xwOBA allowed" if player_type == "pitcher" else "xwOBA"
         parts.append(f"{tag} {data['xwoba']:.3f} {pctile_tag(data['xwoba'], 'xwoba', player_type)}")
+    if player_type == "batter" and "bb_pct" in data:
+        bb = data.get("bb_pct")
+        if bb is None:
+            parts.append("BB% —")
+        else:
+            parts.append(f"BB% {bb:.1f}% {pctile_tag(bb, 'bb_pct', 'batter')}")
     if data.get("hh_pct") is not None:
         tag = "HH% allowed" if player_type == "pitcher" else "HH%"
         parts.append(f"{tag} {data['hh_pct']:.1f}% {pctile_tag(data['hh_pct'], 'hh_pct', player_type)}")
@@ -518,6 +749,10 @@ def cmd_savant(args):
     """Look up a player's Statcast data from Baseball Savant CSV.
 
     Checks both batter and pitcher CSVs, picks the type with higher BBE.
+    For pitchers, branches on GS: ≥3 → SP v4 5-slot; else → RP v2 indicators.
+
+    SP v4 = first-order signal per CLAUDE.md framework. RP still on v2 because
+    the RP framework hasn't been upgraded yet — TODO: align when it is.
     """
     query = args.player
     years = [int(args.year)] if args.year else [2026, 2025]
@@ -528,27 +763,57 @@ def cmd_savant(args):
     # (pitchers have hundreds of BBE as pitcher but few as batter)
     detected_type = None
     best_bbe = -1
+    primary_pid = None
     for pt in ["batter", "pitcher"]:
         test = _savant_lookup(query, years[0], pt)
         if test and (test.get("bbe") or 0) > best_bbe:
             best_bbe = test.get("bbe") or 0
             detected_type = pt
+            primary_pid = test.get("player_id")
 
     if not detected_type:
         print(f"  Player not found in batter or pitcher CSV for {years[0]}")
         print()
         return
 
-    if detected_type == "pitcher":
-        print(f"  (detected as pitcher)\n")
+    if detected_type == "batter":
+        for year in years:
+            label = "本季" if year == 2026 else str(year)
+            data = _savant_lookup(query, year, "batter")
+            if data:
+                pid = data.get("player_id")
+                # BB% comes from MLB Stats API, not Savant CSV. Always populate
+                # the key so the print line shows '—' rather than omitting on
+                # fetch failure.
+                data["bb_pct"] = _fetch_batter_bb_pct(pid, year) if pid else None
+                _print_savant_line(label, data, "batter")
+            else:
+                print(f"  {label}: no data found")
+        print()
+        return
 
-    for year in years:
-        label = "本季" if year == 2026 else str(year)
-        data = _savant_lookup(query, year, detected_type)
-        if data:
-            _print_savant_line(label, data, detected_type)
-        else:
-            print(f"  {label}: no data found")
+    # Pitcher path: decide SP v4 vs RP v2 from primary-year GS
+    is_sp = False
+    primary_v4 = None
+    if primary_pid:
+        primary_v4 = _fetch_pitcher_v4(primary_pid, years[0])
+        is_sp = primary_v4.get("gs", 0) >= 3
+
+    if is_sp:
+        print(f"  (detected as SP — v4 5-slot)\n")
+        for year in years:
+            label = "本季" if year == 2026 else str(year)
+            data = primary_v4 if year == years[0] else _fetch_pitcher_v4(primary_pid, year)
+            _print_pitcher_v4_line(label, data)
+    else:
+        print(f"  (detected as RP — v2 indicators; RP framework v4 upgrade pending)\n")
+        for year in years:
+            label = "本季" if year == 2026 else str(year)
+            data = _savant_lookup(query, year, "pitcher")
+            if data:
+                _print_savant_line(label, data, "pitcher")
+            else:
+                print(f"  {label}: no data found")
 
     print()
 
