@@ -467,6 +467,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
   ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
   -->
+- [ ] **SP v4 cutover 補完**（高優先，2026-05-06 系統性 v2 grep 發現 7 項殘留）：v4 cutover 實際只 Phase 6 multi-agent + 5 個 SP prompt 對齊；每日戰報資料層 / FA SP_THRESHOLDS gate / Phase 6 context 排序與顯示 / FA prior_stats 寫入 / 週覆盤 / opposing SP prompt 文字 全仍 v2。詳見 [`docs/handoff-sp-v4-cutover-completion.md`](docs/handoff-sp-v4-cutover-completion.md)（reviewer audit 確認 + 排序依賴 + commit 分組）。預估 5-7 hr / 5 commits。**P1（daily_advisor.py）必須先做才能改 P6 prompt**。
 - [ ] **RP 框架 v4 升級**（SP v4 觀察期 1-2 個月後啟動）：當前 RP 仍走 v2 指標（xERA / xwOBA allowed / HH% allowed / Barrel% allowed），SP 已 cutover 至 v4 5-slot。RP 升級**不是換指標**，是框架重設計：(a) IP/GS 對 RP 無意義，要重決定 5-slot 第 5 軸；(b) `calc_v4_percentiles.py` 要重跑 RP n=284 的百分位（RP Whiff% 分布通常高於 SP）；(c) RP 目前無 Phase 6 / urgency / Sum，整套決策邏輯要設計。同步更新 `yahoo_query.py savant` RP path（已留 TODO comment）+ CLAUDE.md「RP 評估」段 + `prompt_*_rp.txt`（若有）。預估 1-2 週工作量。
 - [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
