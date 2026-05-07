@@ -1,0 +1,216 @@
+{
+  "_provenance": {
+    "case": "fa-scan #149 (2026-05-04 SP-v4) — hand-composed for issue 008 baseline spike",
+    "source": "Reconstructed from #149 issue body agent rationale + 2025 SP v4 percentile table in CLAUDE.md",
+    "intent": "Known anchor failure case — under v4-thick prompts (production at time of #149), 3 agents lazy-anchored on Sum 14 / 19 numbers. Re-running with B1 thin prompts measures whether independent reasoning emerges.",
+    "ground_truth_master_p1": "Cole Ragans (3/3 step1 P1 + master) — high-confidence drop, structurally weak in 2 slots both years",
+    "missing_fields": "Some 5-slot raw values (e.g. Ragans IP/GS, Cantillo IP/GS) not cited in rationale; estimated from reverse-Sum and marked _estimated. 2025 prior breakdown for non-Nola candidates partial.",
+    "shape_notes": "Matches payload_slimmer.slim_entry(role='my_team') schema. percentile uses fa_compute._v4_percentile bucket logic (≥P90 → 95, otherwise band match)."
+  },
+  "candidates": [
+    {
+      "name": "Cole Ragans",
+      "team": "KC",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": 5.0, "percentile": 0, "_estimated": true},
+          "Whiff%": {"raw": 30.7, "percentile": 95},
+          "BB/9": {"raw": 5.85, "percentile": 0},
+          "GB%": {"raw": 36.0, "percentile": 0, "_estimated": true},
+          "xwOBACON": {"raw": 0.455, "percentile": 0}
+        },
+        "context": {
+          "xera": 5.33,
+          "era": 5.29,
+          "bbe": 76,
+          "ip": 30.0,
+          "g": 6,
+          "gs": 6,
+          "k9": 11.4,
+          "whip": 1.55
+        }
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": 4.5, "percentile": 0, "_estimated": true},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.455,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": ["Per #149: 2025 prior Sum 17 — BB/9 already poor; not a slump, structural"]
+    },
+    {
+      "name": "Aaron Nola",
+      "team": "PHI",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": 3.73, "percentile": 0},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.425, "percentile": 0}
+        },
+        "context": {
+          "xera": 4.86,
+          "era": 6.03,
+          "bbe": 92,
+          "ip": null,
+          "g": null,
+          "gs": null,
+          "k9": null,
+          "whip": null
+        }
+      },
+      "prior_v4": {
+        "ip": 94.3,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.382, "percentile": 0}
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.425,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": [
+        "Per #149: 2025 prior Sum 14, 275 BBE — dual-year structural weakness on xwOBACON",
+        "Luck factor: xERA 4.86 vs ERA 6.03 = -1.17 (slight buy-low signal but underlying poor)"
+      ]
+    },
+    {
+      "name": "JR Ritchie",
+      "team": "ATL",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": 6.17, "percentile": 95},
+          "Whiff%": {"raw": 19.3, "percentile": 0},
+          "BB/9": {"raw": 4.38, "percentile": 0},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.389, "percentile": 0}
+        },
+        "context": {
+          "xera": null,
+          "era": null,
+          "bbe": 34,
+          "ip": null,
+          "g": 2,
+          "gs": 2,
+          "k9": null,
+          "whip": null
+        }
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.389,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": ["⚠️ 樣本小"],
+      "add_tags": [],
+      "warn_tags": ["⚠️ 樣本小"],
+      "low_confidence": true,
+      "notes": [
+        "Per #149: only 2 GS / BBE 34 — extreme small sample, no 2025 prior",
+        "Elite IP/GS but Whiff%/BB/9 both <P25 — true quality unknown until more starts"
+      ]
+    },
+    {
+      "name": "Joey Cantillo",
+      "team": "CLE",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": 26.0, "percentile": 60},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": 45.7, "percentile": 60},
+          "xwOBACON": {"raw": null, "percentile": null}
+        },
+        "context": {
+          "xera": null,
+          "era": null,
+          "bbe": null,
+          "ip": null,
+          "g": null,
+          "gs": null,
+          "k9": null,
+          "whip": null
+        }
+      },
+      "prior_v4": {
+        "ip": 95.3,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.364, "percentile": 60}
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": null,
+        "delta": 0.039,
+        "bbe": 59
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": [
+        "Per #149: 2025 prior Sum 22 with 95 IP, xwOBACON .364 (P70) — solid structural floor",
+        "21d Δ xwOBACON +0.039 BBE 59 = mid-range deterioration, credible signal but not decisive",
+        "Highest in pool by master verdict — hold candidate"
+      ]
+    }
+  ],
+  "slump_hold_excluded": [],
+  "low_confidence_excluded": []
+}

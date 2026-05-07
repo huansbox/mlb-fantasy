@@ -62,6 +62,25 @@ def _load_prompt(name: str) -> str:
     return (_MODULE_DIR / fname).read_text(encoding="utf-8")
 
 
+def _dump_fixture(args, today_str: str, suffix: str, payload_str: str) -> None:
+    """Capture LLM payload as spike fixture (issue 008 baseline collection).
+
+    Writes <args.capture_payload>/<today_str>_<suffix>.json. No-op if flag unset.
+    Failure is non-fatal — production fa-scan continues regardless.
+    """
+    capture_dir = getattr(args, "capture_payload", None)
+    if not isinstance(capture_dir, str) or not capture_dir:
+        return
+    try:
+        out_dir = Path(capture_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / f"{today_str}_{suffix}.json"
+        out_path.write_text(payload_str, encoding="utf-8")
+        print(f"  capture: wrote {out_path}", file=sys.stderr)
+    except Exception as e:
+        print(f"  capture: failed to dump {suffix}: {e}", file=sys.stderr)
+
+
 # ── v4 data attachment ──
 
 def _attach_v4_to_my_roster(my_roster: list[dict]) -> None:
@@ -319,6 +338,7 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
         print(f"  Layer 5 ({label}): step 1 — 3 agents rank P1-P4 in parallel...",
               file=sys.stderr)
         step1_payload = _build_step1_payload(urgency_result, low_conf)
+        _dump_fixture(args, today_str, "sp_step1", step1_payload)
         step1_results = run_parallel_agents(
             _load_prompt("sp_step1"), step1_payload, n_agents=3, timeout=_PHASE6_TIMEOUT,
         )
@@ -393,6 +413,7 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
         # === FA line ===
         print(f"  Layer 5 ({label}): step 4 — FA classify (3 agents)...", file=sys.stderr)
         fa_classify_payload = _build_fa_classify_payload(anchor_entry, fa_tagged)
+        _dump_fixture(args, today_str, "fa_classify", fa_classify_payload)
         fa_classify_results = run_parallel_agents(
             _load_prompt("fa_classify"), fa_classify_payload,
             n_agents=3, timeout=_PHASE6_TIMEOUT,
