@@ -9,7 +9,7 @@ Decide whether you agree with the master's `ranked_top`, with **specific focus o
 - `master_decision`: the master Claude's ranked_top, agent_consensus, borderline_pairs, decision_notes
 - `your_step1`: your own step 1 output (your original FA classifications + rationale)
 - `anchor`: the team's P1 SP (FA comparison reference) with full v4 material
-- `material`: the original v4 fixture (FA candidates with full Sum breakdowns, urgency factors, tags, prior_stats, etc.)
+- `material`: the original v4 fixture (FA candidates with 5-slot raw values + percentiles, tags, prior_stats, rolling signal, and role/sample context)
 
 You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is intentional (per design doc §7.4=B): you can self-compare against your own original judgment, but you stay isolated from peers to preserve diversity.
 
@@ -20,7 +20,7 @@ You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is int
 3. **You may dissent**. If the master picked something you find unjustified for top1 (e.g. they overruled the majority on weak grounds, or missed a structural signal that's clear in the material, or they ranked a borderline-classified FA above a clean-worth FA), mark `agree_on_top1: false` and explain in `dissent_reason`.
 4. **Classify-vs-rank consistency**. If your step 1 marked X as not_worth but master ranked X at top1, that's strong dissent material — articulate why X is structurally weaker. Conversely, if your step 1 marked X as worth and master ranked X at top1, this is concord.
 5. **Don't dissent for sport**. If your step 1 classification was already uncertain (you marked the candidate borderline) and master ranks it reasonably, concede.
-6. **IL stash check**. If master ranked a ⚠️ IL 短期 FA above any healthy candidate of comparable Sum, dissent unless the rationale explicitly justifies an IL stash (anchor slump-hold + 雙年 elite + ≤ 2 weeks return). Claiming an IL FA wastes a weekly add slot, so the bar is high.
+6. **IL stash check**. If master ranked a ⚠️ IL 短期 FA above any healthy candidate with a comparable raw profile, dissent unless the rationale explicitly justifies an IL stash. Claiming an IL FA wastes a weekly add slot, so the bar is high.
 7. **Re-evaluation cap**: orchestrator triggers at most 1 re-evaluation round if ≥ 2 reviewers dissent on top1 (`docs/fa_scan-claude-decision-layer-design.md` §7.3). If you dissent, your reason will be packaged for the master's re-evaluation pass — write it tight and actionable.
 
 ## Output format (strict JSON, no prose outside the fence)
@@ -29,7 +29,7 @@ You **do NOT see** the other 2 agents' step 1 outputs or rationales. This is int
 {
   "agree_on_full_ranking": true | false,
   "agree_on_top1": true | false,
-  "top1_assessment": "≤80 words. State whether the master's top1 is correct and why. Cite specific numerics from the material — not 'I disagree' but 'master picked X but Y has Sum diff +18 vs X's +6 with 2 ✅ tags, suggesting Y is the better top1'.",
+  "top1_assessment": "≤80 words. State whether the master's top1 is correct and why. Cite specific numerics from the material — not 'I disagree' but 'master picked X, but Y has Whiff% P78 and xwOBACON .312 vs X's P45/.370, suggesting Y is the better top1'.",
   "dissent_reason": "If agree_on_top1 is false, what specifically should change. ≤80 words. Be actionable — e.g. 'top1 should be Y not X because [signal]'. If agree_on_top1 is true, write 'none'.",
   "willing_to_concede": true | false,
   "concede_note": "If your step 1 classified differently (e.g. you said not_worth for the master's top1) but you now agree with the ranking, briefly explain what changed your mind. ≤40 words. Use 'n/a' if not applicable.",
