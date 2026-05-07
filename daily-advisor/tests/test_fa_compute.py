@@ -6,9 +6,12 @@ from fa_compute import (
     compute_2025_sum,
     compute_fa_tags,
     compute_sum_score,
+    compute_sum_score_v4_sp,
     compute_urgency,
+    format_sp_breakdown_human,
     metric_to_score,
     pick_weakest,
+    score_to_percentile_label,
     value_to_pctile,
 )
 
@@ -407,5 +410,72 @@ class TestBatterIlShortWarn:
     def test_no_tag_for_other_status(self, status):
         result = compute_fa_tags(self._strong_fa(status), self._anchor(), "batter")
         assert "⚠️ IL 短期" not in result["warn_tags"]
+
+
+# ── score → percentile label (v4 SP human display helper) ──
+class TestScoreToPercentileLabel:
+    @pytest.mark.parametrize(
+        "score,expected",
+        [
+            (10, ">P90"),
+            (9, "P80-90"),
+            (8, "P70-80"),
+            (7, "P60-70"),
+            (6, "P50-60"),
+            (5, "P40-50"),
+            (3, "P25-40"),
+            (1, "<P25"),
+            (0, "—"),  # input value was None
+        ],
+    )
+    def test_known_scores(self, score, expected):
+        assert score_to_percentile_label(score) == expected
+
+    @pytest.mark.parametrize("score", [2, 4, 11, -1, 99])
+    def test_unknown_scores_fallback(self, score):
+        # v4_metric_to_score never returns 2/4/11+ — defensive fallback
+        assert score_to_percentile_label(score) == "—"
+
+
+class TestFormatSpBreakdownHuman:
+    def test_v4_sp_breakdown_shape(self):
+        # 模擬 compute_sum_score_v4_sp 產出的 5-slot breakdown
+        breakdown = {
+            "IP/GS": 7,
+            "Whiff%": 1,
+            "BB/9": 10,
+            "GB%": 5,
+            "xwOBACON": 9,
+        }
+        human = format_sp_breakdown_human(breakdown)
+        assert human == {
+            "IP/GS": "P60-70",
+            "Whiff%": "<P25",
+            "BB/9": ">P90",
+            "GB%": "P40-50",
+            "xwOBACON": "P80-90",
+        }
+
+    def test_round_trip_with_compute_sum_score_v4_sp(self):
+        # 用 v4 elite SP 數據（每軸 P90+）跑完整管線
+        elite_data = {
+            "ip_gs": 6.20,    # >P90 (P90=6.11)
+            "whiff_pct": 31.0,  # >P90 (P90=30.0)
+            "bb9": 1.80,        # >P90 reverse (P90=1.96)
+            "gb_pct": 55.0,     # >P90 (P90=54.6)
+            "xwobacon": 0.335,  # >P90 reverse (P90=.341)
+        }
+        _, breakdown = compute_sum_score_v4_sp(elite_data)
+        human = format_sp_breakdown_human(breakdown)
+        assert all(v == ">P90" for v in human.values())
+
+    def test_none_inputs_show_dash(self):
+        # raw value None → score 0 → label "—"
+        _, breakdown = compute_sum_score_v4_sp(
+            {"ip_gs": None, "whiff_pct": None, "bb9": None,
+             "gb_pct": None, "xwobacon": None}
+        )
+        human = format_sp_breakdown_human(breakdown)
+        assert all(v == "—" for v in human.values())
 
 

@@ -549,6 +549,38 @@ def compute_sum_score_v4_sp(data: dict) -> tuple[int, dict]:
     return total, breakdown
 
 
+_SCORE_TO_PCTILE_LABEL = {
+    10: ">P90",
+    9:  "P80-90",
+    8:  "P70-80",
+    7:  "P60-70",
+    6:  "P50-60",
+    5:  "P40-50",
+    3:  "P25-40",
+    1:  "<P25",
+    0:  "—",  # input value was None (no data)
+}
+
+
+def score_to_percentile_label(score: int) -> str:
+    """Inverse of v4_metric_to_score → human-readable percentile band.
+
+    Score 0 = input was None. Scores 2/4 don't exist (v4_metric_to_score
+    skips them by design). Unknown scores fall back to '—'.
+    """
+    return _SCORE_TO_PCTILE_LABEL.get(score, "—")
+
+
+def format_sp_breakdown_human(breakdown: dict) -> dict:
+    """Convert v4 SP breakdown {label: score} → {label: 'P60-70'}.
+
+    Use after compute_sum_score_v4_sp when rendering to humans (skill
+    reports, debug prints). Phase 6 prompts and payload_slimmer feed
+    LLMs raw scores directly — don't apply this helper there.
+    """
+    return {label: score_to_percentile_label(score) for label, score in breakdown.items()}
+
+
 def rotation_gate_v4(g: int, gs: int) -> tuple[str, str]:
     """Pre-filter SP by role, from GS/G ratio + absolute GS.
 
