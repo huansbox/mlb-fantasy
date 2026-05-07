@@ -729,10 +729,12 @@ def v4_decision_sp(sum_diff: int, breakdown_diff: dict,
       ≥ 1 ✅ AND no strong warn → 取代
       else → 觀察
 
-    NOTE: this Python decision function is used by fa_scan_v4.py CLI tool
-    only. The Phase 6 production path uses compute_fa_tags_v4_sp() which
-    intentionally omits the decision field — Claude decides in the
+    NOTE: legacy helper — previously used by the retired fa_scan_v4.py CLI
+    (issue 004). The Phase 6 production path uses compute_fa_tags_v4_sp()
+    which intentionally omits the decision field — Claude decides in the
     multi-agent decision layer per docs/fa_scan-claude-decision-layer-design.md.
+    Currently exercised only by test_fa_compute_v4.py self-coverage; safe to
+    drop in a future cleanup if no new caller materialises.
     """
     positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
     if sum_diff < 5 or positive_count < 3:

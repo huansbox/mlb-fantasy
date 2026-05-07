@@ -14,7 +14,7 @@ Usage (run from daily-advisor/):
 Idempotent: SPs that already have all three v4 keys are skipped automatically.
 After v4 cutover this tool can be re-run when new SPs join the roster.
 
-Reuses fetchers from fa_scan_v4.py to keep the Savant URL patterns in one place.
+Reuses fetchers from sp_data_fetchers.py to keep the Savant URL patterns in one place.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ import json
 import sys
 from pathlib import Path
 
-from fa_scan_v4 import (
+from sp_data_fetchers import (
     fetch_savant_arsenal_whiff,
     fetch_savant_batted_ball,
     fetch_savant_custom,

@@ -447,8 +447,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
-| `daily-advisor/fa_scan_v4.py` | **v4 ad-hoc CLI 工具（純 stdlib + 公開 API，本機 / VPS 皆可跑）— 隊上 SP + FA 候選 5-slot Sum 排序 + Rotation gate；不入 production cron。Stage F 一起決命運（退役 / 偵錯 / Phase 6 manual frontend）** |
-| `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse fa_scan_v4 fetchers，idempotent，新進 SP 也可跑） |
+| `daily-advisor/sp_data_fetchers.py` | Savant + MLB Stats API fetcher 模組（`assemble_data` + 4 個 fetcher），供 `_phase6_sp.py` + `backfill_prior_stats_v4.py` 使用。前身為 `fa_scan_v4.py` CLI 工具（issue 004 退役 CLI，留下 fetcher） |
+| `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse `sp_data_fetchers`，idempotent，新進 SP 也可跑） |
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
 | `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
@@ -480,7 +480,6 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   - **Critical path**：002 → 005+006（SP/FA prompt B1）→ 008（spike fixture baseline）→ 009（production cutover）
   - **HITL slice**（需用戶看品質）：005 / 006 / 008 / 009
   - **Cutover 完成後**：移除以下 3 條被涵蓋的 TODO：①「fa_scan_v4.py CLI 命運」②「SP / Batter 框架對稱性檢視」③「SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin」（暫保留以便檢索；issue 009 acceptance 含移除 ① ③ + 重評 ②）
-- [ ] **fa_scan_v4.py CLI 命運**（被 issue 004 涵蓋，cutover 完成才移除）：退役 / ad-hoc 偵錯 / Phase 6 manual frontend 三選一 → 2026-05-06 grill-me 決定為「退役」。
 - [ ] **SP / Batter 框架對稱性檢視**（部分被 B1 cutover 涵蓋）：原 batter Phase 6 multi-agent 上線時觸發 → 2026-05-06 倒序執行先動 SP（基於 lazy 引用 Sum 觀察）。Batter Phase 6 上線時要重評是否仍按原計畫升 batter，或 batter 留 thin（已對稱無需動）。
 - [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（被 issue 005 + 006 涵蓋，cutover 完成才移除）：5 個 prompt 改寫拿掉 Sum + urgency + evaluation tags 引用，master borderline 改 LLM 自判（H3）。詳見 `docs/sp-b1-cutover-design.md` §LLM 層。
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：

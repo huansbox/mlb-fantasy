@@ -67,13 +67,13 @@ def _load_prompt(name: str) -> str:
 def _attach_v4_to_my_roster(my_roster: list[dict]) -> None:
     """Add `savant_v4` dict to each my-team SP entry (mutates in-place).
 
-    Uses fa_scan_v4.assemble_data — one batch fetch for all SP. The savant_v4
-    dict has the 5 v4 Sum inputs (ip_gs/whiff_pct/bb9/gb_pct/xwobacon) plus
-    gate / luck / context fields (g/gs/ip/bbe/xera/era/...).
+    Uses sp_data_fetchers.assemble_data — one batch fetch for all SP. The
+    savant_v4 dict has the 5 v4 Sum inputs (ip_gs/whiff_pct/bb9/gb_pct/xwobacon)
+    plus gate / luck / context fields (g/gs/ip/bbe/xera/era/...).
     """
-    # Lazy import to avoid circular deps at module load (fa_scan_v4 has heavy
-    # network imports we only need when v4 is active)
-    from fa_scan_v4 import assemble_data
+    # Lazy import to avoid circular deps at module load (sp_data_fetchers has
+    # heavy network imports we only need when v4 is active)
+    from sp_data_fetchers import assemble_data
 
     pids = {p["mlb_id"] for p in my_roster if p.get("mlb_id")}
     if not pids:
@@ -89,7 +89,7 @@ def _attach_v4_to_my_roster(my_roster: list[dict]) -> None:
 
 def _attach_v4_to_fa(fa_entries: list[dict]) -> None:
     """Same as _attach_v4_to_my_roster but for FA candidates."""
-    from fa_scan_v4 import assemble_data
+    from sp_data_fetchers import assemble_data
 
     pids = {p["mlb_id"] for p in fa_entries if p.get("mlb_id")}
     if not pids:

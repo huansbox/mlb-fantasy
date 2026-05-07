@@ -192,7 +192,7 @@ def _fake_fa_candidates():
 
 class TestPhase6OrchestratorHappyPath:
     @patch("_multi_agent.subprocess.run", new=_route_subprocess)
-    @patch("fa_scan_v4.assemble_data")
+    @patch("sp_data_fetchers.assemble_data")
     def test_happy_path_no_borderline_no_dissent(self, mock_assemble):
         """Verify orchestrator walks 8 steps when no borderline → action=drop_add."""
         # Lazy import after patches set up
