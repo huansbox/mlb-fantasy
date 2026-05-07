@@ -41,7 +41,7 @@
 - **Punt SV+H**：不為 SV+H 多拿 RP（最多 2 位），但現有 RP 有 SV+H 是加分
 - **軟 Punt SB**：不刻意追速度，靠陣容中有速度的打者偶爾贏
 - **目標**：每週「贏的類別 > 輸的類別」拿 1 W；contested 類別（差距 ≤ 1 場操作能翻）優先搶
-- **串流 SP**：預設不串流。要用時見 [`docs/streaming-sp-playbook.md`](docs/streaming-sp-playbook.md)（mental model / 決策規則 / 操作流程）— 觸發判斷依「Week 中 H2H 決策框架」的 contested 類別 + controllable 變數推算
+- **串流 SP**：預設不串流。要用時見 [`docs/streaming-sp-playbook.md`](docs/streaming-sp-playbook.md)（mental model / 決策規則 / 操作流程）— 觸發判斷依「Week 中 H2H 決策框架」的 contested 類別 + controllable 變數推算。實際操作呼叫 `/stream-sp`（顯式給 ET 日期或讓 skill 列未來 3 天讓你挑），自動跑 probable → FA 篩 → opener 排除 → v4 5-slot 評估
 
 ### Week 中 H2H 決策框架（One Win majority rule）
 
@@ -403,6 +403,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | 事件 | 動作 |
 |------|------|
 | 球員受傷/表現差 | 查 waiver-log.md 有無候選 → 有：`/player-eval` 確認 → 執行。沒有：`/waiver-scan` 找人 → `/player-eval` → 執行 |
+| 週中需要串流補 QS/W/IP | `/stream-sp`（顯式 ET 日期或選未來 3 天）→ 看候選報告 → 用戶 claim（前一天 TW 15:00 前）|
 | Add/Drop 執行後 | 自動：roster_sync.py（cron TW 15:10）偵測 → 更新 config → git push → Telegram 通知 |
 | FAAB 出價 | 更新 roster_config.json 的 faab_remaining + 本文件 FAAB 餘額 |
 | waiver-log.md 觸發條件達成 | `/player-eval` 深入評估 → 決定行動 |
