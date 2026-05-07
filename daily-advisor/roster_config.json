@@ -225,29 +225,6 @@
       }
     },
     {
-      "name": "Carlos Correa",
-      "mlb_id": 621043,
-      "yahoo_player_key": "469.p.9573",
-      "team": "HOU",
-      "positions": [
-        "3B",
-        "SS"
-      ],
-      "selected_pos": "SS",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.338,
-        "barrel_pct": 6.8,
-        "hh_pct": 45.9,
-        "bb_pct": 7.7,
-        "ops": 0.734,
-        "pa_per_team_g": 3.6,
-        "pa": 584,
-        "g": 144
-      }
-    },
-    {
       "name": "Ryan Jeffers",
       "mlb_id": 680777,
       "yahoo_player_key": "469.p.11794",
@@ -276,7 +253,8 @@
       "team": "CIN",
       "positions": [
         "1B",
-        "LF"
+        "LF",
+        "RF"
       ],
       "selected_pos": "BN",
       "status": "",
@@ -290,6 +268,28 @@
         "pa_per_team_g": 3.51,
         "pa": 568,
         "g": 146
+      }
+    },
+    {
+      "name": "Dansby Swanson",
+      "mlb_id": 621020,
+      "yahoo_player_key": "469.p.10234",
+      "team": "CHC",
+      "positions": [
+        "SS"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.345,
+        "barrel_pct": 11.7,
+        "hh_pct": 47.8,
+        "bb_pct": 7.3,
+        "ops": 0.717,
+        "pa_per_team_g": 3.98,
+        "pa": 645,
+        "g": 159
       }
     }
   ],
@@ -367,7 +367,7 @@
         "xwobacon": 0.37
       },
       "selected_pos": "SP",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Aaron Nola",
@@ -416,7 +416,7 @@
         "gb_pct": 49.3,
         "xwobacon": 0.339
       },
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": ""
     },
     {
@@ -450,7 +450,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -476,7 +476,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "SP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -501,7 +501,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "SP",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": null
     },
@@ -548,6 +548,28 @@
         "era": 4.54,
         "ip": 162.7,
         "ip_per_gs": 5.6
+      }
+    },
+    {
+      "name": "Cade Povich",
+      "mlb_id": 700249,
+      "yahoo_player_key": "469.p.60658",
+      "team": "BAL",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 5.44,
+        "xwoba_allowed": 0.356,
+        "hh_pct_allowed": 46.9,
+        "barrel_pct_allowed": 11.3,
+        "bbe": 326,
+        "era": 5.21,
+        "ip": 112.3,
+        "ip_per_gs": 5.2
       }
     }
   ],
