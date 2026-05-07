@@ -12,7 +12,7 @@
 - 05-04：xwOBA P80 / 14d OPS .926 / K% 12.5 控 K 極佳；PA-TG 2.71 連 6 天未達降低後門檻 2.8；31% plateau 窗口收窄中（fa_scan）
 - 05-05：xwOBA P95 / 14d OPS .875 / K% 10.0 控 K 極佳；PA-TG 2.74 連 6 天未達降低後門檻 2.8；40% rising 3d+9 窗口持續收窄（fa_scan）
 - 05-06：PA-TG 2.69 連 8 天未達 2.8 門檻；14d OPS .895 / K% 10.2 控 K 極佳；42% explosive +11 搶人潮加劇窗口收窄中（fa_scan）
-- 05-07：PA-TG 2.70 連 9 天未達 2.8 門檻；14d OPS .800 / K% 14.0 控 K 極佳；43% explosive +12 窗口即將關閉 — 建議降門檻至「任 1 天 PA-TG ≥2.8」或 preempt（fa_scan）
+- 05-07：PA-TG 2.70 連 9 天未達 2.8；14d OPS .800 / K% 14.0 控 K 極佳；43% explosive +12 窗口即將關閉 — 建議降門檻至「任 1 天 PA-TG ≥2.8」或 preempt（fa_scan）
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：Stanton BB% 持續 <P40 至 Week 7 + 14d OPS 未回 .750 → 升級取代
