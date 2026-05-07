@@ -4,14 +4,16 @@
 
 ## Status
 
-🟡 **In progress (2026-05-07)** — infra + #149 fixture ready; capture cron pending; awaiting 6-day fixture accumulation before final spike run.
+🟡 **In progress (2026-05-07)** — infra + #149 fixture + first real capture ready; awaiting 5-day VPS daily accumulation before final spike run.
 
 | Phase | Status | Notes |
 |-------|--------|-------|
 | Spike runner extended (SP step1 + step2 + FA classify + rank) | ✅ | `daily-advisor/_tools/spike_b1_baseline.py` |
 | `fa_scan --capture-payload` flag | ✅ | commit `7603433` |
+| Cron wrapper + auto git push | ✅ | `daily-advisor/cron_capture_payload.sh`, PR #165 |
 | Case 1 fixture (#149 / 2026-05-04) | ✅ | hand-composed; gaps marked `_estimated` / null |
-| Cases 2-7 fixture | ⏳ | VPS daily capture from 2026-05-08 onwards |
+| Case 2 fixture (2026-05-07) | ✅ | first real VPS capture, end-to-end validated |
+| Cases 3-7 fixture | ⏳ | VPS daily capture from 2026-05-08 onwards (target 2026-05-12) |
 | Spike run (M1/M4 measurement) | ⏳ | Trigger after 7 cases |
 | Baseline numbers + thresholds | ⏳ | Mean / std / -1σ |
 | HITL review | ⏳ | User confirms baseline reasonable before issue 009 cutover |
@@ -47,12 +49,12 @@ Per-case cost: **8 claude -p calls** (4 SP + 4 FA). 7-case run ≈ **56 calls** 
 | Date | SP fixture | FA fixture | Provenance | Notes |
 |------|-----------|-----------|------------|-------|
 | 2026-05-04 | ✅ `2026-05-04_sp_step1.json` | ✅ `2026-05-04_fa_classify.json` | Hand-composed from #149 issue body | Sparse (5-slot raw mostly null for non-cited fields); `_estimated` flagged |
-| 2026-05-08 | ⏳ | ⏳ | VPS capture | First daily fixture after VPS deploy |
-| 2026-05-09 | ⏳ | ⏳ | VPS capture | |
-| 2026-05-10 | ⏳ | ⏳ | VPS capture | |
-| 2026-05-11 | ⏳ | ⏳ | VPS capture | |
-| 2026-05-12 | ⏳ | ⏳ | VPS capture | |
-| 2026-05-13 | ⏳ | ⏳ | VPS capture | (target 7 cases total) |
+| 2026-05-07 | ✅ `2026-05-07_sp_step1.json` | ✅ `2026-05-07_fa_classify.json` | VPS manual trigger via wrapper | Full real capture; 4 SP candidates / 8 FA / anchor "Cole Ragans" |
+| 2026-05-08 | ⏳ | ⏳ | VPS daily cron | First scheduled capture |
+| 2026-05-09 | ⏳ | ⏳ | VPS daily cron | |
+| 2026-05-10 | ⏳ | ⏳ | VPS daily cron | |
+| 2026-05-11 | ⏳ | ⏳ | VPS daily cron | |
+| 2026-05-12 | ⏳ | ⏳ | VPS daily cron | (target 7 cases total) |
 
 > #149 reconstruction is the only "known anchor failure" anchor case. Other 6 are random daily snapshots — natural distribution should mix high-consensus and dispute cases.
 
