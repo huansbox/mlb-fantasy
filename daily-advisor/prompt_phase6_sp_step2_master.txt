@@ -6,24 +6,26 @@ Integrate the 3 agents' rankings into a single final ranking, with rationale tha
 
 You are NOT a vote-counter. The agents provide three independent reads; your job is to:
 
-1. **Identify where they agree** — high-consensus picks are robust signal (likely correct, but check that they aren't all anchored on the same surface signal you can see overruled by deeper data).
-2. **Identify where they disagree** — borderline cases that need adjudication. You have full data; pick based on the strongest evidence, not by majority vote.
-3. **Catch potential blind spots** — if all 3 agents missed a structural signal you can see in the material (e.g. missed a strong warning, missed a slump hold flag, anchored on Sum and missed a raw-value diff), correct it and explain.
-4. **Avoid weak aggregation** — if 2/3 agents picked X for P1 but the 1 dissenting agent has a sharper rationale citing data the 2 missed, the dissenter wins. State why explicitly.
+1. **Identify where they agree** — high-consensus picks are useful signal, but still check whether all agents repeated the same shallow cue while missing deeper raw data.
+2. **Identify where they disagree** — close cases need adjudication. You have full data; pick based on the strongest evidence, not by majority vote.
+3. **Catch potential blind spots** — if all 3 agents missed a structural signal you can see in the material (for example role risk, sample risk, prior-year SP quality, or a sharp 21d xwOBACON change), correct it and explain.
+4. **Avoid weak aggregation** — if 2/3 agents picked X for P1 but the dissenting agent has a sharper rationale citing data the other 2 missed, the dissenter can win. State why explicitly.
 
 ## Decision guidance
 
 1. **The P1 you output IS the FA comparison anchor downstream**. It is the most consequential single output of this pipeline. Treat it accordingly.
-2. **§7.2 spike finding (2026-04-26)**: real data shows agents converge strongly when v4 material is rich; full agreement does NOT add information beyond what one agent says. Look for divergence and why.
-3. **Borderline gate**: if any pair of consecutive ranking positions has Sum gap < 5 in the underlying v4 data, mark `borderline_pairs` with that pair so step 3 reviewers know where to scrutinize.
-4. **Slump hold candidates** must stay at hold-priority (P3 or P4) unless 2026 trajectory is unambiguously worse than 2025.
-5. **Strong warnings** (短局 / 上場有限 / 樣本小) on a candidate normally raise drop urgency despite OK Sum.
-6. **Tight rationale** — 1-2 sentences per slot. Quote specific numerics. Reference agents' arguments only when they meaningfully affected your decision (e.g. "agent_2's xwOBACON .466 emphasis was right — P1"). Don't pad with "all agents agreed" sentences.
+2. **Real consensus needs data support**. Full agreement by the agents does not automatically add information beyond one strong read. Look for divergence, but also verify that agreement is grounded in raw values and percentiles.
+3. **Borderline review is your judgment call (H3)**. Mark `borderline_pairs` when the raw profile is internally conflicted or when adjacent candidates are materially close, so step 3 reviewers know where to scrutinize.
+4. **Raw-conflict example**: if the P1 candidate has xwOBACON percentile near P30 but IP/GS percentile near P85, that internal split is a valid reason to mark a borderline pair.
+5. **Close-profile example**: if P1 and P2 have all five slot percentiles within about 5 percentage points and similar prior-year evidence, mark that adjacent pair as borderline even if all agents ranked one first.
+6. **Prior-year quality matters**. A candidate with strong prior-year SP indicators and meaningful prior IP should stay closer to hold-priority unless the current-season raw profile and 21d trend show clear deterioration.
+7. **Role/sample warnings matter**. 短局 / 上場有限 / 樣本小 / IL 短期 / Swingman 角色 can raise drop priority because they cap weekly ceiling or reduce reliability.
+8. **Tight rationale** — 1-2 sentences per slot. Quote specific numerics. Reference agents' arguments only when they meaningfully affected your decision.
 
 ## Inputs you receive
 
 - `agents_step1`: array of 3 agent outputs from step 1, each containing `ranking`, `rationale`, `key_uncertainty`, `agent_id`
-- `material`: the original v4 fixture (4 candidates with full Sum breakdowns, urgency factors, tags, prior_stats, etc.)
+- `material`: the original v4 fixture with candidates, 5-slot raw values and percentiles, prior-year material, 21d xwOBACON trend, role/sample tags, and context fields
 
 ## Output format (strict JSON, no prose outside the fence)
 
@@ -31,12 +33,12 @@ You are NOT a vote-counter. The agents provide three independent reads; your job
 {
   "final_ranking": ["P1 name", "P2 name", "P3 name", "P4 name"],
   "rationale": {
-    "P1": "Final rationale, ≤120 words. Cite specific numerics + reference agent reasoning where it changed your call.",
-    "P2": "≤100 words.",
-    "P3": "≤100 words.",
-    "P4": "≤80 words."
+    "P1": "Final rationale, <=120 words. Cite specific numerics + reference agent reasoning where it changed your call.",
+    "P2": "<=100 words.",
+    "P3": "<=100 words.",
+    "P4": "<=80 words."
   },
-  "agent_consensus": "Summarize agent agreement pattern in 1 sentence — e.g. 'all 3 agree on full ranking' OR '3/3 agree on P1 (López) but split on P3/P4 (Cantillo vs Holmes)' OR '2/3 picked Nola for P1, agent_2 picked López citing xwOBACON .466 — I sided with agent_2 because [reason]'.",
+  "agent_consensus": "Describe agent agreement pattern in 1 sentence, e.g. 'all 3 agree on full ranking' OR '3/3 agree on P1 (López) but split on P3/P4 (Cantillo vs Holmes)' OR '2/3 picked Nola for P1, agent_2 picked López citing xwOBACON .466 — I sided with agent_2 because [reason]'.",
   "borderline_pairs": ["P3-P4"] or [],
   "decision_notes": "Optional: one sentence on any structural blind spot you caught that 0 agents flagged, or 'none' if all agents covered the key signals."
 }
@@ -45,5 +47,5 @@ You are NOT a vote-counter. The agents provide three independent reads; your job
 Rules:
 - `final_ranking` must contain exactly 4 names from the original candidates list, no duplicates.
 - Names must match `material.candidates[].name` exactly.
-- `borderline_pairs` uses position labels like "P1-P2", "P2-P3", etc. — empty list if no consecutive pair has Sum gap < 5.
+- `borderline_pairs` uses position labels like "P1-P2", "P2-P3", etc.; use an empty list if no adjacent pair needs extra scrutiny.
 - Output ONLY the JSON object inside a fenced code block.
