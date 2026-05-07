@@ -1,0 +1,197 @@
+{
+  "_provenance": {
+    "case": "fa-scan #149 (2026-05-04 SP-v4) — FA classify hand-composed for issue 008 baseline spike",
+    "source": "Reconstructed from #149 issue body fa_rank.ranked_top + agent rationale + 2025 SP v4 percentile table in CLAUDE.md",
+    "anchor": "Cole Ragans (master P1 from SP step1; B1 anchor for FA comparison)",
+    "ground_truth_master_top1": "Casey Mize (3/3 worth, Sum diff +9, BB/9 3.19 fixes anchor's worst slot)",
+    "fa_pool_note": "Production #149 had 12 FA candidates. Reconstruction kept 4 with deepest rationale data (Mize / McCullers / Lambert / Fedde). Small pool acceptable for historical baseline; deviation from production scale documented."
+  },
+  "anchor": {
+    "name": "Cole Ragans",
+    "team": "KC",
+    "position": "SP",
+    "selected_pos": "SP",
+    "status": null,
+    "season_v4": {
+      "slots": {
+        "IP/GS": {"raw": 5.0, "percentile": 0, "_estimated": true},
+        "Whiff%": {"raw": 30.7, "percentile": 95},
+        "BB/9": {"raw": 5.85, "percentile": 0},
+        "GB%": {"raw": 36.0, "percentile": 0, "_estimated": true},
+        "xwOBACON": {"raw": 0.455, "percentile": 0}
+      },
+      "context": {"xera": 5.33, "era": 5.29, "bbe": 76, "ip": 30.0, "g": 6, "gs": 6, "k9": 11.4, "whip": 1.55}
+    },
+    "prior_v4": {
+      "ip": null,
+      "slots": {
+        "IP/GS": {"raw": null, "percentile": null},
+        "Whiff%": {"raw": null, "percentile": null},
+        "BB/9": {"raw": 4.5, "percentile": 0, "_estimated": true},
+        "GB%": {"raw": null, "percentile": null},
+        "xwOBACON": {"raw": null, "percentile": null}
+      }
+    },
+    "rolling_21d": {"xwobacon": null, "season_xwobacon": 0.455, "delta": null, "bbe": null},
+    "pa_tags": [],
+    "sample_tags": [],
+    "add_tags": [],
+    "warn_tags": [],
+    "low_confidence": false,
+    "notes": ["Per #149: anchor with structural weakness BB/9 5.85 + xwOBACON .455 dual-year"]
+  },
+  "fa_candidates": [
+    {
+      "name": "Casey Mize",
+      "team": "DET",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": 3.19, "percentile": 25},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        },
+        "context": {"xera": null, "era": null, "bbe": 81, "ip": null, "g": 6, "gs": 6, "k9": null, "whip": null}
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {"xwobacon": 0.288, "season_xwobacon": null, "delta": null, "bbe": 81},
+      "pa_tags": ["✅ 球隊主力"],
+      "sample_tags": [],
+      "add_tags": ["✅ 球隊主力"],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": ["Per #149: Sum diff +9 vs anchor; 21d xwOBACON .288 elite trending confirmed; 6 GS = locked rotation"],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": null
+    },
+    {
+      "name": "Lance McCullers Jr.",
+      "team": "HOU",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": 26.9, "percentile": 60},
+          "BB/9": {"raw": 4.88, "percentile": 0},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        },
+        "context": {"xera": 4.40, "era": 6.32, "bbe": null, "ip": null, "g": 6, "gs": 6, "k9": null, "whip": null}
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {"xwobacon": 0.331, "season_xwobacon": null, "delta": null, "bbe": null},
+      "pa_tags": ["✅ 球隊主力"],
+      "sample_tags": [],
+      "add_tags": ["✅ 球隊主力"],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": ["Per #149: ERA 6.32 vs xERA 4.40 = -1.92 buy-low; BB/9 4.88 mirrors anchor weakness"],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": null
+    },
+    {
+      "name": "Peter Lambert",
+      "team": "COL",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": 5.0, "percentile": 0, "_estimated": true},
+          "Whiff%": {"raw": 33.8, "percentile": 95},
+          "BB/9": {"raw": 4.11, "percentile": 0},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.310, "percentile": 95}
+        },
+        "context": {"xera": null, "era": null, "bbe": 38, "ip": 15, "g": 3, "gs": 3, "k9": null, "whip": null}
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {"xwobacon": null, "season_xwobacon": 0.310, "delta": null, "bbe": null},
+      "pa_tags": [],
+      "sample_tags": ["⚠️ 樣本小"],
+      "add_tags": [],
+      "warn_tags": ["⚠️ 樣本小"],
+      "low_confidence": true,
+      "notes": ["Per #149: BBE 38 / 3 GS / 15 IP = small sample; elite Whiff/xwOBACON ceiling but unverified"],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": null
+    },
+    {
+      "name": "Erick Fedde",
+      "team": "STL",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": null,
+      "season_v4": {
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": 16.9, "percentile": 0},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": 0.300, "percentile": 95}
+        },
+        "context": {"xera": null, "era": null, "bbe": null, "ip": null, "g": null, "gs": null, "k9": 5.94, "whip": null}
+      },
+      "prior_v4": {
+        "ip": null,
+        "slots": {
+          "IP/GS": {"raw": null, "percentile": null},
+          "Whiff%": {"raw": null, "percentile": null},
+          "BB/9": {"raw": null, "percentile": null},
+          "GB%": {"raw": null, "percentile": null},
+          "xwOBACON": {"raw": null, "percentile": null}
+        }
+      },
+      "rolling_21d": {"xwobacon": null, "season_xwobacon": 0.300, "delta": null, "bbe": null},
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": ["Per #149: elite xwOBACON .300 P90+ but Whiff% 16.9 / K/9 5.94 = K-category structural hole"],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": null
+    }
+  ]
+}

@@ -3585,6 +3585,8 @@ def main():
     parser.add_argument("--date", help="Override date YYYY-MM-DD")
     parser.add_argument("--include-inactive", action="store_true",
                         help="Stash mode: keep IL60/NA FA candidates (default: hard-filter)")
+    parser.add_argument("--capture-payload", metavar="DIR",
+                        help="Dump SP step1 + FA classify LLM payloads as spike fixtures (issue 008)")
     args = parser.parse_args()
 
     env = load_env()
