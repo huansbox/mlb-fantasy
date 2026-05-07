@@ -1,0 +1,377 @@
+---
+name: stream-sp
+description: "Fantasy Baseball 串流 SP 候選評估。給定未來 1-3 天的 ET 日期範圍（默認明後天），找出 MLB probable starter 中是聯賽 FA 且非 opener 的真先發，套 v4 5-slot 框架評估值不值得撿來投一場。用戶說「明後天有沒有可串的 SP」「這兩天 FA SP 評估」「ET X/X stream SP」「值得撿哪場」「明天找個 SP 」時觸發。已假設用戶已決定要串流（不做要不要串流的預檢、不算翻盤路徑、不建議 drop 對象、不算 FAAB 預算），只負責找誰可串。不用於主動週級 FA 掃描（那是 /waiver-scan）或評估特定已知球員（那是 /player-eval）。"
+---
+
+# 串流 SP 候選評估 SOP
+
+主動找出指定日期範圍內 MLB probable starter ∩ 聯賽 FA ∩ 真先發的候選，並用 v4 5-slot 框架排序值不值得串。
+
+> **評估標準**：見 `CLAUDE.md`「SP 評估（v4）」段（唯一定義，本 SOP 不複製百分位表 / Sum 算式）。
+> **串流 mental model / 操作時序**：見 `docs/streaming-sp-playbook.md`。
+> **本 skill 不做**：不評估「該不該串流」（用戶呼叫時已決定要串）/ 不建議 drop 對象 / 不算 FAAB 餘額 / 不算翻盤期望。
+
+## Step 0：Pending TBD 處理
+
+Pending file：`daily-advisor/stream-sp-pending.json`（git 追蹤，跨機同步）。
+
+### 0a：讀檔 + 過期清理
+
+```python
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+ET = timezone(timedelta(hours=-4))  # MLB 4-10 月 DST
+TW = timezone(timedelta(hours=8))
+PENDING_PATH = Path("daily-advisor/stream-sp-pending.json")
+
+now_et = datetime.now(TW).astimezone(ET)
+pending = json.loads(PENDING_PATH.read_text()) if PENDING_PATH.exists() else {}
+
+# 過期 = 已過 ET 該日 13:00（第一場開打，串流不可能再來得及）
+expired_keys = []
+for date_key in list(pending.keys()):
+    et_date = datetime.strptime(date_key.replace("ET ", ""), "%Y-%m-%d").replace(tzinfo=ET)
+    threshold = et_date.replace(hour=13)
+    if now_et >= threshold:
+        expired_keys.append(date_key)
+        del pending[date_key]
+```
+
+過期條目直接刪，不留 history。
+
+### 0b：判斷模式（補查 / 重跑 / 忽略 pending）
+
+| 用戶輸入訊號 | 動作 |
+|---|---|
+| `/stream-sp 5/8 --tbd-only` 或「補查 5/8 TBD」「補查 pending」| 直接走補查模式（只跑 pending 對應 ET 日的 TBD 場次）|
+| `/stream-sp 5/8`（顯式日期）+ pending 有該日 | AskUserQuestion：「ET 5/8 上次留 N 場 TBD，要 補查（只跑 TBD）/ 重跑全部 / 忽略 pending」|
+| `/stream-sp` + pending 非空 | AskUserQuestion 同上，但選項加「先看 Step 1b 列出 3 天再決定」|
+| `/stream-sp` + pending 為空 | 直接走 Step 1 |
+
+如有過期清理，主動告知用戶：「清掉 ET {日期} pending（已過 13:00）」。
+
+## Step 1：解析日期範圍
+
+> 補查模式跳過此步（ET 日期已由 Step 0 從 pending file 取得）。
+
+### 1a：若用戶顯式指定 ET 日期
+
+- 用戶說「ET 5/8」「ET 5/7 5/8」「2026-05-08」 → 直接使用，跳到 Step 2
+- 用戶說相對詞「明後天」「明天」「這兩天」**不要直接套 currentDate ± N**（時區語義不穩，TW 用戶的「明天」常等於 ET currentDate 而非 +1）→ 走 1b 讓用戶挑
+
+### 1b：默認 — 列出未來 3 天 ET 比賽日讓用戶挑
+
+從 `currentDate` 起算，查 MLB API schedule 取連續 3 天，每天的場次數 + TBD 數，呈現給用戶選：
+
+```bash
+for offset in 0 1 2; do
+  date=$(date -j -v+${offset}d -f '%Y-%m-%d' '2026-05-07' '+%Y-%m-%d')  # macOS
+  curl -s "https://statsapi.mlb.com/api/v1/schedule?date=$date&sportId=1&hydrate=probablePitcher" \
+    | python3 -c "<count games + TBD>"
+done
+```
+
+呈現給用戶（用 AskUserQuestion）：
+
+```
+ET 2026-05-07：10 場 / 0 TBD
+ET 2026-05-08：15 場 / 8 TBD
+ET 2026-05-09：14 場 / 12 TBD
+```
+
+讓用戶 multiSelect 想評估的日期。**Lineup lock 時序由用戶自行判斷**（本 skill 不算）。
+
+> 為什麼不默認 currentDate + 1：TW 用戶在 TW 早上/中午時，currentDate = TW 今天 ≈ ET 今天，但「今晚要看的 MLB 比賽」是 ET currentDate（= 用戶口中的「明天」）。直接套 +1 會少一天。讓用戶挑可避免時區語義踩雷。
+
+## Step 2：並行抓 probable + FA pool
+
+兩件事無依賴，同訊息一起送。
+
+### 2a：MLB Stats API probable pitchers
+
+對每個目標 ET 日期：
+
+```bash
+curl -s "https://statsapi.mlb.com/api/v1/schedule?date=YYYY-MM-DD&sportId=1&hydrate=probablePitcher" \
+  | python3 -c "<parse 出每場 away/home SP 名 + id + 主客場>"
+```
+
+每場記錄：away team / home team / away SP (id) / home SP (id) / TBD 標記。
+
+**補查模式**：拉到 schedule 後，對照 pending 的 `tbd_games`：
+- 原 TBD 邊現在已公布 starter → 該 starter 進候選池（走 Step 3-7）
+- 原 TBD 邊現在仍 TBD → 跳過，仍保留在 pending
+- pending 沒列的場次 → 跳過（補查不重評非 TBD 的場次）
+
+### 2b：Yahoo FA pool
+
+聯賽全部 available SP（一頁 25，分頁直到取空）：
+
+```bash
+ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && \
+  for s in 0 25 50 75 100 125 150 175 200 225 250 275; do \
+    python3 yahoo_query.py fa -p SP -n 25 --status A --start \$s; \
+    echo '---PAGE---'; \
+  done"
+```
+
+Parse 出 `{name → (team, pos, %owned, status)}`。
+
+## Step 3：篩 FA only
+
+對 Step 2a 每位 probable：
+- 若名字在 Step 2b dict → **FA 候選**
+- 若名字在 `roster_config.json` 的 `pitchers[]` → **本隊**（標註但不評估，無需串流自家）
+- 其他 → **被別隊 own**（過濾掉）
+
+排除 RP（從 yahoo position string 看 `RP only` 過濾）。
+
+## Step 4：並行 v4 5-slot + Sum 自動化（前置短路）
+
+> **設計理由**：v4 Sum 短路放在 opener filter 前，**結構性確認弱（Sum < 15）的候選直接淘汰，不浪費 WebSearch agent**（每次 WebSearch ~50K tokens / 70+ 秒）。對串流 SP 不該有「opener 但 v4 Sum 高」的情感 — Sum < 15 = 五軸全 P25 以下，opener 與否都不串。
+
+對 Step 3 通過的候選，**用 sp_data_fetchers.assemble_data 一次拿全部 5 軸**（不要逐一跑 yahoo_query savant，太慢）：
+
+```bash
+ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"
+import json
+from sp_data_fetchers import assemble_data
+from fa_compute import (
+    compute_sum_score_v4_sp,
+    format_sp_breakdown_human,
+    rotation_gate_v4,
+    luck_tag_v4,
+)
+
+candidates = [{'name': 'Keider Montero', 'id': 672456}, ...]  # 從 Step 3
+ids = [c['id'] for c in candidates]
+data = assemble_data(ids, 2026)
+
+results = []
+for c in candidates:
+    d = data.get(c['id'], {})
+    sum_score, breakdown = compute_sum_score_v4_sp(d)
+    gate_icon, gate_desc = rotation_gate_v4(d.get('g', 0), d.get('gs', 0))
+    luck = luck_tag_v4(d.get('xera'), d.get('era'), d.get('bbe'))
+    results.append({
+        'name': c['name'],
+        'sum': sum_score,
+        'breakdown_score': breakdown,                            # {label: 1-10}
+        'breakdown_pct': format_sp_breakdown_human(breakdown),   # {label: 'P60-70'}
+        'gate': gate_icon,
+        'luck': luck,
+        'raw': d,  # 注意：ip_per_gs / bb_per_9 看 None 是正常 — 詳下方注解
+    })
+
+print(json.dumps(results, indent=2, default=str))
+\""
+```
+
+> **raw None 注解**：`sp_data_fetchers.assemble_data` 不直接回傳 derived `ip_per_gs` / `bb_per_9` 欄位（compute_sum_score_v4_sp 內部從 `ip / gs / walks` 推回）。看 raw 顯示 None 但 breakdown 有分數是預期行為，從 breakdown_pct 看百分位即可。
+
+### 過濾規則
+
+| 條件 | 處理 |
+|---|---|
+| `rotation_gate_v4 == 🚫`（pure-RP / long-relief）| 直接淘汰 |
+| `Sum < 15` | 直接淘汰（結構性確認弱，不走 opener filter）|
+| `Sum ≥ 15` | 進 Step 5 走 opener filter |
+
+**Sum 區間參考**：
+- Sum 5-15：結構性確認弱（hard floor，淘汰）
+- Sum 15-25：偏弱但保留進 opener filter（mixed-role / breakout 候選可能在此）
+- Sum 25-30：邊緣，看單軸 elite
+- Sum ≥ 30：整體菁英軸
+
+> 評分映射見 CLAUDE.md「SP 評估」段（百分位 → 1-10 分）；reverse mapping 見 `fa_compute.score_to_percentile_label`。
+
+## Step 5：Opener 篩選（只跑 Sum ≥ 15 的，規則化 + 自動 WebSearch）
+
+對 Step 4 通過 Sum ≥ 15 的候選查近期 game log：
+
+```bash
+curl -s "https://statsapi.mlb.com/api/v1/people/{id}/stats?stats=gameLog&season={year}&group=pitching" \
+  | python3 -c "<parse 近 6 場 GS / IP>"
+```
+
+### 規則
+
+| 近 6 場樣態 | 判定 | 處理 |
+|---|---|---|
+| 全 GS=0 + 全 IP ≤ 3 | 高度疑似 opener（純 reliever 排成 starter）| **必須 WebSearch 確認** |
+| Mixed (2-3 GS + 2-3 relief) + 平均 IP < 4 | 疑似 piggyback / 限局 | **必須 WebSearch 確認** |
+| 近 5 場 ≥ 4 GS 且每場 IP ≥ 4 | 真先發 | 過關 |
+| 樣本 < 3 場（剛升上來）| 不確定 | **必須 WebSearch 確認** |
+
+### 自動 WebSearch（命中疑似時）
+
+Spawn `general-purpose` agent，prompt 範本：
+
+```
+Search for news about {pitcher_name} ({team}) starting on {ET_date} vs {opponent}.
+
+Determine:
+1. True starter or "opener" (1-2 IP + bulk reliever behind)?
+2. If opener, who is the planned bulk pitcher?
+3. Expected workload / pitch count if known?
+
+Context: {一行近期 game log 摘要說明為什麼疑似}
+
+Search beat reporters, MLB.com, Pitcher List, Fangraphs. Today is {currentDate}.
+Report under 200 words.
+```
+
+WebSearch 結論：
+- **真先發 + 預期 IP ≥ 5** → 過關
+- **Opener / piggyback / 沒拉長 → 預期 IP ≤ 4** → 從候選池移除（QS 機率太低，串流 ROI 差）
+
+也跑 2025 prior（如 BBE ≥ 50 / IP ≥ 50 才有意義）：
+
+```python
+data_2025 = assemble_data(ids, 2025)
+# 用 2025 prior 加 context（雙年雙確認弱 / breakout 候選 / slump hold）
+```
+
+## Step 6：對手 lineup 強度（best-effort）
+
+每位候選對應一個對手隊（從 Step 2a probable 拿）。查對手隊近 14d team offense vs SP 投手手向。
+
+### 嘗試順序
+
+**首選**：MLB Stats API team splits
+
+```bash
+curl -s "https://statsapi.mlb.com/api/v1/teams/{teamId}/stats?stats=byDateRange&group=hitting&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&sportId=1"
+```
+
+抓 14d team OPS / wOBA。Splits vs RHP/LHP 需要額外參數（若 endpoint 不支援，跳到次選）。
+
+**次選**：Fangraphs team splits 頁面 WebFetch
+
+```
+https://www.fangraphs.com/leaders/team?stats=bat&type=14d&pos=all&season={year}&split=12  # vs RHP
+# split=13 = vs LHP（具體參數需現場確認）
+```
+
+讓 Claude 從表格 extract `{team → wRC+}`。
+
+**Fallback**：用全季 team OPS（不分手）+ 加註「未取得 14d split, 用全季粗判」。
+
+### 標註強度
+
+| 對手 14d wRC+ | 標註 |
+|---|---|
+| ≥ 110 | 🔴 強打線 |
+| 95-110 | 🟡 中等 |
+| < 95 | 🟢 弱打線 |
+
+加進候選評估表「對手」欄。
+
+## Step 7：整合報告
+
+### 輸出格式
+
+```markdown
+## ET {日期} probable FA starter 評估
+
+### 已過濾
+- TBD probable: {N} 場（建議 ET-1 day 早上補查）
+  - 列出 TBD 場次：{Team A @ Team B}
+- Owned by 別隊: {N} 位（不列）
+- v4 Sum < 15 hard floor 排除: {N} 位（{name} Sum {n} - 五軸全 P25 以下，跳過 opener filter 直接淘汰）
+- Opener 排除: {N} 位（{name} - {WebSearch 結論摘要}）
+- 本隊已有: {N} 位（不列）
+
+### FA 真先發候選（按 v4 Sum 排序）
+
+| # | SP | 隊 | 對手 | %own | v4 Sum | 5-slot 細節 | 對手 wRC+ | 推/不推 |
+|---|----|---|---|---|---|---|---|---|
+| 1 | Keider Montero | DET | KC 🟢 | 9% | 29/50 | IP/GS P60-70 \| Whiff <P25 \| BB/9 >P90 \| GB <P25 \| xwOBACON >P90 | 88 (14d) | ✅ 推 |
+| ... |
+
+### 推薦理由（每位推薦的）
+
+**{Name}**：
+- v4 結構：{2-3 個 elite 軸點出}
+- 對手：{wRC+ + 強弱}
+- 風險：{IP/GS 短 / Whiff 低 / 雙年低 等}
+- 期望：{IP / K / QS 機率粗估，一句話不量化}
+
+### 不推薦速覽（一句話帶過）
+
+- **{Name}**：{結構性弱 / 對手太硬 / 限局型 — 一行}
+- ...
+
+### TBD 提醒
+
+ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pending.json`。建議 TW {日期} 早上 9-10 點呼叫 `/stream-sp 補查` 或 `/stream-sp {ET 日期} --tbd-only` 只跑這 N 場，不重評其他。
+```
+
+### 報告原則
+
+- 推薦標準：v4 Sum ≥ 25 + 至少 1 個 elite 軸（>P90 或 P80-90）+ 對手不是 🔴 強打 — 三條件至少滿足兩條
+- **不算翻盤期望勝率**（用戶自己判斷對本週類別狀況的影響）
+- **不建議 drop 對象**（用戶自己看當天 fa_scan SP-v4 issue 找 worst SP）
+- **不算 lineup lock 時序**（用戶自己換算）
+- 若全部候選都不推（Sum < 25 或對手全 🔴）→ 明確說「無值得串流的候選」
+
+## Step 8：寫/更新 pending file
+
+讀回 Step 0 載入的 pending dict（過期已清理），更新本次跑的 ET 日期條目：
+
+```python
+from datetime import datetime, timezone, timedelta
+
+TW = timezone(timedelta(hours=8))
+now_tw_iso = datetime.now(TW).isoformat(timespec="seconds")
+
+for et_date in target_dates:  # 本次跑的 ET 日期
+    key = f"ET {et_date}"  # e.g. "ET 2026-05-08"
+    tbd_games = [
+        {"away": g["away_team"], "home": g["home_team"],
+         "away_tbd": g["away_sp_id"] is None,
+         "home_tbd": g["home_sp_id"] is None}
+        for g in schedule[et_date]
+        if g["away_sp_id"] is None or g["home_sp_id"] is None
+    ]
+
+    if key in pending:
+        # 補查：保留原 recorded_at，更新 last_recheck_at + tbd_games
+        pending[key]["last_recheck_at"] = now_tw_iso
+        pending[key]["tbd_games"] = tbd_games
+    else:
+        # 首次：寫 recorded_at
+        pending[key] = {
+            "recorded_at": now_tw_iso,
+            "last_recheck_at": None,
+            "tbd_games": tbd_games,
+        }
+
+    # 若 tbd_games 為空（全部公布了）→ 從 pending 移除
+    if not tbd_games:
+        del pending[key]
+
+PENDING_PATH.write_text(json.dumps(pending, indent=2, ensure_ascii=False))
+```
+
+### Pending file schema
+
+```json
+{
+  "ET 2026-05-08": {
+    "recorded_at": "2026-05-07T10:30:00+08:00",
+    "last_recheck_at": "2026-05-08T09:15:00+08:00",
+    "tbd_games": [
+      {"away": "ATH", "home": "BAL", "away_tbd": true, "home_tbd": true},
+      {"away": "COL", "home": "PHI", "away_tbd": true, "home_tbd": false}
+    ]
+  }
+}
+```
+
+### 不寫進 pending 的情況
+
+- 該 ET 日全部 starter 公布（無 TBD）→ pending 該 key 移除
+- 補查模式 + 仍有 TBD → 保留條目，更新 `last_recheck_at` + 縮減後的 `tbd_games`
