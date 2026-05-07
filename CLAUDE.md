@@ -475,6 +475,10 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
 - [ ] **B1 cutover 進行中**（2026-05-06 啟動，9 個 issues 拆完）：SP Phase 6 對齊 Batter v4 thin。完整脈絡見 `docs/sp-b1-cutover-design.md`，工作隊列 `issues/001-009-*.md`，PRD `issues/prd.md`。
+  - **目前進度（2026-05-07）**：001-007 ✅ merged；008 🟡 infra ✅ + cron wrapper ✅ + case 1-2 fixture（5/4 hand-composed + 5/7 real capture）；009 ⏳ blocked by 008
+  - **Issue 008 剩下的 acceptance**：累積 case 3-7（VPS daily cron 5/8-5/12 自動跑）→ 跑 `_tools/spike_b1_baseline.py`（56 LLM calls）→ 填 baseline mean/std/-1σ 進 `docs/sp-b1-baseline.md` → HITL review
+  - **最早能動 issue 009 的時間**：5/12 之後（7 case 累積完 + spike 跑完 + 你 HITL 通過 baseline 數字）。**5/8-5/11 期間 session 不要直接動 009**，要動先看 `docs/sp-b1-baseline.md` Status 段是否從 🟡 翻 ✅
+  - **5/8-5/12 每天健康檢查**：`ssh root@107.175.30.172 "ls /opt/mlb-fantasy/daily-advisor/_tools/fixtures/b1_baseline/$(date +%Y-%m-%d)*"` → 沒檔就查 `/var/log/fa-scan-capture.log`
   - **動 SP / Phase 6 / fa_compute / _phase6_sp / 5 個 sp prompt / fa_scan_v4 之前**：先讀 `issues/` 看是否有相關 in-flight slice，避免衝突
   - **Day-1 可並行起跑**：001（SP Sum≥40 hard filter）/ 002（payload_slimmer 抽深模組）/ 003（metrics_emitter）/ 004（fa_scan_v4.py 退役）— 4 個無 blocker
   - **Critical path**：002 → 005+006（SP/FA prompt B1）→ 008（spike fixture baseline）→ 009（production cutover）
