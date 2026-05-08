@@ -489,7 +489,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（被 issue 005 + 006 涵蓋，cutover 完成才移除）：5 個 prompt 改寫拿掉 Sum + urgency + evaluation tags 引用，master borderline 改 LLM 自判（H3）。詳見 `docs/sp-b1-cutover-design.md` §LLM 層。
 - [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
   - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
-  - finding D：`fa_scan.py:683` `_calc_batter_sum`（Layer 2 filter）與 `fa_compute.py compute_sum_score` 雙重實作 batter Sum → 統一使用 fa_compute（要小心 input dict shape 略不同）
+  - ~~finding D~~：✅ 2026-05-08 完成（commit `a94cf2f`，Layer 2 filter 改呼叫 `fa_compute.compute_sum_score`，同步刪除 fa_scan 重複的 `_calc_batter_sum` / `_metric_to_score`）
   - ~~finding E~~：✅ 2026-04-26 完成（commit `95c9713`，`--no-send` mode `print(advice, flush=True)`）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
