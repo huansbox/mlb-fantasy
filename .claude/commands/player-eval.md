@@ -226,8 +226,8 @@ WebSearch: "{球員名} ERA FIP K% fastball velocity year by year"
 
 | 流程 | 職責 | 對打者的處理 |
 |------|------|------------|
-| fa_scan（自動）| 批量篩選 + drop 排序 | Layer 2 Sum≥21 → Pass 1 最弱 4 人 → Pass 2 urgency + ✅/⚠️ tags |
-| /player-eval（手動）| 單點深入 + 陣容脈絡 | 同樣 Sum / urgency / tags **+** 守位/角色/單點故障/邊際遞減 |
+| fa_scan（自動）| 批量篩選 + drop 排序 | v4 thin：Sum≥25 排除 → 全候選池（不限 4 人 cap）→ LLM 自由 reasoning + ✅/⚠️ PA-based tags |
+| /player-eval（手動）| 單點深入 + 陣容脈絡 | 同上 + 新聞層 / 多年 trend / age 老化區 / decisive signal 掃描 / 守位 / 單點故障 / 邊際遞減 |
 
 → `/player-eval` **完整套用 fa_scan 的評估規則**（保證一致），再加 fa_scan **不做**的陣容脈絡判斷。
 

@@ -568,6 +568,8 @@ def _savant_custom_batter(query: str, year: int):
         rows = list(csv.DictReader(io.StringIO(text)))
         match = _match_player(rows, query)
         if not match:
+            print(f"  Savant custom: player not found for '{query}' ({year})",
+                  file=sys.stderr)
             return None
         return {
             "launch_angle": _safe_float(match.get("launch_angle_avg")),
@@ -720,10 +722,12 @@ def cmd_savant(args):
                 data["bb_pct"] = _fetch_batter_bb_pct(pid, year) if pid else None
                 # Deep signals (LA / EV / Whiff% / Chase% / xSLG / xBA) from
                 # the custom endpoint surface age/mechanic decay invisible to
-                # the v4 thin core.
+                # the v4 thin core. Filter out None so partial schema drift
+                # surfaces as missing line items rather than silently zeroing
+                # the whole deep line.
                 deep = _savant_custom_batter(query, year)
                 if deep:
-                    data.update(deep)
+                    data.update({k: v for k, v in deep.items() if v is not None})
                 _print_savant_line(label, data, "batter")
             else:
                 print(f"  {label}: no data found")
