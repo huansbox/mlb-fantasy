@@ -547,6 +547,41 @@ def _fetch_batter_bb_pct(pid: int, year: int):
         return None
 
 
+def _savant_custom_batter(query: str, year: int):
+    """Deep Savant signals for a batter via the custom leaderboard endpoint.
+
+    Returns dict with launch_angle / exit_velocity / whiff_pct / chase_pct /
+    xslg / xba (None on missing fields) or None if the player is not found.
+
+    Surfaces age-related decline and swing-mechanic breaks that the v4 thin
+    core (xwOBA / BB% / Barrel%) cannot — e.g. launch_angle dropping ≥10°
+    year-over-year is a structural-decay signature.
+    """
+    url = (
+        "https://baseballsavant.mlb.com/leaderboard/custom"
+        f"?year={year}&type=batter&filter=&min=q"
+        "&selections=launch_angle_avg,exit_velocity_avg,whiff_percent,"
+        "oz_swing_percent,xslg,xba&csv=true"
+    )
+    try:
+        text = _fetch_savant_csv(url)
+        rows = list(csv.DictReader(io.StringIO(text)))
+        match = _match_player(rows, query)
+        if not match:
+            return None
+        return {
+            "launch_angle": _safe_float(match.get("launch_angle_avg")),
+            "exit_velocity": _safe_float(match.get("exit_velocity_avg")),
+            "whiff_pct": _safe_float(match.get("whiff_percent")),
+            "chase_pct": _safe_float(match.get("oz_swing_percent")),
+            "xslg": _safe_float(match.get("xslg")),
+            "xba": _safe_float(match.get("xba")),
+        }
+    except Exception as e:
+        print(f"  Savant custom CSV error ({year}): {e}", file=sys.stderr)
+        return None
+
+
 def _fmt_pct(value, fmt: str) -> str:
     """Format a numeric metric with given fmt string, dash if None."""
     if value is None:
@@ -621,6 +656,26 @@ def _print_savant_line(label, data, player_type):
         parts.append(f"BBE {data['bbe']}")
     print("  " + " | ".join(parts))
 
+    # Batter deep-signal line: raw values without percentile tags — agent
+    # reasons from cross-year comparison (e.g. launch angle 17.7° → 5.5° as
+    # a swing-mechanic collapse signature).
+    if player_type == "batter":
+        deep_parts = []
+        if data.get("xslg") is not None:
+            deep_parts.append(f"xSLG {data['xslg']:.3f}")
+        if data.get("xba") is not None:
+            deep_parts.append(f"xBA {data['xba']:.3f}")
+        if data.get("launch_angle") is not None:
+            deep_parts.append(f"LA {data['launch_angle']:.1f}°")
+        if data.get("exit_velocity") is not None:
+            deep_parts.append(f"EV {data['exit_velocity']:.1f} mph")
+        if data.get("whiff_pct") is not None:
+            deep_parts.append(f"Whiff% {data['whiff_pct']:.1f}%")
+        if data.get("chase_pct") is not None:
+            deep_parts.append(f"Chase% {data['chase_pct']:.1f}%")
+        if deep_parts:
+            print("    " + " | ".join(deep_parts))
+
 
 def cmd_savant(args):
     """Look up a player's Statcast data from Baseball Savant CSV.
@@ -663,6 +718,12 @@ def cmd_savant(args):
                 # the key so the print line shows '—' rather than omitting on
                 # fetch failure.
                 data["bb_pct"] = _fetch_batter_bb_pct(pid, year) if pid else None
+                # Deep signals (LA / EV / Whiff% / Chase% / xSLG / xBA) from
+                # the custom endpoint surface age/mechanic decay invisible to
+                # the v4 thin core.
+                deep = _savant_custom_batter(query, year)
+                if deep:
+                    data.update(deep)
                 _print_savant_line(label, data, "batter")
             else:
                 print(f"  {label}: no data found")
