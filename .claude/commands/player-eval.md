@@ -83,7 +83,10 @@ WebSearch: "{球員名} age born {球員所屬球隊}"
 python daily-advisor/yahoo_query.py savant "{球員名}"
 ```
 
-> 回傳 2025 + 2026 的 xwOBA / **BB%** / HH% / Barrel% / BBE，不需 Yahoo auth。
+> 回傳 2025 + 2026 **兩行**，不需 Yahoo auth：
+> - **第一行（v4 thin core）**：xwOBA / **BB%** / HH% / Barrel% / BBE，含百分位 tag — 一般評估用
+> - **第二行（deep signals）**：LA（launch angle）/ EV（exit velocity）/ Whiff% / Chase% / xSLG / xBA，raw 值無百分位 — 老化區 / Savant 訊號異常 / Step 3.5 decisive signal 掃描時用，**跨年比較看結構性變化**（如 Altuve LA 17.7°→5.5° = swing 機制崩）
+>
 > BB% 從 MLB Stats API 抓（Savant CSV 無此欄位），fetch 失敗顯示 `—`。
 > 名字支援模糊匹配（Jesús = Jesus）。
 
