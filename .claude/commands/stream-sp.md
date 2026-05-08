@@ -13,33 +13,19 @@ description: "Fantasy Baseball 串流 SP 候選評估。給定未來 1-3 天的 
 
 ## Step 0：Pending TBD 處理
 
-Pending file：`daily-advisor/stream-sp-pending.json`（git 追蹤，跨機同步）。
+Pending file：`daily-advisor/stream-sp-pending.md`（git 追蹤，跨機同步；markdown 格式，AI 讀寫，schema 見 Step 8）。
 
 ### 0a：讀檔 + 過期清理
 
-```python
-import json
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
+1. **讀檔**：Read `daily-advisor/stream-sp-pending.md`（不存在 → 視為空，跳過清理）
+2. **取當前 ET 時間**：TW now → ET（UTC-4，MLB 4-10 月 DST）
+3. **對檔內每個 `## ET YYYY-MM-DD` H2 section**：
+   - 解析 ET 日期
+   - 過期門檻 = ET 該日 13:00（第一場開打，串流不可能再來得及）
+   - 若 `now_et ≥ 門檻` → 用 Edit 刪整個 H2 section（從該 H2 到下一個 `## ` 標題前；包含其下所有 `### TBD 場次` / `### 已評估` / `### 備註` 子段）
+4. **若有清理**：主動告知用戶「清掉 ET {日期} pending（已過 13:00）」
 
-ET = timezone(timedelta(hours=-4))  # MLB 4-10 月 DST
-TW = timezone(timedelta(hours=8))
-PENDING_PATH = Path("daily-advisor/stream-sp-pending.json")
-
-now_et = datetime.now(TW).astimezone(ET)
-pending = json.loads(PENDING_PATH.read_text()) if PENDING_PATH.exists() else {}
-
-# 過期 = 已過 ET 該日 13:00（第一場開打，串流不可能再來得及）
-expired_keys = []
-for date_key in list(pending.keys()):
-    et_date = datetime.strptime(date_key.replace("ET ", ""), "%Y-%m-%d").replace(tzinfo=ET)
-    threshold = et_date.replace(hour=13)
-    if now_et >= threshold:
-        expired_keys.append(date_key)
-        del pending[date_key]
-```
-
-過期條目直接刪，不留 history。
+過期條目直接刪，不留 history。備註段（free-form 用戶手寫）也一併清掉。
 
 ### 0b：判斷模式（補查 / 重跑 / 忽略 pending）
 
@@ -271,6 +257,18 @@ https://www.fangraphs.com/leaders/team?stats=bat&type=14d&pos=all&season={year}&
 
 ## Step 7：整合報告
 
+### 補查模式：合併呈現舊 evaluations + 新評
+
+**僅補查模式（Step 0b 走補查模式 + 該 ET 日有舊 pending）才執行此段**：
+
+1. 從 pending file 讀回該 ET 日 `### 已評估` 表格的 row（舊評）。**「舊評」嚴格僅指此表格內容，不含上次或當次報告的「已過濾」段（Sum<15 hard floor / Rotation gate / Owned 別隊 / Owned 自家）**。已過濾的候選不持久化、不帶回 — 它們是結構性結論，補查時新評同樣的 filter 邏輯會再排除一次。
+2. 新評的 row 在 SP 名前面加 `🆕` 標記
+3. 合併新舊兩份清單，按 v4 Sum26 由高到低排序
+4. 在主表「FA 真先發候選」中合併呈現（**不分舊/新兩段**，只用 🆕 標記區分）
+5. 報告開頭加一行：「補查 ET {日期}：新評 {N} 位（🆕 標記），舊評 {M} 位帶回」
+
+非補查模式（首次評估該 ET 日 / 重跑模式）跳過此段。重跑模式 Step 7 純走首次評估邏輯。
+
 ### 輸出格式
 
 ```markdown
@@ -306,7 +304,7 @@ https://www.fangraphs.com/leaders/team?stats=bat&type=14d&pos=all&season={year}&
 
 ### TBD 提醒
 
-ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pending.json`。建議 TW {日期} 早上 9-10 點呼叫 `/stream-sp 補查` 或 `/stream-sp {ET 日期} --tbd-only` 只跑這 N 場，不重評其他。
+ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pending.md`。建議 TW {日期} 早上 9-10 點呼叫 `/stream-sp 補查` 或 `/stream-sp {ET 日期} --tbd-only` 只跑這 N 場，不重評其他。
 ```
 
 ### 報告原則
@@ -319,59 +317,68 @@ ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pen
 
 ## Step 8：寫/更新 pending file
 
-讀回 Step 0 載入的 pending dict（過期已清理），更新本次跑的 ET 日期條目：
+對本次跑的每個 ET 日期，更新 `daily-advisor/stream-sp-pending.md`。AI 直接用 Read/Write/Edit 操作 markdown，不走 Python json。
 
-```python
-from datetime import datetime, timezone, timedelta
+### 8a：Schema 範本（每個 ET 日期一個 H2 section）
 
-TW = timezone(timedelta(hours=8))
-now_tw_iso = datetime.now(TW).isoformat(timespec="seconds")
+```markdown
+## ET 2026-05-10
+- recorded_at: 2026-05-08T18:00:00+08:00
+- last_recheck_at: —
 
-for et_date in target_dates:  # 本次跑的 ET 日期
-    key = f"ET {et_date}"  # e.g. "ET 2026-05-08"
-    tbd_games = [
-        {"away": g["away_team"], "home": g["home_team"],
-         "away_tbd": g["away_sp_id"] is None,
-         "home_tbd": g["home_sp_id"] is None}
-        for g in schedule[et_date]
-        if g["away_sp_id"] is None or g["home_sp_id"] is None
-    ]
+### TBD 場次（待補查）
+- TB @ BOS (BOS home TBD)
+- COL @ PHI (PHI home TBD)
+- DET @ KC (both TBD)
 
-    if key in pending:
-        # 補查：保留原 recorded_at，更新 last_recheck_at + tbd_games
-        pending[key]["last_recheck_at"] = now_tw_iso
-        pending[key]["tbd_games"] = tbd_games
-    else:
-        # 首次：寫 recorded_at
-        pending[key] = {
-            "recorded_at": now_tw_iso,
-            "last_recheck_at": None,
-            "tbd_games": tbd_games,
-        }
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Cade Cavalli | WSH | MIA (.618) | 20% | 25/31 | <P25·P70-80·<P25·P50-60·**P80-90** | ✅ 強推 | Whiff/xwOBACON 雙菁英 + 對手最弱 |
+| Chris Bassitt | BAL | ATH (.780) | 13% | 18/28 | <P25·<P25·<P25·P70-80·P60-70 | ❌ 不推 | 5 軸 3 <P25 + 對手最硬 |
 
-    # 若 tbd_games 為空（全部公布了）→ 從 pending 移除
-    if not tbd_games:
-        del pending[key]
-
-PENDING_PATH.write_text(json.dumps(pending, indent=2, ensure_ascii=False))
+### 備註
+_（free-form 區，用戶可手寫「已 claim X $3」「想下週再評估 Y」等註記。AI 讀進來但不主動覆寫。）_
 ```
 
-### Pending file schema
+### 8b：寫入規則
 
-```json
-{
-  "ET 2026-05-08": {
-    "recorded_at": "2026-05-07T10:30:00+08:00",
-    "last_recheck_at": "2026-05-08T09:15:00+08:00",
-    "tbd_games": [
-      {"away": "ATH", "home": "BAL", "away_tbd": true, "home_tbd": true},
-      {"away": "COL", "home": "PHI", "away_tbd": true, "home_tbd": false}
-    ]
-  }
-}
-```
+對應 Step 0b 三種輸入模式（補查 / 重跑全部 / 忽略 pending）+ pending file 是否已有該 ET 日 H2 section：
 
-### 不寫進 pending 的情況
+- **首次評估該 ET 日**（pending file 沒有此 H2 section）：
+  - 用 Edit / Write 在檔尾 append 整個 H2 section
+  - `recorded_at` = 當下 TW ISO 時間（精確到秒），`last_recheck_at` = `—`
+  - TBD 場次 + 已評估表格寫入，備註留空提示文字
 
-- 該 ET 日全部 starter 公布（無 TBD）→ pending 該 key 移除
-- 補查模式 + 仍有 TBD → 保留條目，更新 `last_recheck_at` + 縮減後的 `tbd_games`
+- **補查模式**（已存在該 ET 日 H2 section + Step 0b 走補查）：
+  - 用 Edit 更新 `last_recheck_at` 為當下 TW ISO 時間，`recorded_at` 保留原值
+  - 用 Edit 替換 TBD 場次列表（剩下還沒公布的）
+  - 用 Edit 在已評估表格 append 新評 row。**Dedup 規則**：append 前先掃表格是否已有同 SP 名 row（用 SP 名作 key），**有則 Edit 覆寫該行**（保留位置不重排，更新成本次新評的數值），**無才 append 在表尾**。避免同投手在不同 run 出現重複行。
+  - 備註段保留原樣不動
+
+- **重跑模式**（已存在該 ET 日 H2 section + Step 0b 走「重跑全部」或「忽略 pending」）：
+  - 用 Edit 整段替換 H2 section 內容：
+    - `recorded_at` 保留原值（語義 = 該 ET 日初次寫入時間，不重置）
+    - `last_recheck_at` 更新為當下 TW ISO 時間
+    - TBD 場次列表 + 已評估表格 **完全用本次新評取代**（不 append 舊 row、不 dedup，整個 reset）
+  - 備註段保留原樣不動
+
+- **TBD 完全公布**（list 變空 + 走補查/重跑且本次跑完無 TBD 剩）：刪除整個 H2 section（包含 evaluations + 備註，因為決策週期結束）
+
+### 8c：哪些評估會寫入
+
+只寫入 **Step 4 通過 Sum ≥ 15 + Rotation gate 過** 且走完 Step 5-6 的候選（推薦 ✅ + 不推薦 ❌ 都寫，確保補查時能對照優劣）。
+
+**不寫入**：
+- Sum < 15 hard floor 排除
+- Rotation gate 排除（pure-RP / long-relief）
+- 上述兩類是結構性結論，補查時新評同樣會走這兩個 filter，無需保留歷史
+
+### 8d：TBD 場次格式
+
+每行一場 TBD：
+- `AWAY @ HOME (AWAY away TBD)` — 客場 SP TBD
+- `AWAY @ HOME (HOME home TBD)` — 主場 SP TBD
+- `AWAY @ HOME (both TBD)` — 兩邊都 TBD
+
+補查模式對照新 schedule 的 diff 邏輯：對檔內每行 TBD 找對應今日 schedule 的場次，原 TBD 邊現在公布 starter 即視為「該 starter 進候選池」走 Step 3-7，並從 TBD list 移除。
