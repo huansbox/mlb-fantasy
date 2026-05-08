@@ -51,6 +51,27 @@ python daily-advisor/yahoo_query.py player "{球員名}"
 
 > ⚠️ **平行執行注意**：多個 player-eval agent 同時跑時，各 agent 不要自行寫入 waiver-log.md（會衝突）。改為在結論中列出建議的 log 更新內容，由主 session 統一寫入。單獨執行時正常寫入。
 
+### Step 1.0a：Age 與老化區檢查（必做）
+
+`roster_config.json` 不存 age — 從 `yahoo_query.py player` 回傳或 WebSearch 補查：
+
+```
+WebSearch: "{球員名} age born {球員所屬球隊}"
+```
+
+**老化區門檻**（觸發後續深查步驟）：
+
+| 球員類型 | 老化區門檻 | 老化區行為 |
+|----------|----------|-----------|
+| 打者 | age ≥33 | 觸發 Step 1.3 多年趨勢線 + Step 1.1b 老化軸新聞搜尋 |
+| SP | age ≥32 | 觸發 Step 1.3 多年趨勢線 + Step 1.1b velocity / IP 限縮新聞 |
+| RP | age ≥34 | 觸發 Step 1.1b 角色變動 / role demote 新聞 |
+
+**不在老化區**：略過 Step 1.3 + 老化軸搜尋（避免 over-search）。
+
+> 為什麼要查 age：fantasy 評估裡 age 是「結構性 vs slump」分流的核心變數 — 25 歲 14d OPS .437 = 等回歸（slump），35 歲 14d OPS .437 = 加速跳水（age-related decline）。同一 14d 數據兩種解讀，差別在 age。
+> 教訓：曾因不查 age 把 35 歲 Altuve 14d 崩盤誤讀為短期 slump。
+
 **隊上球員比較基準**：跑 `roster_stats.py --season {今年}` 取全隊當季 + 前一年 Savant 數據。
 ⚠️ **不可只靠 `roster_config.json` 的 prior_stats**（那只有去年數據，無法反映當季 breakout 或衰退）。
 
@@ -84,19 +105,43 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 
 **Step 1.1b：近期新聞（必做，非補充）**
 
+**通用層**（必做）：
 ```
 WebSearch: "{球員名} {今年} news injury role lineup"
 ```
 
 > 必須確認：健康狀態、打序角色、上場時間前景（platoon？傷兵回歸後 PA 縮減？）
-> 教訓：Hicks 的 platoon 限制 + Morel/Stowers 回歸後 PA 預計縮減、Woodruff 的局數受限 — 都是新聞才能發現的資訊，直接影響結論。
+
+**條件觸發層**（依 Step 1.0a 老化區 + Step 1.1 Savant 訊號決定）：
+
+| 觸發條件 | 搜尋詞模板 | 目的 |
+|----------|----------|------|
+| 老化區（age ≥33）| `{球員名} struggles velocity fastball decline {今年}` | 抓 age-related decline 訊號（對速球弱、bat speed 衰退）|
+| Savant 訊號異常（launch angle / Whiff% 跨年跳動 / xSLG 與 Barrel% 矛盾）| `{球員名} swing mechanic adjustment launch angle {今年}` | 抓 swing 機制變化（受傷？角度調整失敗？）|
+| PA-TG 變動 / 打序變動 | `{球員名} batting order demoted promoted {今年}` | 抓角色脈絡變化 |
+
+> 通用層每次都做。條件觸發層只在對應 trigger 滿足時做（避免 over-search）。
+> 教訓：Hicks 的 platoon 限制 + Morel/Stowers 回歸後 PA 預計縮減 — 通用層搜尋抓得到。
+> 教訓：Altuve 通用搜尋只抓到 lineup change，但「對速球 .242 / SLG .323」這條 aging signal 要靠老化軸 `struggles velocity fastball` 才挖到 — 沒老化軸搜尋會漏掉決定性訊號。
 
 **Step 1.2：WebSearch 補充**
 
 1. `{球員名} {去年} stats batting` → 取得 OPS / HR / SB / BB%
 2. `{球員名} position eligibility yahoo fantasy` → Yahoo 守位資格（Step 1.0 未取得時）
 
-**必須取得（不可用「大概」代替）**：xwOBA、Barrel%、BB%、HH%、OPS、HR、上場場次、守位資格、PA/BBE（樣本量）
+**Step 1.3：多年趨勢線（Step 1.0a 老化區觸發才做）**
+
+```
+WebSearch: "{球員名} wRC+ OPS+ career year by year"
+```
+
+> 拉 3-4 年 wRC+ 或 OPS+，確認是否 monotone decay。
+> 區分 slump（短期 noise）vs age-related decline（結構性下行）：
+> - 連 3+ 年 wRC+ 單調下降 → decline curve confirmed，drop 證據強化
+> - 起伏但無趨勢 → 仍是 slump 候選
+> 教訓：Altuve wRC+ 164→154→127→113→2026 崩 = 4 年 decay curve，與「14d slump 等回歸」結論完全相反。
+
+**必須取得（不可用「大概」代替）**：xwOBA、Barrel%、BB%、HH%、OPS、HR、上場場次、守位資格、PA/BBE（樣本量）；老化區另需 age + 多年 wRC+/OPS+
 
 ### 投手 — 資料蒐集
 
@@ -113,16 +158,37 @@ python daily-advisor/yahoo_query.py savant "{球員名}"
 
 **Step 1.1b：近期新聞（必做，非補充）**
 
+**通用層**（必做）：
 ```
 WebSearch: "{球員名} {今年} news injury rotation role"
 ```
 
 > 必須確認：健康狀態、輪值順位、IP 限制、角色穩定性
-> 教訓：Woodruff「多數先發間隔 5 天以上 + 主要目標是季末健康」= IP 天花板受限，直接影響 IP 產量評估；Detmers「GM 背書回歸先發」= SP 定位確認。
+
+**條件觸發層**（依 Step 1.0a 老化區 + Step 1.1 Savant 訊號決定）：
+
+| 觸發條件 | 搜尋詞模板 | 目的 |
+|----------|----------|------|
+| 老化區（SP age ≥32）| `{球員名} fastball velocity decline arm strength {今年}` | 抓速球球速下滑（K% 跟著掉的前驅訊號）|
+| Savant 訊號異常（Whiff% 跨年降 / xwOBACON 跨年升 / GB% 跨年掉）| `{球員名} pitch mix change mechanics adjustment {今年}` | 抓配球或機制調整（手感變動）|
+| IP/Team_G 偏低 | `{球員名} innings limit workload management {今年}` | 抓 IP 天花板訊號 |
+
+> 通用層每次都做。條件觸發層只在對應 trigger 滿足時做（避免 over-search）。
+> 教訓：Woodruff「多數先發間隔 5 天以上 + 主要目標是季末健康」= IP 限縮（IP/Team_G 軸抓得到）；Detmers「GM 背書回歸先發」= SP 定位確認（通用層）。
 
 **Step 1.2：WebSearch 補充**
 
 1. `{球員名} {去年} stats ERA WHIP strikeouts innings` → 完整投球數據
+
+**Step 1.3：多年趨勢線（Step 1.0a 老化區觸發才做）**
+
+```
+WebSearch: "{球員名} ERA FIP K% fastball velocity year by year"
+```
+
+> 拉 3-4 年 ERA / FIP / K% / fastball velocity（mph）— SP age-related 殺手訊號。
+> 重點：fastball velocity 連年下降 → K% 跟著掉是常見路徑（Whiff% 也會跟著降）。
+> 區分：連年 K% 下降 + velocity 下降 → decline confirmed；ERA 起伏但 K% 穩 → 仍 slump 候選。
 
 **必須取得**：
 - **SP**：v4 5-slot（IP/GS / Whiff% / BB/9 / GB% / xwOBACON）+ xERA / ERA / WHIP / K/9 / 球隊名（判斷 W 支援）/ BBE（樣本量）
@@ -247,13 +313,22 @@ python -c "..." # 用 /api/v1/people/{id}/stats?stats=gameLog&season=2026&group=
 
 **3.2 — 自由 reasoning 判斷**（不卡 binary matrix）
 
-從 raw + 14d + %owned + prior 判斷球員定位：
-- 結構性弱（雙年雙低）→ drop 候選
-- Slump hold（雙年高，當季低）→ 不急 cut，等樣本回歸
-- BABIP 噪音（Savant 好 + Trad 差）→ buy-low
-- 賣高窗口（Trad 好 + Savant 差）→ trade value 最大化但結構不佳
-- 14d 火燙但 season Sum 低 → 賣低風險，hold
-- K% 短期跳 +5pp 以上 → 傷勢警訊
+**優先讀 fa_scan 最新報告**該球員段落：
+
+```bash
+gh issue list -R huansbox/mlb-fantasy --label fa-scan --limit 5
+gh issue view <N> -R huansbox/mlb-fantasy  # 最新打者報告
+```
+
+fa_scan 已對隊上球員 + FA 池跑完 v4 thin reasoning（結構性弱 / slump hold / BABIP 噪音 / 賣高窗口 / 14d 火燙 / K% 跳動 全部覆蓋）— 不重複該層。
+
+**player-eval 在 fa_scan 之上補的層**（這才是 player-eval 獨有價值）：
+- **新聞層**（Step 1.1b 通用 + 條件觸發軸）— fa_scan LLM 無 web tool
+- **多年 trend line**（Step 1.3，老化區觸發）— fa_scan 只看當季 + 前一年
+- **Age + 老化區檢查**（Step 1.0a）— fa_scan 不查 age
+- **Decisive signal 掃描**（Step 3.5）— fa_scan 是 single-pass 不迭代
+
+**fa_scan 池外的球員**（trade target 不在 FA、剛升上來不在報告）才需 player-eval 自己跑 reasoning — 規則參考 CLAUDE.md「球員評估框架」。
 
 **3.3 — PA-based gate**（v4 thin 唯一保留 binary tag）
 
@@ -295,6 +370,42 @@ python -c "..." # 用 /api/v1/people/{id}/stats?stats=gameLog&season=2026&group=
 - 高 owned（>80%）+ Savant 好 → 市場認知正確，不太可能 FA 撿到
 - 低 owned（<30%）+ Savant 好 → 市場低估，buy-low 機會（Detmers 27% 模式）
 - Owned% 反映「其他 GM 怎麼看（傳統數據視角）」，不是品質指標
+
+**⚠️ Brand bias 警示**（高 owned + 結構崩 = market lag）
+
+評估隊上球員命中以下任一項時，**必須在結論中明確警示 brand bias，不得讓 owned% 拖延 drop 決定**：
+
+- 高 owned% (>80%) + Savant 結構崩（雙年雙低 / launch angle 暴跌 / 對速球結構弱）
+- 高 owned% (>80%) + 多年 wRC+ / OPS+ 連 3+ 年單調下降
+- 高 owned% (>80%) + 14d Savant Δ ≤-0.080 連 5+ 天
+
+**判讀**：
+- Owned% 是「其他 GM 對 brand 的延遲認知」，不是「球員當前價值」— 市場資訊延遲 1-2 週
+- 90+ % owned **不是 hold 理由** — 市場修正後下週 ownership 會跳到 60%，且 FA 池當週的替代品也被搶走
+- 經典偏誤語言：「他應該回得來」「下週可能反彈」「換掉他怕後悔」「他畢竟是 X 屆 MVP / 全壘打王」— 都是 brand inertia 不是分析
+
+**反向**：低 owned (<30%) + 結構強 = market 還沒注意到，buy-low 窗口在開（搶在熱點起來前）
+
+> 教訓：曾因 9x% owned Altuve 14d OPS .437 + launch angle 17.7°→5.5° + 4 年 wRC+ 連跌（164→154→127→113）仍猶豫 drop — owned% 是雜訊不是信號，brand bias 是最常見偏誤。
+
+## Step 3.5：決定性訊號掃描（避免初判固化）
+
+Step 3 出初判後，掃描以下 **decisive signals** — 命中任一項要明確升級/降級結論，不得停留在「多選項並列」：
+
+| Decisive signal | 條件 | 應觸發的結論修正 |
+|----------------|------|----------------|
+| 多年 decay curve | 連 3+ 年 wRC+ 或 K% / velocity 單調下降 | drop 路徑優先序提升；trade 路徑撤回（市場資訊延遲，下週折價）|
+| Launch angle 暴跌 | Δ ≥10° 跨年 | swing mechanic 結構性變化，drop 證據壓倒性 |
+| 對特定球種結構崩 | 對 fastball SLG <.350 / 對 breaking ball Whiff% >40% | aging 或 mechanic 訊號，不可期待短期回歸 |
+| Owned% + Savant 矛盾 | Owned% >80 但 14d Savant Δ ≤-0.080 連 5+ 天 | market lag 確認，drop 不要等市場修正 |
+| 新聞 explicit signal | 教練公開談角色降級 / 球員自承 swing 改造失敗 / 醫療長期受限 | 結構性訊號，不是 noise |
+
+**輸出格式**：
+- 命中 0 項 → 維持 Step 3 初判
+- 命中 1+ 項 → explicit 寫「**初判修正**：原 X 路徑 [撤回/升級]，理由：[命中 signal]」
+- 必須收斂到單一推薦行動，避免「初判給多選項但沒收斂」
+
+> 教訓：曾給 A/B/C 三選一含 trade 路徑，深查 launch angle 17.7°→5.5° 後才撤回 trade（B 路徑前提是市場仍認可 brand，但 launch angle 暴跌一旦其他 GM 知道就崩盤）。Step 3.5 確保查到後就立即收斂。
 
 ## Step 4：陣容脈絡檢查
 
