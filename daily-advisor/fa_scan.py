@@ -32,7 +32,7 @@ from yahoo_query import (
 
 TPE = ZoneInfo("Asia/Taipei")
 
-from daily_advisor import pctile_tag, BATTER_PCTILES
+from daily_advisor import pctile_tag
 from savant_rolling import fetch_savant_rolling
 from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
@@ -723,41 +723,6 @@ def _classify_fa_type(position_str):
     return "batter"
 
 
-def _metric_to_score(value, metric):
-    """Convert metric value to 1-10 score per CLAUDE.md Sum 打分表.
-
-    >P90=10, P80-90=9, P70-80=8, P60-70=7, P50-60=6, P40-50=5, P25-40=3, <P25=1
-    Returns 0 if value is None (unknown — Sum 不算分).
-    """
-    if value is None:
-        return 0
-    bp = BATTER_PCTILES.get(metric)
-    if not bp:
-        return 0
-    higher_better = bp[-1][1] > bp[0][1]
-    matched_pct = 0
-    for pct, thresh in bp:
-        if (higher_better and value >= thresh) or (not higher_better and value <= thresh):
-            matched_pct = pct
-    if matched_pct >= 90: return 10
-    if matched_pct >= 80: return 9
-    if matched_pct >= 70: return 8
-    if matched_pct >= 60: return 7
-    if matched_pct >= 50: return 6
-    if matched_pct >= 40: return 5
-    if matched_pct >= 25: return 3
-    return 1
-
-
-def _calc_batter_sum(metrics):
-    """3-metric Sum (xwOBA + BB% + Barrel%) per CLAUDE.md Step 1 規則."""
-    return (
-        _metric_to_score(metrics.get("xwoba"), "xwoba")
-        + _metric_to_score(metrics.get("bb_pct"), "bb_pct")
-        + _metric_to_score(metrics.get("barrel_pct"), "barrel_pct")
-    )
-
-
 def _extract_v4_sp_data(mlb_id, savant_csvs, year=None):
     """Pull v4 4-slot fields (whiff/bb9-pending/gb%/xwobacon) for one SP from
     league-bulk v4 CSVs. BB/9 is missing here (needs MLB API season stats);
@@ -880,7 +845,7 @@ def filter_by_savant(snapshot, savant_2026):
         # Quality filter — batter uses 3-metric Sum, SP uses v4 4-slot Sum
         v4_sp_data = None
         if fa_type == "batter":
-            if _calc_batter_sum(metrics) < BATTER_SUM_THRESHOLD:
+            if fa_compute.compute_sum_score(metrics, "batter")[0] < BATTER_SUM_THRESHOLD:
                 continue
         else:  # sp — v4 4-slot Sum (Whiff/BB9/GB/xwOBACON; IP/GS in Layer 3)
             v4_sp_data = _extract_v4_sp_data(mlb_id, savant_2026)
