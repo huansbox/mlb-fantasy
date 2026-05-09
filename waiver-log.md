@@ -19,10 +19,6 @@
 - 05-09：PA-TG 2.95 接近 3.0；14d OPS .842 / 10R / 7BB 穩健；Altuve 14d OPS .496 連 2 天 <.600 觸發門檻 — 建議 preempt 今日行動取代 Altuve（fa_scan）
 - 05-09：[eval] 逐場驗證為 **platoon hitter**（4/30 / 5/4 / 5/8 PH/late，leadoff 17/29 = 59% lineup rate）；14d trad OPS .842→.741 下滑 + 最近 6 場 0 HR / 11 K 熱度退散 vs Savant Δ+0.030；prior 雙年菁英底仍成立但 platoon 抵銷 prior 安全性；**降級為 second tier**，Altuve P1 替代位讓給 Duran（player-eval）
 
-### Ezequiel Duran (TEX, 1B/2B/3B/SS/LF) [mlb_id:677649] — 觀察中（首選 Altuve 替代）
-觸發：FAAB 出價 $3-5 取代 Altuve；或 Smith 回歸後 PA-TG <3.0 連 5 天 → 降級觀察
-- 05-09：[eval] xwOBA P85 / BB% P85 / Barrel% P30 / BBE 64；2025 prior 全 <P25 雙年低 = breakout 待驗；14d xwOBA .421 Δ 強正向 / 14d trad OPS 季線 5/2 .741→5/8 .861 上升 12 點；Smith 5/6 IL → 5/6-5/8 連 3 場 starter，7d starter 率 100% vs Julien 67%；多位 eligible 補 SS/3B 單點故障；5-agent vote 排序中段（A/B 分別 Altuve / Swanson）— 替代 Julien 為 P1 替代候選（player-eval）
-
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
 - 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低）；OF 飽和無 drop 對象（player-eval）
@@ -88,6 +84,9 @@
 - 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
 
 ## 已結案
+
+### Ezequiel Duran (TEX, 1B/2B/3B/SS/LF) — 被搶（自動偵測）
+- 2026-05-09：Yahoo ownership_type=team，從觀察中移除。
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — Pass
 - 2026-05-09：Stanton IL 期間觸發條件「BB% <P40 至 Week 7」凍結中；Jensen 自身 14d OPS .492 / K% 37.5 崩盤加劇 / xwOBA 從 P80 退至 P50；觸發實質失效，結案。
