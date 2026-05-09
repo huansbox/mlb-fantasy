@@ -14,6 +14,7 @@
 - 05-06：PA-TG 2.69 連 8 天未達 2.8 門檻；14d OPS .895 / K% 10.2 控 K 極佳；42% explosive +11 搶人潮加劇窗口收窄中（fa_scan）
 - 05-07：PA-TG 2.70 連 9 天未達 2.8；14d OPS .800 / K% 14.0 控 K 極佳；43% explosive +12 窗口即將關閉 — 建議降門檻至「任 1 天 PA-TG ≥2.8」或 preempt（fa_scan）
 - 05-08：PA-TG 2.76 連 10 天未達 2.8；14d OPS .718 / K% 13.0 控 K 極佳；43% plateau 窗口持續收窄 — 建議 preempt：PA-TG 任 1 天 ≥2.8 或 Albies 14d OPS <.800 即行動（fa_scan）
+- 05-09：PA-TG 2.69 連 11 天未達 2.8；14d OPS .718 / K% 13.0 控 K 極佳；41% plateau — Preempt 條件：PA-TG 任 1 天 ≥2.8 或 Albies 14d OPS <.800 即行動（fa_scan）
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — 觀察中
 觸發：Stanton BB% 持續 <P40 至 Week 7 + 14d OPS 未回 .750 → 升級取代
@@ -27,6 +28,7 @@
 - 05-06：14d OPS .602 / K% 31.6 冷卻中；37% dropping；仍等 Stanton 觸發條件（fa_scan）
 - 05-07：14d OPS .602 / K% 31.6 明顯冷卻；35% dropping -4/-6；Stanton 觸發條件仍未達（fa_scan）
 - 05-08：14d OPS .602 / K% 33.3 冷卻加劇；xwOBA P55 從 P80 持續回落；0% 無壓力但品質下滑中；仍等 Stanton 觸發條件（fa_scan）
+- 05-09：14d OPS .492 / K% 37.5 崩盤加劇；season xwOBA P50 從 P80 持續回落；0% 無壓力但自身品質劣化；仍等 Stanton 觸發條件（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中
 觸發：PA-TG ≥3.2 連 7 天 + xwOBA 維持 P80+ → 升級取代
@@ -39,6 +41,7 @@
 - 05-06：PA-TG 2.83 連 7 天未達 3.2；14d OPS .787 + 8 BB；xwOBA P95 結構不變；3% 零壓力（fa_scan）
 - 05-07：PA-TG 2.89 連 7 天未達 3.2 — 更新觸發：Altuve 14d OPS <.600 連 3 天 OR PA-TG ≥3.0 即行動（vs Altuve 結構差距明確）（fa_scan）
 - 05-08：PA-TG 2.95 接近 3.0；14d OPS .821 / 10 R / 7 BB 穩健；xwOBA P95 結構不變；Altuve 14d OPS .437 已低於 .600 觸發門檻 — 確認是否連 3 天達標即行動（fa_scan）
+- 05-09：PA-TG 2.95 接近 3.0；14d OPS .842 / 10R / 7BB 穩健；Altuve 14d OPS .496 連 2 天 <.600 觸發門檻 — 建議 preempt 今日行動取代 Altuve（結構差距三項全勝 + prior 雙年確認）（fa_scan）
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — 觀察中
 觸發：PA-TG ≥3.0 + xwOBA 維持 P80+ 至 BBE 80 → 升級取代
@@ -50,6 +53,7 @@
 - 05-06：14d Savant Δ-0.116 品質暴跌第 4 天加劇（季最差）；OPS .877 靠 BABIP 撐；PA-TG 2.78 仍未達 3.0；下修風險升級（fa_scan）
 - 05-07：14d Savant Δ-0.115 品質暴跌第 5 天加劇；OPS .837 靠 trad 撐；PA-TG 2.81 仍未達 3.0；breakout 可信度持續下降（fa_scan）
 - 05-08：14d Savant Δ-0.141 品質暴跌第 6 天加劇（季最差）；OPS .837 靠 trad 撐；PA-TG 2.74 仍未達 3.0；breakout 可信度降至低（fa_scan）
+- 05-09：14d Savant Δ-0.141 品質暴跌第 7 天（季最差）；OPS .760 靠 trad 撐；breakout 可信度極低 — 建議結案（fa_scan）
 
 ### Dillon Dingler (DET, C) [mlb_id:693307] — 觀察中
 觸發：Buxton 14d OPS 連跌 <.700 + xwOBA 未回 P70 → 升級取代 Buxton
@@ -61,6 +65,7 @@
 - 05-06：14d Savant Δ-0.068 品質下滑第 5 天；14d RBI 12 counting 仍有產量；50% rising 3d+9 窗口收窄；BB% P0 結構缺陷不變（fa_scan）
 - 05-07：14d Savant Δ-0.074 連跌第 6 天；14d RBI 12 counting 仍有；51% rising 窗口收窄；但 Buxton 14d OPS .980 + 8HR 觸發條件遠未達（fa_scan）
 - 05-08：14d Savant Δ-0.097 連跌第 7 天；14d RBI 12 counting 仍有；50% rising 3d+3 窗口收窄；Buxton 14d OPS .932 + 7HR 觸發條件遠未達（fa_scan）
+- 05-09：14d Savant Δ-0.097 連跌第 8 天；14d RBI 8 counting 下滑；50% plateau；Buxton 14d OPS 1.011 + 7HR 觸發條件遠未達（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -70,6 +75,7 @@
 - 05-06：14d Savant Δ+0.062 品質上升 / 4 HR power 持續；PA-TG 3.09 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
 - 05-07：14d Savant Δ+0.062 / 4 HR power 持續；PA-TG 3.03 但 Nootbaar 5/24 回歸 PT 縮減風險；BB% P0 結構不變（fa_scan）
 - 05-08：14d Savant Δ+0.065 品質上升 / 3 HR power 持續；PA-TG 3.14 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
+- 05-09：14d Savant Δ+0.055 品質上升 / 3 HR power 持續；PA-TG 3.08 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
 
 ### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
 觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
@@ -78,6 +84,7 @@
 - 05-06：14d OPS 1.017 / Savant Δ-0.036 微降；PA-TG 3.00 剛達門檻；xwOBA P60 從 P80 回落；breakout 驗證尚早（fa_scan）
 - 05-07：14d OPS 1.070 爆發；PA-TG 3.03 剛達門檻；但 season xwOBA 從 P80 回落至 P60 + prior P40/P0 breakout 驗證尚早（fa_scan）
 - 05-08：14d OPS 1.109 爆發；PA-TG 3.05 達主力門檻；season xwOBA P80 + prior P40/P0 breakout 驗證中；30% plateau 無急迫（fa_scan）
+- 05-09：14d OPS 1.068 爆發；PA-TG 3.03 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；31% plateau（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
@@ -85,11 +92,25 @@
 - 05-06：DTD 持續；xwOBA P80 / BB% P95 雙年菁英；14d 12 BB / OPS .753；等回歸 active + Albies 冷卻（fa_scan）
 - 05-07：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.160 觸發條件遠未達（fa_scan）
 - 05-08：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.160 觸發條件遠未達（fa_scan）
+- 05-09：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.124 觸發條件遠未達（fa_scan）
 
 ### Sam Antonacci (CWS, 2B,3B,LF) [mlb_id:803011] — 觀察中
 觸發：PA-TG ≥2.8 + BBE 達 70 + xwOBA 維持 P90+
 - 05-07：xwOBA P95 / 14d Savant .415 品質真實；PA-TG 2.00 上場嚴重有限 + 無 prior 新人待驗（fa_scan）
 - 05-08：xwOBA P95 / 14d Savant .422 品質真實上升；PA-TG 2.00 上場嚴重有限 + 無 prior；維持觀察（fa_scan）
+- 05-09：xwOBA P95 / 14d Savant .408 品質真實；PA-TG 2.05 上場嚴重有限 + 無 prior；維持觀察（fa_scan）
+
+### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
+觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
+- 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
+
+### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
+觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
+- 05-09：Season P95/P95/P70 全面強但 prior P40/P0/P0 純 breakout 零支持；14d OPS .900 + 9BB；1% 零壓力（fa_scan）
+
+### Ryan McMahon (NYY, 3B) [mlb_id:641857] — 觀察中
+觸發：xwOBA 回升 P60+ 或 Altuve 被換後備用錨點
+- 05-09：BB% P80 / HH% P95 + prior P70/P80/P80 三項雙年確認；14d OPS .816；xwOBA P50 是短板；3% 零壓力（fa_scan）
 
 ## 隊上觀察
 
