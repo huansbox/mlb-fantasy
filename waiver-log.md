@@ -9,6 +9,7 @@
 - 05-07：PA-TG 2.70 連 9 天未達 2.8；14d OPS .800；43% explosive +12 窗口即將關閉 — 建議降門檻至「任 1 天 PA-TG ≥2.8」或 preempt（fa_scan）
 - 05-08：PA-TG 2.76 連 10 天未達 2.8；14d OPS .718 / K% 13.0 控 K 極佳；43% plateau 窗口持續收窄 — 建議 preempt（fa_scan）
 - 05-09：PA-TG 2.69 連 11 天未達 2.8；14d OPS .718 / K% 13.0；41% plateau — Preempt 條件：PA-TG 任 1 天 ≥2.8 或 Albies 14d OPS <.800 即行動（fa_scan）
+- 05-10：PA-TG 2.65 連 12 天未達 2.8；14d OPS .699 / K% 13.7 控 K 佳但 OPS 再降；39% dropping -4 壓力降；Albies 14d OPS 1.003 另一觸發遠未達（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
 觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評；
@@ -18,6 +19,7 @@
 - 05-08：PA-TG 2.95 接近 3.0；14d OPS .821 / 10 R / 7 BB 穩健；Altuve 14d OPS .437 已低於 .600（fa_scan）
 - 05-09：PA-TG 2.95 接近 3.0；14d OPS .842 / 10R / 7BB 穩健；Altuve 14d OPS .496 連 2 天 <.600 觸發門檻 — 建議 preempt 今日行動取代 Altuve（fa_scan）
 - 05-09：[eval] 逐場驗證為 **platoon hitter**（4/30 / 5/4 / 5/8 PH/late，leadoff 17/29 = 59% lineup rate）；14d trad OPS .842→.741 下滑 + 最近 6 場 0 HR / 11 K 熱度退散 vs Savant Δ+0.030；prior 雙年菁英底仍成立但 platoon 抵銷 prior 安全性；**降級為 second tier**，Altuve P1 替代位讓給 Duran（player-eval）
+- 05-10：Altuve 14d OPS .436 已連 3+ 天 <.600 技術觸發，但 platoon 降級 second tier 不行動；14d OPS .802 / 9R / 7BB 穩健；0% 零壓力（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -25,6 +27,7 @@
 - 05-04~05-07：xwOBA P55-60 / BB% P0 雙年確認；14d OPS .820-.839 / 4 HR / Savant Δ+0.062 上升；PA-TG 3.03-3.09 但 Nootbaar 5/24 回歸 PT 縮減風險
 - 05-08：14d Savant Δ+0.065 上升 / 3 HR power 持續；PA-TG 3.14；BB% P0 結構不變（fa_scan）
 - 05-09：14d Savant Δ+0.055 品質上升 / 3 HR power 持續；PA-TG 3.08 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
+- 05-10：14d OPS .832 / 3 HR power 持續；PA-TG 3.10 穩定；BB% P0 結構不變；Nootbaar 5/24 回歸 PT 縮減風險（fa_scan）
 
 ### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
 觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
@@ -32,12 +35,14 @@
 - 05-07：14d OPS 1.070 爆發；PA-TG 3.03 達門檻；season xwOBA 從 P80 回落至 P60 + prior breakout 驗證尚早（fa_scan）
 - 05-08：14d OPS 1.109 爆發；PA-TG 3.05 達主力門檻；season xwOBA P80 + prior P40/P0 breakout 驗證中；30% plateau 無急迫（fa_scan）
 - 05-09：14d OPS 1.068 爆發；PA-TG 3.03 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；31% plateau（fa_scan）
+- 05-10：14d OPS 1.051 / AVG .392 爆發持續；PA-TG 3.05 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；0% 零壓力（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
 - 05-05：xwOBA P80 / BB% P95 雙年菁英確認（prior P95/P95）；14d 12 BB / 62 PA；PA-TG 4.00 全職；vs Albies 三項全勝（結構差距 50 百分位點 BB%）（fa_scan）
 - 05-06~05-08：DTD → IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.160 觸發遠未達
 - 05-09：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.124 觸發條件遠未達（fa_scan）
+- 05-10：IL10 持續；season P80/P95 結構不變；Albies 14d OPS 1.003 觸發遠未達（fa_scan）
 
 ### Sam Antonacci (CWS, 2B,3B,LF) [mlb_id:803011] — 觀察中
 觸發：PA-TG ≥2.8 + BBE 達 70 + xwOBA 維持 P90+
@@ -48,14 +53,17 @@
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
 - 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
+- 05-10：14d K% 37.5 spike 持續 + OPS .467 冰冷；season xwOBA P95 / Barrel% P95 結構仍強 + Savant Δ+0.027 品質上升矛盾冷卻；22% dropping -3；觸發未達（K% >28% / OPS <.700）（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
 觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
 - 05-09：Season P95/P95/P70 全面強但 prior P40/P0/P0 純 breakout 零支持；14d OPS .900 + 9BB；1% 零壓力（fa_scan）
+- 05-10：14d OPS .900 / 9BB 爆發 + Savant Δ+0.030 品質上升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
 
 ### Ryan McMahon (NYY, 3B) [mlb_id:641857] — 觀察中
 觸發：xwOBA 回升 P60+ 或 Altuve 被換後備用錨點
 - 05-09：BB% P80 / HH% P95 + prior P70/P80/P80 三項雙年確認；14d OPS .816；xwOBA P50 是短板；3% 零壓力（fa_scan）
+- 05-10：14d OPS .802 / 8 RBI 穩健；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.012 小幅上升；0% 零壓力（fa_scan）
 
 ## 隊上觀察
 
@@ -111,6 +119,7 @@
 
 ### Cole Young (SEA, 2B) — 被搶（自動偵測）
 - 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
+- 05-10：xwOBA P80 / BB% P55 / ✅主力 PA-TG 3.92；prior BB% P80 結構優於 Altuve；14d OPS .851 穩健但 Savant Δ-0.027 小幅下滑（fa_scan）
 
 ### Jose Caballero (NYY, 2B/3B/SS/LF/RF) [mlb_id:676609] — Pass
 - 2026-05-03：[eval] xwOBA / HH% / Barrel% **雙年雙確認 <P25 結構性弱**（Sum 內部 5，全隊最低）；SB 是唯一亮點（2025 49 / 2026 pace 60+）但我隊軟 punt SB 不主動追；BB% 從 2025 P90+ 崩到 2026 <P25 大幅退化；14d trad .313 是 BABIP 幻覺（Savant 全 <P25）；79% owned 市場溢價（player-eval）
