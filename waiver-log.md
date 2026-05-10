@@ -44,12 +44,6 @@
 - 05-09：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.124 觸發條件遠未達（fa_scan）
 - 05-10：IL10 持續；season P80/P95 結構不變；Albies 14d OPS 1.003 觸發遠未達（fa_scan）
 
-### Sam Antonacci (CWS, 2B,3B,LF) [mlb_id:803011] — 觀察中
-觸發：PA-TG ≥2.8 + BBE 達 70 + xwOBA 維持 P90+
-- 05-07：xwOBA P95 / 14d Savant .415 品質真實；PA-TG 2.00 上場嚴重有限 + 無 prior 新人待驗（fa_scan）
-- 05-08：xwOBA P95 / 14d Savant .422 品質真實上升；PA-TG 2.00 上場嚴重有限；維持觀察（fa_scan）
-- 05-09：xwOBA P95 / 14d Savant .408 品質真實；PA-TG 2.05 上場嚴重有限 + 無 prior；維持觀察（fa_scan）
-
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
 - 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
@@ -92,6 +86,9 @@
 - 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
 
 ## 已結案
+
+### Sam Antonacci (CWS, 2B,3B,LF) — 被搶（自動偵測）
+- 2026-05-10：Yahoo ownership_type=team，從觀察中移除。
 
 ### Ezequiel Duran (TEX, 1B/2B/3B/SS/LF) — 被搶（自動偵測）
 - 2026-05-09：Yahoo ownership_type=team，從觀察中移除。
