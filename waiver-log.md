@@ -10,6 +10,7 @@
 - 05-08：PA-TG 2.76 連 10 天未達 2.8；14d OPS .718 / K% 13.0 控 K 極佳；43% plateau 窗口持續收窄 — 建議 preempt（fa_scan）
 - 05-09：PA-TG 2.69 連 11 天未達 2.8；14d OPS .718 / K% 13.0；41% plateau — Preempt 條件：PA-TG 任 1 天 ≥2.8 或 Albies 14d OPS <.800 即行動（fa_scan）
 - 05-10：PA-TG 2.65 連 12 天未達 2.8；14d OPS .699 / K% 13.7 控 K 佳但 OPS 再降；39% dropping -4 壓力降；Albies 14d OPS 1.003 另一觸發遠未達（fa_scan）
+- 05-11：14d OPS .548 / K% 18.9 冷卻持續第 3 週；PA-TG 2.68 連 13 天未達 2.8；38% dropping -5 壓力消退；Albies 14d OPS .935 另一觸發遠未達 — 急迫性已低（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
 觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評；
@@ -20,6 +21,7 @@
 - 05-09：PA-TG 2.95 接近 3.0；14d OPS .842 / 10R / 7BB 穩健；Altuve 14d OPS .496 連 2 天 <.600 觸發門檻 — 建議 preempt 今日行動取代 Altuve（fa_scan）
 - 05-09：[eval] 逐場驗證為 **platoon hitter**（4/30 / 5/4 / 5/8 PH/late，leadoff 17/29 = 59% lineup rate）；14d trad OPS .842→.741 下滑 + 最近 6 場 0 HR / 11 K 熱度退散 vs Savant Δ+0.030；prior 雙年菁英底仍成立但 platoon 抵銷 prior 安全性；**降級為 second tier**，Altuve P1 替代位讓給 Duran（player-eval）
 - 05-10：Altuve 14d OPS .436 已連 3+ 天 <.600 技術觸發，但 platoon 降級 second tier 不行動；14d OPS .802 / 9R / 7BB 穩健；0% 零壓力（fa_scan）
+- 05-11：14d OPS .811 / 9R / 7BB 穩健但 K% 29.4 升；PA-TG 2.85 未達 3.0；Altuve 14d OPS .479 連 3+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -28,6 +30,7 @@
 - 05-08：14d Savant Δ+0.065 上升 / 3 HR power 持續；PA-TG 3.14；BB% P0 結構不變（fa_scan）
 - 05-09：14d Savant Δ+0.055 品質上升 / 3 HR power 持續；PA-TG 3.08 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
 - 05-10：14d OPS .832 / 3 HR power 持續；PA-TG 3.10 穩定；BB% P0 結構不變；Nootbaar 5/24 回歸 PT 縮減風險（fa_scan）
+- 05-11：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數（fa_scan）
 
 ### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
 觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
@@ -36,6 +39,7 @@
 - 05-08：14d OPS 1.109 爆發；PA-TG 3.05 達主力門檻；season xwOBA P80 + prior P40/P0 breakout 驗證中；30% plateau 無急迫（fa_scan）
 - 05-09：14d OPS 1.068 爆發；PA-TG 3.03 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；31% plateau（fa_scan）
 - 05-10：14d OPS 1.051 / AVG .392 爆發持續；PA-TG 3.05 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；0% 零壓力（fa_scan）
+- 05-11：14d OPS 1.071 / AVG .392 爆發第 2 週；PA-TG 3.07 主力確認；+10 7d rising 搶人潮；prior P40/P0 breakout 驗證中 BBE 81（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
@@ -43,21 +47,29 @@
 - 05-06~05-08：DTD → IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.160 觸發遠未達
 - 05-09：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.124 觸發條件遠未達（fa_scan）
 - 05-10：IL10 持續；season P80/P95 結構不變；Albies 14d OPS 1.003 觸發遠未達（fa_scan）
+- 05-11：IL10 持續；season P80/P95 結構不變；Albies 14d OPS .935 觸發條件遠未達（fa_scan）
 
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
 - 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
 - 05-10：14d K% 37.5 spike 持續 + OPS .467 冰冷；season xwOBA P95 / Barrel% P95 結構仍強 + Savant Δ+0.027 品質上升矛盾冷卻；22% dropping -3；觸發未達（K% >28% / OPS <.700）（fa_scan）
+- 05-11：14d K% 36.4 spike 第 2 週 + OPS .499 冰冷；season P95/P95 結構仍強；觸發未達（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
 觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
 - 05-09：Season P95/P95/P70 全面強但 prior P40/P0/P0 純 breakout 零支持；14d OPS .900 + 9BB；1% 零壓力（fa_scan）
 - 05-10：14d OPS .900 / 9BB 爆發 + Savant Δ+0.030 品質上升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
+- 05-11：14d OPS .785 / Savant Δ+0.082 品質飆升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
 
 ### Ryan McMahon (NYY, 3B) [mlb_id:641857] — 觀察中
 觸發：xwOBA 回升 P60+ 或 Altuve 被換後備用錨點
 - 05-09：BB% P80 / HH% P95 + prior P70/P80/P80 三項雙年確認；14d OPS .816；xwOBA P50 是短板；3% 零壓力（fa_scan）
 - 05-10：14d OPS .802 / 8 RBI 穩健；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.012 小幅上升；0% 零壓力（fa_scan）
+- 05-11：14d OPS .730 / 7 RBI；xwOBA P55 短板不變 + prior P70 支撐；Savant Δ+0.010 微升；0% 零壓力（fa_scan）
+
+### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
+觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級取代 Altuve
+- 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
 
 ## 隊上觀察
 
