@@ -92,6 +92,10 @@
 觸發：Phase 6 multi-agent watch
 - 05-12：Phase 6 watch — xwOBACON .334 P95 + GB% P80 菁英 contact，但 21d Δ+.045 劣化 + Whiff% P50 K 降級 + SP/RP 混用。等下場驗證 K + 趨勢（fa_scan）
 
+### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
+觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
+- 05-12：[eval] Consensus top 100 新秀（MLBP #49 / FG #35 / ESPN #63 / BA #41，AZ #1，2024 首輪）；AAA Reno 34G .289/.400/.477（.877 OPS）/ 3 HR / 6 SB OBP 型；5/8 MLB debut 取代 DFA Alek Thomas，MLB 樣本 3/8（BBE <10 低信心）；第 9 棒（extended leadoff）PA ceiling 限制 RBI/R 潛力；17% owned 市場已注意；暫不撿等驗證（player-eval）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
