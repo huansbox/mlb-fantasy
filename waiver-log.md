@@ -117,8 +117,12 @@
 - 短線崩（5/4-5/8 5G AVG .050）+ glute 短期傷已過 + Bregman 同 IL 確保 PT 穩
 - **5-agent vote 5/5 票一致排為三人中 best**（vs Altuve worst / Duran 中段）— 用戶 trad-driven 質疑被獨立判斷化解
 - 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
+- 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
 
 ## 已結案
+
+### Chase Meidroth (CWS, 2B/3B/SS) [mlb_id:805367] — Pass
+- 2026-05-12：[eval] vs 隊上 Swanson；雙年 Barrel% 1.6/3.8 <P25 + HH% P25-40 contact 結構性弱，xwOBA P50-55 中段；AVG .278 是 BABIP 幻覺（xBA .241 差 -37 點）；14d K% 從 19.5% 跳至 ~30% 警訊；BB% P70-80 是亮點但比 Swanson P90+ 顯著差；24 歲 leadoff 主力是唯一 upside 但 contact ceiling 結構封頂（player-eval）
 
 ### J.T. Ginn (ATH, SP,RP) — 被搶（自動偵測）
 - 2026-05-12：Yahoo ownership_type=team，從觀察中移除。
