@@ -141,7 +141,10 @@ def main(argv=None):
         rec = updates.get(p["name"])
         if rec is None:
             continue
-        prior = p.setdefault("prior_stats", {})
+        # setdefault doesn't replace an explicit None — guard for that.
+        if p.get("prior_stats") is None:
+            p["prior_stats"] = {}
+        prior = p["prior_stats"]
         if rec["whiff_pct"] is not None:
             prior["whiff_pct"] = round(rec["whiff_pct"], 1)
         if rec["gb_pct"] is not None:
