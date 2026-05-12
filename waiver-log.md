@@ -88,10 +88,6 @@
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級取代 Altuve
 - 05-12：Prior P95/P95/P70 slump 候選；當季 P60/P70/P55 低於 prior；PA-TG 3.54 主力；14d OPS .733 回歸未啟動（fa_scan）
 
-### J.T. Ginn (ATH, SP,RP) [mlb_id:669372] — 觀察中
-觸發：Phase 6 multi-agent watch
-- 05-12：Phase 6 watch — xwOBACON .334 P95 + GB% P80 菁英 contact，但 21d Δ+.045 劣化 + Whiff% P50 K 降級 + SP/RP 混用。等下場驗證 K + 趨勢（fa_scan）
-
 ### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
 觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
 - 05-12：[eval] Consensus top 100 新秀（MLBP #49 / FG #35 / ESPN #63 / BA #41，AZ #1，2024 首輪）；AAA Reno 34G .289/.400/.477（.877 OPS）/ 3 HR / 6 SB OBP 型；5/8 MLB debut 取代 DFA Alek Thomas，MLB 樣本 3/8（BBE <10 低信心）；第 9 棒（extended leadoff）PA ceiling 限制 RBI/R 潛力；17% owned 市場已注意；暫不撿等驗證（player-eval）
@@ -123,6 +119,9 @@
 - 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
 
 ## 已結案
+
+### J.T. Ginn (ATH, SP,RP) — 被搶（自動偵測）
+- 2026-05-12：Yahoo ownership_type=team，從觀察中移除。
 
 ### Sam Antonacci (CWS, 2B,3B,LF) — 被搶（自動偵測）
 - 2026-05-10：Yahoo ownership_type=team，從觀察中移除。
