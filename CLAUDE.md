@@ -465,11 +465,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 ## 待辦
 
-<!-- 已完成 2026-04-21 commit 3ce1eae：
-- waiver-log auto-close mlb_id 驗證 — _check_player_ownership 加 expected_team
-  參數交叉驗證 Yahoo editorial_team_abbr，同名同姓不會再誤關（Muncy LAD vs
-  ATH 兩次誤關事件：afbe6ca / 39170c9 → 已根治）
-  -->
+
+
 - [ ] **roster_sync watermark bug**（2026-05-12 發現）：`roster_sync.py run_daily` 第 780-785 行 — 當 Yahoo transaction 已新增但同次 `fetch_full_roster(date=ET-today)` snapshot 還沒反映 add/drop 時（Yahoo API 一致性 lag），代碼會 advance `.last_sync` 但 **不寫 config**，導致該 transaction 後續永久不會被重抓。5/8-5/10 May→Lambert 換人事件就是這樣中招（5/10 cron 看到 add:Peter Lambert 但 roster diff 空 → watermark 前進，後續 cron 認為「處理過了」），直到 5/12 手動 `--init` 才修復。修法：偵測「transaction 有 add/drop type 但 roster diff 空」時，**不要** advance watermark（或縮短 watermark 至上次 transaction timestamp 之前），下次 cron 重試。或加 fallback：每天跑一次 `--init` 模式作 safety net（成本只多 4 個 CSV 下載）。
 - [ ] **RP 框架 v4 升級**（SP v4 觀察期 1-2 個月後啟動）：當前 RP 仍走 v2 指標（xERA / xwOBA allowed / HH% allowed / Barrel% allowed），SP 已 cutover 至 v4 5-slot。RP 升級**不是換指標**，是框架重設計：(a) IP/GS 對 RP 無意義，要重決定 5-slot 第 5 軸；(b) `calc_v4_percentiles.py` 要重跑 RP n=284 的百分位（RP Whiff% 分布通常高於 SP）；(c) RP 目前無 Phase 6 / urgency / Sum，整套決策邏輯要設計。同步更新 `yahoo_query.py savant` RP path（已留 TODO comment）+ CLAUDE.md「RP 評估」段 + `prompt_*_rp.txt`（若有）。預估 1-2 週工作量。
 - [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
@@ -488,10 +485,6 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   - **Cutover 完成後**：移除以下 3 條被涵蓋的 TODO：①「fa_scan_v4.py CLI 命運」②「SP / Batter 框架對稱性檢視」③「SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin」（暫保留以便檢索；issue 009 acceptance 含移除 ① ③ + 重評 ②）
 - [ ] **SP / Batter 框架對稱性檢視**（部分被 B1 cutover 涵蓋）：原 batter Phase 6 multi-agent 上線時觸發 → 2026-05-06 倒序執行先動 SP（基於 lazy 引用 Sum 觀察）。Batter Phase 6 上線時要重評是否仍按原計畫升 batter，或 batter 留 thin（已對稱無需動）。
 - [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（被 issue 005 + 006 涵蓋，cutover 完成才移除）：5 個 prompt 改寫拿掉 Sum + urgency + evaluation tags 引用，master borderline 改 LLM 自判（H3）。詳見 `docs/sp-b1-cutover-design.md` §LLM 層。
-- [ ] **Phase 5 minor refactor**（2026-04-21 Architect 審查 finding，不影響功能）：
-  - ~~finding C~~：✅ 2026-04-26 完成（commit `fca8cb2`，改用 `_PRIOR_IP_SLUMP_HOLD_MIN` 常數）
-  - ~~finding D~~：✅ 2026-05-08 完成（commit `a94cf2f`，Layer 2 filter 改呼叫 `fa_compute.compute_sum_score`，同步刪除 fa_scan 重複的 `_calc_batter_sum` / `_metric_to_score`）
-  - ~~finding E~~：✅ 2026-04-26 完成（commit `95c9713`，`--no-send` mode `print(advice, flush=True)`）
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎
 - [ ] Week 6-8：更新百分位表為 2026 賽季數據（CLAUDE.md + daily_advisor.py + prompt 檔，腳本 `calc_percentiles_2026.py` 已備好）
 - [ ] **交易掃描工具**：`_trade_batter_rank.py` 已完成（wRC+ 排名掃描）。待擴充：SP 端掃描（目標 SP vs 對方隊 SP 排名）、自動交叉比對「我方打者在對方排 ≤8 + 對方 SP 品質 > Detmers」
