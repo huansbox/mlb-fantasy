@@ -88,6 +88,10 @@
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級取代 Altuve
 - 05-12：Prior P95/P95/P70 slump 候選；當季 P60/P70/P55 低於 prior；PA-TG 3.54 主力；14d OPS .733 回歸未啟動（fa_scan）
 
+### J.T. Ginn (ATH, SP,RP) [mlb_id:669372] — 觀察中
+觸發：Phase 6 multi-agent watch
+- 05-12：Phase 6 watch — xwOBACON .334 P95 + GB% P80 菁英 contact，但 21d Δ+.045 劣化 + Whiff% P50 K 降級 + SP/RP 混用。等下場驗證 K + 趨勢（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
