@@ -59,6 +59,21 @@ class TestClassifyOpener:
         ]
         assert classify_opener(games) == "opener_suspect"
 
+    @pytest.mark.parametrize(
+        "games_data,expected",
+        [
+            # 3-game minimum-valid boundary (just past small_sample cutoff)
+            ([(1, 5.0), (1, 5.0), (1, 5.0)], "true_starter"),
+            ([(0, 1.0), (0, 1.2), (0, 2.0)], "opener_suspect"),
+        ],
+    )
+    def test_three_game_minimum_sample_boundary(self, games_data, expected):
+        games = [
+            GameLog(date=f"2026-05-{i+1:02d}", gs=gs, ip=ip)
+            for i, (gs, ip) in enumerate(games_data)
+        ]
+        assert classify_opener(games) == expected
+
     def test_starter_with_one_bulk_relief_game_still_true_starter(self):
         # Sean Burke 2026-04-26: GS=0 但 IP=7.1（bulk reliever 一場）
         # 其餘 5 場都是 GS + IP ≥ 4.1，平均 IP 5.6 → 仍是真先發
@@ -338,7 +353,7 @@ def _build_fetchers(
         fa_pool_fn=lambda starter_names: [e for e in fa_list if e.name in starter_names],
         roster_pitchers_fn=lambda: list(roster or []),
         game_log_fn=lambda mid, season: (game_logs or {}).get(mid, []),
-        team_14d_ops_fn=lambda team_abbr: (team_ops or {}).get(team_abbr, 0.720),
+        team_14d_ops_fn=lambda team_abbr, end_date: (team_ops or {}).get(team_abbr, 0.720),
         v4_data_fn=lambda ids, season: v4_data or {},
     )
 
@@ -386,7 +401,7 @@ class TestScan:
             ),
             roster_pitchers_fn=lambda: [],
             game_log_fn=lambda mid, season: {680732: burke_log}.get(mid, []),
-            team_14d_ops_fn=lambda abbr: {"CHC": 0.702}.get(abbr, 0.720),
+            team_14d_ops_fn=lambda abbr, end_date: {"CHC": 0.702}.get(abbr, 0.720),
             v4_data_fn=lambda ids, season: v4_data_by_season.get(season, {}),
         )
         result = scan(["2026-05-15"], fetchers=fetchers)
@@ -468,6 +483,34 @@ class TestScan:
         assert [s["name"] for s in day["owned_by_me"]] == ["Janson Junk"]
         assert [s["name"] for s in day["owned_by_others"]] == ["Owned Cub"]
 
+    def test_empty_et_dates_returns_empty_dict(self):
+        # CLI 用戶可能 `--et-dates ,` 過濾後留空 list
+        fetchers = _build_fetchers()
+        assert scan([], fetchers=fetchers) == {}
+
+    def test_team_14d_ops_called_with_scanned_et_date(self):
+        # W1 fix: 14d 對手強度視窗以掃描的 ET 日期錨點，不是 date.today()
+        # （否則 backtest / 跨日 scan 14d 窗口錯位）
+        captured = []
+        schedule = {"dates": [{"games": [{
+            "teams": {
+                "away": {"team": {"id": 145}, "probablePitcher": {"id": 1, "fullName": "P1"}},
+                "home": {"team": {"id": 112}, "probablePitcher": {"id": 2, "fullName": "P2"}},
+            },
+        }]}]}
+        fetchers = Fetchers(
+            schedule_fn=lambda d: schedule,
+            fa_pool_fn=lambda names: [FAEntry("P1", "10%")] if "P1" in names else [],
+            roster_pitchers_fn=lambda: [],
+            game_log_fn=lambda mid, season: [GameLog("d", 1, 5.0)] * 6,
+            team_14d_ops_fn=lambda team_abbr, end_date: (
+                captured.append((team_abbr, end_date)) or 0.700
+            ),
+            v4_data_fn=lambda ids, season: {},
+        )
+        scan(["2026-05-15"], fetchers=fetchers)
+        assert captured == [("CHC", "2026-05-15")]
+
     def test_multiple_dates_query_schedule_per_date(self):
         # 不同日不同 schedule — schedule_fn 由 et_date 決定
         sched_d1 = {"dates": [{"games": [{"teams": {
@@ -489,7 +532,7 @@ class TestScan:
             fa_pool_fn=lambda names: [e for e in all_fa if e.name in names],
             roster_pitchers_fn=lambda: [],
             game_log_fn=lambda mid, season: [GameLog(date="d", gs=1, ip=5.0)] * 6,
-            team_14d_ops_fn=lambda abbr: 0.700,
+            team_14d_ops_fn=lambda abbr, end_date: 0.700,
             v4_data_fn=lambda ids, season: {},
         )
         result = scan(["2026-05-14", "2026-05-15"], fetchers=fetchers)

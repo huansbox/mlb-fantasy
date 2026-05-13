@@ -67,7 +67,7 @@ class Fetchers:
     fa_pool_fn: object   # (starter_names: set[str]) -> list[FAEntry]
     roster_pitchers_fn: object  # () -> iterable[str] (my pitcher names)
     game_log_fn: object  # (mlb_id, season) -> list[GameLog]
-    team_14d_ops_fn: object  # (team_abbr) -> float
+    team_14d_ops_fn: object  # (team_abbr, end_date: str YYYY-MM-DD) -> float
     v4_data_fn: object   # (mlb_ids, season) -> dict[mlb_id, dict]
 
 
@@ -233,7 +233,7 @@ def scan(et_dates, *, fetchers):
         candidates_out = []
         for sp in cross.candidates:
             log = fetchers.game_log_fn(sp.mlb_id, 2026)
-            ops = fetchers.team_14d_ops_fn(sp.opponent)
+            ops = fetchers.team_14d_ops_fn(sp.opponent, et_date)
             candidates_out.append({
                 **_starter_to_summary(sp),
                 "percent_owned": pct_by_name.get(sp.name, "—"),
@@ -298,12 +298,17 @@ def fetch_game_log(mlb_id, season, *, limit=6):
     return logs
 
 
-def fetch_team_14d_ops(team_abbr):
+def fetch_team_14d_ops(team_abbr, end_date):
+    """14d team OPS ending at ``end_date`` (YYYY-MM-DD).
+
+    Anchored on the scanned ET date rather than wall-clock today() so
+    backtests / cross-day scans get the correct window.
+    """
     from datetime import date, timedelta
     team_id = ABBR_TO_ID.get(team_abbr)
     if team_id is None:
         return 0.720  # fallback to league avg
-    end = date.today()
+    end = date.fromisoformat(end_date) if isinstance(end_date, str) else end_date
     start = end - timedelta(days=14)
     url = (
         f"https://statsapi.mlb.com/api/v1/teams/{team_id}/stats"
