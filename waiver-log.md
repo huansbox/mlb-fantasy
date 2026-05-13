@@ -12,6 +12,7 @@
 - 05-10：PA-TG 2.65 連 12 天未達 2.8；14d OPS .699 / K% 13.7 控 K 佳但 OPS 再降；39% dropping -4 壓力降；Albies 14d OPS 1.003 另一觸發遠未達（fa_scan）
 - 05-11：14d OPS .548 / K% 18.9 冷卻持續第 3 週；PA-TG 2.68 連 13 天未達 2.8；38% dropping -5 壓力消退；Albies 14d OPS .935 另一觸發遠未達 — 急迫性已低（fa_scan）
 - 05-12：14d OPS .548 / K% 18.9 冷卻第 3 週；PA-TG 2.68 連 14 天未達 2.8；34% dropping -7 壓力消退；Albies 14d OPS .935 另一觸發遠未達 — 急迫性已低（fa_scan）
+- 05-13：14d OPS .456 / K% 17.3 冷卻第 3 週；PA-TG 2.69 連 15 天未達 2.8；32% dropping -7 壓力消退；Albies 14d OPS .835 另一觸發遠未達 — 急迫性已低（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
 觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評；
@@ -24,6 +25,7 @@
 - 05-10：Altuve 14d OPS .436 已連 3+ 天 <.600 技術觸發，但 platoon 降級 second tier 不行動；14d OPS .802 / 9R / 7BB 穩健；0% 零壓力（fa_scan）
 - 05-11：14d OPS .811 / 9R / 7BB 穩健但 K% 29.4 升；PA-TG 2.85 未達 3.0；Altuve 14d OPS .479 連 3+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 - 05-12：14d OPS .811 / K% 29.4 升；PA-TG 2.85 未達 3.0；Altuve 14d OPS .585 連 4+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
+- 05-13：14d OPS .755 / K% 30.0 升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .644 連 5+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -34,6 +36,7 @@
 - 05-10：14d OPS .832 / 3 HR power 持續；PA-TG 3.10 穩定；BB% P0 結構不變；Nootbaar 5/24 回歸 PT 縮減風險（fa_scan）
 - 05-11：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數（fa_scan）
 - 05-12：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數 2 週（fa_scan）
+- 05-13：14d OPS .529 / K% 20.4 持續退散；PA-TG 3.20 穩定；BB% 3.91 P0 結構不變；Nootbaar 5/24 回歸倒數不足 2 週（fa_scan）
 
 ### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
 觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
@@ -44,6 +47,7 @@
 - 05-10：14d OPS 1.051 / AVG .392 爆發持續；PA-TG 3.05 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；0% 零壓力（fa_scan）
 - 05-11：14d OPS 1.071 / AVG .392 爆發第 2 週；PA-TG 3.07 主力確認；+10 7d rising 搶人潮；prior P40/P0 breakout 驗證中 BBE 81（fa_scan）
 - 05-12：14d OPS 1.071 / AVG .392 爆發連 2 週；PA-TG 3.00 主力；35% rising +4 搶人潮啟動；但 DTD 不可立即 add；prior P40/P0 breakout 驗證中 BBE 83（fa_scan）
+- 05-13：14d OPS .953 / AVG .360 爆發持續；PA-TG 3.02 主力；season xwOBA P80 / Barrel% P70 / HH% P95 均衡；prior P40/P0 breakout 驗證中 BBE 83；DTD 不可立即 add（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
@@ -53,6 +57,7 @@
 - 05-10：IL10 持續；season P80/P95 結構不變；Albies 14d OPS 1.003 觸發遠未達（fa_scan）
 - 05-11：IL10 持續；season P80/P95 結構不變；Albies 14d OPS .935 觸發條件遠未達（fa_scan）
 - 05-12：IL10 持續；season P80/P95 結構不變；Albies 14d OPS .935 觸發條件遠未達（fa_scan）
+- 05-13：IL10 持續；season P80/P95 結構不變；55% dropping -2；Albies 14d OPS .835 觸發條件遠未達（fa_scan）
 
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
@@ -60,6 +65,7 @@
 - 05-10：14d K% 37.5 spike 持續 + OPS .467 冰冷；season xwOBA P95 / Barrel% P95 結構仍強 + Savant Δ+0.027 品質上升矛盾冷卻；22% dropping -3；觸發未達（K% >28% / OPS <.700）（fa_scan）
 - 05-11：14d K% 36.4 spike 第 2 週 + OPS .499 冰冷；season P95/P95 結構仍強；觸發未達（fa_scan）
 - 05-12：14d K% 34.5 spike 第 2 週持續 + OPS .523 冰冷；season P80/P95 結構仍強 + Savant Δ-0.002 持平；觸發未達（K% >28% / OPS <.700）（fa_scan）
+- 05-13：14d K% 34.5 spike 第 3 週持續 + OPS .523 冰冷；season P95/P80 Savant Δ+0.032 品質上升矛盾冷卻；觸發未達（K% >28% / OPS <.700）（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
 觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
@@ -67,6 +73,7 @@
 - 05-10：14d OPS .900 / 9BB 爆發 + Savant Δ+0.030 品質上升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
 - 05-11：14d OPS .785 / Savant Δ+0.082 品質飆升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
 - 05-12：14d OPS .785 / Savant Δ+0.081 品質飆升；BBE 70 距 80 門檻仍遠；1% 零壓力（fa_scan）
+- 05-13：14d OPS .785 / Savant Δ+0.081 品質飆升持續；BBE 70 距 80 門檻差 10；1% 零壓力（fa_scan）
 
 ### Ryan McMahon (NYY, 3B) [mlb_id:641857] — 觀察中
 觸發：xwOBA 回升 P60+ 或 Altuve 被換後備用錨點
@@ -74,23 +81,28 @@
 - 05-10：14d OPS .802 / 8 RBI 穩健；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.012 小幅上升；0% 零壓力（fa_scan）
 - 05-11：14d OPS .730 / 7 RBI；xwOBA P55 短板不變 + prior P70 支撐；Savant Δ+0.010 微升；0% 零壓力（fa_scan）
 - 05-12：14d OPS .684 / 6 RBI；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.018 微升；0% 零壓力（fa_scan）
+- 05-13：14d OPS .639 / 6 RBI 持續下滑；xwOBA P40 降 + prior P70 支撐；Savant Δ+0.022 微升；0% 零壓力（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級取代 Altuve
 - 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
 - 05-12：14d OPS .910 / 10BB / 2SB 全面爆發 + Savant Δ+0.041 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
+- 05-13：14d OPS .864 / 8BB / 2SB 全面 + Savant Δ+0.033 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
 
 ### Kody Clemens (MIN, 1B,2B,LF,RF) [mlb_id:665019] — 觀察中
 觸發：立即行動
 - 05-12：xwOBA P80 / Barrel% P95 雙年確認（prior P80）結構性優於 Altuve；14d OPS .809 穩健；PA-TG 2.63；取代 Altuve（fa_scan）
+- 05-13：⚠️ 已推薦「立即行動」第 2 天未執行；結構 P80/P70/P95 + prior P80/P80 雙年確認全面優於 Altuve P70/P70/P40；14d OPS .809 穩健；PA-TG 2.67（fa_scan）
 
 ### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級取代 Altuve
 - 05-12：Prior P95/P95/P70 slump 候選；當季 P60/P70/P55 低於 prior；PA-TG 3.54 主力；14d OPS .733 回歸未啟動（fa_scan）
+- 05-13：14d OPS .747 / Savant Δ+0.014 品質微升；prior P95/P95/P70 slump 候選；PA-TG 3.55 主力；觸發未達（OPS <.800）（fa_scan）
 
 ### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
 觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
 - 05-12：[eval] Consensus top 100 新秀（MLBP #49 / FG #35 / ESPN #63 / BA #41，AZ #1，2024 首輪）；AAA Reno 34G .289/.400/.477（.877 OPS）/ 3 HR / 6 SB OBP 型；5/8 MLB debut 取代 DFA Alek Thomas，MLB 樣本 3/8（BBE <10 低信心）；第 9 棒（extended leadoff）PA ceiling 限制 RBI/R 潛力；17% owned 市場已注意；暫不撿等驗證（player-eval）
+- 05-13：PA-TG 0.34 / BBE 7 樣本極低；14d OPS .714 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
 
 ## 隊上觀察
 
