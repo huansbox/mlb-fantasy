@@ -38,17 +38,6 @@
 - 05-12：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數 2 週（fa_scan）
 - 05-13：14d OPS .529 / K% 20.4 持續退散；PA-TG 3.20 穩定；BB% 3.91 P0 結構不變；Nootbaar 5/24 回歸倒數不足 2 週（fa_scan）
 
-### Samuel Basallo (BAL, C) [mlb_id:694212] — 觀察中
-觸發：14d Savant Δ 維持正值 + xwOBA 維持 P70+ 至 BBE 80 + PA-TG ≥3.0 → 升級取代
-- 05-04~05-06：xwOBA P60-80 / BB% P70 / HH% P70-80 均衡；14d OPS .829-1.017；PA-TG 從 2.94 升至 3.00；2025 prior P40/P0 breakout 待驗
-- 05-07：14d OPS 1.070 爆發；PA-TG 3.03 達門檻；season xwOBA 從 P80 回落至 P60 + prior breakout 驗證尚早（fa_scan）
-- 05-08：14d OPS 1.109 爆發；PA-TG 3.05 達主力門檻；season xwOBA P80 + prior P40/P0 breakout 驗證中；30% plateau 無急迫（fa_scan）
-- 05-09：14d OPS 1.068 爆發；PA-TG 3.03 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；31% plateau（fa_scan）
-- 05-10：14d OPS 1.051 / AVG .392 爆發持續；PA-TG 3.05 達主力門檻；season xwOBA P80 / Barrel% P70 / HH% P80 均衡；prior P40/P0 breakout 驗證中；0% 零壓力（fa_scan）
-- 05-11：14d OPS 1.071 / AVG .392 爆發第 2 週；PA-TG 3.07 主力確認；+10 7d rising 搶人潮；prior P40/P0 breakout 驗證中 BBE 81（fa_scan）
-- 05-12：14d OPS 1.071 / AVG .392 爆發連 2 週；PA-TG 3.00 主力；35% rising +4 搶人潮啟動；但 DTD 不可立即 add；prior P40/P0 breakout 驗證中 BBE 83（fa_scan）
-- 05-13：14d OPS .953 / AVG .360 爆發持續；PA-TG 3.02 主力；season xwOBA P80 / Barrel% P70 / HH% P95 均衡；prior P40/P0 breakout 驗證中 BBE 83；DTD 不可立即 add（fa_scan）
-
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
 - 05-05：xwOBA P80 / BB% P95 雙年菁英確認（prior P95/P95）；14d 12 BB / 62 PA；PA-TG 4.00 全職；vs Albies 三項全勝（結構差距 50 百分位點 BB%）（fa_scan）
@@ -132,6 +121,9 @@
 - 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
 
 ## 已結案
+
+### Samuel Basallo (BAL, C) — 被搶（自動偵測）
+- 2026-05-13：Yahoo ownership_type=team，從觀察中移除。
 
 ### Chase Meidroth (CWS, 2B/3B/SS) [mlb_id:805367] — Pass
 - 2026-05-12：[eval] vs 隊上 Swanson；雙年 Barrel% 1.6/3.8 <P25 + HH% P25-40 contact 結構性弱，xwOBA P50-55 中段；AVG .278 是 BABIP 幻覺（xBA .241 差 -37 點）；14d K% 從 19.5% 跳至 ~30% 警訊；BB% P70-80 是亮點但比 Swanson P90+ 顯著差；24 歲 leadoff 主力是唯一 upside 但 contact ceiling 結構封頂（player-eval）
