@@ -22,6 +22,15 @@ fa_scan.py（FA 市場分析唯一入口）
   ├─ 被讀取：weekly_review.py（scan_summary）
   └─ 被更新：waiver-log.md（觀察中球員追蹤）
 
+stream_sp_scan.py（/stream-sp skill 機械層；非 cron，skill 觸發）
+  ├─ 輸入：--et-dates YYYY-MM-DD[,...]
+  ├─ 流程：parse_schedule → cross_check_fa → 並行 batch v4_2026/2025 + game_log + 14d OPS → enrich
+  │   └─ 重用：sp_data_fetchers (Savant) + fa_compute (Sum/breakdown_pct/rotation_gate/luck_tag)
+  │   └─ 短路：fa_pool 拉到當天所有 starter hits 後早停分頁
+  ├─ 輸出：純 JSON to stdout（LLM 拿來寫報告 + 更新 pending file）
+  ├─ 被讀取：/stream-sp skill（Step 2-6 整合）
+  └─ 不更新任何 state（pending file 由 LLM 在 Step 8 寫）
+
 roster_config.json（陣容唯一來源）
   ├─ 球員名 / mlb_id / yahoo_player_key / positions / team / prior_stats
   ├─ selected_pos（Yahoo 格位：IL/IL+/BN/NA/位置）/ status（MLB 狀態：IL10/IL60/DTD/NA/空=健康）
