@@ -206,19 +206,22 @@ def parse_player_stats(player_data):
     return stats
 
 
-def cmd_fa(args, access_token, config):
-    """Query FA players."""
-    league_key = config["league"]["league_key"]
+def _fetch_fa_page(start, *, page_size, position, status, sort, sort_type,
+                   league_key, access_token):
+    """Fetch a single page of Yahoo FA pool. Returns list[dict] of player
+    info + stats (extract_player_info shape with a ``stats`` key).
 
-    filters = [f"status={args.status}"]
-    if args.position:
-        filters.append(f"position={args.position}")
-    filters.append(f"sort={args.sort}")
-    if args.sort_type:
-        filters.append(f"sort_type={args.sort_type}")
-    filters.append(f"count={args.count}")
-    if args.start:
-        filters.append(f"start={args.start}")
+    Empty list when Yahoo returns no players (end of pool or filter miss).
+    """
+    filters = [f"status={status}"]
+    if position:
+        filters.append(f"position={position}")
+    filters.append(f"sort={sort}")
+    if sort_type:
+        filters.append(f"sort_type={sort_type}")
+    filters.append(f"count={page_size}")
+    if start:
+        filters.append(f"start={start}")
 
     filter_str = ";".join(filters)
     path = f"/league/{league_key}/players;{filter_str};out=stats,percent_owned,ownership"
@@ -226,10 +229,8 @@ def cmd_fa(args, access_token, config):
     data = api_get(path, access_token)
     league_data = data["fantasy_content"]["league"]
     if len(league_data) < 2 or "players" not in league_data[1]:
-        print("查無結果")
-        return
+        return []
     players_data = league_data[1]["players"]
-
     players = []
     for k, v in players_data.items():
         if k == "count":
@@ -237,10 +238,97 @@ def cmd_fa(args, access_token, config):
         p = extract_player_info(v["player"])
         p["stats"] = parse_player_stats(v["player"])
         players.append(p)
+    return players
 
-    # Output
+
+def query_fa(access_token, league_key, *, position=None, status="A",
+             sort="AR", sort_type=None, page_size=25, start=0,
+             names=None, auto_page=False, max_pages=12):
+    """Query Yahoo FA pool. Returns list[dict] of player info + stats.
+
+    - ``names=None, auto_page=False`` (default): one page from ``start``.
+    - ``auto_page=True``: loop pages until empty page, partial page (<
+      page_size), or ``max_pages`` cap.
+    - ``names={...}``: implies ``auto_page``; only matching players returned;
+      stops early once all wanted names located.
+
+    Single importable entry point shared by ``cmd_fa`` and external callers
+    (e.g. ``stream_sp_scan.fetch_yahoo_fa_sp_pool``).
+    """
+    target_names = set(names) if names else None
+    do_auto_page = bool(auto_page or target_names)
+
+    collected = []
+    cur_start = start
+    pages_fetched = 0
+
+    while pages_fetched < max_pages:
+        page = _fetch_fa_page(
+            cur_start,
+            page_size=page_size, position=position, status=status,
+            sort=sort, sort_type=sort_type,
+            league_key=league_key, access_token=access_token,
+        )
+        pages_fetched += 1
+        if not page:
+            break
+
+        if target_names:
+            collected.extend(p for p in page if p["name"] in target_names)
+            found = {p["name"] for p in collected}
+            if target_names.issubset(found):
+                break
+        else:
+            collected.extend(page)
+
+        if not do_auto_page:
+            break
+        if len(page) < page_size:
+            break
+        cur_start += page_size
+
+    return collected
+
+
+def cmd_fa(args, access_token, config):
+    """Query FA players. Supports --names filter + --auto-page (multi-page sweep)."""
+    league_key = config["league"]["league_key"]
+
+    target_names = (
+        {n.strip() for n in args.names.split(",") if n.strip()}
+        if args.names else None
+    )
+    auto_page = bool(args.auto_page or target_names)
+
+    players = query_fa(
+        access_token, league_key,
+        position=args.position, status=args.status,
+        sort=args.sort, sort_type=args.sort_type,
+        page_size=args.count, start=args.start,
+        names=target_names, auto_page=auto_page,
+    )
+
     pos_filter = args.position or "ALL"
-    print(f"=== FA 查詢 (position={pos_filter}, sort={args.sort}, count={args.count}) ===\n")
+    extras = []
+    if target_names:
+        extras.append(f"names={','.join(sorted(target_names))}")
+    if auto_page:
+        extras.append("auto-page")
+    extra_str = f", {', '.join(extras)}" if extras else ""
+    print(f"=== FA 查詢 (position={pos_filter}, sort={args.sort}, count={args.count}{extra_str}) ===\n")
+
+    if not players:
+        print("查無結果")
+        if target_names:
+            print(f"(--names filter: {', '.join(sorted(target_names))} 未在 {pos_filter} 池中找到)")
+        return
+
+    if target_names:
+        found = {p["name"] for p in players}
+        missing = target_names - found
+        if missing:
+            print(f"(--names filter: 未找到 {', '.join(sorted(missing))})\n")
+
     for i, p in enumerate(players, 1):
         po = f"{p['percent_owned']}%" if p["percent_owned"] else "—"
         st = p["status"] if p["status"] else ""
@@ -840,6 +928,8 @@ def main():
     fa_parser.add_argument("--count", "-n", type=int, default=25, help="Number of results (default: 25)")
     fa_parser.add_argument("--start", type=int, default=0, help="Pagination offset (default: 0)")
     fa_parser.add_argument("--status", default="A", help="Player status: A (all available, default), FA (free agents only), W (waivers only)")
+    fa_parser.add_argument("--names", help="Comma-separated player names to filter (implies --auto-page; pages until all hits found)")
+    fa_parser.add_argument("--auto-page", action="store_true", help="Loop pages until empty/partial/cap (default: single page from --start)")
 
     # Player lookup
     player_parser = sub.add_parser("player", help="Look up a specific player")

@@ -342,10 +342,8 @@ def _format_pct_owned(value):
 def fetch_yahoo_fa_sp_pool(starter_names=None):
     """Page through Yahoo FA SP pool, optionally short-circuit on starter name hits.
 
-    If ``starter_names`` is given, paging stops once all hits are collected so
-    we don't pull the full ~300-row pool when /stream-sp only cares about
-    ~16 names from today's MLB schedule. When ``starter_names`` is empty/None
-    the legacy behavior (pull all pages) is preserved.
+    Delegates paging + filter + early-stop to ``yahoo_query.query_fa`` so the
+    logic is shared with the CLI ``yahoo_query.py fa --names`` flag.
 
     Requires VPS env (Yahoo token).
     """
@@ -355,42 +353,16 @@ def fetch_yahoo_fa_sp_pool(starter_names=None):
     config = yahoo_query.load_config()
     league_key = config["league"]["league_key"]
 
-    target_names = set(starter_names or [])
-    entries = []
-    page_size = 25
-    for start in range(0, 300, page_size):
-        path = (
-            f"/league/{league_key}/players"
-            f";status=A;position=SP;sort=AR;count={page_size};start={start}"
-            f";out=stats,percent_owned,ownership"
-        )
-        data = yahoo_query.api_get(path, access_token)
-        league_data = data["fantasy_content"]["league"]
-        if len(league_data) < 2 or "players" not in league_data[1]:
-            break
-        players_data = league_data[1]["players"]
-        page_entries = []
-        for k, v in players_data.items():
-            if k == "count":
-                continue
-            p = yahoo_query.extract_player_info(v["player"])
-            page_entries.append(FAEntry(
-                name=p["name"],
-                percent_owned=_format_pct_owned(p.get("percent_owned")),
-            ))
-        if not page_entries:
-            break
-        if target_names:
-            hits = [e for e in page_entries if e.name in target_names]
-            entries.extend(hits)
-            found = {e.name for e in entries}
-            if target_names.issubset(found):
-                break  # all wanted starters already located
-        else:
-            entries.extend(page_entries)
-        if len(page_entries) < page_size:
-            break
-    return entries
+    players = yahoo_query.query_fa(
+        access_token, league_key,
+        position="SP", status="A",
+        names=set(starter_names) if starter_names else None,
+        auto_page=True,
+    )
+    return [
+        FAEntry(name=p["name"], percent_owned=_format_pct_owned(p.get("percent_owned")))
+        for p in players
+    ]
 
 
 def fetch_v4_data(mlb_ids, season):
