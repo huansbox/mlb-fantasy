@@ -27,17 +27,14 @@ _*Ritchie 2025=5 因為 0 IP MLB（rookie 剛升上來），不是真實雙年 p
 
 ## ET 2026-05-14
 - recorded_at: 2026-05-13T13:40:00+08:00
-- last_recheck_at: 2026-05-13T21:30:00+08:00
+- last_recheck_at: 2026-05-14T00:10:00+08:00
 
 ### TBD 場次（待補查）
 - DET @ NYM (DET away TBD)
 - MIA @ MIN (MIN home TBD)
 
 ### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Carmen Mlodzinski | PIT | COL (.722) | 11% | 17/25 | <P25·<P25·P50-60·**P70-80**·<P25 | ⚠️ 條件推 | 雙年中下游 (25/17)，5 軸僅 GB% P70-80 1 菁英；對手 COL 客場離 Coors + 14d 中等；近 2 場拉長到 5.2-6 IP，主場 PNC 友善 |
-| Ben Brown | CHC | CIN (.724) | 9% | 33/26 | <P25·P60-70·P50-60·**P80-90**·**>P90** | ❌ 不推 | Sum 33 帳面強但 Rotation Gate 🚫 (13G/1GS pure-RP)；5/9 從 RP 轉 SP 第一場僅 46 球/4 IP，5/14 預期 piggyback 60-75 球/4-5 IP ceiling，QS 不可能 |
+_（本次重跑無通過 Rotation gate + Sum ≥15 + opener 真先發的候選；Sum<15 hard floor 排除 Jacob Lopez 14 / Anthony Kay 9。Carmen Mlodzinski + Ben Brown 已被別隊撿走轉為 owned_by_others。）_
 
 ### 備註
 - 2026-05-13 21:30 補查：TBD 兩場 (DET away / MIN home) 仍未公布 starter，新評 0 位。
@@ -45,7 +42,7 @@ _*Ritchie 2025=5 因為 0 IP MLB（rookie 剛升上來），不是真實雙年 p
 
 ## ET 2026-05-15
 - recorded_at: 2026-05-13T21:30:00+08:00
-- last_recheck_at: —
+- last_recheck_at: 2026-05-14T00:20:00+08:00
 
 ### TBD 場次（待補查）
 - PHI @ PIT (both TBD)
