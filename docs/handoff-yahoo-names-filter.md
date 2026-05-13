@@ -1,5 +1,7 @@
 # Handoff — Yahoo `--names` filter（CLI 層）
 
+> **✅ 完成（2026-05-13 commit `f688f48`）**：CLI `--names` / `--auto-page` flag 上線，抽出 `yahoo_query.query_fa()` importable helper，`stream_sp_scan.fetch_yahoo_fa_sp_pool` 改 import。VPS 4 case 驗證通過（hits / nonexistent / single-page / auto-page 300 行），stream_sp_scan e2e 維持 ~5.0s。8 個新 unit tests 全綠（test_yahoo_query.py），305 全 regression 通過。下面內容保留作歷史脈絡。
+>
 > 寫於 2026-05-13。前置工作 commits：`b672713` (function 層短路) / `5c7a71e` (skill 接 stream_sp_scan)。
 
 ## 上下文：兩個層級的「names filter」
