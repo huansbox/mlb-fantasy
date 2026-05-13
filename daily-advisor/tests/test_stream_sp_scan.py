@@ -3,6 +3,7 @@
 import pytest
 
 from stream_sp_scan import (
+    FAEntry,
     Fetchers,
     GameLog,
     StarterRef,
@@ -275,8 +276,17 @@ class TestCrossCheckFA:
 
 
 class TestEnrichV4:
-    def test_empty_raw_returns_empty(self):
-        assert _enrich_v4({}) == {}
+    def test_empty_raw_returns_unavailable_placeholder(self):
+        # 之前回 {} 害 LLM 過濾規則查 .rotation_gate / .sum_score KeyError；
+        # 改回明確 placeholder 帶 v4_available=False 讓 LLM 知道要排除/標註
+        out = _enrich_v4({})
+        assert out == {
+            "v4_available": False,
+            "sum_score": None,
+            "breakdown_pct": {},
+            "rotation_gate": None,
+            "luck_tag": None,
+        }
 
     def test_full_raw_adds_sum_breakdown_gate_luck(self):
         # Sean Burke 2026 actual snapshot from VPS run
@@ -289,28 +299,43 @@ class TestEnrichV4:
         out = _enrich_v4(raw)
         # raw 欄位保留
         assert out["ip_gs"] == 5.11
-        # enrich 加上的四個欄位
+        # enrich 加上的五個欄位
+        assert out["v4_available"] is True
         assert isinstance(out["sum_score"], int)
         assert 5 <= out["sum_score"] <= 50
         assert isinstance(out["breakdown_pct"], dict)
         assert set(out["breakdown_pct"].keys()) == {"IP/GS", "Whiff%", "BB/9", "GB%", "xwOBACON"}
-        assert out["rotation_gate"] in {"🟢", "🟡", "🚫"}
-        # luck_tag 可能是 None（差距未達 P70 顯著門檻），但 key 必須存在
+        # rotation_gate_v4 回三種 icon：🟢 / ⚠️ / 🚫（不是 🟡）
+        assert out["rotation_gate"] in {"🟢", "⚠️", "🚫"}
+        # luck_tag 可能是 None（差距未達 P70 顯著門檻 或 BBE<40），但 key 必須存在
         assert "luck_tag" in out
+
+    def test_swingman_role_returns_warning_gate(self):
+        # GS/G ratio 0.3-0.6 → ⚠️ swingman（rotation_gate_v4 specific path）
+        # 之前 test set 用 🟡 是 typo，這個 case 直接 exercise ⚠️ 路徑防 regression
+        raw = {
+            "ip_gs": 4.5, "whiff_pct": 22.0, "bb9": 3.0,
+            "gb_pct": 40.0, "xwobacon": 0.370,
+            "g": 10, "gs": 4, "ip": 38.0, "bbe": 90,
+            "era": 4.20, "xera": 4.30,
+        }
+        out = _enrich_v4(raw)
+        assert out["rotation_gate"] == "⚠️"
 
 
 def _build_fetchers(
     *,
     schedule=None,
-    fa_names=None,
+    fa_entries=None,
     roster=None,
     game_logs=None,
     team_ops=None,
     v4_data=None,
 ):
+    fa_list = list(fa_entries or [])
     return Fetchers(
         schedule_fn=lambda d: schedule or {"dates": []},
-        fa_pool_fn=lambda: list(fa_names or []),
+        fa_pool_fn=lambda starter_names: [e for e in fa_list if e.name in starter_names],
         roster_pitchers_fn=lambda: list(roster or []),
         game_log_fn=lambda mid, season: (game_logs or {}).get(mid, []),
         team_14d_ops_fn=lambda team_abbr: (team_ops or {}).get(team_abbr, 0.720),
@@ -355,7 +380,10 @@ class TestScan:
         v4_data_by_season = {2026: {680732: burke_v4_26}, 2025: {680732: burke_v4_25}}
         fetchers = Fetchers(
             schedule_fn=lambda d: schedule,
-            fa_pool_fn=lambda: ["Sean Burke"],
+            fa_pool_fn=lambda names: (
+                [FAEntry(name="Sean Burke", percent_owned="25%")]
+                if "Sean Burke" in names else []
+            ),
             roster_pitchers_fn=lambda: [],
             game_log_fn=lambda mid, season: {680732: burke_log}.get(mid, []),
             team_14d_ops_fn=lambda abbr: {"CHC": 0.702}.get(abbr, 0.720),
@@ -375,8 +403,10 @@ class TestScan:
         assert c["opener_verdict"] == "true_starter"
         assert c["opponent_14d"]["ops"] == 0.702
         assert c["opponent_14d"]["tier"] == "🟢"
+        assert c["percent_owned"] == "25%"  # 從 FAEntry 帶到 candidate
 
         # v4_2026 enriched
+        assert c["v4_2026"]["v4_available"] is True
         assert c["v4_2026"]["ip_gs"] == 5.11  # raw passthrough
         assert isinstance(c["v4_2026"]["sum_score"], int)
         assert c["v4_2026"]["rotation_gate"] == "🟢"  # 8 G / 6 GS, IP/GS > 3
@@ -384,6 +414,7 @@ class TestScan:
             "IP/GS", "Whiff%", "BB/9", "GB%", "xwOBACON",
         }
         # v4_2025 prior 也要被 fetch + enrich
+        assert c["v4_2025"]["v4_available"] is True
         assert c["v4_2025"]["ip_gs"] == 5.0
         assert isinstance(c["v4_2025"]["sum_score"], int)
 
@@ -419,7 +450,7 @@ class TestScan:
         ]}]}
         fetchers = _build_fetchers(
             schedule=schedule,
-            fa_names={"Sean Burke"},
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
             roster={"Janson Junk"},
             game_logs={680732: [GameLog(date="d", gs=1, ip=5.0)] * 6},
             team_ops={"CHC": 0.702},
@@ -449,9 +480,13 @@ class TestScan:
         }}]}]}
         schedules = {"2026-05-14": sched_d1, "2026-05-15": sched_d2}
 
+        all_fa = [
+            FAEntry(name="Pitcher D1", percent_owned="5%"),
+            FAEntry(name="Pitcher D2", percent_owned="3%"),
+        ]
         fetchers = Fetchers(
             schedule_fn=lambda d: schedules[d],
-            fa_pool_fn=lambda: ["Pitcher D1", "Pitcher D2"],
+            fa_pool_fn=lambda names: [e for e in all_fa if e.name in names],
             roster_pitchers_fn=lambda: [],
             game_log_fn=lambda mid, season: [GameLog(date="d", gs=1, ip=5.0)] * 6,
             team_14d_ops_fn=lambda abbr: 0.700,

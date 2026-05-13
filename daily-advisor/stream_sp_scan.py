@@ -55,10 +55,16 @@ class CrossCheckResult:
     owned_by_others: list
 
 
+@dataclass(frozen=True)
+class FAEntry:
+    name: str
+    percent_owned: str  # "9%" / "25%" / "—" — formatted display string
+
+
 @dataclass
 class Fetchers:
     schedule_fn: object  # (et_date) -> schedule_json
-    fa_pool_fn: object   # () -> iterable[str] (FA names)
+    fa_pool_fn: object   # (starter_names: set[str]) -> list[FAEntry]
     roster_pitchers_fn: object  # () -> iterable[str] (my pitcher names)
     game_log_fn: object  # (mlb_id, season) -> list[GameLog]
     team_14d_ops_fn: object  # (team_abbr) -> float
@@ -168,11 +174,21 @@ def _starter_to_summary(sp):
 def _enrich_v4(raw):
     """Wrap raw v4 5-slot dict with sum_score / breakdown_pct / rotation_gate / luck_tag.
 
+    Empty raw (rookie / no Savant data / fetch miss) returns an explicit
+    placeholder with ``v4_available=False`` so downstream filter rules can
+    branch on a known key instead of catching KeyError on missing fields.
+
     Lazy-imports fa_compute so test envs that don't need enrichment (e.g. pure-
     function unit tests) don't pay the daily_advisor import cost.
     """
     if not raw:
-        return {}
+        return {
+            "v4_available": False,
+            "sum_score": None,
+            "breakdown_pct": {},
+            "rotation_gate": None,
+            "luck_tag": None,
+        }
     from fa_compute import (  # type: ignore[import-not-found]
         compute_sum_score_v4_sp,
         format_sp_breakdown_human,
@@ -184,6 +200,7 @@ def _enrich_v4(raw):
     luck = luck_tag_v4(raw.get("xera"), raw.get("era"), raw.get("bbe"))
     return {
         **raw,
+        "v4_available": True,
         "sum_score": sum_score,
         "breakdown_pct": format_sp_breakdown_human(breakdown),
         "rotation_gate": gate_icon,
@@ -198,7 +215,13 @@ def scan(et_dates, *, fetchers):
         games = parse_schedule(sched_json)
         probable = _flatten_to_starters(games)
 
-        fa_names = set(fetchers.fa_pool_fn())
+        # Pass starter names to fa_pool_fn so it can filter the pool early —
+        # production fetcher can stop paging once all hits are found.
+        starter_names = {sp.name for sp in probable}
+        fa_entries = fetchers.fa_pool_fn(starter_names) if starter_names else []
+        fa_names = {e.name for e in fa_entries}
+        pct_by_name = {e.name: e.percent_owned for e in fa_entries}
+
         my_names = set(fetchers.roster_pitchers_fn())
         cross = cross_check_fa(probable, fa_names, my_names)
 
@@ -213,6 +236,7 @@ def scan(et_dates, *, fetchers):
             ops = fetchers.team_14d_ops_fn(sp.opponent)
             candidates_out.append({
                 **_starter_to_summary(sp),
+                "percent_owned": pct_by_name.get(sp.name, "—"),
                 "opener_verdict": classify_opener(log),
                 "opponent_14d": {"ops": ops, "tier": tier_opponent(ops)},
                 "v4_2026": _enrich_v4(v4_26_all.get(sp.mlb_id, {})),
@@ -303,15 +327,31 @@ def load_roster_pitchers():
     return [p["name"] for p in data.get("pitchers", [])]
 
 
-def fetch_yahoo_fa_sp_names():
-    """Page through Yahoo FA SP pool, return all names. Requires VPS env (token)."""
+def _format_pct_owned(value):
+    """Yahoo percent_owned is int (0-100) or None/empty. Display as '9%' / '—'."""
+    if value is None or value == "":
+        return "—"
+    return f"{value}%"
+
+
+def fetch_yahoo_fa_sp_pool(starter_names=None):
+    """Page through Yahoo FA SP pool, optionally short-circuit on starter name hits.
+
+    If ``starter_names`` is given, paging stops once all hits are collected so
+    we don't pull the full ~300-row pool when /stream-sp only cares about
+    ~16 names from today's MLB schedule. When ``starter_names`` is empty/None
+    the legacy behavior (pull all pages) is preserved.
+
+    Requires VPS env (Yahoo token).
+    """
     import yahoo_query  # type: ignore[import-not-found]
     env = yahoo_query.load_env()
     access_token = yahoo_query.refresh_token(env)
     config = yahoo_query.load_config()
     league_key = config["league"]["league_key"]
 
-    names = []
+    target_names = set(starter_names or [])
+    entries = []
     page_size = 25
     for start in range(0, 300, page_size):
         path = (
@@ -324,18 +364,28 @@ def fetch_yahoo_fa_sp_names():
         if len(league_data) < 2 or "players" not in league_data[1]:
             break
         players_data = league_data[1]["players"]
-        page_names = []
+        page_entries = []
         for k, v in players_data.items():
             if k == "count":
                 continue
             p = yahoo_query.extract_player_info(v["player"])
-            page_names.append(p["name"])
-        if not page_names:
+            page_entries.append(FAEntry(
+                name=p["name"],
+                percent_owned=_format_pct_owned(p.get("percent_owned")),
+            ))
+        if not page_entries:
             break
-        names.extend(page_names)
-        if len(page_names) < page_size:
+        if target_names:
+            hits = [e for e in page_entries if e.name in target_names]
+            entries.extend(hits)
+            found = {e.name for e in entries}
+            if target_names.issubset(found):
+                break  # all wanted starters already located
+        else:
+            entries.extend(page_entries)
+        if len(page_entries) < page_size:
             break
-    return names
+    return entries
 
 
 def fetch_v4_data(mlb_ids, season):
@@ -352,7 +402,7 @@ def fetch_v4_data(mlb_ids, season):
 def build_real_fetchers():
     return Fetchers(
         schedule_fn=fetch_mlb_schedule,
-        fa_pool_fn=fetch_yahoo_fa_sp_names,
+        fa_pool_fn=fetch_yahoo_fa_sp_pool,
         roster_pitchers_fn=load_roster_pitchers,
         game_log_fn=fetch_game_log,
         team_14d_ops_fn=fetch_team_14d_ops,
