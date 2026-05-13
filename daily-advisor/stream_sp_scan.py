@@ -165,6 +165,32 @@ def _starter_to_summary(sp):
     }
 
 
+def _enrich_v4(raw):
+    """Wrap raw v4 5-slot dict with sum_score / breakdown_pct / rotation_gate / luck_tag.
+
+    Lazy-imports fa_compute so test envs that don't need enrichment (e.g. pure-
+    function unit tests) don't pay the daily_advisor import cost.
+    """
+    if not raw:
+        return {}
+    from fa_compute import (  # type: ignore[import-not-found]
+        compute_sum_score_v4_sp,
+        format_sp_breakdown_human,
+        luck_tag_v4,
+        rotation_gate_v4,
+    )
+    sum_score, breakdown = compute_sum_score_v4_sp(raw)
+    gate_icon, _ = rotation_gate_v4(raw.get("g", 0), raw.get("gs", 0))
+    luck = luck_tag_v4(raw.get("xera"), raw.get("era"), raw.get("bbe"))
+    return {
+        **raw,
+        "sum_score": sum_score,
+        "breakdown_pct": format_sp_breakdown_human(breakdown),
+        "rotation_gate": gate_icon,
+        "luck_tag": luck,
+    }
+
+
 def scan(et_dates, *, fetchers):
     result = {}
     for et_date in et_dates:
@@ -176,16 +202,21 @@ def scan(et_dates, *, fetchers):
         my_names = set(fetchers.roster_pitchers_fn())
         cross = cross_check_fa(probable, fa_names, my_names)
 
+        # Batch v4 fetches: one call per season covers all candidates.
+        ids = [sp.mlb_id for sp in cross.candidates]
+        v4_26_all = fetchers.v4_data_fn(ids, 2026) if ids else {}
+        v4_25_all = fetchers.v4_data_fn(ids, 2025) if ids else {}
+
         candidates_out = []
         for sp in cross.candidates:
             log = fetchers.game_log_fn(sp.mlb_id, 2026)
             ops = fetchers.team_14d_ops_fn(sp.opponent)
-            v4 = fetchers.v4_data_fn([sp.mlb_id], 2026).get(sp.mlb_id, {})
             candidates_out.append({
                 **_starter_to_summary(sp),
                 "opener_verdict": classify_opener(log),
                 "opponent_14d": {"ops": ops, "tier": tier_opponent(ops)},
-                "v4_2026": v4,
+                "v4_2026": _enrich_v4(v4_26_all.get(sp.mlb_id, {})),
+                "v4_2025": _enrich_v4(v4_25_all.get(sp.mlb_id, {})),
             })
 
         result[et_date] = {

@@ -6,6 +6,7 @@ from stream_sp_scan import (
     Fetchers,
     GameLog,
     StarterRef,
+    _enrich_v4,
     classify_opener,
     cross_check_fa,
     parse_schedule,
@@ -273,6 +274,31 @@ class TestCrossCheckFA:
         assert result.owned_by_others == [bibee]
 
 
+class TestEnrichV4:
+    def test_empty_raw_returns_empty(self):
+        assert _enrich_v4({}) == {}
+
+    def test_full_raw_adds_sum_breakdown_gate_luck(self):
+        # Sean Burke 2026 actual snapshot from VPS run
+        raw = {
+            "ip_gs": 5.11, "whiff_pct": 19.5, "bb9": 2.04,
+            "gb_pct": 41.5, "xwobacon": 0.354,
+            "g": 8, "gs": 6, "ip": 44.0, "bbe": 130,
+            "era": 3.68, "xera": 3.79,
+        }
+        out = _enrich_v4(raw)
+        # raw 欄位保留
+        assert out["ip_gs"] == 5.11
+        # enrich 加上的四個欄位
+        assert isinstance(out["sum_score"], int)
+        assert 5 <= out["sum_score"] <= 50
+        assert isinstance(out["breakdown_pct"], dict)
+        assert set(out["breakdown_pct"].keys()) == {"IP/GS", "Whiff%", "BB/9", "GB%", "xwOBACON"}
+        assert out["rotation_gate"] in {"🟢", "🟡", "🚫"}
+        # luck_tag 可能是 None（差距未達 P70 顯著門檻），但 key 必須存在
+        assert "luck_tag" in out
+
+
 def _build_fetchers(
     *,
     schedule=None,
@@ -314,13 +340,26 @@ class TestScan:
             GameLog(date="2026-05-02", gs=1, ip=6.0),
             GameLog(date="2026-05-08", gs=1, ip=5.0),
         ]
-        fetchers = _build_fetchers(
-            schedule=schedule,
-            fa_names={"Sean Burke"},
-            roster=set(),
-            game_logs={680732: burke_log},
-            team_ops={"CHC": 0.702},  # opponent of Burke (CWS away)
-            v4_data={680732: {"sum_26": 24}},
+        burke_v4_26 = {
+            "ip_gs": 5.11, "whiff_pct": 19.5, "bb9": 2.04,
+            "gb_pct": 41.5, "xwobacon": 0.354,
+            "g": 8, "gs": 6, "ip": 44.0, "bbe": 130,
+            "era": 3.68, "xera": 3.79,
+        }
+        burke_v4_25 = {
+            "ip_gs": 5.0, "whiff_pct": 25.0, "bb9": 3.5,
+            "gb_pct": 42.0, "xwobacon": 0.395,
+            "g": 28, "gs": 22, "ip": 134.0, "bbe": 130,
+            "era": 4.22, "xera": 4.30,
+        }
+        v4_data_by_season = {2026: {680732: burke_v4_26}, 2025: {680732: burke_v4_25}}
+        fetchers = Fetchers(
+            schedule_fn=lambda d: schedule,
+            fa_pool_fn=lambda: ["Sean Burke"],
+            roster_pitchers_fn=lambda: [],
+            game_log_fn=lambda mid, season: {680732: burke_log}.get(mid, []),
+            team_14d_ops_fn=lambda abbr: {"CHC": 0.702}.get(abbr, 0.720),
+            v4_data_fn=lambda ids, season: v4_data_by_season.get(season, {}),
         )
         result = scan(["2026-05-15"], fetchers=fetchers)
 
@@ -336,7 +375,17 @@ class TestScan:
         assert c["opener_verdict"] == "true_starter"
         assert c["opponent_14d"]["ops"] == 0.702
         assert c["opponent_14d"]["tier"] == "🟢"
-        assert c["v4_2026"] == {"sum_26": 24}
+
+        # v4_2026 enriched
+        assert c["v4_2026"]["ip_gs"] == 5.11  # raw passthrough
+        assert isinstance(c["v4_2026"]["sum_score"], int)
+        assert c["v4_2026"]["rotation_gate"] == "🟢"  # 8 G / 6 GS, IP/GS > 3
+        assert set(c["v4_2026"]["breakdown_pct"].keys()) == {
+            "IP/GS", "Whiff%", "BB/9", "GB%", "xwOBACON",
+        }
+        # v4_2025 prior 也要被 fetch + enrich
+        assert c["v4_2025"]["ip_gs"] == 5.0
+        assert isinstance(c["v4_2025"]["sum_score"], int)
 
     def test_tbd_games_and_owned_segments_populated(self):
         schedule = {"dates": [{"games": [
