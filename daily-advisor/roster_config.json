@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "Util",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -109,7 +109,7 @@
         "pa": 654,
         "g": 155
       },
-      "selected_pos": "2B",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -153,7 +153,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "BN",
+      "selected_pos": "2B",
       "status": ""
     },
     {
@@ -210,7 +210,7 @@
       "positions": [
         "CF"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -232,7 +232,7 @@
       "positions": [
         "C"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -535,25 +535,26 @@
       }
     },
     {
-      "name": "Grant Holmes",
-      "mlb_id": 656550,
-      "yahoo_player_key": "469.p.10549",
-      "team": "ATL",
+      "name": "Sean Burke",
+      "mlb_id": 680732,
+      "yahoo_player_key": "469.p.12418",
+      "team": "CWS",
       "positions": [
-        "SP"
+        "SP",
+        "RP"
       ],
       "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
-        "xera": 4.55,
-        "xwoba_allowed": 0.329,
-        "hh_pct_allowed": 41.9,
-        "barrel_pct_allowed": 10.1,
-        "bbe": 308,
-        "era": 3.99,
-        "ip": 115.0,
-        "ip_per_gs": 5.4
+        "xera": 4.96,
+        "xwoba_allowed": 0.342,
+        "hh_pct_allowed": 42.7,
+        "barrel_pct_allowed": 10.4,
+        "bbe": 393,
+        "era": 4.22,
+        "ip": 134.3,
+        "ip_per_gs": 4.7
       }
     }
   ],
