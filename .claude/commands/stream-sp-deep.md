@@ -187,11 +187,11 @@ python3 /tmp/opp_trend.py"
 ## {SP Name} ({SP team}) vs {Opp} — ET {date} {主/客}場串流深評
 
 > **Verdict divergence**（**只有 deep verdict ≠ pending verdict 才寫此段；相同則整段省略**）：
-> - Pending: {❌ 不推 / ⚠️ 條件推 / ✅ 推}（理由摘要：{pending 表格「一行理由」欄}）
+> - Pending: {verdict}（{若含 `(deep)` 戳記註明「上一輪 deep」；否則就是 scan baseline}；理由摘要：{pending 表格「一行理由」欄}）
 > - **Deep eval: {✅ 強推 / ⚠️ 條件推 / ❌ 不推}**
-> - **差異訊號**：{近 N 場 ERA 反轉 / floor risk 重評 / 對手 7d 趨勢 / vs 慣用手 split / 其他 — 一行說明 5-slot Sum 看不到的訊號}
+> - **差異訊號**：{近 N 場 ERA 反轉 / floor risk 重評 / 對手 7d 趨勢 / vs 慣用手 split / 其他 — 一行說明 pending 反映不到的訊號}
 >
-> 範例（ground truth）：May pending ❌ 不推（理由：5-slot Sum 20 雙年雙弱）→ deep ⚠️ 條件推（差異訊號：近 6 場 ERA 1.67 + floor risk 低，是 5-slot Sum 反映不到的短期訊號）。
+> 範例（ground truth）：May pending ❌ 不推（scan 理由：5-slot Sum 20 雙年雙弱）→ deep ⚠️ 條件推（差異訊號：近 6 場 ERA 1.67 + floor risk 低，是 5-slot Sum 反映不到的短期訊號）。
 
 ### 1. {SP Name} 2026 game log
 
@@ -258,7 +258,49 @@ python3 /tmp/opp_trend.py"
 ## Step 6：不做什麼
 
 - **不重新跑 stream_sp_scan.py** — 已有 pending file 帶 5-slot / Sum / breakdown_pct，本 skill 是補充不是重做
-- **不寫回 pending file** — 深評是 ad-hoc，不持久化（避免 pending 變第二份 cache）。**但若深評 verdict 與 pending 不同，必須在報告開頭主動標出「Verdict divergence」段**，見 Step 5 報告模板。否則用戶看到 deep 報告但 pending 已 stale 而沒察覺，深評最大價值（短期訊號修正結構面 verdict）等於白做
+- **寫回 pending file（限定欄位）** — 見 Step 7。深評 verdict 與 pending 不同必須回寫；相同則只寫備註戳記。不改 Sum / 5-slot / 對手 OPS（scan baseline 不動，保留 audit trail）
 - **不算具體 FAAB 出價** — 預算策略 ≠ 串流評估
 - **不建議 drop 對象** — 由用戶配合當天 fa_scan SP-v4 issue 看 worst SP
 - **不算 lineup lock 時序** — 由用戶換算 ET/TW
+
+## Step 7：寫回 pending file
+
+報告產出後執行寫回。deep verdict ≠ pending verdict → 必須回寫；相同則只 append 備註戳記。
+
+### 7a：改 evaluations 表（限定 2 欄）
+
+只 Edit `### 已評估` 表格的兩欄：
+
+- **Verdict** cell: 改為 `{new verdict} (deep)`，例 `✅ 強推 (deep)` / `⚠️ 條件推 (deep)` / `❌ 不推 (deep)`
+- **一行理由** cell: 改寫為 deep 訊號為主 — 對手 7d / 近 N 場 ERA / floor risk / pattern 訊號（比 scan 一行多顯示什麼）
+
+**不改**（保留 scan baseline 作 audit）：
+- Sum26/25 — 5-slot 結構訊號
+- 5-slot 細節 cell — 同上
+- 對手 OPS（14d）— scan 當天取值
+- SP / 隊 / 對手 / %own — 識別欄位
+
+### 7b：append 備註段
+
+同一輪深評多位候選時統一寫一個區塊：
+
+```
+- {YYYY-MM-DD HH:MM} deep eval（{N} 位候選）：
+  - **{SP1}**：{舊 verdict} → {新 verdict}。差異訊號 = {對手 7d / 近 N 場 ERA / floor / 其他訊號摘要}
+  - **{SP2}**：...
+- 排序：**{SP1} {≈|>|>>} {SP2} {≈|>|>>} {SP3}**。{各自適用情境一句，例「A 對 ERA/WHIP 翻盤較好；B 對 QS/IP 累積較穩」}
+```
+
+verdict 未變動的候選也列入（標 `❌ 維持` / `⚠️ 維持` / `✅ 維持` + 深評確認的訊號），用戶下次補查能看到「上次深評過 X 也已驗證」。
+
+### 7c：更新 last_recheck_at
+
+該 ET 日 H2 的 `- last_recheck_at: ` 改為當下 TW ISO 時間。深評也算一次 recheck。
+
+### 7d：下次深評同位候選時的 baseline
+
+Pending Verdict 若已含 `(deep)` 戳記 → divergence callout 比對 baseline 是「上一輪 deep verdict」，不是原始 scan verdict。戳記不疊加（仍是 `(deep)`），但 一行理由 + 備註 反映最新訊號。
+
+### 7e：原始 scan verdict 哪裡留 audit？
+
+不留。Verdict 欄被 deep 覆寫後 scan 原 verdict 失去，但 Sum26/25 + 5-slot 細節 cell 保留 — 那是 scan 的結構性 ground truth。若需要回看 scan verdict，從 git log 翻 pending file 歷史版本。
