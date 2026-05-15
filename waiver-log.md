@@ -120,10 +120,6 @@
 - 05-14：xwOBA P95 / BB% P80 / Barrel% P95 / HH% P95 全面菁英結構；14d OPS .918 / 3 HR 驗證；prior P70/P25/P50 breakout 跳升；但 PA-TG 1.59 上場有限 + BBE 46 剛過門檻（fa_scan）（fa_scan）
 - 05-15：xwOBA P95 / Barrel% P95 / HH% P95 結構菁英持續；14d OPS .918 / 3 HR 驗證；但 PA-TG 1.59 上場有限 + BBE 46 信心仍低；prior P70/P25/P50 breakout 跳升（fa_scan）
 
-### Daylen Lile (WSH, LF,RF) [mlb_id:695734] — 觀察中
-觸發：Albies 14d OPS <.700 連 3 天 OR Lile Barrel% 升至 P60+ → 升級取代 Albies
-- 05-14：xwOBA P80 / BB% P55 / Barrel% P40 三項全勝 Albies；PA-TG 4.33 全職 + 2SB；prior P80/P25/P25 power 弱確認但量產穩定；54% rising 窗口收窄（fa_scan）（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -152,6 +148,9 @@
 - 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
 
 ## 已結案
+
+### Daylen Lile (WSH, LF,RF) — 被搶（自動偵測）
+- 2026-05-15：Yahoo ownership_type=team，從觀察中移除。
 
 ### Samuel Basallo (BAL, C) — 被搶（自動偵測）
 - 2026-05-13：Yahoo ownership_type=team，從觀察中移除。
