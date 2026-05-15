@@ -104,7 +104,7 @@ ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"impor
 
 替換：
 - `{opp_team_id}` — 對手 team ID（BAL=110 / CLE=114 / WSH=120 / CHC=112 / KC=118 ...，不確定先查 `/teams?sportId=1`）
-- `{et_date}` — 該 ET 日期 ISO 字串（"2026-05-16"）
+- `{et_date}` — **深評對象比賽的 ET 日期 ISO 字串**（例 `"2026-05-16"`），**不是執行報告當下的日期**。Helper 用此 date 為 anchor 算 7d/14d/30d 窗口；填錯（如 5/15 執行時填 `"2026-05-15"` 評估隔天 5/16 的比賽）會讓窗口往前滑 1 天，造成跟下一輪深評 1 天遊戲結果差異被誤判為 regression。Pending file 的 H2 `## ET YYYY-MM-DD` 就是該值。
 - `{sp_id}` — SP MLB Player ID（helper 內部用來查 pitchHand 自動接 vs RHP / vs LHP split，**caller 不用傳慣用手**）
 
 Helper 回 JSON dict，含 4 key：
