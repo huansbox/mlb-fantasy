@@ -4,50 +4,49 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-05-14
-- recorded_at: 2026-05-13T13:40:00+08:00
-- last_recheck_at: 2026-05-14T13:00:00+08:00
-
-### TBD 場次（待補查）
-- MIA @ MIN (MIN home TBD)
-
-### 已評估
-_（本次重跑無通過 Rotation gate + Sum ≥15 + opener 真先發的 FA 候選；DET away 已公布 Keider Montero 為本隊球員，其餘 starter 全 owned by 別隊。）_
-
-### 備註
-- 2026-05-13 21:30 補查：TBD 兩場 (DET away / MIN home) 仍未公布 starter，新評 0 位。
-- 2026-05-13 21:30：Robby Snelling 已被別隊撿走（用戶確認），從評估表移除（不再是 FA 候選）。
-- 2026-05-14 13:00 重跑：DET away 公布 Keider Montero（本隊）。MIN home 仍 TBD。FA candidates 仍 0 位。
-
 ## ET 2026-05-15
 - recorded_at: 2026-05-13T21:30:00+08:00
-- last_recheck_at: 2026-05-14T22:00:00+08:00
+- last_recheck_at: 2026-05-15T12:10:00+08:00
 
 ### TBD 場次（待補查）
-- PHI @ PIT (both TBD)
-- BAL @ WSH (WSH home TBD)
-- TOR @ DET (DET home TBD)
-- MIL @ MIN (both TBD)
-- BOS @ ATL (both TBD)
-- TEX @ HOU (both TBD)
-- KC @ STL (KC away TBD)
-- AZ @ COL (COL home TBD)
-- LAD @ LAA (LAD away TBD)
-- SF @ ATH (both TBD)
+- MIL @ MIN (MIL away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Sean Burke | CWS | CHC (.661) | 25% | 24/15 | <P25·<P25·**P80-90**·P40-50·**P70-80** | ✅ 強推 (deep) | CHC **7d OPS .522** 極弱 + 趨勢強下滑 (.785→.661→.522)；Burke **近 4 場 ERA 3.04 / QS 75%**（5/8 SEA 爆是 outlier）；BB/9 + xwOBACON 雙菁英剛好對應 CHC 弱點 |
-| Dustin May | STL | KC (.709) | 15% | 20/13 | P25-40·<P25·**P70-80**·P40-50·P25-40 | ⚠️ 條件推 (deep) | **近 6 場 ERA 2.55 / QS 83% / IP/GS 5.89**（開季 2 場污染整季 Sum 20）；KC 7d .761 中等持平不到強推門檻，但 floor risk 已消 + 結構回歸風險仍在 |
-| Jesse Scholtens | TB | MIA (.663) | 2% | 18/24* | <P25·<P25·P25-40·P40-50·**P70-80** | ❌ 不推 (deep) | **6 場僅 2 場 GS=1**（4 場 bulk relief）+ 真先發 IP avg **4.92** → QS<15%；MIA 7d .655 弱對手但 role 是 disqualifier，對手再弱也救不了 |
-
-_*Scholtens 2025 sum 24 但 GS=0 全 RP，IP/GS 缺值；雙年 prior 不是真實 SP 樣本。_
+| 🆕 Kyle Freeland | COL home | AZ (.583) | 2% | 20/21 | <P25·P50-60·P60-70·P40-50·<P25 | ⚠️ 借觀察 | AZ 14d .583 極弱對手，但 Freeland 5 軸無菁英 + 雙年 xwOBACON <P25 + Coors 主場放大風險，期望 IP 4-5 / QS 低 |
 
 ### 備註
-- 2026-05-14 22:00 deep eval（3 位候選）：
-  - **Burke**：⚠️ → ✅ 強推。差異訊號 = CHC 7d .522 極弱 + 趨勢下滑 + 近 4 場 ERA 3.04 / QS 75%（5/8 SEA 爆 outlier）
-  - **May**：❌ → ⚠️ 條件推。差異訊號 = 近 6 場 ERA 2.55 / QS 83%（開季 TB/DET 兩場污染 Sum 20）；KC 7d .761 中等沒到強推
-  - **Scholtens**：❌ 維持。深評確認 mixed-role（6 場僅 2 GS / 真先發 IP avg 4.92），對手 .655 弱救不了 role
-- 排序：**Burke ≈ May >> Scholtens**。Burke 對 ERA/WHIP 翻盤較好；May 對 QS/IP 累積較穩。
+- 2026-05-15 12:10 補查：舊評三位全部不再是 FA — **Burke 已 claim 成本隊 ✅**；**May / Scholtens 已被別隊撿走**。三 row 從表格移除。
+- 唯一新評 Kyle Freeland（Sum 20 對手 .583 🟢🟢）— 借觀察等級不推，建議不串 5/15。
+- 剩 1 場 TBD：MIL @ MIN（MIL away），TW 5/15 晚補查或讓它自然 13:00 過期。
+- 2026-05-14 22:00 deep eval 紀錄（保留 audit）：
+  - **Burke**：⚠️ → ✅ 強推（CHC 7d .522 極弱 + Burke 近 4 場 ERA 3.04 / QS 75%）→ 已 claim
+  - **May**：❌ → ⚠️ 條件推（近 6 場 ERA 2.55 / QS 83%）→ 被別隊撿
+  - **Scholtens**：❌ mixed-role 維持 → 被別隊撿
+
+## ET 2026-05-16
+- recorded_at: 2026-05-15T12:10:00+08:00
+- last_recheck_at: 2026-05-15T13:00:00+08:00
+
+### TBD 場次（待補查）
+- TOR @ DET (both TBD)
+- SD @ SEA (SD away TBD)
+- NYY @ NYM (NYM home TBD)
+
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Cade Cavalli | WSH home | BAL (.639) | 14% | 24/31 | <P25·**P70-80**·<P25·P50-60·**P70-80** | ✅ 推 (deep) | BAL **7d .595 極弱 + 30d→7d 強下滑 -.073**；BAL K% 26.7% 對 Whiff P70-80 直接利 K；Cavalli 近 5 場 ERA 3.64 + floor risk 低（4/13 PIT 1.1IP 4ER 是 outlier）|
+| Chris Paddack | CIN | CLE (.665) | 1% | 20/15 | <P25·P40-50·P50-60·P25-40·P40-50 | ❌ 不推 (deep) | **近 4 場 ERA 9.29 災難**（7 場 4 場 ER ≥5，連對弱也爆）；CLE K% 16.9% contact 線抵銷 K 期望 + BB% 14.7% 極高吃 PC，luck (xERA 4.33) 連 4 場沒回歸 |
+| Chris Bassitt | BAL | WSH (.803) | 13% | 21/28 | <P25·P25-40·<P25·P70-80·P70-80 | ❌ 不推 (deep) | **WSH 30d→7d 強上升 +.093**（.704→.769→.797 正熱化）；Bassitt 近 6 場 ERA 3.43 反而回升但對手熱抵銷；對「強/中-強」歷史 1/3 QS |
+
+### 備註
+- 2026-05-15 12:10 首次評估（3 位候選通過 Rotation gate + Sum ≥15 + opener 真先發）。
+- 已過濾：Kai-Wei Teng（Rotation gate 🚫，2026 GS 2/15 mixed role）/ Kyle Leahy（Sum 14 hard floor）。
+- 2026-05-15 13:00 deep eval（3 位候選）：
+  - **Cavalli**：✅ 維持。深評確認訊號 = BAL 7d .595 + 趨勢強下滑 + K% 26.7% 高利 K + Cavalli 近 5 場 ERA 3.64 floor 低
+  - **Paddack**：❌ 維持加強。差異訊號 = 近 4 場 ERA 9.29（floor 系統性破裂，xERA luck 連 4 場沒回歸）+ CLE K% 16.9% contact 不利 K + BB% 14.7% 極高
+  - **Bassitt**：❌ 維持加強。差異訊號 = WSH 30d→14d→7d 強上升 +.093（scan 14d baseline 沒反映）+ Bassitt 對中-強歷史 1/3 QS
+- 排序：**Cavalli >>> Paddack ≈ Bassitt**。Cavalli 對 ERA/K 翻盤最好；Paddack/Bassitt 都 floor risk 不適合 contested。FAAB $1-3 撿 Cavalli。
 - _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
