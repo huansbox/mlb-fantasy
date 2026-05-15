@@ -2,20 +2,6 @@
 
 ## 觀察中
 
-### Moisés Ballesteros (CHC, C) [mlb_id:694208] — 觀察中
-觸發：PA-TG 任 1 天 ≥2.8 OR Albies 14d OPS <.800 → 立即取代（05-08 preempt 化）
-- 04-29~05-05：xwOBA P80-95 / 14d OPS 1.456→.875 持續火燙退散；PA-TG 連 5 天未達 3.0 → 05-03 降低門檻至 2.8 連 3 天
-- 05-06：PA-TG 2.69 連 8 天未達 2.8；14d OPS .895 / K% 10.2 控 K 極佳；42% explosive +11 搶人潮加劇（fa_scan）
-- 05-07：PA-TG 2.70 連 9 天未達 2.8；14d OPS .800；43% explosive +12 窗口即將關閉 — 建議降門檻至「任 1 天 PA-TG ≥2.8」或 preempt（fa_scan）
-- 05-08：PA-TG 2.76 連 10 天未達 2.8；14d OPS .718 / K% 13.0 控 K 極佳；43% plateau 窗口持續收窄 — 建議 preempt（fa_scan）
-- 05-09：PA-TG 2.69 連 11 天未達 2.8；14d OPS .718 / K% 13.0；41% plateau — Preempt 條件：PA-TG 任 1 天 ≥2.8 或 Albies 14d OPS <.800 即行動（fa_scan）
-- 05-10：PA-TG 2.65 連 12 天未達 2.8；14d OPS .699 / K% 13.7 控 K 佳但 OPS 再降；39% dropping -4 壓力降；Albies 14d OPS 1.003 另一觸發遠未達（fa_scan）
-- 05-11：14d OPS .548 / K% 18.9 冷卻持續第 3 週；PA-TG 2.68 連 13 天未達 2.8；38% dropping -5 壓力消退；Albies 14d OPS .935 另一觸發遠未達 — 急迫性已低（fa_scan）
-- 05-12：14d OPS .548 / K% 18.9 冷卻第 3 週；PA-TG 2.68 連 14 天未達 2.8；34% dropping -7 壓力消退；Albies 14d OPS .935 另一觸發遠未達 — 急迫性已低（fa_scan）
-- 05-13：14d OPS .456 / K% 17.3 冷卻第 3 週；PA-TG 2.69 連 15 天未達 2.8；32% dropping -7 壓力消退；Albies 14d OPS .835 另一觸發遠未達 — 急迫性已低（fa_scan）
-- 05-14：14d OPS .326 崩塌 / K% 19.2 控 K 仍佳但產量全滅；PA-TG 2.72 未達 2.8；30% dropping -8 壓力消退；Albies 14d OPS .814 另一觸發遠未達 — 急迫性已低（fa_scan）
-- 05-15：14d OPS .326 崩塌第 4 週 / K% 19.2；PA-TG 2.72 連 16 天未達 2.8；29% dropping -14 市場大量拋售；Albies 14d OPS .696 另一觸發接近但未達 — 建議結案（fa_scan）
-
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
 觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評；
      或 Duran 被搶 → 立即升級為 Altuve 替代候選
@@ -76,16 +62,6 @@
 - 05-14：14d OPS .856 / Savant Δ+0.051 品質飆升持續；BBE 70 距 80 門檻差 10；1% 零壓力（fa_scan）
 - 05-15：14d OPS .856 / Savant Δ+0.056 品質飆升持續；BBE 71 距 80 門檻差 9；1% 零壓力（fa_scan）
 
-### Ryan McMahon (NYY, 3B) [mlb_id:641857] — 觀察中
-觸發：xwOBA 回升 P60+ 或 Altuve 被換後備用錨點
-- 05-09：BB% P80 / HH% P95 + prior P70/P80/P80 三項雙年確認；14d OPS .816；xwOBA P50 是短板；3% 零壓力（fa_scan）
-- 05-10：14d OPS .802 / 8 RBI 穩健；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.012 小幅上升；0% 零壓力（fa_scan）
-- 05-11：14d OPS .730 / 7 RBI；xwOBA P55 短板不變 + prior P70 支撐；Savant Δ+0.010 微升；0% 零壓力（fa_scan）
-- 05-12：14d OPS .684 / 6 RBI；xwOBA P50 短板不變 + prior P70 支撐；Savant Δ+0.018 微升；0% 零壓力（fa_scan）
-- 05-13：14d OPS .639 / 6 RBI 持續下滑；xwOBA P40 降 + prior P70 支撐；Savant Δ+0.022 微升；0% 零壓力（fa_scan）
-- 05-14：14d OPS .639 / 6 RBI 持續下滑；xwOBA P25 惡化 + prior P70 支撐；Savant Δ+0.025 微升；0% 零壓力（fa_scan）
-- 05-15：14d OPS .639 / 6 RBI 持續下滑；xwOBA P25 惡化至結構性弱 + prior P70 支撐；Savant Δ+0.012 微升；0% 零壓力（fa_scan）
-
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級取代 Altuve
 - 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
@@ -120,21 +96,26 @@
 - 05-14：xwOBA P95 / BB% P80 / Barrel% P95 / HH% P95 全面菁英結構；14d OPS .918 / 3 HR 驗證；prior P70/P25/P50 breakout 跳升；但 PA-TG 1.59 上場有限 + BBE 46 剛過門檻（fa_scan）（fa_scan）
 - 05-15：xwOBA P95 / Barrel% P95 / HH% P95 結構菁英持續；14d OPS .918 / 3 HR 驗證；但 PA-TG 1.59 上場有限 + BBE 46 信心仍低；prior P70/P25/P50 breakout 跳升（fa_scan）
 
+### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
+觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
+     或 Crawford 後 15 場 BB% 退至 <10% + AVG <.200 連 5 天 → 降級結案（breakout 消退確認）
+- 2026-05-15：[eval] FA SS pool 掃描唯一達 Swanson 等級候選（其他 6 人全部 Sum <20 或結構性弱）；雙年雙菁英 xwOBA P80→P95 / BB% P85→>P90 + 機制大幅進步 Whiff% 20.4→14.4 / Chase% 21.9→17.1 ✅；近況：後 15 場 AVG .263 / BB% 17.4% / K% 11.6% / HR 4，breakout 持續驗證中；xBA .263 vs AVG .215 = +48 點 BABIP 噪音 buy-low（強過 Swanson +36 點）；11% owned + 5/3 被搶後 drop 回池 = 市場 brand-bias 撿便宜窗口；不立即執行原因：Swanson Sum 26 = Crawford Sum 26 平手 + Swanson 機制跨年穩無崩 = 不顯著升級，鎖窗口等 Swanson 真正過 brand bias 警戒線（player-eval）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
 
-### Luis Severino (ATH, SP) [mlb_id:622663] — borderline anchor 觀察
-觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），近 2 場 transformation level（13.2 IP / 2 ER / 3 BB / 13 K = ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）
+### Luis Severino (ATH, SP) [mlb_id:622663] — borderline anchor 觀察（控球失守降回 hold）
+觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），4/29 起 transformation 候選
 - 啟動 2026-05-02（roster_sync 自動 add）
 - 新聞脈絡：04-29 Sutter 簽約後最佳場（7 IP / 1 ER / 8 K），fastball 使用率 reverted（sit 96 / top 99 mph，stuff elite 沒退化)
 - A's Opening Day starter，球隊 2026 唯一可靠 SP，輪值 100% 鎖定
-- **驗證觸發**（下 2 場 ALL 通過 → borderline 轉正式 anchor）：
-  1. BB ≤2（控球修復確認，非 2 場 fluke）
-  2. IP ≥6（IP/GS 結構維持）
-  3. 主場場至少 1 場 ER ≤2（破除 2025 home ERA 6.01 結構弱點）
-- **失守降級**（任一觸發 → 降回觀察 / hold）：BB ≥4 任一場 / IP <5 任一場
-- 風險：季線 BB/9 5.40 P25 floor 仍是大缺口，2 場樣本對抗 7 場 noise；Sutter 主場結構性弱點未完全破除
+- **驗證進度**（5/5、5/10 兩場）：
+  - 5/5 vs SEA（主場）: 5.0 IP / 1 ER / BB 2 / K 3 — ER ≤2 ✓ / BB ≤2 ✓ / IP ≥6 ❌（5.0 邊緣）
+  - 5/10 @ TEX: 5.1 IP / 2 ER / **BB 4** / K 4 — **BB ≥4 失守條件觸發** ❌
+- **狀態**：降回正式 hold，控球修復不確認（季線 BB/9 5.40 P25 floor 仍是結構大缺口）
+- **重新升級觸發**：未來 3 場連續 BB ≤2 + IP ≥6 + ER ≤3 → 重啟 anchor 觀察
+- **drop 觸發**：BB ≥4 連 2 場 OR ER ≥5 任 1 場 → 啟動 drop 候選掃描
 
 ### Dansby Swanson (CHC, SS) [mlb_id:621020] — BABIP 噪音追蹤
 觸發：xBA-AVG 差距收斂至 ≤0.020（回歸啟動確認）→ 移除追蹤；或 14d xwOBA <P50 連 7 天 → 重評
@@ -146,8 +127,19 @@
 - **5-agent vote 5/5 票一致排為三人中 best**（vs Altuve worst / Duran 中段）— 用戶 trad-driven 質疑被獨立判斷化解
 - 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
 - 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
+- 05-15：[eval] vs Stott (FA, 37% owned) + Meidroth (15% owned 已 Pass)，結論：hold；Sum 26 vs Stott 12 / Meidroth 14（差 +14 / +12），LA/EV/Whiff%/Chase% 跨年全穩 = mechanic 無崩；14d xwOBA .257 弱化 Δ -0.074 接近 -0.080 警戒但未達；持續 BABIP 噪音 buy-low（xBA .225 vs AVG .189 差 -36 點）（player-eval）
+- 05-15：[eval] 3-agent 獨立 reasoning 一致 hold；補 split 訊號：前 15 場 BB% 18.0% / 後 15 場 BB% 7.5% = breakout 後段消退（後 15 場已回 2025 7.3% 水準）；14d Savant 三指標同步退化 xwOBA -.074 / Barrel% -6.4pp / HH% -5.4pp 非純 BABIP 噪音；信心下調 高→中；交叉觀察 [[Crawford]]（FA SS pool 唯一達 Sum 26 候選，但雙人平手不顯著升級）；stop-loss：14d xwOBA Δ ≥-0.080 連 5 天 / 後 10 場 Barrel% 仍 <P25 / Whiff% 或 Chase% 跨年劇變 / 角色變動（player-eval）
 
 ## 已結案
+
+### Moisés Ballesteros (CHC, C) [mlb_id:694208] — Pass
+- 2026-05-15：觀察 17 天結案；14d OPS 從 1.456 一路崩塌至 .326（第 4 週冷卻），%owned 29% dropping -14 市場大量拋售；PA-TG 連 16 天未達 2.8 觸發；Albies 14d OPS .696 另一觸發接近但未達 — 上場時間問題 + 熱度退散雙重失敗（fa_scan）
+
+### Ryan McMahon (NYY, 3B) [mlb_id:641857] — Pass
+- 2026-05-15：14d OPS .639 連 4 天持續下滑 / 6 RBI；xwOBA 從 P50 一路惡化至 P25 結構性弱（5/9 P50 → 5/13 P40 → 5/14-15 P25），prior P70 支撐被當季退化抵銷；0% 持有零市場壓力；Altuve 替代備案觸發未達，主動結案
+
+### Bryson Stott (PHI, 2B/SS) [mlb_id:656555] — Pass
+- 2026-05-15：[eval] vs 隊上 Swanson；季線 xwOBA P50-55 / BB% <P25 / Barrel% P40-45 整體平庸，Sum 12 vs Swanson 26 差 -14；**BB% 雙年退步**：2025 9.6% (P75) → 2026 5.0% (<P25) 是 plate discipline 結構性崩，xwOBA 也從 P65 退回 P55；HH% 跨年從 P<25 跳 P55 是 contact 進步亮點但不足翻 Sum gap；速度 8 SB 是亮點但我們軟 punt SB；持有率 37% 反映市場已給折價（player-eval）
 
 ### Daylen Lile (WSH, LF,RF) — 被搶（自動偵測）
 - 2026-05-15：Yahoo ownership_type=team，從觀察中移除。
@@ -157,6 +149,7 @@
 
 ### Chase Meidroth (CWS, 2B/3B/SS) [mlb_id:805367] — Pass
 - 2026-05-12：[eval] vs 隊上 Swanson；雙年 Barrel% 1.6/3.8 <P25 + HH% P25-40 contact 結構性弱，xwOBA P50-55 中段；AVG .278 是 BABIP 幻覺（xBA .241 差 -37 點）；14d K% 從 19.5% 跳至 ~30% 警訊；BB% P70-80 是亮點但比 Swanson P90+ 顯著差；24 歲 leadoff 主力是唯一 upside 但 contact ceiling 結構封頂（player-eval）
+- 2026-05-15：[eval] vs 隊上 Swanson 再次確認 Pass；14d「火燙」AVG .351 證實為 BABIP 幻覺 — 最近 10 場 BB 1 / K 14（BB% 2.7% 從 season 9.7% 急跌 / K% 38% 從 19.5% 暴升），contact 結構崩跡象擴大；Sum 14 vs Swanson 26 仍差 -12（player-eval）
 
 ### J.T. Ginn (ATH, SP,RP) — 被搶（自動偵測）
 - 2026-05-12：Yahoo ownership_type=team，從觀察中移除。
@@ -168,14 +161,14 @@
 - 2026-05-09：Yahoo ownership_type=team，從觀察中移除。
 
 ### Carter Jensen (KC, C) [mlb_id:695600] — Pass
-- 2026-05-09：Stanton IL 期間觸發條件「BB% <P40 至 Week 7」凍結中；Jensen 自身 14d OPS .492 / K% 37.5 崩盤加劇 / xwOBA 從 P80 退至 P50；觸發實質失效，結案。
+- 2026-05-09：14d OPS .492 / K% 37.5 崩盤 / xwOBA P80→P50；Stanton IL 觸發凍結 — 觸發實質失效結案
 
 ### Carson Kelly (CHC, C) [mlb_id:608348] — Pass
-- 2026-05-09：14d Savant Δ-0.141 連 7 天暴跌（季最差）；OPS .760 靠 trad 撐；PA-TG 連 9 天未達 3.0；breakout 可信度極低，fa_scan 同步建議結案。
+- 2026-05-09：14d Savant Δ-0.141 連 7 天暴跌（季最差）；OPS .760 靠 trad 撐；PA-TG 連 9 天未達 3.0；breakout 可信度極低
 
-### Dillon Dingler (DET, C) [mlb_id:693307] — Pass
-- 2026-05-09：14d Savant Δ-0.097 連跌第 8 天 / 14d RBI 8 counting 下滑；BB% P0 結構缺陷不填 BB 缺口；Buxton 14d OPS 1.011 / 7 HR 觸發「<.700」遠未達 — 破窗無望，結案。
-- 05-15：xwOBA P95 / Barrel% P95 / HH% P95 結構菁英 + prior P95/P60；BB% P25 是 7×7 結構短板；14d OPS .795 / 3 HR / Savant Δ-0.062 品質下滑；50% rising +3 窗口收窄中（fa_scan）
+### Dillon Dingler (DET, C) [mlb_id:693307] — Pass（5/15 訊號待重評）
+- 2026-05-09：14d Savant Δ-0.097 連跌第 8 天 / BB% P0 結構缺陷；Buxton 14d OPS 1.011 觸發遠未達 — 破窗無望結案
+- 05-15：fa_scan 訊號回升 xwOBA P95 / Barrel% P95 / HH% P95 結構菁英 + 14d OPS .795 / 3 HR + 50% rising +3，但 BB% P25 短板 + Savant Δ-0.062 品質下滑 — 維持 Pass 觀察中（fa_scan）
 
 ### Austin Martin (MIN, 2B,LF,CF) — 被搶（自動偵測）
 - 2026-05-06：Yahoo ownership_type=team，從觀察中移除。
@@ -186,24 +179,25 @@
 ### Spencer Steer (CIN, 1B,LF) — 被搶（自動偵測）
 - 2026-05-05：Yahoo ownership_type=team，從觀察中移除。
 
-### J.P. Crawford (SEA, SS) — 被搶（自動偵測）
+### J.P. Crawford (SEA, SS) — 被搶（自動偵測，5/15 重新激活觀察）
 - 2026-05-03：Yahoo ownership_type=team，從觀察中移除。
+- 2026-05-15：回到 FA 池（11% owned），雙年菁英 + 機制大幅進步 → 重新激活見上方「觀察中」段
 
 ### Cole Young (SEA, 2B) — 被搶（自動偵測）
 - 2026-05-01：Yahoo ownership_type=team，從觀察中移除。
 - 05-10：xwOBA P80 / BB% P55 / ✅主力 PA-TG 3.92；prior BB% P80 結構優於 Altuve；14d OPS .851 穩健但 Savant Δ-0.027 小幅下滑（fa_scan）
 
 ### Jose Caballero (NYY, 2B/3B/SS/LF/RF) [mlb_id:676609] — Pass
-- 2026-05-03：[eval] xwOBA / HH% / Barrel% **雙年雙確認 <P25 結構性弱**（Sum 內部 5，全隊最低）；SB 是唯一亮點（2025 49 / 2026 pace 60+）但我隊軟 punt SB 不主動追；BB% 從 2025 P90+ 崩到 2026 <P25 大幅退化；14d trad .313 是 BABIP 幻覺（Savant 全 <P25）；79% owned 市場溢價（player-eval）
+- 2026-05-03：[eval] xwOBA/HH%/Barrel% 雙年雙確認 <P25 結構性弱（Sum 5 全隊最低）；BB% P90→<P25 大幅退化；14d trad .313 是 BABIP 幻覺；SB 唯一亮點但軟 punt 不追；79% owned 市場溢價（player-eval）
 
 ### Anthony Kay (CWS, SP) [mlb_id:641743] — Pass
-- 2026-05-04：[stream-eval] Week 6 vs WorkWork 串流評估；K/9 5.4 + WHIP 1.68（季線 25 IP / 6.12 ERA）對 SD 預期 5 IP / 3 K，補 K 邊際小但 WHIP 拉爆。對手 2 SP（Luzardo K9 10.7 / Matz K9 7.8）K 預期 +12-14，撿 Kay 補 +3 K 仍翻不了 K，且 ERA 4.70→4.78、WHIP 1.39→1.41 把已輸的拉更開。整體 1 win 機率撿 Kay 4.9% vs 不撿 4.1%，邊際 +0.8pp 不值得動 acquisition
+- 2026-05-04：[stream-eval] Week 6 vs SD；K/9 5.4 / WHIP 1.68，對手雙 SP K9 10.7+7.8 翻 K 無望，撿 Kay 1 win 機率 4.9% vs 不撿 4.1% 邊際 +0.8pp 不值得 acquisition
 
 ### Trey Gibson (BAL, SP) [mlb_id:694346] — Pass
-- 2026-05-04：[stream-eval] 5/3 新秀首登 @ NYY 評估；AAA 4.01 ERA / K9 9.1 / BB9 4.4 / 球速 93.6 + plus death ball stuff，對位最差（NYY elite 打線 + Yankee Stadium 左打天堂 + 客場新秀首登）。Yahoo 系統 NA 狀態（撿了若 24h 內未升級成 SP，stats 不算 = 浪費 acquisition）。預期 4-5 IP / 4-6 K / WHIP 1.7+，K upside 被 NA 風險吃掉後跟 Kay 差不多但 WHIP 更傷。Kay > Gibson > 不撿（Kay vs Gibson Yahoo NA 風險 + 對位差是 deal-breaker）
+- 2026-05-04：[stream-eval] 5/3 新秀首登 @ NYY；對位最差（NYY 左打天堂 + 客場新秀）+ Yahoo NA 狀態風險（24h 內未升 SP = 浪費 acquisition）
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — Pass
-- 2026-05-06：[stream-eval] 5/6 @ SEA vs Woo 串流評估；v4 Sum 21 + xwOBACON .355 (s=8) 結構優於 Corbin，**但 4/26 已被 ATL DFA 改簽 MiLB 合約**，5/6 schedule 顯示先發極可能過時資料（ATL 已換 Dylan Dodd 上來）。撿了會浪費 FAAB + acquisition。即使排除身分問題：xERA 4.46 / xERA-ERA −2.24 賣高運氣極端，撿來預期 ERA 大幅回升拉爛我隊 1.96 ERA。
+- 2026-05-06：[stream-eval] 4/26 已被 ATL DFA 改 MiLB 合約，schedule 過時資料；即使先發 xERA-ERA −2.24 賣高運氣極端會拉爛 ERA
 
 ### Patrick Corbin (TOR, SP) [mlb_id:571578] — Pass
-- 2026-05-06：[stream-eval] 5/6 @ TB vs McClanahan 串流評估；v4 Sum 13（5 項 ⚠️）/ xwOBACON **.426 (s=1) 極端差** / xERA 5.69 / Whiff% 20.7 / IP/GS 4.93 全方位結構崩盤；3.65 ERA 是運氣加持（xERA-ERA −2.04 賣高極端）。對 McClanahan W 機率低，預期 5 IP / 2 K / 4 ER 拉爛 ERA。我隊 ERA 1.96 已聯盟前段 + IP 23/40 路徑安全 + 10 SP 在隊上，無 contested 觸發訊號。
+- 2026-05-06：[stream-eval] v4 Sum 13 / xwOBACON .426 全方位結構崩 / xERA-ERA −2.04 賣高運氣極端；我隊 ERA 1.96 + IP 路徑安全無 contested 觸發
