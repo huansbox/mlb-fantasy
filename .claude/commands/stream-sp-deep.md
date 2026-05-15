@@ -41,33 +41,22 @@ ssh root@107.175.30.172 "curl -s 'https://statsapi.mlb.com/api/v1/people/search?
 
 ## Step 1：拉 game log + 對手強弱 pattern 分類
 
-### 1a：MLB Stats API gameLog
+### 1a：呼叫 `mlb_query.gamelog_with_qs`
 
 ```bash
-ssh root@107.175.30.172 "cat > /tmp/sp_log.py << 'PYEOF'
-import json, urllib.request
-MLB_ID = {mlb_id}  # 替換
-url = f'https://statsapi.mlb.com/api/v1/people/{MLB_ID}/stats?stats=gameLog&season=2026&group=pitching'
-d = json.loads(urllib.request.urlopen(url).read())
-splits = d['stats'][0]['splits']
-
-teams = json.loads(urllib.request.urlopen('https://statsapi.mlb.com/api/v1/teams?sportId=1').read())['teams']
-abbr = {t['id']: t.get('abbreviation', t['name'][:3]) for t in teams}
-
-print(f'2026 共 {len(splits)} 場')
-print()
-print(f\"{'Date':<12}{'Opp':<6}{'H/A':<5}{'IP':<6}{'H':<4}{'R':<4}{'ER':<4}{'BB':<4}{'K':<4}{'HR':<4}{'PC':<6}{'ERA':<7}\")
-print('-'*65)
-for s in splits:
-    st = s['stat']
-    opp = abbr.get(s['opponent']['id'], s['opponent']['name'][:3])
-    ha = 'H' if s.get('isHome') else 'A'
-    print(f\"{s['date']:<12}{opp:<6}{ha:<5}{str(st['inningsPitched']):<6}{str(st['hits']):<4}{str(st['runs']):<4}{str(st['earnedRuns']):<4}{str(st['baseOnBalls']):<4}{str(st['strikeOuts']):<4}{str(st['homeRuns']):<4}{str(st.get('numberOfPitches','-')):<6}{str(st.get('era','-')):<7}\")
-PYEOF
-python3 /tmp/sp_log.py"
+ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"import json; from mlb_query import gamelog_with_qs; print(json.dumps(gamelog_with_qs({mlb_id}, 2026), indent=2))\""
 ```
 
-> **Quoting hint**：MLB Stats API 從 VPS heredoc 寫 Python 比本機 Windows PowerShell 直接 inline 穩。AI 直接 ssh 跑 VPS script。
+替換 `{mlb_id}` 為 SP 的 MLB Player ID。Helper 回 JSON list，每場含：
+
+| 欄位 | 說明 |
+|---|---|
+| `date` / `opp` / `h_a` | 比賽日期 / 對手 abbr / H 或 A |
+| `ip` (string) / `ip_decimal` (float) | "5.2" 跟 5.667 兩個都給；報告用 `ip`，QS 邏輯內部用 `ip_decimal` |
+| `qs` (bool) | Quality Start = IP ≥ 6 且 ER ≤ 3，已 mechanical 算好 |
+| `h` / `r` / `er` / `bb` / `k` / `hr` / `pc` / `era` | 比賽其他 raw 欄位 |
+
+> **不要再自己手算 QS**。helper 已用 `parse_ip("5.2") = 5.667` 邏輯保證 5⅔ IP 不會被誤判為 QS（單元測試覆蓋）。
 
 ### 1b：對手強弱 pattern 分類（手動，AI 看 table 整理）
 
@@ -105,44 +94,29 @@ python3 /tmp/sp_log.py"
 
 > 為什麼明確 N：兩 session 用「自然分界」會切出不同 N，verdict 也跟著漂。先 anchor N=6，再才考慮 override。
 
-## Step 2：對手多窗口趨勢
+## Step 2：對手多窗口趨勢 + vs 慣用手 split
+
+### 2a：呼叫 `mlb_query.opponent_context`
 
 ```bash
-ssh root@107.175.30.172 "cat > /tmp/opp_trend.py << 'PYEOF'
-import json, urllib.request
-from datetime import date, timedelta
-
-OPP_TEAM_ID = {opp_id}  # 替換（CHC=112 / KC=118 / 用 abbr lookup）
-END_DATE = '{et_date}'  # 該 ET 日期
-
-def fetch_range(start, end):
-    url = f'https://statsapi.mlb.com/api/v1/teams/{OPP_TEAM_ID}/stats?stats=byDateRange&group=hitting&season=2026&startDate={start}&endDate={end}&sportId=1'
-    return json.loads(urllib.request.urlopen(url).read())
-
-end = date.fromisoformat(END_DATE)
-for days, label in [(7, '7d'), (14, '14d'), (30, '30d')]:
-    start = end - timedelta(days=days)
-    d = fetch_range(start.isoformat(), end.isoformat())
-    s = d['stats'][0]['splits'][0]['stat']
-    pa = s['plateAppearances']
-    print(f\"{label} ({start} → {end}): G={s['gamesPlayed']:>2} AVG={s['avg']} OBP={s['obp']} OPS={s['ops']} R/G={s['runs']/max(s['gamesPlayed'],1):.2f} K%={s['strikeOuts']/pa*100:.1f}% BB%={s['baseOnBalls']/pa*100:.1f}%\")
-
-# vs same-hand season split. SP 慣用手 → sitCodes: 'vr' (vs RHP) or 'vl' (vs LHP)
-SP_THROWS = '{sp_throws}'  # 'R' or 'L'
-sit = 'vr' if SP_THROWS == 'R' else 'vl'
-url = f'https://statsapi.mlb.com/api/v1/teams/{OPP_TEAM_ID}/stats?stats=statSplits&sitCodes={sit}&group=hitting&season=2026&sportId=1'
-d = json.loads(urllib.request.urlopen(url).read())
-splits = d['stats'][0]['splits']
-if splits:
-    s = splits[0]['stat']
-    pa = s['plateAppearances']
-    print(f\"season vs {SP_THROWS}HP: G={s['gamesPlayed']} PA={pa} AVG={s['avg']} OBP={s['obp']} OPS={s['ops']} K%={s['strikeOuts']/max(pa,1)*100:.1f}% BB%={s['baseOnBalls']/max(pa,1)*100:.1f}%\")
-PYEOF
-python3 /tmp/opp_trend.py"
+ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"import json; from mlb_query import opponent_context; print(json.dumps(opponent_context({opp_team_id}, '{et_date}', {sp_id}), indent=2))\""
 ```
 
-讀完看：
-- **趨勢方向**：7d vs 14d vs 30d 是惡化 / 持平 / 回升？（門檻：±.040 OPS 算明顯方向）
+替換：
+- `{opp_team_id}` — 對手 team ID（BAL=110 / CLE=114 / WSH=120 / CHC=112 / KC=118 ...，不確定先查 `/teams?sportId=1`）
+- `{et_date}` — 該 ET 日期 ISO 字串（"2026-05-16"）
+- `{sp_id}` — SP MLB Player ID（helper 內部用來查 pitchHand 自動接 vs RHP / vs LHP split，**caller 不用傳慣用手**）
+
+Helper 回 JSON dict，含 4 key：
+
+| Key | 內容 |
+|---|---|
+| `7d` / `14d` / `30d` | 各窗口 batting stats — `g` / `avg` / `obp` / `ops` / `rg` / `k_pct` / `bb_pct` |
+| `vs_hand` | season vs SP 慣用手 split — `pa` / `avg` / `obp` / `ops` / `k_pct` / `bb_pct` / `hand`（"R" or "L"）|
+
+### 2b：讀完看
+
+- **趨勢方向**：7d vs 14d vs 30d OPS 是惡化 / 持平 / 回升？（門檻：±.040 OPS 算明顯方向）
 - **K%/BB% 變化**：7d 對比 30d 是否明顯波動？高 BB% 對控球弱的 SP 是警示
 - **vs 慣用手 split**：對 SP 是利多 / 中性 / 利空？（比季全 OPS ±.030 算顯著）
 
