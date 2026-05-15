@@ -132,7 +132,7 @@
         "g": 126
       },
       "selected_pos": "CF",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Ozzie Albies",
@@ -178,29 +178,6 @@
       },
       "selected_pos": "RF",
       "status": ""
-    },
-    {
-      "name": "Giancarlo Stanton",
-      "mlb_id": 519317,
-      "team": "NYY",
-      "positions": [
-        "LF",
-        "RF"
-      ],
-      "yahoo_player_key": "469.p.8634",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.354,
-        "barrel_pct": 22.1,
-        "hh_pct": 55.2,
-        "bb_pct": 10.3,
-        "ops": 0.944,
-        "pa_per_team_g": 1.73,
-        "pa": 281,
-        "g": 77
-      },
-      "selected_pos": "IL",
-      "status": "IL10"
     },
     {
       "name": "Trent Grisham",
@@ -366,7 +343,7 @@
         "gb_pct": 37.5,
         "xwobacon": 0.37
       },
-      "selected_pos": "BN",
+      "selected_pos": "IL",
       "status": "IL15"
     },
     {
