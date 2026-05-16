@@ -37,7 +37,7 @@
 
 ## ET 2026-05-17
 - recorded_at: 2026-05-16T10:35:00+08:00
-- last_recheck_at: —
+- last_recheck_at: 2026-05-16T11:00:29+08:00
 
 ### TBD 場次（待補查）
 - BOS @ ATL (BOS away TBD)
@@ -47,12 +47,12 @@
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Andre Pallante | STL home | KC (.694) | 6% | 28/31 | P25-40·P40-50·<P25·**>P90**·**P80-90** | ✅ 推 | GB% >P90 + xwOBACON P80-90 雙菁英抑長打，雙年 Sum 28/31 穩；對手 KC 🟢；風險 BB/9 4.04 <P25 吃 WHIP |
-| Jeffrey Springs | ATH home | SF (.656) | 33% | 26/22 | P40-50·P40-50·P50-60·<P25·**P80-90** | ✅ 推 | xwOBACON P80-90 菁英 + xERA 3.59 < ERA 4.22 買低訊號；IP/GS 5.44 有 QS 機會；對手 SF 🟢；%own 33% 別隊可能搶 |
-| Grant Holmes | ATL home | BOS (.680) | 16% | 24/23 | <P25·P70-80·<P25·P60-70·P60-70 | ⚠️ 借觀察 | Whiff P70-80（25 P80-90）K stuff 真，但 BB/9 4.57 <P25 爆局風險 + IP/GS <P25 QS 難；Sum 24 差 1 分到推薦線 |
+| Andre Pallante | STL home | KC (.694) | 6% | 28/31 | P25-40·P40-50·<P25·**>P90**·**P80-90** | ❌ 不推 (deep) | 近 6 場 ERA 5.29 + **QS 1/8（季）結構性封頂**（場場 5.0 IP）；2/8 ER≥5 floor risk；GB/xwOBACON 雙菁英是 buy-low 訊號但對 1 場串流無用 |
+| Jeffrey Springs | ATH home | SF (.656) | 33% | 26/22 | P40-50·P40-50·P50-60·<P25·**P80-90** | ❌ 不推 (deep) | **4/19 明顯分界後崩盤** — 近 5 場 ERA 7.03 / QS 0/5 / 7 HR；floor risk 高（3/9 ER≥4）；SF 季 vs LHP .634 利多救不了自身崩盤 |
+| Grant Holmes | ATL home | BOS (.680) | 16% | 24/23 | <P25·P70-80·<P25·P60-70·P60-70 | ⚠️ 條件推 (deep) | BOS 三窗口一致 .660-.680（中-弱，非噪音）+ 季 vs RHP .645 + K% 23-25% 利 Whiff P70-80；floor risk 低（僅 1/8 ER≥5）；封頂於 IP/GS <P25 QS 難 + BB/9 <P25 WHIP 風險 |
 | Adrian Houser | SF | ATH (.762) | 1% | 20/34 | P25-40·<P25·P40-50·P70-80·P25-40 | ❌ 不推 | K9 4.93 極低無 K 貢獻 + 對手 ATH .762 🔴；2025 Sum 34 是 slump 對照但 2026 五軸無菁英 |
 | Brady Singer | CIN | CLE (.628) | 15% | 18/21 | <P25·P25-40·P70-80·P40-50·<P25 | ❌ 不推 | xwOBACON .420 <P25 contact 結構崩 + xERA 6.06 無運氣成分（真被打）；對手弱也救不了 |
-| Roki Sasaki | LAD | LAA (.640) | 27% | 17/15 | <P25·**P80-90**·<P25·P40-50·<P25 | ⚠️ 條件推 | Whiff P80-90 K 上限高，但 IP/GS <P25 + BB/9 <P25 + xwOBACON <P25 + ERA 5.88 — K 樂透，僅在需 K 且能吃 ERA/WHIP 損失時撿 |
+| Roki Sasaki | LAD | LAA (.640) | 27% | 17/15 | <P25·**P80-90**·<P25·P40-50·<P25 | ⚠️ 條件推 (deep) | 純 K 樂透 — Whiff P80-90 vs LAA K% 26-28% K 上限真；但近 6 場 ERA 6.37 / QS 1/7 / 9 HR(xwOBACON <P25)；LAA 季 vs RHP .691 中等抵銷弱對手；僅 K contested + ERA/WHIP 已輸時撿 |
 | Miles Mikolas | WSH home | BAL (.808) | 1% | 17/21 | <P25·<P25·P25-40·**P80-90**·P25-40 | ❌ 不推 | WebSearch 確認真先發（非 opener），但近況 ~4-5 IP / 7.00 ERA / 9 場僅 2 場 5+ IP；對手 BAL .808 🔴 |
 
 ### 備註
@@ -61,4 +61,10 @@
 - Miles Mikolas opener_suspect → WebSearch 確認：5/17 標準先發（非 opener；先前 3 次救援是 PJ Poulin opener 後 bulk arm，5/17 無 Poulin 配對），但近況短局 ~4-5 IP QS 機率低 → 進主表評為 ❌。
 - 排序：Pallante ≈ Springs（兩 ✅）>> Holmes（⚠️ 借觀察）≈ Sasaki（⚠️ K 條件推）>> Singer ≈ Houser ≈ Mikolas（❌）。
 - TBD 3 場（BOS@ATL / TEX@HOU / MIL@MIN）均客場 TBD，建議 TW 5/17 早上補查。
+- 2026-05-16 11:00 deep eval（4 位候選）：
+  - **Pallante**：✅ → ❌ 不推。差異訊號 = 近 6 場 ERA 5.29 + QS 1/8（季）結構性封頂（場場 5.0 IP）+ 2/8 floor risk；scan ✅ 純靠 5-slot 結構 Sum，game log 即時命中率打臉
+  - **Springs**：✅ → ❌ 不推。差異訊號 = 4/19 明顯分界後崩盤（近 5 場 ERA 7.03 / QS 0/5 / 7 HR）；scan ERA 4.22 / xERA 3.59 是含開季 4 場神投的季線；floor risk 高
+  - **Holmes**：⚠️ 維持（借觀察 → 條件推）。深評確認 = BOS 三窗口一致 .660-.680 中-弱 + 季 vs RHP .645 利多 + K-prone 利 Whiff；floor risk 低（1/8）。封頂於 IP/GS <P25 + BB/9 <P25
+  - **Sasaki**：⚠️ 維持條件推。深評確認 = 純 K 樂透（Whiff P80-90 vs LAA K% 26%）；近 6 場 ERA 6.37 + 9 HR + LAA 季 vs RHP .691 抵銷弱對手
+- 排序：**Holmes > Sasaki >> Pallante ≈ Springs**。Holmes 唯一具「利對手 + 低 floor」雙條件（K 流可用 / QS 弱）；Sasaki 純 K 流（需 K 且 ERA/WHIP 已輸才撿）；Pallante/Springs 兩 ❌ 自身近況崩。
 - _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
