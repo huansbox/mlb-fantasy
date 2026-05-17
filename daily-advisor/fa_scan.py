@@ -3540,7 +3540,7 @@ def _run_daily_scan(access_token, config, today_str, env, args):
 def main():
     parser = argparse.ArgumentParser(description="FA Scan — unified FA market analysis")
     parser.add_argument("--rp", action="store_true", help="RP scan mode (weekly, Monday)")
-    parser.add_argument("--snapshot-only", action="store_true", help="Only save %owned snapshot")
+    parser.add_argument("--snapshot-only", action="store_true", help="Only save %%owned snapshot")
     parser.add_argument("--cleanup", action="store_true", help="Clean rostered watchlist players")
     parser.add_argument("--dry-run", action="store_true", help="Layer 1+2 only, skip Claude")
     parser.add_argument("--no-send", action="store_true", help="Skip Telegram + GitHub Issue")
