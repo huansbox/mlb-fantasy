@@ -21,6 +21,7 @@ MLB_API = "https://statsapi.mlb.com/api/v1"
 
 sys.path.insert(0, SCRIPT_DIR)
 from yahoo_query import load_env, refresh_token, api_get as yahoo_api_get, is_pitcher, pitcher_type, send_telegram  # noqa: E402
+from git_sync import pull_rebase_with_recovery  # noqa: E402
 
 
 def load_config():
@@ -574,21 +575,23 @@ def sync_repo_before_edit(env=None):
     Mirrors fa_scan._sync_waiver_log_before_edit. Called at the start of
     main() so we read a fresh roster_config.json and the subsequent
     commit is a clean fast-forward — no post-commit rebase race.
+
+    Delegates to git_sync.pull_rebase_with_recovery, which auto-resolves
+    harmless untracked-file collisions (see docs/handoff-vps-git-sync-fix.md).
     Returns True on success; False if pull fails (caller should abort).
     """
-    try:
-        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
-                       cwd=REPO_ROOT, check=True, timeout=30)
+    ok, detail = pull_rebase_with_recovery(REPO_ROOT)
+    if ok:
+        if "recovered" in detail:
+            print(f"[roster_sync] git sync auto-recovered: {detail}",
+                  file=sys.stderr)
         return True
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
-                       capture_output=True, timeout=10)
-        msg = ("[roster_sync] pre-edit pull --rebase failed — "
-               "skipping sync. Needs manual fix.")
-        print(msg, file=sys.stderr)
-        if env:
-            send_telegram(msg, env)
-        return False
+    msg = ("[roster_sync] pre-edit pull --rebase failed — "
+           f"skipping sync. Needs manual fix. ({detail})")
+    print(msg, file=sys.stderr)
+    if env:
+        send_telegram(msg, env)
+    return False
 
 
 def git_commit_and_push(added_names, dropped_names, env=None):

@@ -2,7 +2,7 @@
 
 ## 狀態
 
-✅ **已執行完成（2026-05-19）** — 第一、二階段完成，VPS git 同步恢復。第三階段（預防程式碼）未做，非緊急。
+✅ **全部完成（2026-05-19）** — 第一、二階段恢復 VPS git 同步；第三階段預防程式碼於 branch `fix/sync-untracked-collision` 落地。
 
 執行結果：
 - 第一階段：`mlb_query.py` 衝突解除 → rebase 成功 → week-9 資料推回（`687fc53`）→ 6 個 b1_baseline fixture 拆 3 commit 推回（`eecb054`/`79d58d1`/`3da9fc0`）
@@ -173,7 +173,14 @@ ssh root@107.175.30.172 "cd /opt/mlb-fantasy && <command>"
 
 9. **復原第零階段停用的 cron**
 
-### 第三階段 — 預防再發（另開 branch，非緊急）
+### 第三階段 — 預防再發 ✅ 已完成（branch `fix/sync-untracked-collision`）
+
+實作摘要：
+- 新增 `daily-advisor/git_sync.py` — 共用 helper `pull_rebase_with_recovery(repo_root)`：pull 失敗且為「未追蹤檔碰撞」時，逐檔比對工作區 blob vs `FETCH_HEAD` blob，**全部相同才整批 `os.remove` 並重試一次 pull**，任一不同則整批不動 + 回 `(False, detail)`。同時可當 CLI 跑（`python3 git_sync.py REPO_ROOT`，exit 0/2）供 bash 使用。
+- 4 個呼叫點改用 helper：`fa_scan._sync_waiver_log_before_edit` / `roster_sync.sync_repo_before_edit` / `weekly_review.git_push` Step 2 / `cron_capture_payload.sh`（走 CLI）。
+- `tests/test_git_sync.py` 11 cases（純函式 5 + 真 git repo 整合 6）。完整套件 368 tests 全綠、無回歸。
+
+> 以下為原設計記錄（已落地）：
 
 根因是「VPS 出現未追蹤檔 → 之後同路徑被別處 commit」。`_sync_*_before_edit` 目前只 abort + 報警，不自癒。
 

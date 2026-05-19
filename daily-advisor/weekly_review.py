@@ -21,6 +21,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 
 # Shared helpers from yahoo_query.py (same pattern as weekly_scan.py / fa_watch.py)
+from git_sync import pull_rebase_with_recovery
 from yahoo_query import (
     refresh_token, load_env, load_config, api_get as yahoo_api_get,
     send_telegram, YAHOO_STAT_MAP,
@@ -556,18 +557,19 @@ def git_push(json_path, week_number, env=None):
         print(f"  Git commit failed: {e}", file=sys.stderr)
         return
 
-    # Step 2: pull --rebase to get on top of remote
-    try:
-        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
-                       cwd=REPO_ROOT, check=True, timeout=30)
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=REPO_ROOT,
-                       capture_output=True, timeout=10)
-        msg = "[weekly_review] git pull --rebase failed — skipping push. Needs manual fix."
+    # Step 2: pull --rebase to get on top of remote (auto-recovers harmless
+    # untracked-file collisions — see docs/handoff-vps-git-sync-fix.md).
+    ok, detail = pull_rebase_with_recovery(REPO_ROOT)
+    if not ok:
+        msg = ("[weekly_review] git pull --rebase failed — skipping push. "
+               f"Needs manual fix. ({detail})")
         print(f"  {msg}", file=sys.stderr)
         if env:
             send_telegram(msg, env)
         return
+    if "recovered" in detail:
+        print(f"  [weekly_review] git sync auto-recovered: {detail}",
+              file=sys.stderr)
 
     # Step 3: push (should be fast-forward after rebase)
     try:

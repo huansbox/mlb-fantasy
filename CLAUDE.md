@@ -434,6 +434,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP 並行 / 週一 RP / snapshot-only） |
 | `daily-advisor/fa_compute.py` | Python 機械計算層（Sum/urgency/✅⚠️ 標籤/升級判定，Phase 5） |
+| `daily-advisor/git_sync.py` | cron 腳本共用的 git 同步 helper — `pull_rebase_with_recovery()` 自動修復「未追蹤檔與上游同路徑碰撞」（內容相同才整批移除重試，不同則中止報警）。fa_scan / roster_sync / weekly_review import 用，`cron_capture_payload.sh` 走 CLI（`python3 git_sync.py REPO_ROOT`，exit 0=ok / 2=fail）。背景見 `docs/handoff-vps-git-sync-fix.md` |
+| `daily-advisor/tests/test_git_sync.py` | git_sync 單元 + 整合測試（11 cases — parse_blocking_files 純函式 5 + 真 git repo 整合 6 涵蓋 clean pull / 同檔自動修復 / 異檔中止 / all-or-nothing 部分相符 / CLI exit code） |
 | `daily-advisor/tests/test_fa_compute.py` | fa_compute 單元測試（85 cases 覆蓋百分位分桶 + 四因子 + 標籤 + fixture 回歸） |
 | `daily-advisor/stream_sp_scan.py` | `/stream-sp` skill Step 2-6 機械層（TDD 32 tests）— schedule parse + Yahoo FA cross-check + v4 5-slot enrich + opener filter + 對手 14d → JSON。CLI: `python3 stream_sp_scan.py --et-dates YYYY-MM-DD[,YYYY-MM-DD]`。skill 觸發 / 非 cron。e2e ~5s |
 | `daily-advisor/tests/test_stream_sp_scan.py` | stream_sp_scan 單元測試（32 cases 覆蓋 classify_opener / tier_opponent / parse_schedule / cross_check_fa / _enrich_v4 / scan 注入 Fetchers 端到端） |

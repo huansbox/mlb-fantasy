@@ -33,6 +33,7 @@ from yahoo_query import (
 TPE = ZoneInfo("Asia/Taipei")
 
 from daily_advisor import pctile_tag
+from git_sync import pull_rebase_with_recovery
 from savant_rolling import fetch_savant_rolling
 from roster_sync import (
     _download_savant_csv, _find_id_column, _extract_savant_row,
@@ -418,21 +419,23 @@ def _sync_waiver_log_before_edit(repo_root, env=None):
     working copy is already up-to-date before we read and write. This
     prevents the post-commit rebase conflicts that previously occurred
     when local edits (e.g. manual pushes) diverged from VPS cron state.
+
+    Delegates to git_sync.pull_rebase_with_recovery, which auto-resolves
+    harmless untracked-file collisions (see docs/handoff-vps-git-sync-fix.md).
     Returns True on success; False if pull fails (caller should skip).
     """
-    try:
-        subprocess.run(["git", "pull", "--rebase", "origin", "master"],
-                       cwd=repo_root, check=True, timeout=30)
+    ok, detail = pull_rebase_with_recovery(repo_root)
+    if ok:
+        if "recovered" in detail:
+            print(f"  [fa_scan] git sync auto-recovered: {detail}",
+                  file=sys.stderr)
         return True
-    except subprocess.CalledProcessError:
-        subprocess.run(["git", "rebase", "--abort"], cwd=repo_root,
-                       capture_output=True, timeout=10)
-        msg = ("[fa_scan] pre-edit pull --rebase failed — "
-               "skipping waiver-log update. Needs manual fix.")
-        print(f"  {msg}", file=sys.stderr)
-        if env:
-            send_telegram(msg, env)
-        return False
+    msg = ("[fa_scan] pre-edit pull --rebase failed — "
+           f"skipping waiver-log update. Needs manual fix. ({detail})")
+    print(f"  {msg}", file=sys.stderr)
+    if env:
+        send_telegram(msg, env)
+    return False
 
 
 def cleanup_rostered_watchlist(access_token, config, today_str, env=None):

@@ -46,10 +46,11 @@ echo "$new_files" >> "$WRAP_LOG"
 
 # Sync before push to avoid conflict with concurrent commits (waiver-log
 # auto-update, etc). fa_scan already pulled at startup but the cron tail
-# may have produced upstream changes since.
-if ! git pull --rebase origin master >> "$WRAP_LOG" 2>&1; then
-    log "git pull --rebase failed — abort + manual fix needed"
-    git rebase --abort >/dev/null 2>&1
+# may have produced upstream changes since. Delegates to git_sync.py, which
+# auto-recovers harmless untracked-file collisions (identical-content shadow
+# files) and aborts loudly on real divergence — see docs/handoff-vps-git-sync-fix.md.
+if ! python3 daily-advisor/git_sync.py "$REPO" >> "$WRAP_LOG" 2>&1; then
+    log "git pull --rebase failed (collision recovery did not resolve) — manual fix needed"
     exit 2
 fi
 
