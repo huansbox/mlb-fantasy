@@ -124,14 +124,22 @@ hop 5+ * * *                                     無法測量（路由器不回 
 
 ## F2 落地紀錄（2026-05-19，branch `feat/vps-ssh-retry-wrapper`）
 
-- **新增 `bin/vps-run.sh`**：`bash bin/vps-run.sh [--no-retry] '<remote command>'`。每次嘗試 `timeout -k 5 90 ssh -o ConnectTimeout=15 -o BatchMode=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 ...`，預設 3 次嘗試。
-  - **只對 retryable exit 重試**：124（timeout）/ 137（SIGKILL）/ 255（ssh 連線錯誤）。0 或 1-254 的真實 remote exit **不重試**（重試救不了真失敗）。
-  - `--no-retry`：單次嘗試。寫檔 / git 指令用——避免「指令已在 VPS 跑、本機 timeout 砍掉 ssh 後 retry 跑第二份」。
-  - timeout 預設 90s（高於任何 legit 指令 runtime，只砍真 hang）；`VPS_RUN_TIMEOUT` / `VPS_RUN_TRIES` 可覆寫。
-  - retry 訊息走 stderr，stdout 維持純 remote 輸出（skill 當 JSON parse）。
-- **改 4 個 skill md（共 6 處 SSH）走 wrapper**：`rp-svh`（1，retry）/ `stream-sp`（1，retry）/ `stream-sp-deep`（3，retry）/ `weekly-review`（1，`--no-retry` — `weekly_review.py --prepare` 會寫檔）。
-- **e2e 驗證**：success 透傳 exit 0 / 真失敗 `exit 7` 不重試直接透傳 / 用法錯誤 exit 2 / `--no-retry` 單次。測試當下實地撞到一次 ssh 連線逾時（exit 255）→ 自動 retry → 第 2 次成功，wrapper 行為符合預期。
+- **新增 `bin/vps-run.sh`**：`bash bin/vps-run.sh [--no-retry] [--] '<remote command>'`。每次嘗試 `timeout -k 5 90 ssh -o ConnectTimeout=15 -o BatchMode=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 ...`，預設 3 次嘗試。
+  - **只對 retryable exit 重試**：124（timeout）/ 137（SIGKILL）/ 255（ssh error）。0 或 1-254 的真實 remote exit **不重試**。
+  - `--no-retry`：單次嘗試。寫檔 / git 指令用。**邊界**：`--no-retry` 只阻止 wrapper **自己**重試；無法阻止呼叫端（LLM / 人）看到 timeout 失敗後再呼叫一次 → 對有副作用指令，呼叫端仍須先查狀態（檔案 / commit 是否已落地）再決定重跑。
+  - timeout 預設 90s；`VPS_RUN_TIMEOUT` / `VPS_RUN_TRIES` 可覆寫。
+  - macOS 無 `timeout`（是 `gtimeout`）→ wrapper 自動偵測 `timeout` / `gtimeout`，皆無則 exit 2 報錯。
+  - stdout 逐次 buffer、只在最終非 retryable 結果才輸出 → timeout 砍掉的那次若已吐部分輸出，不會被接在好輸出前面污染 JSON。retry 訊息走 stderr。
+- **改 4 個 skill md（共 6 處 SSH）走 wrapper**：`rp-svh`（1，retry）/ `stream-sp`（1，retry）/ `stream-sp-deep`（3，retry）/ `weekly-review`（1，`--no-retry` — `weekly_review.py --prepare` 確會寫 `week-{N}.json` + git commit/pull/push）。
+- **e2e 驗證**：① success 透傳 exit 0 / 真失敗 `exit 7` 不重試直接透傳 / 用法錯誤 exit 2 / `--no-retry` / `--` 終止符。② hammer 15 run（`VPS_RUN_TIMEOUT=12` 加速）→ **8 run 實地撞到 exit 124 handshake hang**（含 1 run 連撞 2 次），全部 retry 後 rc=0、stdout 逐字乾淨（`VPS-OK|hostname|`，無部分輸出污染）。核心 hang→retry→成功路徑已實測。
 - CLAUDE.md「執行環境」+「檔案索引」同步更新。
+
+### 已知限制 / follow-up（review 提出、本次未處理）
+
+- **`docs/player-eval-sp.md` 4 處裸 SSH 未納入**（行 58/83/127/168，後 2 處是 `python3 << EOF` here-doc）。`/player-eval` 是高頻 skill，會中同一卡死。here-doc 塞進 wrapper 單一字串參數的 quoting 風險高 → 建議先把 here-doc 段轉成 VPS 端 `.py` 腳本檔、再走 wrapper。列為獨立 follow-up。
+- **`waiver-scan.md` / `player-eval.md` 的 `yahoo_query.py` 寫成本機直跑**（`python daily-advisor/yahoo_query.py`，無 ssh），與 CLAUDE.md「token 只在 VPS、本機跑會報錯」矛盾——既存 bug，與 F2 無關，待釐清。
+- **retry 次數 3 / sleep 3s 是工程估計**，非數據結論——未量測 loss burst 長度分布。若 burst 長於 `90s×3 + 3s×2` 總預算，三次 retry 仍會失敗（長 burst 情境結構性無法靠 retry 解）。
+- **Windows git-bash 下 `timeout` 砍 `ssh.exe`**：MSYS signal→Windows process 映射不完全可靠，理論上可能短暫殘留 orphan ssh.exe（自身也會超時死，不持鎖，影響小）。未專門驗證。
 
 ## 參考
 

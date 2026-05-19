@@ -420,7 +420,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   ```bash
   bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 yahoo_query.py <cmd>'
   ```
-- ⚠️ **本機↔VPS 路徑間歇封包遺失** → SSH handshake 偶發卡死 ~30-40s（根因確認見 `issues/vps-ssh-handshake-hang.md`）。VPS 指令一律走 `bash bin/vps-run.sh '<remote cmd>'`（timeout + retry wrapper）；純讀指令免旗標、寫檔 / git 指令加 `--no-retry`。skill 的 SSH step 已全部改走 wrapper。
+- ⚠️ **本機↔VPS 路徑間歇封包遺失** → SSH handshake 偶發卡死 ~30-40s（根因確認見 `issues/vps-ssh-handshake-hang.md`）。VPS 指令一律走 `bash bin/vps-run.sh '<remote cmd>'`（timeout + retry wrapper）；純讀指令免旗標、寫檔 / git 指令加 `--no-retry`。`rp-svh` / `stream-sp` / `stream-sp-deep` / `weekly-review` 的 SSH step 已改走 wrapper；`docs/player-eval-sp.md` 4 處 SSH（含 here-doc）待轉 VPS 端腳本後再納入。
 - **本機取歷史數據（daily report / fa_scan 存檔）**：
   ```bash
   gh issue view <N> -R huansbox/mlb-fantasy
