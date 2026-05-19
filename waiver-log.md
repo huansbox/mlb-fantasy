@@ -118,6 +118,10 @@
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
 - 05-19：xwOBA P95 / PA-TG 4.00 主力 / 14d OPS .929；無 prior 新人待驗證（fa_scan）
 
+### Grant Holmes (ATL, SP) [mlb_id:656550] — 觀察中
+觸發：Phase 6 multi-agent watch
+- 05-19：觀察中 — Whiff% P60 + GB% P50 勝 Montero，但 BB/9 4.18 P0 是硬傷；等下一場 BB/IP 表現再決定（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
