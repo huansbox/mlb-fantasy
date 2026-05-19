@@ -1,6 +1,6 @@
 # Issue: RP-SV+H SOP 落地（取代 fa_scan.py --rp 週掃）
 
-**狀態**：A 機械層（`rp_svh_scan.py`，TDD 43 tests）+ B skill（`/rp-svh`）已實作（2026-05-19，分支 `feat/rp-svh-scan`）。8 個開放決策已定案（見「開放決策」段）。剩 VPS 部署 + e2e + 並行驗證 + C1 退役。
+**狀態**：A 機械層（`rp_svh_scan.py`，TDD 44 tests）+ B skill（`/rp-svh`）已實作、code review 修復、merged master、VPS 部署 + e2e 驗證通過（2026-05-19）。8 個開放決策已定案（見「開放決策」段）。**剩**：① 與舊 `--rp` 並行 1-2 週驗證 → ② C1 退役 `fa_scan.py` RP 殘留 → ③ 後續迭代 I1/I2/I4/I5（見末段「後續迭代」）。
 **規格依據**：[`docs/rp-svh-metrics.md`](../docs/rp-svh-metrics.md)（SOP 已手動走驗證一輪）。
 **背景**：2026-05-19 手動走 RP-SV+H SOP，verdict → add Kevin Kelly。決定將此 SOP
 落地為腳本 + skill，取代原本 `fa_scan.py --rp` 週掃。
@@ -88,3 +88,70 @@ enrich → 單次 Claude call。FA-first，受 Yahoo AR 排序失準會漏掉真
   verdict 段已示範 Kelly whiff% caveat）。
 - A2 的 `--names` 修復是低風險獨立小修，可先單獨做。
 - 開放決策建議在次 session 規劃階段一次定完再開工（尤其決策 2 改 A4 結構）。
+
+## 後續迭代（2026-05-19 `/rp-svh` 首次實測回饋）
+
+A 機械層 + B skill 落地後另一 session 實跑 `/rp-svh` 一輪，提出 5 點優化。
+評估後採納 4 項、駁回 1 項。**未實作，留給後續 session**。
+
+### I1 — 對手 W-L 進 JSON（高優先，code + skill）
+
+**問題**：`week_schedule.opponents` 目前只有隊名縮寫。news-check 階段對 top-N + incumbent
+各 spawn 一個 agent，prompt 第 3 點要 agent 自己查對手戰績 → 5 個 agent 各跑一次
+standings WebSearch 抓同一份 deterministic 資料，浪費且結果可能不一致。
+
+**改法**：機械層加一次 MLB `/standings` call（一次回 30 隊 W-L），把每場對手的
+W-L（+ 勝率）附進 `week_schedule.opponents`（縮寫 → `{team, w, l}`）。skill md 的
+news-check prompt 第 3 點同步改為「對手戰績已在 JSON，專注判斷打線強弱 / 競爭性」。
+
+**範圍收斂**：只抓 W-L（+ 勝率）。**不做** runs/game（要 per-team byDateRange、多 N 個
+call）、wRC+（MLB API 無此欄位）。
+
+> **Guardrail**：對手 W-L 是給 LLM 層賽程前瞻用的 **context，不是新的 rank-sum 軸**。
+> 開放決策 2 已明確把球隊強弱排除在 quant 之外、交 LLM 兜底。此改動只是讓「已交給
+> LLM 的工作」資料更好，**不可順手做成第 4 軸**。
+
+### I2 — incumbent phantom rank（中優先，code）
+
+**問題**：情況 A 的「明顯優於 incumbent」判斷，incumbent 目前只有 bb9 / whiff_pct /
+svh_30d 原始值，無 rank / rank_sum（`in_pool: false`、無 `axes`）。原始值已能
+apples-to-apples（bb9 比 bb9），但缺一個 pool-relative 的「incumbent 排第幾」訊號。
+
+**改法**：另算一份 `candidates + incumbent` 的 phantom ranking，只讀 incumbent 的
+rank_sum + 各軸 rank + 名次，填進 `incumbent` 輸出。verdict 的「明顯優於」就有
+「incumbent 併入池排第 X / N+1」直接對照（排第 1 → 沒人明顯優於 → hold；排第 6 →
+top FA 明顯贏）。
+
+**實作 caveat**：phantom ranking 是**另算一份**、只取 incumbent 的名次，**絕不能動到
+真正 `top_candidates` 的 rank**（多一個競爭者會讓真候選名次位移）。rank 會壓縮量級 →
+incumbent 原始三軸值仍要保留並列。
+
+### I4 — whiff_low_sample 對 RP 結構性恆真（中優先，純文檔）
+
+**問題**：`WHIFF_LOW_SAMPLE_PITCHES=500` 是從 SP 百分位表借來的門檻。RP 季中 arsenal
+~300 球幾乎不可能達標 → 首次實測 top-4 + incumbent 5 位全部 `whiff_low_sample: true`。
+旗標恆真、對候選間零區辨力，不該被誤讀為個別候選警訊。
+
+**改法**：`docs/rp-svh-metrics.md` 明寫「RP 季中此旗標結構性恆真，whiff% 只作 pool 內
+相對排序、絕對值一律打折」。旗標本身不算錯（「絕對值信心低」屬實），不動 code。
+
+### I5 — 機械層耗時提示（低優先，純文檔）
+
+**問題**：SSH 跑 `rp_svh_scan.py` 約 1-2 分鐘（全聯盟 byDateRange ×2 + Yahoo FA 交叉）。
+skill md Step 1 未提示時長。
+
+**改法**：skill md Step 1 註明「約 1-2 分鐘，建議 `run_in_background` 起手」。與
+`issues/vps-ssh-handshake-hang.md` 獨立 — 無論 SSH 問題修不修都該加。
+
+### I3 — incumbent percent_owned（駁回）
+
+**提議**：candidate 都有 `percent_owned`，incumbent 沒有，補上湊齊對照表。
+
+**駁回理由**：incumbent 是我方已 rostered 球員，FA pool query 涵蓋不到它 → 要另開
+一次 Yahoo `player_keys` call 才拿得到。而「一個已被我撿走的球員」的全聯盟持有率對
+swap/hold 決策幾乎零資訊量。為一個裝飾性表格欄位多打一次 API，不值得。
+
+### 實作順序建議
+
+- **先做 I4 + I5**（純文檔、零風險、可獨立）。
+- **I1 + I2 動 `rp_svh_scan.py`**，需配 TDD test（比照現有 44 cases 慣例）。I1 高優先。
