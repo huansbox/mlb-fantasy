@@ -3,8 +3,7 @@
 ## 觀察中
 
 ### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
-觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評；
-     或 Duran 被搶 → 立即升級為 Altuve 替代候選
+觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評
 - 04-30~05-06：xwOBA P95 / BB% P95 / Barrel% P70 雙年確認；14d OPS .924→.787；PA-TG 2.84-2.95 連 7 天未達 3.2；3% 零壓力
 - 05-07：PA-TG 2.89 — 更新觸發：Altuve 14d OPS <.600 連 3 天 OR PA-TG ≥3.0 即行動（fa_scan）
 - 05-08：PA-TG 2.95 接近 3.0；14d OPS .821 / 10 R / 7 BB 穩健；Altuve 14d OPS .437 已低於 .600（fa_scan）
@@ -16,6 +15,7 @@
 - 05-13：14d OPS .755 / K% 30.0 升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .644 連 5+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 - 05-14：14d OPS .650 / K% 29.2 持續升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .561 已連 6+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 - 05-15：14d OPS .548 / K% 29.8 持續升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .539 連 7+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
+- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「Duran 被搶 → 升級 Altuve 替代」第二觸發失效；維持 second tier platoon 觀察
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -63,26 +63,21 @@
 - 05-15：14d OPS .856 / Savant Δ+0.056 品質飆升持續；BBE 71 距 80 門檻差 9；1% 零壓力（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
-觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級取代 Altuve
+觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
 - 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
 - 05-12：14d OPS .910 / 10BB / 2SB 全面爆發 + Savant Δ+0.041 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
 - 05-13：14d OPS .864 / 8BB / 2SB 全面 + Savant Δ+0.033 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
 - 05-14：14d OPS .737 / 7BB / 2SB + Savant Δ+0.039 品質上升；但 season xwOBA P55 / Barrel% P60 接近門檻 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70）（fa_scan）
 - 05-15：14d OPS .737 / 6BB / 2SB + Savant Δ+0.034 品質上升；season xwOBA P55 / Barrel% P55 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70）（fa_scan）
-
-### Kody Clemens (MIN, 1B,2B,LF,RF) [mlb_id:665019] — 觀察中
-觸發：立即行動
-- 05-12：xwOBA P80 / Barrel% P95 雙年確認（prior P80）結構性優於 Altuve；14d OPS .809 穩健；PA-TG 2.63；取代 Altuve（fa_scan）
-- 05-13：⚠️ 已推薦「立即行動」第 2 天未執行；結構 P80/P70/P95 + prior P80/P80 雙年確認全面優於 Altuve P70/P70/P40；14d OPS .809 穩健；PA-TG 2.67（fa_scan）
-- 05-14：⚠️ 已推薦「立即行動」第 3 天未執行 — 推測原因：FAAB 考量 / 陣容異動排序 / 用戶 override；結構 P80/P60/P95 + prior P80/P45/P80 雙年確認全面優於 Altuve；14d OPS .948 爆發；PA-TG 2.70（fa_scan）
-- 05-15：⚠️ 已推薦「立即行動」第 4 天未執行 — 推測原因：FAAB 考量 / PA-TG 偏低 / 用戶 override；結構 P80/P60/P95 + prior P80/P45/P80 雙年確認；14d OPS .948 爆發 / 2 HR / 10 R / 1 SB 全面產量；PA-TG 2.70（fa_scan）
+- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
 
 ### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
-觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級取代 Altuve
+觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級為 2B/UTIL 補強候選
 - 05-12：Prior P95/P95/P70 slump 候選；當季 P60/P70/P55 低於 prior；PA-TG 3.54 主力；14d OPS .733 回歸未啟動（fa_scan）
 - 05-13：14d OPS .747 / Savant Δ+0.014 品質微升；prior P95/P95/P70 slump 候選；PA-TG 3.55 主力；觸發未達（OPS <.800）（fa_scan）
 - 05-14：14d OPS .718 / Savant Δ+0.036 品質上升；prior P95/P95/P70 slump 候選；PA-TG 3.56 主力；觸發未達（OPS <.800）（fa_scan）
 - 05-15：14d OPS .706 / Savant Δ+0.034 品質上升持續；prior P95/P95/P70 slump 候選；PA-TG 3.57 主力；觸發未達（OPS <.800）（fa_scan）
+- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
 
 ### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
 觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
@@ -131,6 +126,9 @@
 - 05-15：[eval] 3-agent 獨立 reasoning 一致 hold；補 split 訊號：前 15 場 BB% 18.0% / 後 15 場 BB% 7.5% = breakout 後段消退（後 15 場已回 2025 7.3% 水準）；14d Savant 三指標同步退化 xwOBA -.074 / Barrel% -6.4pp / HH% -5.4pp 非純 BABIP 噪音；信心下調 高→中；交叉觀察 [[Crawford]]（FA SS pool 唯一達 Sum 26 候選，但雙人平手不顯著升級）；stop-loss：14d xwOBA Δ ≥-0.080 連 5 天 / 後 10 場 Barrel% 仍 <P25 / Whiff% 或 Chase% 跨年劇變 / 角色變動（player-eval）
 
 ## 已結案
+
+### Kody Clemens (MIN, 1B/2B/LF/RF) [mlb_id:665019] — 已撿入隊
+- 2026-05-19：drop Altuve → add Kody Clemens。觀察 7 天（5/12 fa_scan 首標「立即行動」，連 4 天未執行後本日落地）；xwOBA P80 / Barrel% P95 + prior P80/P80 雙年確認結構全面優於 Altuve；14d OPS .948 爆發 / 2 HR / 10 R / 1 SB。Altuve Grade 2 左腹斜肌拉傷（5/17 IL，分析師估 6-8 週 + 同側 2023 復發風險）+ 傷前 5 月 OPS .572 深度低潮 → stash 機會成本過高放生。
 
 ### Moisés Ballesteros (CHC, C) [mlb_id:694208] — Pass
 - 2026-05-15：觀察 17 天結案；14d OPS 從 1.456 一路崩塌至 .326（第 4 週冷卻），%owned 29% dropping -14 市場大量拋售；PA-TG 連 16 天未達 2.8 觸發；Albies 14d OPS .696 另一觸發接近但未達 — 上場時間問題 + 熱度退散雙重失敗（fa_scan）
