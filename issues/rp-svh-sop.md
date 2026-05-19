@@ -1,6 +1,6 @@
 # Issue: RP-SV+H SOP 落地（取代 fa_scan.py --rp 週掃）
 
-**狀態**：規劃中（2026-05-19 建立，同日經 agent 審查修訂）。實作留待後續 session。
+**狀態**：A 機械層（`rp_svh_scan.py`，TDD 43 tests）+ B skill（`/rp-svh`）已實作（2026-05-19，分支 `feat/rp-svh-scan`）。8 個開放決策已定案（見「開放決策」段）。剩 VPS 部署 + e2e + 並行驗證 + C1 退役。
 **規格依據**：[`docs/rp-svh-metrics.md`](../docs/rp-svh-metrics.md)（SOP 已手動走驗證一輪）。
 **背景**：2026-05-19 手動走 RP-SV+H SOP，verdict → add Kevin Kelly。決定將此 SOP
 落地為腳本 + skill，取代原本 `fa_scan.py --rp` 週掃。
@@ -51,16 +51,18 @@ enrich → 單次 Claude call。FA-first，受 Yahoo AR 排序失準會漏掉真
 
 > 次 session 可決定是否把 A 拆成 TDD increments（A 是主體且可測，建議先做；B skill 後做）。
 
-## 開放決策（實作前需定）
+## 開放決策（2026-05-19 全數定案）
 
-1. **SV+H floor**：≥3 vs ≥4（≥3 不漏剛沉寂 closer 但留太多人；≥4 較準有 lumpiness 風險）
-2. **機會供給軸**：團隊 14d 勝率（手動走用，最吵）vs 前瞻本週場次數（Agent 3 原選，前瞻、可精確讀）vs 並用 —— **會改 A4 結構，建議最先定**
-3. **rank-sum**：三軸等權 vs 加權
-4. **top-N 的 N**（手動走用 4）
-5. **觸發形態**：cron 跑機械層 + 手動 skill 跑 LLM 層 vs 全 skill 觸發。**附考量**：若 cron 產 JSON、skill 後讀，JSON 有**時效問題**（cron 凌晨跑、使用者下午開 skill，中間有新賽果）— `stream_sp_scan` 採純 skill 觸發正因如此
-6. **`fa_scan.py --rp`**：完全退役 vs 保留機械殼
-7. **incumbent 比較規則**（agent 審查新增）：規格 doc 已補 verdict 框架（情況 A best-FA vs incumbent、預設 hold），但「明顯優於」的判準細則 — 純交 LLM reasoning vs 給量化提示 — 待定
-8. **趨勢訊號做不做**（agent 審查新增）：規格 doc 把「近 2-4 週 SV+H 速率趨勢」列為 layer-1 主訊號，需改 `fa_history.json` schema 存多期 SV+H。本期暫 out-of-scope（見不在範圍），是否納入後續迭代待定
+1. **SV+H floor** → **≥3**，CLI `--floor` 可覆寫。機器版可對全池跑 step 3。
+2. **機會供給軸** → **30d SV+H 累積**（非團隊勝率、非本週場次數）。3 agent 開放發想後選定：team-level 的勝率/場次數都有重複投票（勝率含 bullpen 表現）或回溯/區辨力問題；30d SV+H 是 player-level、與 BB/9 / whiff% 正交、reuse Step 1 byDateRange call（多一個 30d 窗），且用比 14d floor 更寬的窗口避免與 floor 同源塌成 tie。「球隊製造領先能力」交 LLM 層賽程前瞻兜底。
+3. **rank-sum** → **三軸等權**。落地觀察期若某軸預測力明顯較強再改加權。
+4. **top-N** → **預設 4**，CLI `--top` 可覆寫；rank-sum 在第 N 名並列時一律納入（硬切點任意性交 LLM 吸收）。
+5. **觸發形態** → **純 skill 觸發**，無 cron。LLM 層需 web search（news check）本就不適合 cron；skill 內即時跑 `rp_svh_scan.py`，避開 cron-JSON 時效落差。
+6. **`fa_scan.py --rp`** → **完全退役**（不保留機械殼，單人維護不留 dead code）。先與舊 `--rp` 並行 1-2 週驗證，通過後 grep 清除。
+7. **incumbent 比較規則** → 「明顯優於」**純交 LLM 自由 reasoning**，不卡 binary 門檻（規格 doc 已定）。
+8. **趨勢訊號** → 本期 **out-of-scope**（需改 `fa_history.json` schema 存多期 SV+H），留後續迭代。
+
+> 軸 3 定案後 A4 從「新寫球隊 W-L parse」簡化為「reuse Step 1 byDateRange、改 30d startDate」。
 
 ## 不在範圍
 

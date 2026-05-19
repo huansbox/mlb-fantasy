@@ -300,18 +300,17 @@ Urgency 高 → 可能成 multi-agent step 1 候選 P1。但 final action 仍由
 - W 受球隊影響 → 強隊 SP 有 W 加成
 - 串流 SP：下週 2 先發 + 對戰後段打線，不看全季指標
 
-### RP 評估
+### RP 評估（RP-SV+H SOP）
 
-**策略前提**：Punt SV+H（不主動追），但 RP 仍貢獻 ERA/WHIP/K。維持 2 位 RP，不會加到 3-4 位。
+**策略前提**：Punt SV+H（不主動追），但放 1 個 RP 主攻 SV+H。維持 2 位 RP，不會加到 3-4 位。
 
-**評估流程**：只有 2 人，不排最弱清單。FA 有無優於目前 2 位 RP → 有就換。
+**評估流程**：走 RP-SV+H **production-first** SOP — MLB 全聯盟 14d SV+H 排行找產出者 → Yahoo FA 交叉 → 三軸 rank-sum（BB/9 升序 · whiff% 降序 · 30d SV+H 降序，等權）選 top-N（cutoff 並列納入）→ LLM 角色安全 news check → verdict（換 incumbent / hold / 選 1 / pass，預設 hold）。
 
-**品質指標**（核心，2 項勝出 = 值得行動）：xERA、xwOBA allowed、HH% allowed（同 SP）
-**輔助**：Barrel% allowed、ERA、xERA-ERA 運氣標記（同 SP：正=運氣好會回升，負=運氣差可撿便宜）
-**產量**：K/9、IP / Team_G
-**加分項**：SV+H — 品質小輸也值得換（RP 只佔 2 格，比率影響有限；但 SV+H 是獨立類別，多贏 1 類 = 多 1 勝，且多隊 punt SV+H → 門檻低）
-
-注意：RP 百分位分布和 SP 不同，需分開計算。
+- **機械層**：`rp_svh_scan.py`（TDD 43 tests）；**LLM 層**：`/rp-svh` skill。
+- **唯一規格依據**：`docs/rp-svh-metrics.md`。球員追蹤：`waiver-log-rp.md`。落地規劃：`issues/rp-svh-sop.md`。
+- 取代舊 `fa_scan.py --rp` 週掃（v2 指標 xERA / xwOBA / HH%）— 並行 1-2 週驗證後退役。
+- 三軸 rank-sum 是 pool 內相對排名，**不需絕對百分位門檻**（不必算 RP 百分位表）。
+- contact-quality 指標（Barrel% / xwOBACON / xERA-ERA）**不進機械層** — RP 季中 BBE 噪音過大；交 LLM 層 context-only。
 
 ### 2025 MLB 百分位分布（P90 = 菁英）
 
@@ -382,7 +381,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | 順序 | 做什麼 | 說明 |
 |------|--------|------|
 | 1 | FA Scan 報告已在 12:30 自動產出（含打者 + SP） | 自動推送 |
-| 2 | FA Scan --rp（12:45 自動，週一限定） | 自動推送 |
+| 2 | `/rp-svh`：RP-SV+H 掃描（手動 session）| 取代舊 `--rp` 週掃；舊 `--rp` cron 並行 1-2 週驗證中 |
 | 3 | `/weekly-review`：覆盤上週 + 預測本週 | 手動 session |
 | 4 | 按需：`/player-eval` 或 `/waiver-scan` | 手動 session |
 
@@ -442,15 +441,20 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `daily-advisor/tests/test_stream_sp_scan.py` | stream_sp_scan 單元測試（32 cases 覆蓋 classify_opener / tier_opponent / parse_schedule / cross_check_fa / _enrich_v4 / scan 注入 Fetchers 端到端） |
 | `daily-advisor/mlb_query.py` | `/stream-sp-deep` skill 用的 MLB Stats API helper（2 函式）— `gamelog_with_qs(mlb_id, season)` 加 ip_decimal+qs 欄；`opponent_context(team_id, end_date, sp_id)` 一次回 7d/14d/30d 趨勢 + vs SP 慣用手 split（pitchHand 內部 resolve）。Pure functions: parse_ip / is_quality_start 可單測。Skill 觸發 / 非 cron。 |
 | `daily-advisor/tests/test_mlb_query.py` | mlb_query 單元測試（12 cases 覆蓋 parse_ip 5 boundary / is_quality_start 3 boundary 含 (5.667, 0 ER)→False 防 5⅔ IP 誤判為 QS / gamelog_with_qs + opponent_context orchestrators 注入 mock fetcher） |
+| `daily-advisor/rp_svh_scan.py` | `/rp-svh` skill 機械層（TDD 43 tests）— production-first：MLB byDateRange 全聯盟 14d SV+H≥floor → Yahoo FA 交叉 → 三軸 rank-sum（BB/9 · whiff% · 30d SV+H）top-N → incumbent benchmark + 角色訊號 → JSON。CLI: `python3 rp_svh_scan.py [--floor N] [--top N] [--date YYYY-MM-DD] --pretty`。skill 觸發 / 非 cron |
+| `daily-advisor/tests/test_rp_svh_scan.py` | rp_svh_scan 單元測試（43 cases 覆蓋 parse_svh_leaderboard / _normalize / filter_fa_candidates / rank_avg 含 tie+None / rank_sum_select 含 cutoff 並列 / pick_incumbent / recent_svh / count_team_games / scan 注入 Fetchers 端到端） |
 | `daily-advisor/savant_rolling.py` | 14d Savant rolling 抓取（cron TW 12:00，產出 `savant_rolling.json` 供 fa_scan + daily_advisor 讀取） |
 | `daily-advisor/roster_config.json` | 陣容唯一來源（球員名單 + ID + 位置 + 去年數據 + Yahoo 格位 + MLB 狀態） |
-| `waiver-log.md` | 球員追蹤（FA 觀察中 / 隊上觀察 / 已結案） |
+| `waiver-log.md` | 球員追蹤（FA 觀察中 / 隊上觀察 / 已結案）— 打者 / SP |
+| `waiver-log-rp.md` | RP-SV+H 子系統球員追蹤（隊上 RP / FA 觀察中 / 已結案）|
 | `week-reviews.md` | 累積式週覆盤記錄 |
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
 | `docs/handoff-il-na-filter.md` | FA IL/NA 過濾機制 handoff（2026-05-05）— ✅ Part 1 已完成 merged（commits `87bf243` / `e69555b` / `5113932`）；附加 Task `yahoo_query.py savant v4 SP 升級` 仍待辦 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
+| `docs/rp-svh-metrics.md` | **RP-SV+H 評估 SOP 唯一規格依據** — production-first 大名單產生 / 三軸 rank-sum 候選池縮減 / LLM 層輸入設計。`/rp-svh` skill 引用此處 |
+| `issues/rp-svh-sop.md` | RP-SV+H SOP 落地規劃 issue（A 機械層 / B skill / C 整合退役）— 8 個開放決策 2026-05-19 定案 |
 | `docs/player-eval-sp.md` | `/player-eval` skill 的 SP 子流程（2026-05-09 從 SKILL.md 抽出 + 升級）— 21d xwOBACON Δ / IP/Team_G / 3 年 pitch arsenal / vs L/R splits 為必做；SP brand bias 觸發 + 5 條 decisive signals 走雙條件確認（避免 RP↔SP 角色變化誤判）|
 | `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
 | `docs/handoff-yahoo-names-filter.md` | Yahoo `--names` filter CLI 層 handoff（2026-05-13）— ✅ 全部完成（function 層 commit `b672713`，CLI 層 + `query_fa()` helper commit `f688f48`） |
@@ -492,7 +496,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
     - 訊號門檻 (`PA_TG_STARTER=3.5` / `PA_TG_JUMP_MIN=1.0` / `OWNED_DELTA_3D_MIN=5.0` / `OWNED_DELTA_7D_MIN=10.0` / `PERF_OPS_MIN=0.650` / `HOT_STREAK_XWOBA_P75=0.326` / `HOT_STREAK_BARREL_P75=11.2` / `HOT_STREAK_BBE_MIN=25` / `PCT_OWNED_MAX=40`) 在 `emerging_batter_scan.py` 頂層常數，設計 doc §「訊號門檻定義」對應。落地觀察期若門檻需調整改頂層常數即可。
     - skill md 結構參考 `.claude/commands/stream-sp.md`（已 git tracked，跨電腦可見）。設計 doc §「/emerging-batter — 找候選」§「/emerging-batter-deep — 指名深評」分別給 Step 結構藍圖。
 - [ ] **roster_sync watermark bug**（2026-05-12 發現）：`roster_sync.py run_daily` 第 780-785 行 — 當 Yahoo transaction 已新增但同次 `fetch_full_roster(date=ET-today)` snapshot 還沒反映 add/drop 時（Yahoo API 一致性 lag），代碼會 advance `.last_sync` 但 **不寫 config**，導致該 transaction 後續永久不會被重抓。5/8-5/10 May→Lambert 換人事件就是這樣中招（5/10 cron 看到 add:Peter Lambert 但 roster diff 空 → watermark 前進，後續 cron 認為「處理過了」），直到 5/12 手動 `--init` 才修復。修法：偵測「transaction 有 add/drop type 但 roster diff 空」時，**不要** advance watermark（或縮短 watermark 至上次 transaction timestamp 之前），下次 cron 重試。或加 fallback：每天跑一次 `--init` 模式作 safety net（成本只多 4 個 CSV 下載）。
-- [ ] **RP 框架重設計 → RP-SV+H SOP 落地**（2026-05-19 改向）：原計畫「RP 換 SP-v4 式 5-slot（重決定第 5 軸 / 重跑 RP 百分位 / 設計 Phase 6-urgency-Sum）」**已否決**。新方向：RP 改走 SV+H production-first SOP — 從 MLB 全聯盟 14d SV+H 排行找產出者 → Yahoo FA 交叉 → BB/9 / whiff% / 球隊勝率 三軸 rank-sum → LLM news check + verdict。手動走驗證完成（2026-05-19，verdict add Kevin Kelly）。落地為 `rp_svh_scan.py` 機械層 + skill LLM 層，取代 `fa_scan.py --rp` 週掃。完整規劃見 [`issues/rp-svh-sop.md`](issues/rp-svh-sop.md)，SOP 規格見 [`docs/rp-svh-metrics.md`](docs/rp-svh-metrics.md)，球員追蹤見 `waiver-log-rp.md`。實作待後續 session。
+- [ ] **RP-SV+H SOP — 並行驗證 + 退役舊 --rp**（2026-05-19 落地）：機械層 `rp_svh_scan.py`（TDD 43 tests）+ `/rp-svh` skill 已實作（A2 `--names` accent/apostrophe 正規化 / A3 `sp_data_fetchers` saves-holds-blownSaves-SVO parse 同波完成）。8 個開放決策定案：rank-sum 軸 3 = **30d SV+H 累積**（非球隊勝率/場次數 — 3 agent 發想後選定，player-level 且與 BB/9 / whiff% 正交）、三軸等權、top-4（cutoff 並列納入）、純 skill 觸發無 cron、incumbent 比較交 LLM 自由 reasoning、趨勢訊號 out-of-scope。**剩餘**：① VPS 部署 + e2e 驗證（feat 分支 merge 後 VPS git pull）② 與舊 `fa_scan.py --rp` cron 並行 1-2 週比對（驗收：新 SOP 是否漏掉舊 scan 抓到的真候選 + verdict 是否合理）③ 通過後 C1 完全退役 `fa_scan.py` RP 殘留（grep `_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `_fmt_roster_pitcher_rp` / `prompt_fa_scan_rp.txt` / `--rp` flag）。完整脈絡見 [`issues/rp-svh-sop.md`](issues/rp-svh-sop.md)。
 - [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
