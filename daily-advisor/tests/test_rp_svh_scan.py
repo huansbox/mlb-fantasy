@@ -1,10 +1,12 @@
 """TDD tests for rp_svh_scan.py — mechanical layer of the /rp-svh skill."""
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 
 from rp_svh_scan import (
+    WINDOW_14D,
+    WINDOW_30D,
     FAEntry,
     Fetchers,
     RosterPitcher,
@@ -283,10 +285,16 @@ class TestCountTeamGames:
 # ── scan (end-to-end) ──
 
 def _scan_fetchers(*, lb14, lb30, fa_entries, roster, season_stats,
-                   whiff, game_logs, schedule):
+                   whiff, game_logs, schedule, today=date(2026, 5, 19)):
     fa_list = list(fa_entries)
+    # Dispatch on the computed window starts — a wrong start raises KeyError
+    # (fails loud) instead of silently routing both calls to one leaderboard.
+    windows = {
+        (today - timedelta(days=WINDOW_14D)).isoformat(): lb14,
+        (today - timedelta(days=WINDOW_30D)).isoformat(): lb30,
+    }
     return Fetchers(
-        svh_leaderboard_fn=lambda s, e: lb14 if s == "2026-05-05" else lb30,
+        svh_leaderboard_fn=lambda s, e: windows[s],
         fa_pool_fn=lambda names: [e for e in fa_list
                                   if any(_normalize(e.name) == _normalize(n)
                                          for n in names)],
@@ -440,3 +448,22 @@ class TestScan:
             RosterPitcher(669373, "Tarik Skubal", ("SP",))]
         result = scan(today=date(2026, 5, 19), fetchers=fx)
         assert result["incumbent"] is None
+
+    def test_incumbent_excluded_from_candidates_even_if_in_fa_pool(self):
+        # Yahoo roster-sync lag can briefly list a just-added RP as FA.
+        # The incumbent must never appear in both top_candidates and incumbent.
+        fx = _full_scan_fixture()
+        pool = [
+            FAEntry("Adrian Morejon", "8%"), FAEntry("Matt Festa", "2%"),
+            FAEntry("Jason Adam", "5%"), FAEntry("Ryne Stanek", "1%"),
+            FAEntry("Kevin Kelly", "12%"),  # incumbent leaked into FA pool
+        ]
+        fx.fa_pool_fn = lambda names: [
+            e for e in pool
+            if any(_normalize(e.name) == _normalize(n) for n in names)
+        ]
+        result = scan(today=date(2026, 5, 19), fetchers=fx)
+        assert 104 not in {c["mlb_id"] for c in result["top_candidates"]}
+        assert result["candidate_pool_size"] == 4  # Kelly excluded
+        assert result["incumbent"]["mlb_id"] == 104
+        assert result["incumbent"]["in_pool"] is False

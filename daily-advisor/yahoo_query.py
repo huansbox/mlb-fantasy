@@ -6,7 +6,6 @@ import io
 import json
 import os
 import sys
-import unicodedata
 import urllib.parse
 import urllib.request
 
@@ -14,6 +13,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 from daily_advisor import pctile_tag  # noqa: E402
 from _savant_v4_fetch import fetch_pitcher_v4  # noqa: E402
+from name_match import normalize_name as _normalize  # noqa: E402
 
 YAHOO_API = "https://fantasysports.yahooapis.com/fantasy/v2"
 YAHOO_TOKEN_URL = "https://api.login.yahoo.com/oauth2/get_token"
@@ -495,20 +495,6 @@ def send_telegram(message, env):
     except Exception as e:
         print(f"Telegram send error: {e}", file=sys.stderr)
         return False
-
-
-def _normalize(name):
-    """Strip accents + apostrophes + lowercase for fuzzy name matching.
-
-    Jesús → jesus; Riley O'Brien → riley obrien. Used by both Savant CSV
-    matching (``_match_player``) and the ``query_fa`` --names filter, where
-    Yahoo and MLB sources disagree on accents / apostrophe characters.
-    """
-    stripped = "".join(
-        c for c in unicodedata.normalize("NFD", name)
-        if unicodedata.category(c) != "Mn"
-    )
-    return stripped.replace("'", "").replace("’", "").lower()
 
 
 MLB_API_BASE = "https://statsapi.mlb.com/api/v1"

@@ -20,10 +20,10 @@ See issues/rp-svh-sop.md open decision 2.
 
 from __future__ import annotations
 
-import unicodedata
 from dataclasses import dataclass
 from datetime import date, timedelta
 
+from name_match import normalize_name as _normalize
 from stream_sp_scan import TEAM_ABBR
 
 FLOOR_DEFAULT = 3
@@ -35,16 +35,6 @@ WEEK_AHEAD_DAYS = 6
 # sits around ~300, so whiff% rank is usable (relative) but the absolute
 # value carries a low-sample caveat for the LLM layer.
 WHIFF_LOW_SAMPLE_PITCHES = 500
-
-
-def _normalize(name: str) -> str:
-    """Strip accents + apostrophes + lowercase — fuzzy name match across the
-    MLB Stats API (Step 1) and Yahoo (Step 2) name spellings."""
-    stripped = "".join(
-        c for c in unicodedata.normalize("NFD", name)
-        if unicodedata.category(c) != "Mn"
-    )
-    return stripped.replace("'", "").replace("’", "").lower()
 
 
 # ── Dataclasses ──
@@ -303,8 +293,17 @@ def scan(*, today, fetchers, floor=FLOOR_DEFAULT, top_n=TOP_N_DEFAULT,
             fetchers.svh_leaderboard_fn(start_30, end))
     }
 
+    # Identify the incumbent before building candidates so it can be excluded
+    # from the FA pool — a rostered player must never appear in both
+    # top_candidates and incumbent (guards against Yahoo roster-sync lag
+    # briefly listing a just-added RP as still available).
+    incumbent_player = pick_incumbent(roster, season_stats)
+    incumbent_pid = incumbent_player.mlb_id if incumbent_player else None
+
     candidates = []
     for pr, entry in fa_pairs:
+        if pr.mlb_id == incumbent_pid:
+            continue
         st = season_stats.get(pr.mlb_id, {})
         w_pct, w_pitches, w_low = _whiff_profile(whiff.get(pr.mlb_id))
         candidates.append({
@@ -343,7 +342,6 @@ def scan(*, today, fetchers, floor=FLOOR_DEFAULT, top_n=TOP_N_DEFAULT,
             team_games=team_games.get(c["team_id"], {"games": 0, "opponents": []}),
         )
 
-    incumbent_player = pick_incumbent(roster, season_stats)
     incumbent_out = None
     if incumbent_player is not None:
         pid = incumbent_player.mlb_id
@@ -353,12 +351,17 @@ def scan(*, today, fetchers, floor=FLOOR_DEFAULT, top_n=TOP_N_DEFAULT,
         incumbent_out = {
             "name": incumbent_player.name,
             "mlb_id": pid,
+            # in_pool is always False by construction — the incumbent is
+            # excluded from the candidate loop above.
             "in_pool": False,
             "bb9": st.get("bb9"),
             "whiff_pct": w_pct,
             "whiff_pitches": w_pitches,
             "whiff_low_sample": w_low,
-            "svh_30d": svh_30_by_pid.get(pid, 0),
+            # svh_30d fallback mirrors the FA-candidate path (14d SV+H, a
+            # lower bound on the wider 30d window) rather than 0 — an
+            # asymmetric 0 would systematically under-rate the incumbent.
+            "svh_30d": svh_30_by_pid.get(pid, pr.svh if pr else 0),
             "profile": {
                 "svh_14d": pr.svh if pr else 0,
                 "sv_14d": pr.saves if pr else 0,

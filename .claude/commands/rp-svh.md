@@ -59,7 +59,11 @@ ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && \
       }
     }
   ],
-  "incumbent": { "...同 candidate schema, in_pool=false, 無 rank_sum..." } 或 null,
+  "incumbent": {
+    "name", "mlb_id", "in_pool": false,
+    "bb9", "whiff_pct", "whiff_pitches", "whiff_low_sample", "svh_30d",
+    "profile": {...同 candidate}, "role_signals": {...同 candidate}
+  } 或 null,
   "all_candidates": [
     {"name", "team", "mlb_id", "svh_14d", "rank_sum", "rank_sum_place", "axes"}
   ]
