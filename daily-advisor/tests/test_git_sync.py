@@ -7,6 +7,7 @@ pytest's tmp_path. No network — all remotes are local paths.
 """
 
 import subprocess
+from unittest.mock import patch
 
 from git_sync import main, parse_blocking_files, pull_rebase_with_recovery
 
@@ -97,8 +98,14 @@ def _make_origin_with_clones(tmp_path):
 
 
 def _origin_adds_tracked_file(seed, name, content):
-    """Seed clone commits a new tracked file and pushes it to origin."""
-    (seed / name).write_text(content)
+    """Seed clone commits a new tracked file and pushes it to origin.
+
+    `name` may include subdirectories ('daily-advisor/x.py'); parents are
+    created as needed.
+    """
+    target = seed / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content)
     _run(["git", "add", "."], seed)
     _run(["git", "commit", "-m", f"add {name}"], seed)
     _run(["git", "push", "origin", "master"], seed)
@@ -126,6 +133,32 @@ def test_recovers_identical_untracked_file(tmp_path):
     r = subprocess.run(["git", "ls-files", "new.py"], cwd=str(vps),
                         capture_output=True, text=True)
     assert r.stdout.strip() == "new.py"
+
+
+def test_recovers_identical_untracked_file_in_subdir(tmp_path):
+    """Mirrors the real incident — collision file lives in a subdirectory."""
+    _, seed, vps = _make_origin_with_clones(tmp_path)
+    rel = "daily-advisor/mlb_query.py"
+    _origin_adds_tracked_file(seed, rel, "print('hi')\n")
+    (vps / "daily-advisor").mkdir()
+    (vps / rel).write_text("print('hi')\n")
+    ok, detail = pull_rebase_with_recovery(str(vps))
+    assert ok, detail
+    assert "recovered" in detail
+    r = subprocess.run(["git", "ls-files", rel], cwd=str(vps),
+                        capture_output=True, text=True)
+    assert r.stdout.strip() == rel
+
+
+def test_timeout_degrades_to_false_not_exception(tmp_path):
+    """A git command timeout becomes (False, detail) — never an unhandled
+    exception — so the caller still reaches its skip-and-alert path."""
+    _, _, vps = _make_origin_with_clones(tmp_path)
+    with patch("git_sync._git", side_effect=subprocess.TimeoutExpired(
+            cmd=["git", "pull", "--rebase"], timeout=30)):
+        ok, detail = pull_rebase_with_recovery(str(vps))
+    assert not ok
+    assert "timed out" in detail
 
 
 def test_aborts_when_untracked_file_differs(tmp_path):

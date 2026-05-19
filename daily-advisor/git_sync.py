@@ -53,9 +53,14 @@ def parse_blocking_files(text):
 
 
 def _git(args, repo_root, timeout=30):
-    """Run a git subcommand in repo_root, capturing output as text."""
+    """Run a git subcommand in repo_root, capturing output as text.
+
+    Forces LC_ALL=C so git's messages are always English: parse_blocking_files
+    matches on English wording and the VPS cron locale is not guaranteed.
+    """
     return subprocess.run(
         ["git", *args], cwd=repo_root,
+        env={**os.environ, "LC_ALL": "C"},
         capture_output=True, text=True, timeout=timeout,
     )
 
@@ -92,7 +97,22 @@ def pull_rebase_with_recovery(repo_root):
     could delete the identical ones, leave a differing one, and still
     fail the retry — stranding a half-cleaned working tree. So we verify
     the whole set first, then remove all and retry the pull exactly once.
+
+    A git command timing out (slow network) degrades to (False, detail)
+    like any other failure — never an unhandled exception, so the caller
+    always reaches its skip-and-alert path instead of crashing the cron.
     """
+    try:
+        return _attempt_pull_rebase(repo_root)
+    except subprocess.TimeoutExpired as e:
+        cmd = " ".join(e.cmd) if isinstance(e.cmd, (list, tuple)) else str(e.cmd)
+        return False, (
+            f"git timed out after {e.timeout}s ({cmd}) — manual check needed"
+        )
+
+
+def _attempt_pull_rebase(repo_root):
+    """Body of pull_rebase_with_recovery; see that function's docstring."""
     r = _git(["pull", "--rebase", "origin", "master"], repo_root)
     if r.returncode == 0:
         return True, "pull --rebase OK"
@@ -126,8 +146,12 @@ def pull_rebase_with_recovery(repo_root):
     for path in blocking:
         try:
             os.remove(os.path.join(repo_root, path))
-        except OSError:
+        except FileNotFoundError:
             pass  # already gone — fine, the retry will tell us
+        except OSError as e:
+            # e.g. PermissionError — the retry pull will still fail; surface
+            # why so the alert isn't just a generic "still failed".
+            print(f"git_sync: could not remove {path}: {e}", file=sys.stderr)
 
     r2 = _git(["pull", "--rebase", "origin", "master"], repo_root)
     if r2.returncode == 0:
