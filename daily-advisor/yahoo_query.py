@@ -256,6 +256,10 @@ def query_fa(access_token, league_key, *, position=None, status="A",
     (e.g. ``stream_sp_scan.fetch_yahoo_fa_sp_pool``).
     """
     target_names = set(names) if names else None
+    # Match on accent/apostrophe-normalized names — Yahoo and the caller's
+    # source (MLB Stats API) disagree on "García" vs "Garcia", "O'Brien" vs
+    # "OBrien". target_norm is the normalized set used for filter + early-stop.
+    target_norm = {_normalize(n) for n in target_names} if target_names else None
     do_auto_page = bool(auto_page or target_names)
 
     collected = []
@@ -274,9 +278,9 @@ def query_fa(access_token, league_key, *, position=None, status="A",
             break
 
         if target_names:
-            collected.extend(p for p in page if p["name"] in target_names)
-            found = {p["name"] for p in collected}
-            if target_names.issubset(found):
+            collected.extend(p for p in page if _normalize(p["name"]) in target_norm)
+            found = {_normalize(p["name"]) for p in collected}
+            if target_norm.issubset(found):
                 break
         else:
             collected.extend(page)
@@ -324,8 +328,8 @@ def cmd_fa(args, access_token, config):
         return
 
     if target_names:
-        found = {p["name"] for p in players}
-        missing = target_names - found
+        found_norm = {_normalize(p["name"]) for p in players}
+        missing = {n for n in target_names if _normalize(n) not in found_norm}
         if missing:
             print(f"(--names filter: 未找到 {', '.join(sorted(missing))})\n")
 
@@ -494,11 +498,17 @@ def send_telegram(message, env):
 
 
 def _normalize(name):
-    """Strip accents for fuzzy matching (Jesús → Jesus)."""
-    return "".join(
+    """Strip accents + apostrophes + lowercase for fuzzy name matching.
+
+    Jesús → jesus; Riley O'Brien → riley obrien. Used by both Savant CSV
+    matching (``_match_player``) and the ``query_fa`` --names filter, where
+    Yahoo and MLB sources disagree on accents / apostrophe characters.
+    """
+    stripped = "".join(
         c for c in unicodedata.normalize("NFD", name)
         if unicodedata.category(c) != "Mn"
-    ).lower()
+    )
+    return stripped.replace("'", "").replace("’", "").lower()
 
 
 MLB_API_BASE = "https://statsapi.mlb.com/api/v1"

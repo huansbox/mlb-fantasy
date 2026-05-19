@@ -155,6 +155,73 @@ class TestQueryFaNamesFilter:
         assert out == []
 
 
+class TestQueryFaNamesNormalize:
+    """--names matching is accent/apostrophe-insensitive (A2 fix).
+
+    MLB Stats API and Yahoo disagree on accents ("García" vs "Garcia") and
+    apostrophe chars ("O'Brien" U+0027 vs "O’Brien" U+2019). The request
+    name and the Yahoo-returned name are both normalized before compare.
+    """
+
+    def test_accent_mismatch_still_matches(self):
+        # caller passes ASCII "Luis Garcia", Yahoo returns accented "Luis García"
+        page0 = [_player("Luis García"), _player("noise")]
+        fake = _make_fetch_page([page0, []])
+
+        with patch.object(yahoo_query, "_fetch_fa_page", fake):
+            out = yahoo_query.query_fa(
+                access_token="t", league_key="lk",
+                names={"Luis Garcia"},
+            )
+
+        assert len(out) == 1
+        assert out[0]["name"] == "Luis García"
+
+    def test_apostrophe_variant_still_matches(self):
+        # caller passes straight-quote "Riley O'Brien", Yahoo returns curly "O’Brien"
+        page0 = [_player("Riley O’Brien"), _player("noise")]
+        fake = _make_fetch_page([page0, []])
+
+        with patch.object(yahoo_query, "_fetch_fa_page", fake):
+            out = yahoo_query.query_fa(
+                access_token="t", league_key="lk",
+                names={"Riley O'Brien"},
+            )
+
+        assert len(out) == 1
+        assert out[0]["name"] == "Riley O’Brien"
+
+    def test_accent_match_triggers_early_stop(self):
+        # normalized match must also satisfy the all-found early-stop check
+        page0 = [_player("Luis García"), _player("Jesús Tinoco")]
+        page1 = [_player("never reached")]
+        fake = _make_fetch_page([page0, page1])
+
+        with patch.object(yahoo_query, "_fetch_fa_page", fake):
+            out = yahoo_query.query_fa(
+                access_token="t", league_key="lk",
+                names={"Luis Garcia", "Jesus Tinoco"},
+            )
+
+        assert len(fake.calls) == 1  # early-stop after page 0 despite accents
+        assert {p["name"] for p in out} == {"Luis García", "Jesús Tinoco"}
+
+
+class TestNormalize:
+    @pytest.mark.parametrize(
+        "raw,expected",
+        [
+            ("Jesús Tinoco", "jesus tinoco"),
+            ("Luis García", "luis garcia"),
+            ("Riley O'Brien", "riley obrien"),
+            ("Riley O’Brien", "riley obrien"),  # curly apostrophe U+2019
+            ("Sean Burke", "sean burke"),       # plain name unchanged but lowered
+        ],
+    )
+    def test_normalize_strips_accents_and_apostrophes(self, raw, expected):
+        assert yahoo_query._normalize(raw) == expected
+
+
 class TestQueryFaPassthrough:
     def test_position_status_sort_passed_to_fetch_page(self):
         """Filter args propagate to _fetch_fa_page kwargs."""
