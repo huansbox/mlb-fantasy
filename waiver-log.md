@@ -151,6 +151,15 @@
 - 05-15：[eval] vs Stott (FA, 37% owned) + Meidroth (15% owned 已 Pass)，結論：hold；Sum 26 vs Stott 12 / Meidroth 14（差 +14 / +12），LA/EV/Whiff%/Chase% 跨年全穩 = mechanic 無崩；14d xwOBA .257 弱化 Δ -0.074 接近 -0.080 警戒但未達；持續 BABIP 噪音 buy-low（xBA .225 vs AVG .189 差 -36 點）（player-eval）
 - 05-15：[eval] 3-agent 獨立 reasoning 一致 hold；補 split 訊號：前 15 場 BB% 18.0% / 後 15 場 BB% 7.5% = breakout 後段消退（後 15 場已回 2025 7.3% 水準）；14d Savant 三指標同步退化 xwOBA -.074 / Barrel% -6.4pp / HH% -5.4pp 非純 BABIP 噪音；信心下調 高→中；交叉觀察 [[Crawford]]（FA SS pool 唯一達 Sum 26 候選，但雙人平手不顯著升級）；stop-loss：14d xwOBA Δ ≥-0.080 連 5 天 / 後 10 場 Barrel% 仍 <P25 / Whiff% 或 Chase% 跨年劇變 / 角色變動（player-eval）
 
+### Ryan Jeffers (MIN, C) [mlb_id:680777] — 傷情追蹤（左手腕扭傷）
+觸發：進 IL → 放 IL 格 + 評估替補捕手；或 DTD 恢復先發 → 移除追蹤
+- 啟動 2026-05-19（用戶 news check 觸發）
+- 傷情：5/19 對 Astros 比賽，面對中繼 AJ Blubaugh 揮空斷棒，左手腕扭傷（sprained left wrist）當場離場
+- 狀態：Yahoo status DTD，尚未進 IL；球隊等檢查（test on left wrist）結果決定
+- 風險脈絡：Jeffers 是隊上打擊端強項（season .302/.409/.531 / 5 HR / 22 RBI），手腕傷對打者殺傷力大 — 即使回歸初期打擊也可能縮水
+- 觀察重點：①檢查結果是否升級為 IL ②回歸後打擊是否回到傷前水準（比「何時回」更值得追）
+- 對策：DTD 占 active/BN 不能放 IL 格；確認進 IL 才放 IL 格 + 空出 active 評估替補捕手
+
 ## 已結案
 
 ### Kody Clemens (MIN, 1B/2B/LF/RF) [mlb_id:665019] — 已撿入隊
