@@ -20,7 +20,7 @@
 - **限制與規則**：
   - 每週最低 **40** 投球局數（Min IP = 40，未達 → ERA + WHIP 判負）
   - 每週最多 6 次異動（Max Acquisition = 6）
-  - Waiver：**FAB**（Free Agent Budget）+ Continual rolling list tiebreak
+  - Waiver：被 drop 球員走 **FAB** 競標（Free Agent Budget，同額 tiebreak = Continual rolling list）；已清 waiver 的 FA 先搶先得、免費
   - Lineup 鎖定：**Daily - Tomorrow**（每天要設隔日先發）
   - Trade Review：Commissioner，Reject Time 2 天
 - **季後賽**：4 隊，Week 24-25（至 9/20）
@@ -73,12 +73,13 @@
 
 ### Waiver 操作規則
 
-- **所有撿人走 FAAB**（waiver_rule: all），無即時 FA
-- **處理時間**：每日 ET 3AM（= TW 15:00）
-- **上場時效**：claim（TW 15:00 前）→ 當日 TW 15:00 處理 → 當晚設 Daily-Tomorrow lineup → 隔天上場（前置 1 天）
-- **被 drop 球員**：1 天 waiver period
-- **FAAB 預算**：$100 全季，同額 tiebreak = continual rolling list
-- **FAAB 餘額**：$100（至 2026-05-02 仍滿；Detmers / Junk / Severino 皆 $0 取得）
+- **兩種撿人途徑**：
+  - **Waiver claim** — 對象為近期被 drop、仍在 waiver period 內的球員，**需 FAAB 出價**；每日 ET 3AM（= TW 15:00）統一處理，同額 tiebreak = continual rolling list
+  - **FA add** — 已清 waiver 的自由球員，**先搶先得、免費（$0）、即時生效**
+- **被 drop 球員**：1 天 waiver period，期滿未被 claim → 落入 FA 池
+- **上場時效**：waiver claim（TW 15:00 前）→ 當日 15:00 處理；FA add 即時生效 → 當晚設 Daily-Tomorrow lineup → 隔天上場（前置 1 天）
+- **FAAB 預算**：$100 全季，**僅 waiver claim 消耗**；同額 tiebreak = continual rolling list
+- **FAAB 餘額**：$100（至 2026-05-19 仍滿；Detmers / Junk / Severino / Kody Clemens 皆走 FA $0 取得）
 - **每週上限**：6 次 add（add/drop 一組算 1 次）
 
 ### 陣容風險
