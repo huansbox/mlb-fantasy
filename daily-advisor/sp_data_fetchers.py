@@ -157,9 +157,14 @@ def fetch_savant_arsenal_whiff(year: int) -> dict:
 
 
 def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
-    """Returns {pid: {g, gs, ip, ip_gs, bb9, era, whip, qs, k}}.
+    """Returns {pid: {g, gs, ip, ip_gs, bb9, k9, era, whip, k,
+                      saves, holds, blown_saves, save_opportunities}}.
 
     Batches 50 per call via /people?personIds=...
+
+    saves/holds/blown_saves/save_opportunities support the RP-SV+H scan
+    (rp_svh_scan.py): saves+holds is the realized SV+H production, and
+    blown_saves pairs with save_opportunities for the LLM role-safety read.
     """
     out = {}
     ids = list(pitcher_ids)
@@ -195,6 +200,11 @@ def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
                         "k9": 9 * k / ip_real if ip_real else 0,
                         "era": safe_float(stat.get("era")),
                         "whip": safe_float(stat.get("whip")),
+                        "saves": safe_int(stat.get("saves"), 0),
+                        "holds": safe_int(stat.get("holds"), 0),
+                        "blown_saves": safe_int(stat.get("blownSaves"), 0),
+                        "save_opportunities": safe_int(
+                            stat.get("saveOpportunities"), 0),
                     }
                     break
         except Exception as e:
