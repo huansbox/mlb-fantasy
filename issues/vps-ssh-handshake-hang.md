@@ -1,6 +1,6 @@
 # Issue: VPS SSH 連線間歇性卡死（handshake 階段）
 
-**狀態**：根因已確認（2026-05-19，雙端同步抓包定案）。**網路路徑間歇性雙向封包遺失**——非 sshd / ssh 設定層可修，需 MTR 定位後向 ISP（HiNet）或 VPS 供應商（RackNerd）申告;本機端只能用 timeout + retry 緩解。
+**狀態**：根因已確認 + 緩解已落地（2026-05-19）。**網路路徑間歇性雙向封包遺失**——非 sshd / ssh 設定層可修。pathping 已排除本機端前 4 跳（0% loss），loss 在不可控的國際 transit 段，不申告。緩解 F2（`bin/vps-run.sh` timeout + retry wrapper）已落地於 branch `feat/vps-ssh-retry-wrapper`，待 merge。
 **影響範圍**：所有 SSH 到 VPS 的 skill / 操作（`/rp-svh`、`/stream-sp`、`/weekly-review`、手動 `yahoo_query.py` 查詢等）。
 
 ## 問題
@@ -94,25 +94,46 @@
 - **「前 1-2 次卡、之後快」**：loss 是 burst 性，連線只要熬過 lossy 窗口就完成，隔幾秒的新連線常落在乾淨窗口。非真「熱起來」。
 - 初版「~30s = TCP 指數退避」方向對、但當時零證據且搞錯方向（是 server→client 退避重傳）。pcap 實測退避序列 0.6→2.5→5.3→10s 坐實。
 
-## 剩餘調查（定位 loss 在路徑哪一段）
+## loss 定位（pathping 2026-05-19）+ 「停止深挖」判斷
 
-根因已定，尚需定位以決定向誰申告：
+`pathping -q 50 -p 250 107.175.30.172` 結果：
 
-- 本機跑 `mtr --tcp -P 22 -c 1000 107.175.30.172`（或 `winmtr`），看逐 hop 遺失率。
-- loss 集中在前 1-2 hop → 本機 ISP（HiNet，`61.220.64.106`）；集中在接近 VPS → 供應商（RackNerd，`107.175.30.172`）上游。
-- 帶 pcap + mtr 證據開 ticket。
+```
+hop 1  RT-N18U-F378  192.168.50.1               0% loss   家用路由器
+hop 2  192.168.11.254                            0% loss   第二層 NAT / 數據機
+hop 3  61-220-64-254.hinet-ip.hinet.net          0% loss   HiNet 邊緣
+hop 4  168-95-211-14.tpdt-3310.hinet.net         0% loss   HiNet 骨幹
+hop 5+ * * *                                     無法測量（路由器不回 ICMP TTL-exceeded）
+```
+
+判讀與決策：
+
+- **本機端 + HiNet 入口前 4 跳全 0% loss** → 唯一本機可修的分支（路由器 / 線材 / Wi-Fi）**排除**。附帶發現家中雙層 NAT（192.168.50.x → 192.168.11.x），非 loss 來源。
+- loss 在 hop 5+ 不可測段（國際 transit → ColoCrossing 機房），ICMP 量不到、也非本機可控。
+- **判斷：停止深挖。** 再往下（VPS 端反向 mtr 等）只會得到「loss 在某個改不了的 transit AS」。F0 申告期望報酬低（消費級 ISP + 廉價 VPS、間歇 burst loss 常以「查無異常」結案），不主動做。緩解交給 F2，路徑爛不爛在操作層面就不重要了。
 
 ## 修正計畫
 
 > 根因在網路路徑，**不是 sshd / ssh 設定層能修的**。本機端只能緩解。
 
-- **F0（治本，非本機可控）**：MTR 定位 loss 段 → 向 HiNet 或 RackNerd 申告。能否真的修好取決於對方。
-- **F2（緩解，主要措施）**：建版控 wrapper `bin/vps-run.sh`（`timeout 45 ssh ...` + retry 2-3 次 + retry 記 log）。4 個 skill md（`rp-svh` / `stream-sp` / `stream-sp-deep` / `weekly-review`，共 5 處 ssh）改成呼叫 wrapper。**理由已被數據坐實**：卡死的連線不會自己好（互鎖到 timeout），但隔幾秒的新連線常落在乾淨窗口 → 砍掉重連有效。**retry 只對純讀腳本**（`rp_svh_scan.py` / `stream_sp_scan.py` 冪等）；寫檔 / git 指令走 `--no-retry`，避免「指令已在 VPS 跑、本機 timeout 砍掉後 retry 跑第二份」撞車。timeout 設 45s 區分「卡 handshake」與「指令正常 e2e ~5s」。
+- **F0（治本，不做）**：路徑申告期望報酬低（見上），擱置。若日後 loss 顯著惡化再帶 pcap 開 ticket。
+- **F2（緩解，已落地 2026-05-19）**：見下「F2 落地紀錄」。
 - **~~F1 ControlMaster~~ — 砍掉**：Windows OpenSSH multiplexing 不可靠；且在**會丟封包的路徑**上，長壽的多工連線本身會 stall，反而把單次卡死放大成全 session 連鎖卡。
-- **F3（邊際保險）**：本機 `~/.ssh/config` 加 `ConnectTimeout 15` + `Host vps` 別名。注意 `ServerAliveInterval` 對 **handshake 階段**卡死無效（連線還沒建立、沒有 session keepalive）——handshake 階段只有外層 `timeout`（F2）能救。
+- **~~F3 ~/.ssh/config~~ — 併入 F2**：`ConnectTimeout` 等 ssh 選項直接寫進 wrapper 的 `ssh` 呼叫（self-contained、跨機器 git pull 即生效），不另建機器本地的 `~/.ssh/config`。
 - **~~F4 fail2ban~~ — 不做**：bot flood 已證偽（`established ≤2`），與本 issue 無因果。
+
+## F2 落地紀錄（2026-05-19，branch `feat/vps-ssh-retry-wrapper`）
+
+- **新增 `bin/vps-run.sh`**：`bash bin/vps-run.sh [--no-retry] '<remote command>'`。每次嘗試 `timeout -k 5 90 ssh -o ConnectTimeout=15 -o BatchMode=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 ...`，預設 3 次嘗試。
+  - **只對 retryable exit 重試**：124（timeout）/ 137（SIGKILL）/ 255（ssh 連線錯誤）。0 或 1-254 的真實 remote exit **不重試**（重試救不了真失敗）。
+  - `--no-retry`：單次嘗試。寫檔 / git 指令用——避免「指令已在 VPS 跑、本機 timeout 砍掉 ssh 後 retry 跑第二份」。
+  - timeout 預設 90s（高於任何 legit 指令 runtime，只砍真 hang）；`VPS_RUN_TIMEOUT` / `VPS_RUN_TRIES` 可覆寫。
+  - retry 訊息走 stderr，stdout 維持純 remote 輸出（skill 當 JSON parse）。
+- **改 4 個 skill md（共 6 處 SSH）走 wrapper**：`rp-svh`（1，retry）/ `stream-sp`（1，retry）/ `stream-sp-deep`（3，retry）/ `weekly-review`（1，`--no-retry` — `weekly_review.py --prepare` 會寫檔）。
+- **e2e 驗證**：success 透傳 exit 0 / 真失敗 `exit 7` 不重試直接透傳 / 用法錯誤 exit 2 / `--no-retry` 單次。測試當下實地撞到一次 ssh 連線逾時（exit 255）→ 自動 retry → 第 2 次成功，wrapper 行為符合預期。
+- CLAUDE.md「執行環境」+「檔案索引」同步更新。
 
 ## 參考
 
 - VPS 連線資訊：`~/.claude/projects/.../memory/reference_vps.md`
-- 受影響 skill：`.claude/commands/rp-svh.md`、`stream-sp.md`、`stream-sp-deep.md`、`weekly-review.md` 的 Step「SSH 跑機械層」
+- 受影響 skill：`.claude/commands/rp-svh.md`、`stream-sp.md`、`stream-sp-deep.md`、`weekly-review.md`

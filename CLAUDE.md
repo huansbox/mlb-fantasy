@@ -418,8 +418,9 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - **Yahoo API token 只存在 VPS**（`daily-advisor/yahoo_token.json`），本機無 — `yahoo_query.py` 本機直接跑會報 `Yahoo token not found`
 - **本機取即時數據（scoreboard / matchup / 異動紀錄）**：
   ```bash
-  ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 yahoo_query.py <cmd>"
+  bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 yahoo_query.py <cmd>'
   ```
+- ⚠️ **本機↔VPS 路徑間歇封包遺失** → SSH handshake 偶發卡死 ~30-40s（根因確認見 `issues/vps-ssh-handshake-hang.md`）。VPS 指令一律走 `bash bin/vps-run.sh '<remote cmd>'`（timeout + retry wrapper）；純讀指令免旗標、寫檔 / git 指令加 `--no-retry`。skill 的 SSH step 已全部改走 wrapper。
 - **本機取歷史數據（daily report / fa_scan 存檔）**：
   ```bash
   gh issue view <N> -R huansbox/mlb-fantasy
@@ -431,6 +432,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 | 文件 | 用途 |
 |------|------|
+| `bin/vps-run.sh` | SSH 到 VPS 的 timeout + retry wrapper（本機↔VPS 路徑間歇丟包，見 `issues/vps-ssh-handshake-hang.md`）。`bash bin/vps-run.sh [--no-retry] '<remote cmd>'`，純讀指令會 retry、寫檔/git 走 `--no-retry`。skill 的 SSH step 與本機手動 VPS 指令都走它 |
 | `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP 並行 / 週一 RP / snapshot-only） |
 | `daily-advisor/fa_compute.py` | Python 機械計算層（Sum/urgency/✅⚠️ 標籤/升級判定，Phase 5） |

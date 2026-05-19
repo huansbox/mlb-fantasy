@@ -34,7 +34,7 @@ description: "Fantasy Baseball 串流 SP 候選深評。用戶在 /stream-sp 跑
 2. **MLB Stats API search** fallback（跨 session 已遺失 scan cache 時）：
 
 ```bash
-ssh root@107.175.30.172 "curl -s 'https://statsapi.mlb.com/api/v1/people/search?names=Sean%20Burke' | python3 -m json.tool | head -50"
+bash bin/vps-run.sh "curl -s 'https://statsapi.mlb.com/api/v1/people/search?names=Sean%20Burke' | python3 -m json.tool | head -50"
 ```
 
 > 注：FA 候選**不在** `daily-advisor/roster_config.json`（那只有我隊球員），不必往那找。
@@ -44,7 +44,7 @@ ssh root@107.175.30.172 "curl -s 'https://statsapi.mlb.com/api/v1/people/search?
 ### 1a：呼叫 `mlb_query.gamelog_with_qs`
 
 ```bash
-ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"import json; from mlb_query import gamelog_with_qs; print(json.dumps(gamelog_with_qs({mlb_id}, 2026), indent=2))\""
+bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 -c "import json; from mlb_query import gamelog_with_qs; print(json.dumps(gamelog_with_qs({mlb_id}, 2026), indent=2))"'
 ```
 
 替換 `{mlb_id}` 為 SP 的 MLB Player ID。Helper 回 JSON list，每場含：
@@ -102,7 +102,7 @@ ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"impor
 ### 2a：呼叫 `mlb_query.opponent_context`
 
 ```bash
-ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"import json; from mlb_query import opponent_context; print(json.dumps(opponent_context({opp_team_id}, '{et_date}', {sp_id}), indent=2))\""
+bash bin/vps-run.sh "cd /opt/mlb-fantasy/daily-advisor && python3 -c \"import json; from mlb_query import opponent_context; print(json.dumps(opponent_context({opp_team_id}, '{et_date}', {sp_id}), indent=2))\""
 ```
 
 替換：

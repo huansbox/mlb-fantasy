@@ -20,11 +20,10 @@ description: "Fantasy Baseball 週級 RP-SV+H 掃描。production-first 找出 M
 
 ## Step 1：跑機械層
 
-機械層需 Yahoo token（只在 VPS）。SSH 跑 `rp_svh_scan.py`：
+機械層需 Yahoo token（只在 VPS）。透過 `bin/vps-run.sh` 跑 `rp_svh_scan.py`（wrapper 自動處理 SSH 間歇卡死的 timeout + retry，見 `issues/vps-ssh-handshake-hang.md`）：
 
 ```bash
-ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && \
-  python3 rp_svh_scan.py --pretty 2>/dev/null"
+bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 rp_svh_scan.py --pretty 2>/dev/null'
 ```
 
 可選參數：`--floor N`（14d SV+H 入場門檻，預設 3）/ `--top N`（rank-sum top-N，預設 4，cutoff 並列一律納入）/ `--date YYYY-MM-DD`（預設 ET 今天）。stderr 走 fetcher progress（`2>/dev/null` 過濾），stdout 純 JSON。

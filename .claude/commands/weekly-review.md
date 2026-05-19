@@ -72,7 +72,7 @@
 4. **讀 `waiver-log.md` 「隊上觀察」段** + `git log --since='1 week ago' --oneline`（兩個來源都需手動讀）
 
 若 JSON 不存在，提示用戶：
-- VPS 上跑：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && python3 daily-advisor/weekly_review.py --prepare'`
+- VPS 上跑：`bash bin/vps-run.sh --no-retry 'cd /opt/mlb-fantasy && python3 daily-advisor/weekly_review.py --prepare'`（`--no-retry`：此指令會寫檔，不可重試）
 - 或本地即時拉取：`python daily-advisor/weekly_review.py --prepare --dry-run > daily-advisor/weekly-data/week-{N}.json`
 
 ## Step 2：讀 2 週合併排名（自 JSON）

@@ -78,11 +78,10 @@ ET 2026-05-09：14 場 / 12 TBD
 
 > 原本 5 個 step ~180 行 inline bash + python3 已壓縮成 `daily-advisor/stream_sp_scan.py`（TDD 27 tests，commit `96830ba`）。
 
-對 Step 0/1 確定的 ET 日期清單，一次呼叫：
+對 Step 0/1 確定的 ET 日期清單，一次呼叫（`bin/vps-run.sh` 自動處理 SSH 間歇卡死的 timeout + retry，見 `issues/vps-ssh-handshake-hang.md`）：
 
 ```bash
-ssh root@107.175.30.172 "cd /opt/mlb-fantasy/daily-advisor && \
-  python3 stream_sp_scan.py --et-dates 2026-05-14,2026-05-15 2>/dev/null"
+bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan.py --et-dates 2026-05-14,2026-05-15 2>/dev/null'
 ```
 
 `stdout = JSON`，schema：
