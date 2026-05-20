@@ -134,6 +134,7 @@
 ### Grant Holmes (ATL, SP) [mlb_id:656550] — 觀察中
 觸發：Phase 6 multi-agent watch
 - 05-19：觀察中 — Whiff% P60 + GB% P50 勝 Montero，但 BB/9 4.18 P0 是硬傷；等下一場 BB/IP 表現再決定（fa_scan）
+- 05-20：Phase 6 watch — Whiff% P60 + GB% P50 雙軸大勝 Montero，但 BB/9 P0 / IP/GS P25 拖累，等 Montero 21d 劣化確認或 Holmes BB/9 改善再動（fa_scan）
 
 ### Luke Raley (SEA, 1B,LF,CF,RF) [mlb_id:670042] — 觀察中
 觸發：BB% 升至 P40+ 或 14d 維持 OPS ≥1.000 連 7 天 → 升級
