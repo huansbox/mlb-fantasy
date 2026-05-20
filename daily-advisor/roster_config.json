@@ -108,8 +108,8 @@
         "pa": 542,
         "g": 126
       },
-      "selected_pos": "BN",
-      "status": "DTD"
+      "selected_pos": "CF",
+      "status": ""
     },
     {
       "name": "Ozzie Albies",
@@ -130,7 +130,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "2B",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -155,28 +155,6 @@
       },
       "selected_pos": "RF",
       "status": ""
-    },
-    {
-      "name": "Ryan Jeffers",
-      "mlb_id": 680777,
-      "yahoo_player_key": "469.p.11794",
-      "team": "MIN",
-      "positions": [
-        "C"
-      ],
-      "selected_pos": "Util",
-      "status": "DTD",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.325,
-        "barrel_pct": 6.3,
-        "hh_pct": 42.1,
-        "bb_pct": 10.8,
-        "ops": 0.753,
-        "pa_per_team_g": 2.86,
-        "pa": 464,
-        "g": 119
-      }
     },
     {
       "name": "Spencer Steer",
@@ -235,7 +213,7 @@
         "LF",
         "RF"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "2B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -247,6 +225,32 @@
         "pa_per_team_g": 2.38,
         "pa": 386,
         "g": 119
+      }
+    },
+    {
+      "name": "Ezequiel Duran",
+      "mlb_id": 677649,
+      "yahoo_player_key": "469.p.11886",
+      "team": "TEX",
+      "positions": [
+        "1B",
+        "2B",
+        "3B",
+        "SS",
+        "LF"
+      ],
+      "selected_pos": "Util",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.247,
+        "barrel_pct": 2.6,
+        "hh_pct": 30.9,
+        "bb_pct": 3.7,
+        "ops": 0.559,
+        "pa_per_team_g": 1.35,
+        "pa": 219,
+        "g": 90
       }
     }
   ],
@@ -437,7 +441,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "RP",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -544,7 +548,7 @@
       "positions": [
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
