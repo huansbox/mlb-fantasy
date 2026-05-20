@@ -17,6 +17,7 @@
 - 05-15：14d OPS .548 / K% 29.8 持續升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .539 連 7+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
 - 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「Duran 被搶 → 升級 Altuve 替代」第二觸發失效；維持 second tier platoon 觀察
 - 05-19：14d OPS .229 崩盤 / K% 35.6 spike；PA-TG 2.83 未達 3.0；platoon second tier 不行動（fa_scan）
+- 05-20：14d OPS .215 崩盤 / K% 32.6 spike；PA-TG 2.84 未達 3.0；platoon second tier 不行動（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -31,6 +32,7 @@
 - 05-14：14d OPS .605 / K% 16.7 穩；PA-TG 3.14；BB% 3.79 P0 結構不變；Nootbaar 5/24 回歸倒數 10 天（fa_scan）
 - 05-15：14d OPS .578 / K% 17.0 穩；PA-TG 3.16 穩定；BB% 3.68 P0 結構不變；Nootbaar 5/24 回歸倒數 9 天（fa_scan）
 - 05-19：14d OPS .655 / K% 11.5 穩但 BB% P0 結構不變；Nootbaar 回歸倒數 5 天（fa_scan）
+- 05-20：14d OPS .634 / K% 13.5 穩；BB% P0 結構不變；Nootbaar 回歸倒數 4 天 PT 縮減在即（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
@@ -44,6 +46,7 @@
 - 05-14：IL10 持續；season P80/P95 結構不變；55% dropping -2；Albies 14d OPS .814 觸發條件遠未達（fa_scan）
 - 05-15：IL10 持續；season P80/P95 結構不變；55% dropping -1；Albies 14d OPS .696 接近觸發但未達 .600（fa_scan）
 - 05-19：Albies 14d OPS .424 觸發條件早已 met；05-19 仍待確認是否解除 IL10 — 若健康即行動 drop Albies add Torres（fa_scan）
+- 05-20：IL10 持續；Albies 14d OPS .356 觸發早已 met — 等 IL 解除即行動（若 McLain 已被搶）（fa_scan）
 
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
@@ -55,6 +58,7 @@
 - 05-14：14d K% 34.6 spike 第 3 週持續 + OPS .546 冰冷；season P80/P70/P95 結構仍強 + Savant Δ+0.012 品質上升矛盾冷卻；觸發未達（K% >28% / OPS <.700）（fa_scan）
 - 05-15：14d K% 28.8 接近觸發門檻 + OPS .505 冰冷；season P80/P70/P95 結構仍強 + Savant Δ-0.002 持平；觸發接近（K% 28.8 ≈28%）但 OPS 遠未達 .700（fa_scan）
 - 05-19：14d K% 31.8 仍高 / OPS .333 冰冷；season P80/P70/P80 結構仍強但觸發遠未達（fa_scan）
+- 05-20：14d K% 29.3 / OPS .305 冰冷第 4 週；season P80/P70/P80 結構仍強但觸發遠未達（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
 觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
@@ -66,6 +70,7 @@
 - 05-14：14d OPS .856 / Savant Δ+0.051 品質飆升持續；BBE 70 距 80 門檻差 10；1% 零壓力（fa_scan）
 - 05-15：14d OPS .856 / Savant Δ+0.056 品質飆升持續；BBE 71 距 80 門檻差 9；1% 零壓力（fa_scan）
 - 05-19：BBE 75 距 80 門檻差 5；14d OPS 1.041 / Savant Δ+0.063 持續飆升；預計 ~5 天內達標（fa_scan）
+- 05-20：BBE 77→距 80 門檻差 3；14d OPS 1.041 / Savant Δ+0.068 持續飆升；1% 零壓力（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
@@ -76,6 +81,7 @@
 - 05-15：14d OPS .737 / 6BB / 2SB + Savant Δ+0.034 品質上升；season xwOBA P55 / Barrel% P55 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70）（fa_scan）
 - 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
 - 05-19：season xwOBA P60 / Barrel% P60 接近門檻；14d OPS .721 / Savant Δ+0.042 品質上升；觸發未達（xwOBA <P70）（fa_scan）
+- 05-20：season xwOBA P60 / Barrel% P60 接近門檻；14d OPS .721 / 2SB；錨點改為隊上最弱 2B/UTIL（fa_scan）
 
 ### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級為 2B/UTIL 補強候選
@@ -85,6 +91,7 @@
 - 05-15：14d OPS .706 / Savant Δ+0.034 品質上升持續；prior P95/P95/P70 slump 候選；PA-TG 3.57 主力；觸發未達（OPS <.800）（fa_scan）
 - 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
 - 05-19：14d OPS .770 / Savant Δ+0.006 微升；prior P95 slump 候選；觸發未達（OPS <.800）（fa_scan）
+- 05-20：14d OPS .782 接近 .800 觸發 / Savant Δ+0.013 微升；prior P95 slump 回歸接近但未達（fa_scan）
 
 ### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
 觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
@@ -93,34 +100,44 @@
 - 05-14：PA-TG 0.45 / BBE 10 樣本極低；14d OPS .705 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
 - 05-15：PA-TG 0.45 / BBE 13 樣本極低；14d OPS .705 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
 - 05-19：PA-TG 0.76 / BBE 21 樣本極低；14d OPS .809 但零 HR；debut 驗證中所有觸發遠未達（fa_scan）
+- 05-20：PA-TG 0.83 / BBE 24 樣本極低；14d OPS .780 / 0HR / 3SB；debut 驗證中所有觸發遠未達（fa_scan）
 
 ### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
 - 05-14：xwOBA P95 / BB% P80 / Barrel% P95 / HH% P95 全面菁英結構；14d OPS .918 / 3 HR 驗證；prior P70/P25/P50 breakout 跳升；但 PA-TG 1.59 上場有限 + BBE 46 剛過門檻（fa_scan）（fa_scan）
 - 05-15：xwOBA P95 / Barrel% P95 / HH% P95 結構菁英持續；14d OPS .918 / 3 HR 驗證；但 PA-TG 1.59 上場有限 + BBE 46 信心仍低；prior P70/P25/P50 breakout 跳升（fa_scan）
 - 05-19：14d OPS 1.217 / 4 HR 菁英驗證但 PA-TG 1.69 上場有限觸發未達（fa_scan）
+- 05-20：14d OPS 1.174 / 4HR 菁英驗證持續但 PA-TG 1.69 上場有限觸發遠未達（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
      或 Crawford 後 15 場 BB% 退至 <10% + AVG <.200 連 5 天 → 降級結案（breakout 消退確認）
 - 2026-05-15：[eval] FA SS pool 掃描唯一達 Swanson 等級候選（其他 6 人全部 Sum <20 或結構性弱）；雙年雙菁英 xwOBA P80→P95 / BB% P85→>P90 + 機制大幅進步 Whiff% 20.4→14.4 / Chase% 21.9→17.1 ✅；近況：後 15 場 AVG .263 / BB% 17.4% / K% 11.6% / HR 4，breakout 持續驗證中；xBA .263 vs AVG .215 = +48 點 BABIP 噪音 buy-low（強過 Swanson +36 點）；11% owned + 5/3 被搶後 drop 回池 = 市場 brand-bias 撿便宜窗口；不立即執行原因：Swanson Sum 26 = Crawford Sum 26 平手 + Swanson 機制跨年穩無崩 = 不顯著升級，鎖窗口等 Swanson 真正過 brand bias 警戒線（player-eval）
 - 05-19：Swanson 14d Savant Δ-0.097 首次越過 -0.080 stop-loss 線，開始計天；Crawford 14d OPS .856 / 4 HR 穩健（fa_scan）
+- 05-20：Swanson 14d Savant Δ-0.097 已越 -0.080 stop-loss 線 day 2；Crawford 14d OPS .765 / 3HR 穩健（fa_scan）
 
 ### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
 觸發：立即行動
 - 05-19：xwOBA P70 / BB% P95 / 14d OPS .928 / PA-TG 4.06 全職；全方位碾壓 Albies，50% owned 搶人窗口（fa_scan）
+- 05-20：14d OPS .839 / 3HR / 11RBI / 2SB / Savant Δ+0.052 全面升；50% rising +3；vs Albies 全指標碾壓 — 立即取代 Albies（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
 - 05-19：xwOBA P70 / Barrel% P95 / 14d OPS .958 / Savant Δ+0.128；雙年 P70 穩定確認，McLain B plan（fa_scan）
+- 05-20：14d OPS 1.024 / Savant Δ+0.140 極端飆升；雙年 P70 穩定確認；McLain B plan 維持（fa_scan）
 
 ### TJ Rumfield (COL, 1B) [mlb_id:681198] — 觀察中
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
 - 05-19：xwOBA P95 / PA-TG 4.00 主力 / 14d OPS .929；無 prior 新人待驗證（fa_scan）
+- 05-20：BBE 141 已過 100 門檻 + xwOBA P95 已過 P80 門檻；待確認客場 OPS ≥.750 最後條件（fa_scan）
 
 ### Grant Holmes (ATL, SP) [mlb_id:656550] — 觀察中
 觸發：Phase 6 multi-agent watch
 - 05-19：觀察中 — Whiff% P60 + GB% P50 勝 Montero，但 BB/9 4.18 P0 是硬傷；等下一場 BB/IP 表現再決定（fa_scan）
+
+### Luke Raley (SEA, 1B,LF,CF,RF) [mlb_id:670042] — 觀察中
+觸發：BB% 升至 P40+ 或 14d 維持 OPS ≥1.000 連 7 天 → 升級
+- 05-20：xwOBA P95 / Barrel% P95 / 14d OPS 1.143 / 5HR / 14RBI 爆發；但 BB% P25 結構弱 7×7 懲罰大 + prior P60 非雙年菁英；27% rising +12 市場在搶（fa_scan）
 
 ## 隊上觀察
 
@@ -150,6 +167,7 @@
 - 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
 - 05-15：[eval] vs Stott (FA, 37% owned) + Meidroth (15% owned 已 Pass)，結論：hold；Sum 26 vs Stott 12 / Meidroth 14（差 +14 / +12），LA/EV/Whiff%/Chase% 跨年全穩 = mechanic 無崩；14d xwOBA .257 弱化 Δ -0.074 接近 -0.080 警戒但未達；持續 BABIP 噪音 buy-low（xBA .225 vs AVG .189 差 -36 點）（player-eval）
 - 05-15：[eval] 3-agent 獨立 reasoning 一致 hold；補 split 訊號：前 15 場 BB% 18.0% / 後 15 場 BB% 7.5% = breakout 後段消退（後 15 場已回 2025 7.3% 水準）；14d Savant 三指標同步退化 xwOBA -.074 / Barrel% -6.4pp / HH% -5.4pp 非純 BABIP 噪音；信心下調 高→中；交叉觀察 [[Crawford]]（FA SS pool 唯一達 Sum 26 候選，但雙人平手不顯著升級）；stop-loss：14d xwOBA Δ ≥-0.080 連 5 天 / 後 10 場 Barrel% 仍 <P25 / Whiff% 或 Chase% 跨年劇變 / 角色變動（player-eval）
+- 05-20：14d Savant Δ-0.097 stop-loss -0.080 線 day 2/5；14d OPS .503 / Savant xwOBA .242 持續弱化（fa_scan）
 
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 傷情追蹤（左手腕扭傷）
 觸發：進 IL → 放 IL 格 + 評估替補捕手；或 DTD 恢復先發 → 移除追蹤
@@ -159,6 +177,7 @@
 - 風險脈絡：Jeffers 是隊上打擊端強項（season .302/.409/.531 / 5 HR / 22 RBI），手腕傷對打者殺傷力大 — 即使回歸初期打擊也可能縮水
 - 觀察重點：①檢查結果是否升級為 IL ②回歸後打擊是否回到傷前水準（比「何時回」更值得追）
 - 對策：DTD 占 active/BN 不能放 IL 格；確認進 IL 才放 IL 格 + 空出 active 評估替補捕手
+- 05-20：IL10 確認（左手腕扭傷）；season P95/P95/P95 菁英但手腕傷殺傷力大等回歸再評（fa_scan）
 
 ## 已結案
 
