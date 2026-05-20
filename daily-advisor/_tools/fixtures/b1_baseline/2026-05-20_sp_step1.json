@@ -1,0 +1,318 @@
+{
+  "candidates": [
+    {
+      "name": "Luis Severino",
+      "team": "ATH",
+      "position": "SP",
+      "selected_pos": "P",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.47,
+            "percentile": 50
+          },
+          "Whiff%": {
+            "raw": 22.5620082815735,
+            "percentile": 25
+          },
+          "BB/9": {
+            "raw": 5.103658536585365,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 44.15584415584416,
+            "percentile": 55
+          },
+          "xwOBACON": {
+            "raw": 0.37,
+            "percentile": 50
+          }
+        },
+        "context": {
+          "xera": 4.47,
+          "era": 4.45,
+          "bbe": 154,
+          "ip": 54.66666666666668,
+          "g": 10,
+          "gs": 10,
+          "k9": 8.890243902439023,
+          "whip": 1.57
+        }
+      },
+      "prior_v4": {
+        "ip": 162.7,
+        "slots": {
+          "IP/GS": {
+            "raw": null,
+            "percentile": null
+          },
+          "Whiff%": {
+            "raw": 18.4,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": null,
+            "percentile": null
+          },
+          "GB%": {
+            "raw": 44.4,
+            "percentile": 55
+          },
+          "xwOBACON": {
+            "raw": 0.364,
+            "percentile": 60
+          }
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.329,
+        "season_xwobacon": 0.37,
+        "delta": -0.04099999999999998,
+        "bbe": 72
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    },
+    {
+      "name": "Keider Montero",
+      "team": "DET",
+      "position": "SP",
+      "selected_pos": "RP",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.48,
+            "percentile": 50
+          },
+          "Whiff%": {
+            "raw": 17.639456869009585,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": 2.554054054054054,
+            "percentile": 60
+          },
+          "GB%": {
+            "raw": 32.83582089552239,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.352,
+            "percentile": 70
+          }
+        },
+        "context": {
+          "xera": 3.82,
+          "era": 3.83,
+          "bbe": 134,
+          "ip": 49.333333333333336,
+          "g": 9,
+          "gs": 9,
+          "k9": 5.837837837837838,
+          "whip": 1.01
+        }
+      },
+      "prior_v4": {
+        "ip": 90.7,
+        "slots": {
+          "IP/GS": {
+            "raw": null,
+            "percentile": null
+          },
+          "Whiff%": {
+            "raw": 19.5,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": null,
+            "percentile": null
+          },
+          "GB%": {
+            "raw": 31.4,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.377,
+            "percentile": 25
+          }
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.442,
+        "season_xwobacon": 0.352,
+        "delta": 0.09000000000000002,
+        "bbe": 55
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    },
+    {
+      "name": "Joey Cantillo",
+      "team": "CLE",
+      "position": "SP",
+      "selected_pos": "P",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.03,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 26.639047619047624,
+            "percentile": 70
+          },
+          "BB/9": {
+            "raw": 4.291390728476821,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 44.285714285714285,
+            "percentile": 55
+          },
+          "xwOBACON": {
+            "raw": 0.344,
+            "percentile": 80
+          }
+        },
+        "context": {
+          "xera": 3.9,
+          "era": 3.4,
+          "bbe": 140,
+          "ip": 50.333333333333336,
+          "g": 10,
+          "gs": 10,
+          "k9": 8.04635761589404,
+          "whip": 1.35
+        }
+      },
+      "prior_v4": {
+        "ip": 95.3,
+        "slots": {
+          "IP/GS": {
+            "raw": null,
+            "percentile": null
+          },
+          "Whiff%": {
+            "raw": null,
+            "percentile": null
+          },
+          "BB/9": {
+            "raw": null,
+            "percentile": null
+          },
+          "GB%": {
+            "raw": null,
+            "percentile": null
+          },
+          "xwOBACON": {
+            "raw": null,
+            "percentile": null
+          }
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.292,
+        "season_xwobacon": 0.344,
+        "delta": -0.05199999999999999,
+        "bbe": 63
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    },
+    {
+      "name": "Andre Pallante",
+      "team": "STL",
+      "position": "SP",
+      "selected_pos": "BN",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.44,
+            "percentile": 45
+          },
+          "Whiff%": {
+            "raw": 23.798790810157193,
+            "percentile": 45
+          },
+          "BB/9": {
+            "raw": 3.489795918367347,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 53.64238410596026,
+            "percentile": 80
+          },
+          "xwOBACON": {
+            "raw": 0.333,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.79,
+          "era": 4.04,
+          "bbe": 151,
+          "ip": 49.0,
+          "g": 9,
+          "gs": 9,
+          "k9": 7.346938775510204,
+          "whip": 1.35
+        }
+      },
+      "prior_v4": {
+        "ip": 162.7,
+        "slots": {
+          "IP/GS": {
+            "raw": null,
+            "percentile": null
+          },
+          "Whiff%": {
+            "raw": null,
+            "percentile": null
+          },
+          "BB/9": {
+            "raw": null,
+            "percentile": null
+          },
+          "GB%": {
+            "raw": null,
+            "percentile": null
+          },
+          "xwOBACON": {
+            "raw": null,
+            "percentile": null
+          }
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.285,
+        "season_xwobacon": 0.333,
+        "delta": -0.04800000000000004,
+        "bbe": 73
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    }
+  ],
+  "slump_hold_excluded": [],
+  "low_confidence_excluded": []
+}
