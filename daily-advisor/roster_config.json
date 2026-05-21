@@ -130,7 +130,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -188,7 +188,7 @@
       "positions": [
         "SS"
       ],
-      "selected_pos": "SS",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -239,7 +239,7 @@
         "SS",
         "LF"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "SS",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -379,32 +379,6 @@
         "whiff_pct": 31.8,
         "gb_pct": 39.7,
         "xwobacon": 0.387
-      }
-    },
-    {
-      "name": "Janson Junk",
-      "mlb_id": 676083,
-      "yahoo_player_key": "469.p.12263",
-      "team": "MIA",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "RP",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.45,
-        "xwoba_allowed": 0.326,
-        "hh_pct_allowed": 47.3,
-        "barrel_pct_allowed": 8.5,
-        "bbe": 353,
-        "era": 4.17,
-        "ip": 110.0,
-        "ip_per_gs": 5.5,
-        "whiff_pct": 18.0,
-        "gb_pct": 48.5,
-        "xwobacon": 0.379
       }
     },
     {
@@ -561,6 +535,28 @@
         "k_per_9": 7.94,
         "ip_per_team_g": 0.24,
         "ip": 39.7
+      }
+    },
+    {
+      "name": "Stephen Kolek",
+      "mlb_id": 663568,
+      "yahoo_player_key": "469.p.60645",
+      "team": "KC",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.3,
+        "xwoba_allowed": 0.321,
+        "hh_pct_allowed": 48.0,
+        "barrel_pct_allowed": 6.1,
+        "bbe": 346,
+        "era": 3.51,
+        "ip": 112.7,
+        "ip_per_gs": 5.9
       }
     }
   ],
