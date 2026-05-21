@@ -173,6 +173,7 @@
 - **狀態**：降回正式 hold，控球修復不確認（季線 BB/9 5.40 P25 floor 仍是結構大缺口）
 - **重新升級觸發**：未來 3 場連續 BB ≤2 + IP ≥6 + ER ≤3 → 重啟 anchor 觀察
 - **drop 觸發**：BB ≥4 連 2 場 OR ER ≥5 任 1 場 → 啟動 drop 候選掃描
+- 05-21：Phase 6 決定 drop — BB/9 5.10 P0 雙年結構性弱，WHIP 1.57 每場拖累比率類別，被 Junk 三軸勝出取代（fa_scan）
 
 ### Dansby Swanson (CHC, SS) [mlb_id:621020] — BABIP 噪音追蹤
 觸發：xBA-AVG 差距收斂至 ≤0.020（回歸啟動確認）→ 移除追蹤；或 14d xwOBA <P50 連 7 天 → 重評
