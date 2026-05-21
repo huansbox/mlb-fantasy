@@ -51,6 +51,12 @@ they show what the cron/VPS pipeline actually produced.
 - Python 3.12 currently does not have `pytest` installed.
 - Default Python 3.9 has `pytest 8.4.2`, but it is not the intended runtime for
   files using newer syntax.
+- Running `python3 -m pytest daily-advisor/tests -q` with default Python 3.9
+  fails during collection because `fa_scan.py` uses Python 3.10+ union type
+  syntax.
+- `uv` is installed at `/opt/homebrew/bin/uv`, but `uv python list` was blocked
+  by sandbox access to `/Users/linshuhuan/.cache/uv` during local exploration.
+- No repo-local `.venv` was found during exploration.
 - No local `daily-advisor/.env` or `daily-advisor/yahoo_token.json` was found
   during exploration. Only `daily-advisor/.env.example` exists.
 
