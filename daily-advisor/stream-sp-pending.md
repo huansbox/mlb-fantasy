@@ -4,67 +4,79 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-05-16
-- recorded_at: 2026-05-15T12:10:00+08:00
-- last_recheck_at: 2026-05-16T10:35:00+08:00
+## ET 2026-05-21
+- recorded_at: 2026-05-21T15:30:00+08:00
+- last_recheck_at: —
 
 ### TBD 場次（待補查）
-- NYY @ NYM (NYM home TBD)
+- NYM @ WSH (NYM away TBD)
+- TOR @ NYY (TOR away TBD)
+- COL @ AZ (COL away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Cade Cavalli | WSH home | BAL (.639) | 14% | 24/31 | <P25·**P70-80**·<P25·P50-60·**P70-80** | ✅ 推 (deep) | BAL **7d .595 極弱 + 30d→7d 強下滑 -.073**；BAL K% 26.7% 對 Whiff P70-80 直接利 K；Cavalli 近 5 場 ERA 3.64 + floor risk 低（4/13 PIT 1.1IP 4ER 是 outlier）|
-| Chris Paddack | CIN | CLE (.665) | 1% | 20/15 | <P25·P40-50·P50-60·P25-40·P40-50 | ❌ 不推 (deep) | **近 4 場 ERA 9.29 災難**（7 場 4 場 ER ≥5，連對弱也爆）；CLE K% 16.9% contact 線抵銷 K 期望 + BB% 14.7% 極高吃 PC，luck (xERA 4.33) 連 4 場沒回歸 |
-| Chris Bassitt | BAL | WSH (.803) | 13% | 21/28 | <P25·P25-40·<P25·P70-80·P70-80 | ❌ 不推 (deep) | **WSH 30d→7d 強上升 +.093**（.704→.769→.797 正熱化）；Bassitt 近 6 場 ERA 3.43 反而回升但對手熱抵銷；對「強/中-強」歷史 1/3 QS |
+| _(無候選通過 Sum ≥15 + Rotation gate)_ |  |  |  |  |  |  |  |
 
 ### 備註
-- 2026-05-15 12:10 首次評估（3 位候選通過 Rotation gate + Sum ≥15 + opener 真先發）。
-- 已過濾：Kai-Wei Teng（Rotation gate 🚫，2026 GS 2/15 mixed role）/ Kyle Leahy（Sum 14 hard floor）。
-- 2026-05-15 13:00 deep eval（3 位候選）：
-  - **Cavalli**：✅ 維持。深評確認訊號 = BAL 7d .595 + 趨勢強下滑 + K% 26.7% 高利 K + Cavalli 近 5 場 ERA 3.64 floor 低
-  - **Paddack**：❌ 維持加強。差異訊號 = 近 4 場 ERA 9.29（floor 系統性破裂，xERA luck 連 4 場沒回歸）+ CLE K% 16.9% contact 不利 K + BB% 14.7% 極高
-  - **Bassitt**：❌ 維持加強。差異訊號 = WSH 30d→14d→7d 強上升 +.093（scan 14d baseline 沒反映）+ Bassitt 對中-強歷史 1/3 QS
-- 排序：**Cavalli >>> Paddack ≈ Bassitt**。Cavalli 對 ERA/K 翻盤最好；Paddack/Bassitt 都 floor risk 不適合 contested。FAAB $1-3 撿 Cavalli。
-- 2026-05-15 14:00 deep refresh（3 位全部，與 13:00 verdict 對齊）：
-  - **Cavalli**：✅ 維持。差異訊號 = BAL 7d .595→**.603**（微升 +.008，仍極弱）；趨勢 30d→7d -.067 持續強下滑；K% 26.9% 利 K 不變
-  - **Paddack**：❌ 維持加強。差異訊號 = CLE 7d .655→**.598**（再下滑 -.057！對手變更弱）— 但 Paddack 自己 floor 系統性破裂（近 4 場 ERA 9.00，連對 CWS/STL 弱-中等都爆）+ CLE BB% 7d 16.1% 極高必拖 PC，對手變弱救不了
-  - **Bassitt**：❌ 維持加強。差異訊號 = WSH 7d .797→**.824**（再上升 +.027 熱化加劇）+ 30d→7d +.108 強上升；Bassitt 對弱對手已出現 floor risk (PIT 6ER/KC 5ER/MIA 4ER)，對熱化線更危
-- 排序：**Cavalli >>> Paddack ≈ Bassitt**（與 13:00 一致）。Cavalli 唯一 ✅；Paddack 是 SP 結構破裂，Bassitt 是對手熱化，兩者 floor 皆高。建議 FAAB $1-3 單撿 Cavalli。
-- 2026-05-15 14:00 **issue 011 e2e parity 確認** ✅（new session 走 /stream-sp-deep 全流程，refactored skill md + mlb_query helper 端到端跑通；verdict + 排序與 13:00 一致；數值小差源自此 session 13:00 end_date 用錯 5/15 應為 5/16，新 session 自然修正，非 regression）。feat/mlb-query-helper branch 可 merge。
-- 2026-05-16 10:35 補查：3 場 TBD 中 TOR@DET（Mize/Fluharty）/ SD@SEA（Buehler/Gilbert）已公布但 starter 全 owned by 別隊 → 無新 FA 候選，僅更新 last_recheck_at + TBD list。剩 NYY@NYM（NYM home）TBD。舊評 Cavalli 已被別隊 claim（非本隊）。
+- 2026-05-21 15:30 首次評估：0 位 FA 候選；別隊 9 位（Mize/Ashcraft/May/Cavalli/Strider/Alcantara/Rodón/Soriano/E.Rodriguez）/ 本隊 2 位（Cantillo/Severino）。
+- TBD 3 場均 away 隊 TBD，補查 ROI 低（公布後多半 owned by 別隊）。
 - _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
 
-## ET 2026-05-17
-- recorded_at: 2026-05-16T10:35:00+08:00
-- last_recheck_at: 2026-05-16T11:00:29+08:00
+## ET 2026-05-22
+- recorded_at: 2026-05-21T15:30:00+08:00
+- last_recheck_at: 2026-05-21T16:00:00+08:00
 
 ### TBD 場次（待補查）
-- BOS @ ATL (BOS away TBD)
-- TEX @ HOU (TEX away TBD)
-- MIL @ MIN (MIL away TBD)
+- HOU @ CHC (both TBD)
+- PIT @ TOR (both TBD)
+- DET @ BAL (DET away TBD)
+- WSH @ ATL (both TBD)
+- TEX @ LAA (both TBD)
+- ATH @ SD (ATH away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Andre Pallante | STL home | KC (.694) | 6% | 28/31 | P25-40·P40-50·<P25·**>P90**·**P80-90** | ❌ 不推 (deep) | 近 6 場 ERA 5.29 + **QS 1/8（季）結構性封頂**（場場 5.0 IP）；2/8 ER≥5 floor risk；GB/xwOBACON 雙菁英是 buy-low 訊號但對 1 場串流無用 |
-| Jeffrey Springs | ATH home | SF (.656) | 33% | 26/22 | P40-50·P40-50·P50-60·<P25·**P80-90** | ❌ 不推 (deep) | **4/19 明顯分界後崩盤** — 近 5 場 ERA 7.03 / QS 0/5 / 7 HR；floor risk 高（3/9 ER≥4）；SF 季 vs LHP .634 利多救不了自身崩盤 |
-| Grant Holmes | ATL home | BOS (.680) | 16% | 24/23 | <P25·P70-80·<P25·P60-70·P60-70 | ⚠️ 條件推 (deep) | BOS 三窗口一致 .660-.680（中-弱，非噪音）+ 季 vs RHP .645 + K% 23-25% 利 Whiff P70-80；floor risk 低（僅 1/8 ER≥5）；封頂於 IP/GS <P25 QS 難 + BB/9 <P25 WHIP 風險 |
-| Adrian Houser | SF | ATH (.762) | 1% | 20/34 | P25-40·<P25·P40-50·P70-80·P25-40 | ❌ 不推 | K9 4.93 極低無 K 貢獻 + 對手 ATH .762 🔴；2025 Sum 34 是 slump 對照但 2026 五軸無菁英 |
-| Brady Singer | CIN | CLE (.628) | 15% | 18/21 | <P25·P25-40·P70-80·P40-50·<P25 | ❌ 不推 | xwOBACON .420 <P25 contact 結構崩 + xERA 6.06 無運氣成分（真被打）；對手弱也救不了 |
-| Roki Sasaki | LAD | LAA (.640) | 27% | 17/15 | <P25·**P80-90**·<P25·P40-50·<P25 | ⚠️ 條件推 (deep) | 純 K 樂透 — Whiff P80-90 vs LAA K% 26-28% K 上限真；但近 6 場 ERA 6.37 / QS 1/7 / 9 HR(xwOBACON <P25)；LAA 季 vs RHP .691 中等抵銷弱對手；僅 K contested + ERA/WHIP 已輸時撿 |
-| Miles Mikolas | WSH home | BAL (.808) | 1% | 17/21 | <P25·<P25·P25-40·**P80-90**·P25-40 | ❌ 不推 | WebSearch 確認真先發（非 opener），但近況 ~4-5 IP / 7.00 ERA / 9 場僅 2 場 5+ IP；對手 BAL .808 🔴 |
+| Chris Paddack | CIN home | STL (.692) | 1% | 22/17 | <P25·P25-40·P50-60·P40-50·**P60-70** | ❌ 不推 | Sum<25；5/17 deep eval 已認近 4 場 ERA 9.29 + xERA luck 沒回歸，5/22 對 STL 中等不夠抵銷 |
+| Chris Bassitt | BAL home | DET (.612) | 12% | 20/27 | <P25·P25-40·<P25·P60-70·**P70-80** | ❌ 不推 (deep) | DET 30d→7d -.149 強下滑利好被 Bassitt 自身對弱對手 1/6 QS pattern 抵銷；5/9 ER≥4 = 56% floor 結構性高；xERA 4.98 真被打無 luck 空間 |
 
 ### 備註
-- 2026-05-16 10:35 首次評估（7 位候選通過 Rotation gate + Sum ≥15 + opener 真先發）。
-- 已過濾：Brandon Young（Sum 13 hard floor）/ Stephen Kolek（Sum 12 hard floor，rotation_gate ⚠️ small_sample 2 GS）。
-- Miles Mikolas opener_suspect → WebSearch 確認：5/17 標準先發（非 opener；先前 3 次救援是 PJ Poulin opener 後 bulk arm，5/17 無 Poulin 配對），但近況短局 ~4-5 IP QS 機率低 → 進主表評為 ❌。
-- 排序：Pallante ≈ Springs（兩 ✅）>> Holmes（⚠️ 借觀察）≈ Sasaki（⚠️ K 條件推）>> Singer ≈ Houser ≈ Mikolas（❌）。
-- TBD 3 場（BOS@ATL / TEX@HOU / MIL@MIN）均客場 TBD，建議 TW 5/17 早上補查。
-- 2026-05-16 11:00 deep eval（4 位候選）：
-  - **Pallante**：✅ → ❌ 不推。差異訊號 = 近 6 場 ERA 5.29 + QS 1/8（季）結構性封頂（場場 5.0 IP）+ 2/8 floor risk；scan ✅ 純靠 5-slot 結構 Sum，game log 即時命中率打臉
-  - **Springs**：✅ → ❌ 不推。差異訊號 = 4/19 明顯分界後崩盤（近 5 場 ERA 7.03 / QS 0/5 / 7 HR）；scan ERA 4.22 / xERA 3.59 是含開季 4 場神投的季線；floor risk 高
-  - **Holmes**：⚠️ 維持（借觀察 → 條件推）。深評確認 = BOS 三窗口一致 .660-.680 中-弱 + 季 vs RHP .645 利多 + K-prone 利 Whiff；floor risk 低（1/8）。封頂於 IP/GS <P25 + BB/9 <P25
-  - **Sasaki**：⚠️ 維持條件推。深評確認 = 純 K 樂透（Whiff P80-90 vs LAA K% 26%）；近 6 場 ERA 6.37 + 9 HR + LAA 季 vs RHP .691 抵銷弱對手
-- 排序：**Holmes > Sasaki >> Pallante ≈ Springs**。Holmes 唯一具「利對手 + 低 floor」雙條件（K 流可用 / QS 弱）；Sasaki 純 K 流（需 K 且 ERA/WHIP 已輸才撿）；Pallante/Springs 兩 ❌ 自身近況崩。
+- 2026-05-21 15:30 首次評估：2 位候選；過濾 Kyle Leahy（Sum 14 hard floor）+ 別隊 17 位 + 本隊 0 位。
+- TBD 6 場（含 4 場 both TBD），建議 TW 5/22 早上 9-10 點補查。
+- Paddack/Bassitt 與 5/16-5/17 deep eval 結論一致（❌ ❌），5 天內結構無實質改善。
+- 2026-05-21 16:00 deep eval（1 位候選 Bassitt）：
+  - **Bassitt**：❌ 維持加強。差異訊號 = DET 7d .534 / 30d→7d -.149 強下滑「對手利好」訊號被 Bassitt 自身結構問題抵銷（對弱對手 PIT 6ER/KC 5ER/MIA 4ER/WSH 4ER 1/6 QS = 16.7%）；近 6 場 ERA 4.50 + 3/6 ER≥4 = 50% floor structural
+- _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
+
+## ET 2026-05-23
+- recorded_at: 2026-05-21T15:30:00+08:00
+- last_recheck_at: 2026-05-21T16:00:00+08:00
+
+### TBD 場次（待補查）
+- TB @ NYY (NYY home TBD)
+- HOU @ CHC (both TBD)
+- PIT @ TOR (both TBD)
+- DET @ BAL (DET away TBD)
+- MIN @ BOS (both TBD)
+- WSH @ ATL (both TBD)
+- ATH @ SD (ATH away TBD)
+- TEX @ LAA (both TBD)
+
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Stephen Kolek | KC home | SEA (.653) | 5% | **33/33** | P60-70·<P25·**P80-90**·P70-80·P70-80 | ⚠️ 條件推 (deep) | SEA 7d .590 + 30d→7d -.115 強下滑（回歸實質 .640-.680 弱級）；2025 同 Sum 33 + 113 IP 3.51 ERA baseline 真實力非 outlier；5/17 對 STL 復活 6.1 IP 0 ER；3 場樣本仍是主要風險 |
+| Roki Sasaki | LAD away | MIL (.722) | **35%** | 17/15 | <P25·**P80-90**·<P25·P40-50·<P25 | ❌ 不推 (deep) | MIL 30d→7d +.090 強上升熱化；MIL 7d K% 15.3% 偏低使 Whiff P80-90 K 工具受抑；對中等對手歷史 1/4 QS pattern 致命；HR 機器 8 HR/8 GS 對熱化對手極危 |
+| Brady Singer | CIN home | STL (.693) | 14% | 16/19 | <P25·P25-40·P70-80·P25-40·**<P25** | ❌ 不推 | 2026 xwOBACON .429 <P25 contact 結構崩 + xERA 6.09 真被打 |
+
+### 備註
+- 2026-05-21 15:30 首次評估：3 位候選；過濾 6 位 Sum<15（Brandon Young 13/Fedde 13/Houser 14/Christian Scott 13/Robert Gasser 13/Lucas Giolito 13）+ 別隊 7 位 + 本隊 1 位（Pallante）。
+- TBD 8 場（53% TBD 比例偏高），建議 TW 5/23 早上補查。
+- Kolek 唯一 Sum ≥25 候選但 GS=3 樣本仍小，5/17 時 Sum=12 hard floor 排除；近 3 場跳升須觀察是否 outlier。撿建議 FAAB $0-1。
+- Sasaki 純 K 工具，5/17 deep eval 結論一致；%own 35% 市場已半握。
+- 2026-05-21 16:00 deep eval（2 位候選 Kolek + Sasaki）：
+  - **Kolek**：⚠️ 維持 (deep)。差異訊號 = SEA 7d .590 / 30d→7d -.115 強下滑（回歸實質「弱」.640-.680）+ 2025 baseline 真實力（113 IP 3.51 ERA）+ 5/17 對 STL 復活；3 場樣本（5/12 對 CWS 弱卻爆 5 ER）+ Whiff <P25 K 工具弱仍是兩大風險
+  - **Sasaki**：⚠️ → ❌ 降級 (deep)。差異訊號 = MIL 30d→7d +.090 強上升（scan 14d .722 baseline 沒反映熱化加劇）+ MIL 7d K% **15.3% 偏低**使 Sasaki 唯一強項 Whiff P80-90 K 工具失去發揮空間 + 對中等對手歷史 1/4 QS（4/12 TEX / 4/25 CHC / 5/11 SF 全爆）
+- 排序：**Kolek >>> Sasaki >>> Singer**。Kolek 全 7 維度勝（對手 7d / 趨勢 / Floor / Sum26 / 雙年 / QS%）；Sasaki 僅在「K contested + ERA/WHIP 已輸定」狹窄情境適用；Singer 結構性崩。建議 FAAB $0-1 單撿 Kolek。
 - _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
