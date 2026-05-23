@@ -196,6 +196,10 @@
 觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
 - 05-23：xwOBA P60 / BB% P60 / Barrel% P60 season 偏低但 14d Savant Δ+0.086 品質飆升 + prior P80/P80 有底；11% rising +3 市場注意中（fa_scan）
 
+### Janson Junk (MIA, SP,RP) [mlb_id:676083] — 觀察中
+觸發：Phase 6 multi-agent watch
+- 05-23：5/23 Phase 6 watch — BB/9 P80 + xwOBACON P80 勝 Severino，但 Whiff% P0 + 21d Δ +.034 劣化 + prior xwOBACON P25 回歸風險，等一場確認（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
