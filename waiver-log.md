@@ -170,11 +170,6 @@
 - 05-22：BBE 148 + xwOBA P80 兩項達標；14d OPS .939 / Savant Δ+0.021；差客場 OPS ≥.750 最後確認（fa_scan）
 - 05-23：BBE 149 + xwOBA P80 兩項達標；14d OPS .810 / Savant Δ+0.052；差客場 OPS ≥.750 最後確認（fa_scan）
 
-### Grant Holmes (ATL, SP) [mlb_id:656550] — 觀察中
-觸發：Phase 6 multi-agent watch
-- 05-19：觀察中 — Whiff% P60 + GB% P50 勝 Montero，但 BB/9 4.18 P0 是硬傷；等下一場 BB/IP 表現再決定（fa_scan）
-- 05-20：Phase 6 watch — Whiff% P60 + GB% P50 雙軸大勝 Montero，但 BB/9 P0 / IP/GS P25 拖累，等 Montero 21d 劣化確認或 Holmes BB/9 改善再動（fa_scan）
-
 ### Luke Raley (SEA, 1B,LF,CF,RF) [mlb_id:670042] — 觀察中
 觸發：BB% 升至 P40+ 或 14d 維持 OPS ≥1.000 連 7 天 → 升級
 - 05-20：xwOBA P95 / Barrel% P95 / 14d OPS 1.143 / 5HR / 14RBI 爆發；但 BB% P25 結構弱 7×7 懲罰大 + prior P60 非雙年菁英；27% rising +12 市場在搶（fa_scan）
@@ -245,6 +240,9 @@
 - 05-23：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Grant Holmes (ATL, SP) — 被搶（自動偵測）
+- 2026-05-23：Yahoo ownership_type=team，從觀察中移除。
 
 ### Kody Clemens (MIN, 1B/2B/LF/RF) [mlb_id:665019] — 已撿入隊
 - 2026-05-19：drop Altuve → add Kody Clemens。觀察 7 天（5/12 fa_scan 首標「立即行動」，連 4 天未執行後本日落地）；xwOBA P80 / Barrel% P95 + prior P80/P80 雙年確認結構全面優於 Altuve；14d OPS .948 爆發 / 2 HR / 10 R / 1 SB。Altuve Grade 2 左腹斜肌拉傷（5/17 IL，分析師估 6-8 週 + 同側 2023 復發風險）+ 傷前 5 月 OPS .572 深度低潮 → stash 機會成本過高放生。
