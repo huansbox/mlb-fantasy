@@ -181,28 +181,6 @@
       }
     },
     {
-      "name": "Dansby Swanson",
-      "mlb_id": 621020,
-      "yahoo_player_key": "469.p.10234",
-      "team": "CHC",
-      "positions": [
-        "SS"
-      ],
-      "selected_pos": "BN",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.345,
-        "barrel_pct": 11.7,
-        "hh_pct": 47.8,
-        "bb_pct": 7.3,
-        "ops": 0.717,
-        "pa_per_team_g": 3.98,
-        "pa": 645,
-        "g": 159
-      }
-    },
-    {
       "name": "Kody Clemens",
       "mlb_id": 665019,
       "yahoo_player_key": "469.p.11309",
@@ -251,6 +229,29 @@
         "pa_per_team_g": 1.35,
         "pa": 219,
         "g": 90
+      }
+    },
+    {
+      "name": "Luis Arraez",
+      "mlb_id": 650333,
+      "yahoo_player_key": "469.p.11221",
+      "team": "SF",
+      "positions": [
+        "1B",
+        "2B"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.303,
+        "barrel_pct": 1.1,
+        "hh_pct": 16.7,
+        "bb_pct": 5.0,
+        "ops": 0.719,
+        "pa_per_team_g": 4.17,
+        "pa": 675,
+        "g": 154
       }
     }
   ],
@@ -389,7 +390,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -415,7 +416,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -455,7 +456,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -478,7 +479,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -500,7 +501,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -545,7 +546,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
