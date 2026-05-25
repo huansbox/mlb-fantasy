@@ -128,19 +128,6 @@
 - 05-24：14d OPS .682 / Savant Δ+0.011 微升；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
 - 05-25：14d OPS .682 / Savant Δ-0.007 品質下滑；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
 
-### Ryan Waldschmidt (AZ, LF,CF,RF) [mlb_id:814439] — 觀察中
-觸發：MLB 7 場 OPS >.800 + BBE ≥30 OR 升 1-2 棒 OR %owned >40% OR 我隊 OF 急性需求 → 重評
-- 05-12：[eval] Consensus top 100 新秀（MLBP #49 / FG #35 / ESPN #63 / BA #41，AZ #1，2024 首輪）；AAA Reno 34G .289/.400/.477（.877 OPS）/ 3 HR / 6 SB OBP 型；5/8 MLB debut 取代 DFA Alek Thomas，MLB 樣本 3/8（BBE <10 低信心）；第 9 棒（extended leadoff）PA ceiling 限制 RBI/R 潛力；17% owned 市場已注意；暫不撿等驗證（player-eval）
-- 05-13：PA-TG 0.34 / BBE 7 樣本極低；14d OPS .714 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
-- 05-14：PA-TG 0.45 / BBE 10 樣本極低；14d OPS .705 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
-- 05-15：PA-TG 0.45 / BBE 13 樣本極低；14d OPS .705 / 0 HR；MLB debut 驗證中，所有觸發遠未達（fa_scan）
-- 05-19：PA-TG 0.76 / BBE 21 樣本極低；14d OPS .809 但零 HR；debut 驗證中所有觸發遠未達（fa_scan）
-- 05-20：PA-TG 0.83 / BBE 24 樣本極低；14d OPS .780 / 0HR / 3SB；debut 驗證中所有觸發遠未達（fa_scan）
-- 05-21：PA-TG 0.88 / BBE 25 樣本極低；14d OPS .823 / 0HR / 3SB；debut 驗證中所有觸發遠未達（fa_scan）
-- 05-22：PA-TG 0.94 / BBE 28 樣本極低；14d OPS .778 / 0HR / 3SB；debut 驗證中所有觸發遠未達（fa_scan）
-- 05-23：PA-TG 1.00 / BBE 28 樣本極低；14d OPS .814 / 0HR / 4SB；debut 驗證中所有觸發遠未達（fa_scan）
-- 05-24：PA-TG 1.04 / BBE 30 樣本極低；14d OPS .822 / 4SB；debut 驗證中所有觸發遠未達（fa_scan）
-
 ### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
 - 05-14：xwOBA P95 / BB% P80 / Barrel% P95 / HH% P95 全面菁英結構；14d OPS .918 / 3 HR 驗證；prior P70/P25/P50 breakout 跳升；但 PA-TG 1.59 上場有限 + BBE 46 剛過門檻（fa_scan）（fa_scan）
@@ -224,10 +211,6 @@
 - 05-24：14d OPS .863 / 2HR / 9RBI / Savant Δ+0.074 品質飆升；prior P80/P80 有底；11% rising +2 市場注意中；觸發未達（xwOBA <P70）（fa_scan）
 - 05-25：14d OPS .853 / 2HR / 8RBI / Savant Δ+0.060 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 
-### Janson Junk (MIA, SP,RP) [mlb_id:676083] — 觀察中
-觸發：Phase 6 multi-agent watch
-- 05-23：5/23 Phase 6 watch — BB/9 P80 + xwOBACON P80 勝 Severino，但 Whiff% P0 + 21d Δ +.034 劣化 + prior xwOBACON P25 回歸風險，等一場確認（fa_scan）
-
 ### Carlos Cortes (ATH, LF,RF) [mlb_id:666126] — 觀察中
 觸發：14d OPS ≥.800 連 7 天 + BB% 維持 P70+ → 升級為 UTIL 補強候選
 - 05-24：xwOBA P95 / BB% P80 結構菁英；BB% 從 prior P0 跳到 P80 劇烈 breakout（BBE 103 樣本充足）；14d OPS .718 冷卻中 + 0 HR；PA-TG 2.63 中等（fa_scan）
@@ -280,6 +263,12 @@
 - 05-24：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Ryan Waldschmidt (AZ, LF,CF,RF) — 被搶（自動偵測）
+- 2026-05-25：Yahoo ownership_type=team，從觀察中移除。
+
+### Janson Junk (MIA, SP,RP) — 被搶（自動偵測）
+- 2026-05-25：Yahoo ownership_type=team，從觀察中移除。
 
 ### Grant Holmes (ATL, SP) — 被搶（自動偵測）
 - 2026-05-23：Yahoo ownership_type=team，從觀察中移除。
