@@ -286,7 +286,10 @@ def fetch_game_log(mlb_id, season, *, limit=6):
         f"?stats=gameLog&season={season}&group=pitching"
     )
     data = _http_get_json(url)
-    splits = data.get("stats", [{}])[0].get("splits", [])
+    stats_list = data.get("stats") or []
+    if not stats_list:
+        return []
+    splits = stats_list[0].get("splits", [])
     logs = []
     for s in splits[-limit:]:
         st = s.get("stat", {})
