@@ -227,11 +227,6 @@
 - 05-25：14d OPS .853 / 2HR / 8RBI / Savant Δ+0.060 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 05-26：14d OPS .835 / Savant Δ+0.058 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 
-### Carlos Cortes (ATH, LF,RF) [mlb_id:666126] — 觀察中
-觸發：14d OPS ≥.800 連 7 天 + BB% 維持 P70+ → 升級為 UTIL 補強候選
-- 05-24：xwOBA P95 / BB% P80 結構菁英；BB% 從 prior P0 跳到 P80 劇烈 breakout（BBE 103 樣本充足）；14d OPS .718 冷卻中 + 0 HR；PA-TG 2.63 中等（fa_scan）
-- 05-25：14d OPS .863 / BB% P80 結構菁英；14d Savant Δ-0.023 短期冷卻 + 4% dropping -8；觸發未達（14d OPS 需連 7 天 ≥.800）（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -281,6 +276,9 @@
 - 05-26：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Carlos Cortes (ATH, LF,RF) — 被搶（自動偵測）
+- 2026-05-26：Yahoo ownership_type=team，從觀察中移除。
 
 ### Ryan Waldschmidt (AZ, LF,CF,RF) — 被搶（自動偵測）
 - 2026-05-25：Yahoo ownership_type=team，從觀察中移除。
