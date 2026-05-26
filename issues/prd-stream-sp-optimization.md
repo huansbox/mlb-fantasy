@@ -28,9 +28,9 @@
 - **013 scan-add-sample-warning-tag**（US5）— scan emit sample_warning tag（**2026 only**）+ deep skill prompt 指引（非機械 demote）— ✅ commit `7e50f46`
 - **014 scan-auto-diff-pending**（US2）— `--pending-file` + pending_parser + emit pending_diff — ✅ commit `366365e`
 
-### Stage 2（次優先 · 1 個 vertical slice）— ⏳ 0/1
+### Stage 2（次優先 · 1 個 vertical slice）— ✅ 1/1 merged 2026-05-26
 
-- **016 deep-batch-cli-and-comparison-raw**（US6）— mlb_query.py deep_batch + 比較表 raw JSON（**不依賴 014 pending_parser**，獨立可平行起跑，但建議排最後做避免 SOP 改動 stale）
+- **016 deep-batch-cli-and-comparison-raw**（US6）— mlb_query.py deep_batch + 比較表 raw JSON — ✅ commit `8bec356`（VPS e2e 驗證：3 SP 批次 **3.8s**，遠優於 30s 目標；vs hand OPS + 7d delta 與 pending file 5/27 deep eval byte-level 對齊）
 
 ### Dependency 視圖
 
@@ -77,6 +77,6 @@ Stage 1 起手意向順序（用戶決定）：**015 → 012 → 013 → 014 →
 
 ## Stage 2 完成標準
 
-- [ ] 016 merged
-- [ ] 4 位 SP 深評批次跑 < 30 秒（vs 目前 60-80 秒）
-- [ ] 比較表 raw JSON 結構穩定，LLM 只填 verdict 字串
+- [x] 016 merged — commit `8bec356`
+- [x] 4 位 SP 深評批次跑 < 30 秒（vs 目前 60-80 秒）— 3 SP 實測 **3.8s**（VPS e2e 2026-05-26）
+- [x] 比較表 raw JSON 結構穩定，LLM 只填 verdict 字串 — 7-col `comparison_table` headers 固定，11 cases TDD 覆蓋
