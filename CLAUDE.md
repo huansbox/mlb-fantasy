@@ -426,6 +426,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
   gh issue view <N> -R huansbox/mlb-fantasy
   ```
 - ⚠️ **不要 scp Yahoo token 回本機** — yahoo_query.py 會自動 refresh token，雙邊不同步會讓 VPS 原本 token 失效，cron 全斷
+- ⚠️ **不要本機跑會 call Yahoo 的腳本** — 同前因；`hooks/block-local-yahoo.mjs` PreToolUse hook 機械化執行（攔截 Bash + PowerShell tool，名單：yahoo_query / daily_advisor / fa_scan / emerging_batter_scan / stream_sp_scan / rp_svh_scan / roster_sync / roster_stats / weekly_review / _trade_lookup / _trade_batter_rank。pytest / vps-run.sh / ssh / scp / 引號內字串 / heredoc body 都會放行）。違反規範下次 session 會被擋；hook 註冊在 `.claude/settings.json`（git tracked，跨機器同步）
 - VPS 連線資訊見 `~/.claude/projects/-Users-linshuhuan-mywork-mlb-fantasy/memory/reference_vps.md`
 
 ### 檔案索引
