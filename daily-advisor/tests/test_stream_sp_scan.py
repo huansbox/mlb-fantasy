@@ -7,6 +7,7 @@ from stream_sp_scan import (
     Fetchers,
     GameLog,
     StarterRef,
+    _apply_vs_hand_gate,
     _enrich_v4,
     classify_opener,
     cross_check_fa,
@@ -346,6 +347,7 @@ def _build_fetchers(
     game_logs=None,
     team_ops=None,
     v4_data=None,
+    vs_hand=None,
 ):
     fa_list = list(fa_entries or [])
     return Fetchers(
@@ -355,6 +357,7 @@ def _build_fetchers(
         game_log_fn=lambda mid, season: (game_logs or {}).get(mid, []),
         team_14d_ops_fn=lambda team_abbr, end_date: (team_ops or {}).get(team_abbr, 0.720),
         v4_data_fn=lambda ids, season: v4_data or {},
+        vs_hand_fn=lambda opp_abbr, sp_id: (vs_hand or {}).get(sp_id),
     )
 
 
@@ -432,6 +435,9 @@ class TestScan:
         assert c["v4_2025"]["v4_available"] is True
         assert c["v4_2025"]["ip_gs"] == 5.0
         assert isinstance(c["v4_2025"]["sum_score"], int)
+
+        # vs_hand_2026 key 一定存在（schema contract）；fetcher 未注入 → None
+        assert c["vs_hand_2026"] is None
 
     def test_tbd_games_and_owned_segments_populated(self):
         schedule = {"dates": [{"games": [
@@ -540,3 +546,159 @@ class TestScan:
         assert set(result.keys()) == {"2026-05-14", "2026-05-15"}
         assert [c["name"] for c in result["2026-05-14"]["candidates"]] == ["Pitcher D1"]
         assert [c["name"] for c in result["2026-05-15"]["candidates"]] == ["Pitcher D2"]
+
+
+class TestApplyVsHandGate:
+    """Pure gate logic — fetcher returns raw, scan transforms to final emit dict."""
+
+    def test_normal_path_pa_above_threshold_emits_split_ops(self):
+        raw = {
+            "pa": 1356, "split_ops": 0.686,
+            "k_pct": 21.8, "bb_pct": 8.2,
+            "hand": "R", "season_ops": 0.720,
+        }
+        out = _apply_vs_hand_gate(raw)
+        assert out == {
+            "pa": 1356, "ops": 0.686,
+            "k_pct": 21.8, "bb_pct": 8.2,
+            "hand": "R", "low_pa_fallback": False,
+        }
+
+    def test_pa_at_boundary_400_uses_split_ops(self):
+        # PA=400 邊界含 → 仍取 vs hand split
+        raw = {
+            "pa": 400, "split_ops": 0.650,
+            "k_pct": 20.0, "bb_pct": 7.5,
+            "hand": "L", "season_ops": 0.715,
+        }
+        out = _apply_vs_hand_gate(raw)
+        assert out["ops"] == 0.650
+        assert out["low_pa_fallback"] is False
+
+    def test_pa_just_below_399_falls_back_to_season_ops(self):
+        # PA=399 邊界 → fallback
+        raw = {
+            "pa": 399, "split_ops": 0.640,
+            "k_pct": 19.5, "bb_pct": 7.0,
+            "hand": "L", "season_ops": 0.730,
+        }
+        out = _apply_vs_hand_gate(raw)
+        assert out["ops"] == 0.730  # season fallback
+        assert out["pa"] == 399  # PA 保留原 split 數
+        assert out["low_pa_fallback"] is True
+        assert out["hand"] == "L"
+
+    def test_low_pa_emits_season_ops_with_fallback_flag(self):
+        # 5 月初典型情境：對手 vs hand 累積 PA 不足 400
+        raw = {
+            "pa": 250, "split_ops": 0.580,
+            "k_pct": 22.5, "bb_pct": 6.8,
+            "hand": "R", "season_ops": 0.705,
+        }
+        out = _apply_vs_hand_gate(raw)
+        assert out["pa"] == 250
+        assert out["ops"] == 0.705
+        assert out["low_pa_fallback"] is True
+
+    def test_unknown_hand_falls_back_with_null_hand(self):
+        # 雙手投 / API 無 pitchHand → fetcher 回 hand=None → fallback
+        raw = {
+            "pa": 0, "split_ops": None,
+            "k_pct": None, "bb_pct": None,
+            "hand": None, "season_ops": 0.725,
+        }
+        out = _apply_vs_hand_gate(raw)
+        assert out["hand"] is None
+        assert out["ops"] == 0.725
+        assert out["low_pa_fallback"] is True
+
+    def test_none_raw_returns_none(self):
+        # MLB API 失敗 → fetcher 回 None → gate 直接 passthrough None
+        assert _apply_vs_hand_gate(None) is None
+
+
+class TestScanVsHand:
+    """e2e scan with vs_hand fetcher injected."""
+
+    def _basic_schedule(self):
+        # CWS @ CHC: Burke (FA) vs Owned Cub (owned by others)
+        return {"dates": [{"games": [{
+            "teams": {
+                "away": {
+                    "team": {"id": 145},
+                    "probablePitcher": {"id": 680732, "fullName": "Sean Burke"},
+                },
+                "home": {
+                    "team": {"id": 112},
+                    "probablePitcher": {"id": 9999, "fullName": "Owned Cub"},
+                },
+            },
+        }]}]}
+
+    def test_scan_emits_vs_hand_2026_for_candidate(self):
+        # Springs SEA vs LHP .592 ground truth case
+        raw = {
+            "pa": 1100, "split_ops": 0.592,
+            "k_pct": 24.5, "bb_pct": 8.1,
+            "hand": "L", "season_ops": 0.715,
+        }
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            vs_hand={680732: raw},
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["vs_hand_2026"]["ops"] == 0.592
+        assert c["vs_hand_2026"]["hand"] == "L"
+        assert c["vs_hand_2026"]["low_pa_fallback"] is False
+        assert c["vs_hand_2026"]["pa"] == 1100
+
+    def test_scan_emits_vs_hand_with_low_pa_fallback(self):
+        raw = {
+            "pa": 300, "split_ops": 0.640,
+            "k_pct": 21.0, "bb_pct": 7.5,
+            "hand": "R", "season_ops": 0.720,
+        }
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            vs_hand={680732: raw},
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["vs_hand_2026"]["ops"] == 0.720  # season fallback
+        assert c["vs_hand_2026"]["low_pa_fallback"] is True
+
+    def test_scan_emits_vs_hand_none_on_api_failure(self):
+        # fetcher 回 None (API 失敗) → vs_hand_2026 也 None，scan 不中斷
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            vs_hand={680732: None},  # explicit None
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["vs_hand_2026"] is None
+
+    def test_scan_calls_vs_hand_fn_with_opponent_abbr_and_sp_id(self):
+        # 確認 fetcher 收到正確 args：對手 abbr + SP mlb_id
+        captured = []
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+        )
+        # 覆寫 vs_hand_fn 捕捉 args
+        fetchers.vs_hand_fn = lambda opp_abbr, sp_id: (
+            captured.append((opp_abbr, sp_id)) or None
+        )
+        scan(["2026-05-15"], fetchers=fetchers)
+        assert captured == [("CHC", 680732)]

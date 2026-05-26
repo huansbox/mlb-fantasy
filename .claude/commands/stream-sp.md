@@ -99,6 +99,14 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan
         "percent_owned": "25%",
         "opener_verdict": "true_starter|opener_suspect|small_sample",
         "opponent_14d": {"ops": 0.702, "tier": "🟢|🟡|🔴"},
+        "vs_hand_2026": {
+          "pa": 1356,
+          "ops": 0.686,
+          "k_pct": 21.8,
+          "bb_pct": 8.2,
+          "hand": "R|L|null",
+          "low_pa_fallback": false
+        },
         "v4_2026": {
           "v4_available": true,
           "ip_gs": 5.11, "whiff_pct": 19.5, "bb9": 2.04,
@@ -121,7 +129,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan
 }
 ```
 
-scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-check（帶 percent_owned）/ v4 5-slot Sum + breakdown_pct labels / rotation gate / luck tag（xERA-ERA 差 ≥ P70 0.81 才標；BBE<40 也不標）/ opener 規則化 / 對手 14d OPS → tier。stderr 走 sp_data_fetchers 的 progress prints（用 `2>/dev/null` 過濾掉），stdout 純 JSON。
+scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-check（帶 percent_owned）/ v4 5-slot Sum + breakdown_pct labels / rotation gate / luck tag（xERA-ERA 差 ≥ P70 0.81 才標；BBE<40 也不標）/ opener 規則化 / 對手 14d OPS → tier / 對手 vs SP 慣用手 OPS（`vs_hand_2026`，PA ≥400 取 split / <400 自動 fallback 季全 OPS + `low_pa_fallback=true`，scan 在 schema 已套 sample gate；MLB API 失敗 emit null）。stderr 走 sp_data_fetchers 的 progress prints（用 `2>/dev/null` 過濾掉），stdout 純 JSON。
 
 > **Yahoo FA pool 短路**：scan 把當天所有 probable starter 名單傳給 fetcher，hit 完所有 hits 就提早停止分頁（避免無條件拉滿 12 頁 300 row）。
 
@@ -217,10 +225,12 @@ scan 不知道 pending file 存在，pending diff 是 LLM 的職責。
 
 ### FA 真先發候選（按 v4 Sum 排序）
 
-| # | SP | 隊 | 對手 | %own | v4 Sum26/25 | 5-slot 細節 | 對手 14d OPS / tier | 推/不推 |
-|---|----|---|---|---|---|---|---|---|
-| 1 | Keider Montero | DET | KC 🟢 | 9% | 29/22 | IP/GS P60-70 \| Whiff <P25 \| BB/9 >P90 \| GB <P25 \| xwOBACON >P90 | .698 🟢 | ✅ 推 |
+| # | SP | 隊 | 對手 | %own | v4 Sum26/25 | 5-slot 細節 | 對手 14d OPS / tier | 對手 vs hand OPS | 推/不推 |
+|---|----|---|---|---|---|---|---|---|---|
+| 1 | Keider Montero | DET | KC 🟢 | 9% | 29/22 | IP/GS P60-70 \| Whiff <P25 \| BB/9 >P90 \| GB <P25 \| xwOBACON >P90 | .698 🟢 | .672 (R) | ✅ 推 |
 | ... |
+
+> 「對手 vs hand OPS」欄取自 `vs_hand_2026.ops`（含手 R/L 標註）。`low_pa_fallback=true` 時值已 fallback 成季全 OPS，在欄位加 `(season)` 標註提醒 reader 用 season OPS scale 解讀（≥.770 強 / .720-.770 中 / ≤.720 弱）。null = MLB API 失敗無資料。
 
 ### 推薦理由（每位推薦的）
 

@@ -69,6 +69,9 @@ class Fetchers:
     game_log_fn: object  # (mlb_id, season) -> list[GameLog]
     team_14d_ops_fn: object  # (team_abbr, end_date: str YYYY-MM-DD) -> float
     v4_data_fn: object   # (mlb_ids, season) -> dict[mlb_id, dict]
+    # Optional — old tests / callers not using vs_hand can omit. None ⇒ emit
+    # vs_hand_2026=None for every candidate (LLM falls back to 14d/season anchor).
+    vs_hand_fn: object = None  # (opp_abbr, sp_id) -> raw dict | None
 
 
 def classify_opener(games):
@@ -208,6 +211,32 @@ def _enrich_v4(raw):
     }
 
 
+VS_HAND_PA_THRESHOLD = 400  # Below this, opponent vs SP-hand sample too thin → fallback to full season OPS.
+
+
+def _apply_vs_hand_gate(raw, pa_threshold=VS_HAND_PA_THRESHOLD):
+    """Transform raw vs-hand fetcher output → final emit dict (with PA gate).
+
+    raw expected keys: pa, split_ops, k_pct, bb_pct, hand, season_ops.
+    None raw (API failure) passes through as None.
+    Hand=None (switch / unknown) or PA<threshold → fallback to season_ops + low_pa_fallback=True.
+    """
+    if raw is None:
+        return None
+    pa = raw.get("pa", 0) or 0
+    hand = raw.get("hand")
+    low_pa = pa < pa_threshold or hand is None
+    final_ops = raw.get("season_ops") if low_pa else raw.get("split_ops")
+    return {
+        "pa": pa,
+        "ops": final_ops,
+        "k_pct": raw.get("k_pct"),
+        "bb_pct": raw.get("bb_pct"),
+        "hand": hand,
+        "low_pa_fallback": low_pa,
+    }
+
+
 def scan(et_dates, *, fetchers):
     result = {}
     for et_date in et_dates:
@@ -234,6 +263,10 @@ def scan(et_dates, *, fetchers):
         for sp in cross.candidates:
             log = fetchers.game_log_fn(sp.mlb_id, 2026)
             ops = fetchers.team_14d_ops_fn(sp.opponent, et_date)
+            vs_hand_raw = (
+                fetchers.vs_hand_fn(sp.opponent, sp.mlb_id)
+                if fetchers.vs_hand_fn else None
+            )
             candidates_out.append({
                 **_starter_to_summary(sp),
                 "percent_owned": pct_by_name.get(sp.name, "—"),
@@ -241,6 +274,7 @@ def scan(et_dates, *, fetchers):
                 "opponent_14d": {"ops": ops, "tier": tier_opponent(ops)},
                 "v4_2026": _enrich_v4(v4_26_all.get(sp.mlb_id, {})),
                 "v4_2025": _enrich_v4(v4_25_all.get(sp.mlb_id, {})),
+                "vs_hand_2026": _apply_vs_hand_gate(vs_hand_raw),
             })
 
         result[et_date] = {
@@ -379,6 +413,82 @@ def fetch_v4_data(mlb_ids, season):
         return assemble_data(mlb_ids, season)
 
 
+_VS_HAND_SEASON_OPS_CACHE: dict[tuple[int, int], float] = {}
+
+
+def _fetch_team_season_ops(team_id, season):
+    key = (team_id, season)
+    if key in _VS_HAND_SEASON_OPS_CACHE:
+        return _VS_HAND_SEASON_OPS_CACHE[key]
+    url = (
+        f"https://statsapi.mlb.com/api/v1/teams/{team_id}/stats"
+        f"?stats=season&group=hitting&season={season}&sportId=1"
+    )
+    try:
+        data = _http_get_json(url)
+        stat = data["stats"][0]["splits"][0]["stat"]
+        ops = float(stat.get("ops", 0.720))
+    except (KeyError, IndexError, ValueError, OSError):
+        ops = 0.720  # league avg fallback (also covers HTTP failure)
+    _VS_HAND_SEASON_OPS_CACHE[key] = ops
+    return ops
+
+
+def fetch_vs_hand_split(opp_abbr, sp_id, season=2026):
+    """Fetch opponent vs SP-handedness split + season OPS fallback.
+
+    Returns raw dict for ``_apply_vs_hand_gate`` to transform:
+      {pa, split_ops, k_pct, bb_pct, hand, season_ops}
+    Or ``None`` on statSplits API failure (scan emits vs_hand_2026=null).
+
+    Internally:
+      - SP meta fetch fail / non-R/L hand → hand=None (gate triggers fallback)
+      - statSplits fail (when hand known) → return None (upstream null)
+      - Season OPS fetch fail → 0.720 league avg
+    """
+    import sys
+
+    from mlb_query import _default_meta_fetch, _default_split_fetch  # type: ignore[import-not-found]
+
+    team_id = ABBR_TO_ID.get(opp_abbr)
+    if team_id is None:
+        print(f"vs_hand: unknown opponent abbr {opp_abbr}", file=sys.stderr)
+        return None
+
+    # 1) Resolve SP handedness
+    try:
+        meta = _default_meta_fetch(sp_id)
+        hand = meta.get("throws")
+        if hand not in ("R", "L"):
+            hand = None  # switch-pitcher / unknown → fallback path
+    except (KeyError, IndexError, OSError) as e:
+        print(f"vs_hand meta fail (sp_id={sp_id}): {e}", file=sys.stderr)
+        hand = None
+
+    # 2) Opponent vs-hand split (only if hand known)
+    if hand is not None:
+        try:
+            split = _default_split_fetch(team_id, hand)
+        except (KeyError, IndexError, OSError) as e:
+            print(f"vs_hand split fail ({opp_abbr} vs {hand}): {e}", file=sys.stderr)
+            return None  # statSplits API failure → vs_hand_2026=null
+    else:
+        split = {"pa": 0, "ops": None, "k_pct": None, "bb_pct": None}
+
+    # 3) Season full OPS for PA<400 fallback
+    season_ops = _fetch_team_season_ops(team_id, season)
+
+    split_ops_raw = split.get("ops")
+    return {
+        "pa": split.get("pa", 0),
+        "split_ops": float(split_ops_raw) if split_ops_raw else None,
+        "k_pct": split.get("k_pct"),
+        "bb_pct": split.get("bb_pct"),
+        "hand": hand,
+        "season_ops": season_ops,
+    }
+
+
 def build_real_fetchers():
     return Fetchers(
         schedule_fn=fetch_mlb_schedule,
@@ -387,6 +497,7 @@ def build_real_fetchers():
         game_log_fn=fetch_game_log,
         team_14d_ops_fn=fetch_team_14d_ops,
         v4_data_fn=fetch_v4_data,
+        vs_hand_fn=fetch_vs_hand_split,
     )
 
 

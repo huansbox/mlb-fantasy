@@ -61,19 +61,25 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 -c "import jso
 ### 1b：對手強弱 pattern 分類（手動，AI 看 table 整理）
 
 對 game log 每場：
-- **對手「強」**：對手季 OPS ≥ .770 (R/G ≥ 4.8) — 高 contact / power 線
-- **對手「中」**：對手季 OPS .720-.770 — 中等
-- **對手「弱」**：對手季 OPS ≤ .720 — 投手友善
 
-> **參考門檻**：2026 MLB 全聯盟季 OPS 約 .720 (League avg)，±.050 切強/中/弱。
+**主錨：對手 vs SP 慣用手 OPS**（target 對手從 scan candidates JSON 的 `vs_hand_2026.ops` 取；game log 歷史對手用記憶 take 作 rough proxy，無需逐場查 statSplits）
+- **對手「強」**：vs hand OPS ≥ .770 — 高 contact / power 線
+- **對手「中強」**：vs hand OPS .720-.770 — 中上
+- **對手「中」**：vs hand OPS .680-.720 — 中等
+- **對手「弱」**：vs hand OPS ≤ .680 — 投手友善
+
+**Fallback（`vs_hand_2026.low_pa_fallback=true` 或 5 月初 PA <400 樣本不足）**：退回對手季全 OPS scale —
+強 ≥.770 / 中 .720-.770 / 弱 ≤.720。低 PA 時 scan 的 `vs_hand_2026.ops` 已自動替換成季全 OPS，用此 scale 解讀。
+
+> **參考門檻**：2026 MLB 全聯盟季 OPS 約 .720 (League avg)；vs hand split 通常比季全 OPS 低 .020-.040（同手壓制效應），所以 vs hand scale 的「弱」門檻整體下移 .040。
 >
-> **預設操作：AI 從記憶 take，不必每隊查**。約定俗成的分法（賽季中可能微幅變動，但量級穩）：
+> **預設操作：AI 從記憶 take 隊伍分類，不必每隊查**（rough proxy，季全 OPS 量級）：
 > - **強**：LAD / NYY / PHI / ATL / NYM / BOS（contact + power 雙佳）
 > - **中-強**：TOR / TB / HOU / MIN / SD / SEA
 > - **中**：CHC / STL / SF / DET / AZ / CIN / TEX / MIL
 > - **弱**：COL / CWS / MIA / WSH / PIT / KC / LAA / OAK / BAL / CLE
 >
-> Edge case（一年內格局重洗 / 不確定的隊）才補拉一次 `byDateRange` 全季 OPS 確認。不要對每場都查。
+> Target 對手有 `vs_hand_2026.ops` 時優先用該值對照 vs hand 主錨表；game log 歷史對手仍用記憶 take。Edge case（一年內格局重洗 / 不確定的隊）才補拉一次 `byDateRange` 全季 OPS 確認。
 
 整理後輸出兩個 split：
 - 對「中-弱」打線 X/Y QS（含 ER ≤2）
