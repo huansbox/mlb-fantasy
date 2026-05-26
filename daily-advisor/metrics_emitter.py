@@ -27,9 +27,11 @@ def emit_metric_block(
         "date": str(date),
         "sp_p1_match": _all_match(_values_at_path(sp_step1_results, ["ranking", 0])),
         "sp_review_triggered": _has_borderline_pairs(sp_master),
+        "sp_p1_pair_borderline": _has_top_pair_borderline(sp_master, "P"),
         "sp_anchor_name": _name_of(anchor),
         "fa_p1_match": _fa_classify_match(fa_classify_results, _name_of(fa_top)),
         "fa_review_triggered": _has_borderline_pairs(fa_master),
+        "fa_top1_pair_borderline": _has_top_pair_borderline(fa_master, "top"),
         "fa_top_name": _name_of(fa_top),
     }
     payload = json.dumps(metrics, ensure_ascii=False, indent=2, sort_keys=False)
@@ -77,6 +79,21 @@ def _has_borderline_pairs(master: Any) -> bool:
     if not parsed:
         return False
     return bool(parsed.get("borderline_pairs"))
+
+
+def _has_top_pair_borderline(master: Any, prefix: str) -> bool:
+    # M4' refined metric: the any-pair signal saturates at ~100% in baseline
+    # (master flags P2-P3 / P3-P4 most days). The actionable dissent — master
+    # uncertain about the actual recommendation — is the P1-P2 / top1-top2 pair.
+    # Prompts emit string tokens like "P1-P2" / "top1-top2" (see prompt_phase6_*).
+    parsed = _parsed(master)
+    if not parsed:
+        return False
+    target = f"{prefix}1-{prefix}2"
+    return any(
+        isinstance(p, str) and p.strip() == target
+        for p in (parsed.get("borderline_pairs") or [])
+    )
 
 
 def _name_of(entry: Any) -> str | None:

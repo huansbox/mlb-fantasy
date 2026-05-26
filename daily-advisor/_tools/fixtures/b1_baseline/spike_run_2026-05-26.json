@@ -1,0 +1,291 @@
+{
+  "per_case": [
+    {
+      "case": "2026-05-04",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": true,
+      "sp_p1_distribution": {
+        "Cole Ragans": 3
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Cole Ragans",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P2-P3"
+      ],
+      "sp_path_seconds": 47.6,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Casey Mize": "worth",
+        "Lance McCullers Jr.": "borderline",
+        "Peter Lambert": "borderline",
+        "Erick Fedde": "not_worth"
+      },
+      "fa_survivors_count": 3,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Casey Mize",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top2-top3"
+      ],
+      "fa_top1_unanimous_worth": true,
+      "fa_path_seconds": 56.8
+    },
+    {
+      "case": "2026-05-20",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": true,
+      "sp_p1_distribution": {
+        "Keider Montero": 3
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Keider Montero",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P2-P3"
+      ],
+      "sp_path_seconds": 109.6,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Ben Brown": "borderline",
+        "Kai-Wei Teng": "not_worth",
+        "Jacob Latz": "not_worth",
+        "Chad Patrick": "borderline",
+        "Didier Fuentes": "not_worth",
+        "Stephen Kolek": "borderline",
+        "David Peterson": "not_worth",
+        "Kendry Rojas": "not_worth",
+        "Spencer Miles": "not_worth",
+        "Grant Holmes": "borderline"
+      },
+      "fa_survivors_count": 4,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Ben Brown",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top1-top2"
+      ],
+      "fa_top1_unanimous_worth": false,
+      "fa_path_seconds": 62.8
+    },
+    {
+      "case": "2026-05-21",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": true,
+      "sp_p1_distribution": {
+        "Luis Severino": 3
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Luis Severino",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P3-P4"
+      ],
+      "sp_path_seconds": 84.1,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Ben Brown": "worth",
+        "Martín Pérez": "borderline",
+        "Chad Patrick": "borderline",
+        "Kai-Wei Teng": "not_worth",
+        "Jacob Latz": "not_worth",
+        "Janson Junk": "borderline",
+        "Kumar Rocker": "not_worth",
+        "Didier Fuentes": "not_worth",
+        "Chris Bassitt": "not_worth",
+        "Griffin Jax": "not_worth",
+        "David Peterson": "not_worth",
+        "Kendry Rojas": "not_worth",
+        "Grant Holmes": "borderline"
+      },
+      "fa_survivors_count": 5,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Ben Brown",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top2-top3"
+      ],
+      "fa_top1_unanimous_worth": false,
+      "fa_path_seconds": 111.4
+    },
+    {
+      "case": "2026-05-22",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": false,
+      "sp_p1_distribution": {
+        "Luis Severino": 1,
+        "Keider Montero": 2
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Keider Montero",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P1-P2",
+        "P3-P4"
+      ],
+      "sp_path_seconds": 100.2,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Martín Pérez": "worth",
+        "Jacob Latz": "not_worth",
+        "Chad Patrick": "borderline",
+        "Kai-Wei Teng": "not_worth",
+        "Didier Fuentes": "not_worth",
+        "Kumar Rocker": "not_worth",
+        "Janson Junk": "worth",
+        "David Peterson": "borderline",
+        "Kendry Rojas": "not_worth",
+        "Spencer Miles": "not_worth",
+        "Grant Holmes": "worth"
+      },
+      "fa_survivors_count": 5,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Janson Junk",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top1-top2",
+        "top2-top3"
+      ],
+      "fa_top1_unanimous_worth": true,
+      "fa_path_seconds": 130.7
+    },
+    {
+      "case": "2026-05-23",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": false,
+      "sp_p1_distribution": {
+        "Keider Montero": 2,
+        "Luis Severino": 1
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Keider Montero",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P1-P2"
+      ],
+      "sp_path_seconds": 164.6,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Martín Pérez": "borderline",
+        "Jacob Latz": "not_worth",
+        "Chad Patrick": "borderline",
+        "Didier Fuentes": "not_worth",
+        "Kumar Rocker": "not_worth",
+        "Janson Junk": "borderline",
+        "Chris Bassitt": "not_worth",
+        "Kendry Rojas": "not_worth",
+        "Spencer Miles": "not_worth"
+      },
+      "fa_survivors_count": 3,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Janson Junk",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top2-top3"
+      ],
+      "fa_top1_unanimous_worth": false,
+      "fa_path_seconds": 98.8
+    },
+    {
+      "case": "2026-05-24",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": true,
+      "sp_p1_distribution": {
+        "Keider Montero": 3
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Keider Montero",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P2-P3"
+      ],
+      "sp_path_seconds": 123.7,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Jacob Latz": "borderline",
+        "Grant Holmes": "worth",
+        "Chad Patrick": "borderline",
+        "Kai-Wei Teng": "not_worth",
+        "Spencer Miles": "borderline",
+        "Didier Fuentes": "borderline",
+        "Kumar Rocker": "not_worth",
+        "Chris Bassitt": "not_worth",
+        "Janson Junk": "borderline"
+      },
+      "fa_survivors_count": 6,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Grant Holmes",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top2-top3"
+      ],
+      "fa_top1_unanimous_worth": true,
+      "fa_path_seconds": 112.1
+    },
+    {
+      "case": "2026-05-25",
+      "sp_step1_parsed": 3,
+      "sp_p1_match": false,
+      "sp_p1_distribution": {
+        "Luis Severino": 2,
+        "Keider Montero": 1
+      },
+      "sp_master_parsed": true,
+      "sp_master_p1": "Luis Severino",
+      "sp_master_borderline": true,
+      "sp_borderline_pairs": [
+        "P1-P2"
+      ],
+      "sp_path_seconds": 61.9,
+      "fa_classify_parsed": 3,
+      "fa_aggregated": {
+        "Kai-Wei Teng": "borderline",
+        "Grant Holmes": "borderline",
+        "Jacob Latz": "not_worth",
+        "Chad Patrick": "borderline",
+        "Spencer Miles": "not_worth",
+        "Didier Fuentes": "not_worth",
+        "Kendry Rojas": "not_worth",
+        "Chris Bassitt": "not_worth"
+      },
+      "fa_survivors_count": 3,
+      "fa_master_parsed": true,
+      "fa_master_top1": "Grant Holmes",
+      "fa_master_borderline": true,
+      "fa_borderline_pairs": [
+        "top1-top2"
+      ],
+      "fa_top1_unanimous_worth": false,
+      "fa_path_seconds": 69.7
+    }
+  ],
+  "baseline": {
+    "n_cases": 7,
+    "sp": {
+      "M1_p1_match_rate": {
+        "mean": 0.571,
+        "std": 0.535,
+        "n": 7
+      },
+      "M4_master_borderline_rate": {
+        "mean": 1.0,
+        "std": 0.0,
+        "n": 7
+      },
+      "M1_minus_1sd_threshold": 0.036
+    },
+    "fa": {
+      "M1_top1_unanimous_worth_rate": {
+        "mean": 0.429,
+        "std": 0.535,
+        "n": 7
+      },
+      "M4_master_borderline_rate": {
+        "mean": 1.0,
+        "std": 0.0,
+        "n": 7
+      },
+      "M1_minus_1sd_threshold": -0.106
+    }
+  }
+}

@@ -35,8 +35,10 @@ _MALFORMED = """Advice text.
 
 
 def _block(date, sp_p1, sp_rev, fa_p1, fa_rev,
-           sp_anchor="Nola", fa_top="Pfaadt"):
-    payload = json.dumps({
+           sp_anchor="Nola", fa_top="Pfaadt",
+           sp_p1_pair=False, fa_top1_pair=False,
+           include_pair_fields=True):
+    body = {
         "date": date,
         "sp_p1_match": sp_p1,
         "sp_review_triggered": sp_rev,
@@ -44,7 +46,11 @@ def _block(date, sp_p1, sp_rev, fa_p1, fa_rev,
         "fa_p1_match": fa_p1,
         "fa_review_triggered": fa_rev,
         "fa_top_name": fa_top,
-    }, indent=2)
+    }
+    if include_pair_fields:
+        body["sp_p1_pair_borderline"] = sp_p1_pair
+        body["fa_top1_pair_borderline"] = fa_top1_pair
+    payload = json.dumps(body, indent=2)
     return f"advice text\n<!-- phase6_metrics:\n{payload}\n-->"
 
 
@@ -139,3 +145,56 @@ class TestAggregateMetrics:
         assert s["sp_breakdown"]["p1_match_rate"] == pytest.approx(2 / 3)
         assert s["fa_breakdown"]["p1_match_rate"] == pytest.approx(2 / 3)
         assert s["sp_breakdown"]["review_trigger_rate"] == pytest.approx(1 / 3)
+
+
+# ── M4' (p1_pair_borderline) aggregation ────────────────────────
+
+class TestP1PairBorderlineAggregation:
+    def test_baseline_7_case_replay(self):
+        # Re-emit baseline result: 3/7 SP P1-P2 + 3/7 FA top1-top2 borderline
+        bodies = [
+            _block("2026-05-04", True, True, True, True, sp_p1_pair=False, fa_top1_pair=False),
+            _block("2026-05-20", True, True, False, True, sp_p1_pair=False, fa_top1_pair=True),
+            _block("2026-05-21", True, True, False, True, sp_p1_pair=False, fa_top1_pair=False),
+            _block("2026-05-22", False, True, True, True, sp_p1_pair=True, fa_top1_pair=True),
+            _block("2026-05-23", False, True, False, True, sp_p1_pair=True, fa_top1_pair=False),
+            _block("2026-05-24", True, True, True, True, sp_p1_pair=False, fa_top1_pair=False),
+            _block("2026-05-25", False, True, False, True, sp_p1_pair=True, fa_top1_pair=True),
+        ]
+        s = aggregate_metrics(bodies)
+        assert s["sp_breakdown"]["p1_pair_borderline_rate"] == pytest.approx(3 / 7)
+        assert s["fa_breakdown"]["p1_pair_borderline_rate"] == pytest.approx(3 / 7)
+        assert s["sp_breakdown"]["p1_pair_borderline_n"] == 7
+        assert s["fa_breakdown"]["p1_pair_borderline_n"] == 7
+
+    def test_backward_compat_missing_field(self):
+        # Legacy issue body without the new fields — denominator excludes those
+        bodies = [
+            _block("2026-05-01", True, False, True, False, include_pair_fields=False),
+            _block("2026-05-02", True, False, True, False, include_pair_fields=False),
+            _block("2026-05-03", True, True, True, True, sp_p1_pair=True, fa_top1_pair=True),
+            _block("2026-05-04", True, True, True, True, sp_p1_pair=False, fa_top1_pair=False),
+        ]
+        s = aggregate_metrics(bodies)
+        # only 2 blocks have the new fields → denominator = 2, not 4
+        assert s["sp_breakdown"]["p1_pair_borderline_n"] == 2
+        assert s["fa_breakdown"]["p1_pair_borderline_n"] == 2
+        assert s["sp_breakdown"]["p1_pair_borderline_rate"] == pytest.approx(0.5)
+        assert s["fa_breakdown"]["p1_pair_borderline_rate"] == pytest.approx(0.5)
+
+    def test_all_legacy_no_pair_field(self):
+        bodies = [
+            _block(f"2026-05-{d:02d}", True, False, True, False, include_pair_fields=False)
+            for d in range(1, 4)
+        ]
+        s = aggregate_metrics(bodies)
+        assert s["sp_breakdown"]["p1_pair_borderline_n"] == 0
+        assert s["fa_breakdown"]["p1_pair_borderline_n"] == 0
+        assert s["sp_breakdown"]["p1_pair_borderline_rate"] is None
+        assert s["fa_breakdown"]["p1_pair_borderline_rate"] is None
+
+    def test_empty_input_pair_rate_none(self):
+        s = aggregate_metrics([])
+        assert s["sp_breakdown"]["p1_pair_borderline_rate"] is None
+        assert s["fa_breakdown"]["p1_pair_borderline_rate"] is None
+        assert s["sp_breakdown"]["p1_pair_borderline_n"] == 0

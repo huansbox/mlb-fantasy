@@ -506,16 +506,13 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
-- [ ] **B1 cutover 進行中**（2026-05-06 啟動，9 個 issues 拆完）：SP Phase 6 對齊 Batter v4 thin。完整脈絡見 `docs/sp-b1-cutover-design.md`，工作隊列 `issues/001-009-*.md`，PRD `issues/prd.md`。
-  - **目前進度（2026-05-07）**：001-007 ✅ merged；008 🟡 infra ✅ + cron wrapper ✅ + case 1-2 fixture（5/4 hand-composed + 5/7 real capture）；009 ⏳ blocked by 008
-  - **Issue 008 剩下的 acceptance**：累積 case 3-7（VPS daily cron 5/8-5/12 自動跑）→ 跑 `_tools/spike_b1_baseline.py`（56 LLM calls）→ 填 baseline mean/std/-1σ 進 `docs/sp-b1-baseline.md` → HITL review
-  - **最早能動 issue 009 的時間**：5/12 之後（7 case 累積完 + spike 跑完 + 你 HITL 通過 baseline 數字）。**5/8-5/11 期間 session 不要直接動 009**，要動先看 `docs/sp-b1-baseline.md` Status 段是否從 🟡 翻 ✅
-  - **5/8-5/12 每天健康檢查**：`ssh root@107.175.30.172 "ls /opt/mlb-fantasy/daily-advisor/_tools/fixtures/b1_baseline/$(date +%Y-%m-%d)*"` → 沒檔就查 `/var/log/fa-scan-capture.log`
-  - **動 SP / Phase 6 / fa_compute / _phase6_sp / 5 個 sp prompt / fa_scan_v4 之前**：先讀 `issues/` 看是否有相關 in-flight slice，避免衝突
-  - **Day-1 可並行起跑**：001（SP Sum≥40 hard filter）/ 002（payload_slimmer 抽深模組）/ 003（metrics_emitter）/ 004（fa_scan_v4.py 退役）— 4 個無 blocker
-  - **Critical path**：002 → 005+006（SP/FA prompt B1）→ 008（spike fixture baseline）→ 009（production cutover）
-  - **HITL slice**（需用戶看品質）：005 / 006 / 008 / 009
-  - **Cutover 完成後**：移除以下 3 條被涵蓋的 TODO：①「fa_scan_v4.py CLI 命運」②「SP / Batter 框架對稱性檢視」③「SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin」（暫保留以便檢索；issue 009 acceptance 含移除 ① ③ + 重評 ②）
+- [ ] **B1 cutover — 009 production cutover**（2026-05-26 update）：SP Phase 6 對齊 Batter v4 thin。完整脈絡見 `docs/sp-b1-cutover-design.md`，PRD `issues/prd.md`。
+  - **進度（2026-05-26）**：001-008 ✅ 完成；009 ⏳ 上線到 VPS production
+  - **008 baseline 結果**：M1 SP 57.1% / M1 FA 42.9% / M4' SP+FA 42.9%（top-pair only）。M4 (any-pair) baseline 100% saturated → 退役，改用 M4'（HITL Option A）。Emitter/reader 已擴 `sp_p1_pair_borderline` + `fa_top1_pair_borderline` boolean。完整數字 `docs/sp-b1-baseline.md`。撤退門檻：M1 < 0.036 OR M4' > 75% 連 2 週
+  - **009 剩餘 acceptance**：① VPS git pull 新 commit ② 下次 daily fa-scan cron（TW 12:30）跑通 ③ `gh issue view <最新>` 確認 body 結尾 `<!-- phase6_metrics ... -->` 包含 sp_p1_pair_borderline / fa_top1_pair_borderline 兩個新欄位 ④ 跑 `metrics_reader.py --days 1` sanity check ⑤ 文件化觀察期 SOP（每週日 reader CLI → 比對門檻 → 記入 waiver-log）⑥ CLAUDE.md 移除 3 條被涵蓋的 TODO（①「fa_scan_v4.py CLI 命運」已隨 004 退役 ②「SP / Batter 框架對稱性檢視」③「SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin」）
+  - **動 SP / Phase 6 / fa_compute / _phase6_sp / 5 個 sp prompt 之前**：先確認本 cutover 是否仍在觀察期 4 週內，避免衝突
+- [ ] **011 stream-sp-deep e2e parity**（HITL，2026-05-26 補追蹤）：010 已 merged 半個月但 011 parity 驗證未做。對齊 2026-05-16 prior session 三 SP 深評（Cade Cavalli vs BAL / Chris Paddack vs CLE / Chris Bassitt vs WSH）— 重跑 refactored skill 與當時手算數字比對（game log / 對手 7d-14d-30d OPS / vs RHP split）。Divergence 要 root cause 文件化。詳見 [`issues/011-stream-sp-deep-e2e-parity.md`](issues/011-stream-sp-deep-e2e-parity.md)。
+- [ ] **player-eval-sp.md 4 處 SSH 改 vps-run.sh wrapper**（2026-05-20 拆出 issue，2026-05-26 補追蹤）：F2 wrapper 已上但 `docs/player-eval-sp.md` 4 處裸 SSH（含 2 處 `python3 << EOF` here-doc）未納入。`/player-eval` 是高頻 skill 受同一 SSH handshake 卡死影響。Here-doc 經多層解析 quoting 存活率低，需轉 VPS 端腳本後再納入。詳見 [`issues/player-eval-sp-ssh-wrapper.md`](issues/player-eval-sp-ssh-wrapper.md)。
 - [ ] **SP / Batter 框架對稱性檢視**（部分被 B1 cutover 涵蓋）：原 batter Phase 6 multi-agent 上線時觸發 → 2026-05-06 倒序執行先動 SP（基於 lazy 引用 Sum 觀察）。Batter Phase 6 上線時要重評是否仍按原計畫升 batter，或 batter 留 thin（已對稱無需動）。
 - [ ] **SP Phase 6 prompt 拿掉 Sum 暴露對齊 batter v4 thin**（被 issue 005 + 006 涵蓋，cutover 完成才移除）：5 個 prompt 改寫拿掉 Sum + urgency + evaluation tags 引用，master borderline 改 LLM 自判（H3）。詳見 `docs/sp-b1-cutover-design.md` §LLM 層。
 - [ ] **preview 加入聯盟 scoreboard**：用 `yahoo_query.py scoreboard` 邏輯存入 JSON，預測時有數據基礎

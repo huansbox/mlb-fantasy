@@ -48,7 +48,12 @@ def aggregate_metrics(issue_bodies: list[str]) -> dict:
     """Pure aggregation across N issue bodies."""
     blocks = [b for b in (parse_metric_block(body) for body in issue_bodies) if b]
     n = len(blocks)
-    empty_breakdown = {"p1_match_rate": None, "review_trigger_rate": None}
+    empty_breakdown = {
+        "p1_match_rate": None,
+        "review_trigger_rate": None,
+        "p1_pair_borderline_rate": None,
+        "p1_pair_borderline_n": 0,
+    }
     if n == 0:
         return {
             "n_samples": 0,
@@ -65,16 +70,35 @@ def aggregate_metrics(issue_bodies: list[str]) -> dict:
     fa_p1 = sum(1 for b in blocks if b.get("fa_p1_match")) / n
     fa_rev = sum(1 for b in blocks if b.get("fa_review_triggered")) / n
 
+    # M4' (top-position pair borderline): the actionable refinement of M4.
+    # Aggregated only over blocks that have the new field — issue bodies emitted
+    # before 2026-05-26 lack it and would otherwise count as False, biasing rate
+    # downward during rollout window.
+    sp_pair_blocks = [b for b in blocks if "sp_p1_pair_borderline" in b]
+    fa_pair_blocks = [b for b in blocks if "fa_top1_pair_borderline" in b]
+    sp_pair_rate = (
+        sum(1 for b in sp_pair_blocks if b.get("sp_p1_pair_borderline")) / len(sp_pair_blocks)
+        if sp_pair_blocks else None
+    )
+    fa_pair_rate = (
+        sum(1 for b in fa_pair_blocks if b.get("fa_top1_pair_borderline")) / len(fa_pair_blocks)
+        if fa_pair_blocks else None
+    )
+
     return {
         "n_samples": n,
         "date_range": [dates[0], dates[-1]] if dates else None,
         "sp_breakdown": {
             "p1_match_rate": sp_p1,
             "review_trigger_rate": sp_rev,
+            "p1_pair_borderline_rate": sp_pair_rate,
+            "p1_pair_borderline_n": len(sp_pair_blocks),
         },
         "fa_breakdown": {
             "p1_match_rate": fa_p1,
             "review_trigger_rate": fa_rev,
+            "p1_pair_borderline_rate": fa_pair_rate,
+            "p1_pair_borderline_n": len(fa_pair_blocks),
         },
         "p1_match_rate": (sp_p1 + fa_p1) / 2,
         "review_trigger_rate": (sp_rev + fa_rev) / 2,

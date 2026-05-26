@@ -278,9 +278,11 @@ class TestPhase6OrchestratorHappyPath:
             "date": "2026-04-27",
             "sp_p1_match": True,
             "sp_review_triggered": False,
+            "sp_p1_pair_borderline": False,
             "sp_anchor_name": "Nola",
             "fa_p1_match": True,
             "fa_review_triggered": False,
+            "fa_top1_pair_borderline": False,
             "fa_top_name": "Pfaadt",
         }
 
@@ -323,18 +325,22 @@ class TestMetricsEmitter:
             "date",
             "sp_p1_match",
             "sp_review_triggered",
+            "sp_p1_pair_borderline",
             "sp_anchor_name",
             "fa_p1_match",
             "fa_review_triggered",
+            "fa_top1_pair_borderline",
             "fa_top_name",
         }
         assert metrics == {
             "date": "2026-05-06",
             "sp_p1_match": True,
             "sp_review_triggered": False,
+            "sp_p1_pair_borderline": False,
             "sp_anchor_name": "Detmers",
             "fa_p1_match": True,
             "fa_review_triggered": False,
+            "fa_top1_pair_borderline": False,
             "fa_top_name": "Junk",
         }
 
@@ -388,6 +394,62 @@ class TestMetricsEmitter:
 
         assert metrics["fa_p1_match"] is True
         assert metrics["fa_top_name"] is None
+
+    def test_p1_pair_borderline_string_format_sp_and_fa(self):
+        # Real prompt format: master emits string tokens like "P1-P2" / "top1-top2"
+        metrics = _parse_metric_block(emit_metric_block(
+            "2026-05-22",
+            [{"ranking": ["Montero"]}, {"ranking": ["Severino"]}, {"ranking": ["Montero"]}],
+            {"borderline_pairs": ["P1-P2", "P3-P4"]},
+            [
+                {"classifications": [{"name": "Junk", "verdict": "worth"}]},
+                {"classifications": [{"name": "Junk", "verdict": "worth"}]},
+                {"classifications": [{"name": "Junk", "verdict": "worth"}]},
+            ],
+            {"borderline_pairs": ["top1-top2", "top2-top3"]},
+            {"name": "Montero"},
+            {"name": "Junk"},
+        ))
+        assert metrics["sp_p1_pair_borderline"] is True
+        assert metrics["fa_top1_pair_borderline"] is True
+        assert metrics["sp_review_triggered"] is True  # any-pair still True
+
+    def test_p1_pair_borderline_false_when_only_lower_pairs(self):
+        # Master flags P2-P3 only — M4 any-pair True, but M4' top-pair False
+        metrics = _parse_metric_block(emit_metric_block(
+            "2026-05-04",
+            [{"ranking": ["Ragans"]}, {"ranking": ["Ragans"]}, {"ranking": ["Ragans"]}],
+            {"borderline_pairs": ["P2-P3"]},
+            [
+                {"classifications": [{"name": "Mize", "verdict": "worth"}]},
+                {"classifications": [{"name": "Mize", "verdict": "worth"}]},
+                {"classifications": [{"name": "Mize", "verdict": "worth"}]},
+            ],
+            {"borderline_pairs": ["top2-top3"]},
+            {"name": "Ragans"},
+            {"name": "Mize"},
+        ))
+        assert metrics["sp_review_triggered"] is True
+        assert metrics["fa_review_triggered"] is True
+        assert metrics["sp_p1_pair_borderline"] is False
+        assert metrics["fa_top1_pair_borderline"] is False
+
+    def test_p1_pair_borderline_handles_whitespace_and_empty(self):
+        metrics = _parse_metric_block(emit_metric_block(
+            "2026-05-25",
+            [{"ranking": ["X"]}, {"ranking": ["X"]}, {"ranking": ["X"]}],
+            {"borderline_pairs": [" P1-P2 "]},  # surrounding whitespace
+            [
+                {"classifications": [{"name": "Y", "verdict": "worth"}]},
+                {"classifications": [{"name": "Y", "verdict": "worth"}]},
+                {"classifications": [{"name": "Y", "verdict": "worth"}]},
+            ],
+            {"borderline_pairs": []},  # empty
+            {"name": "X"},
+            {"name": "Y"},
+        ))
+        assert metrics["sp_p1_pair_borderline"] is True
+        assert metrics["fa_top1_pair_borderline"] is False
 
 
 class TestPhase6Emitters:
