@@ -214,6 +214,30 @@ def _enrich_v4(raw):
 VS_HAND_PA_THRESHOLD = 400  # Below this, opponent vs SP-hand sample too thin → fallback to full season OPS.
 
 
+def compute_sample_warning(*, bbe, gs):
+    """2026 sample-confidence warning (issue 013).
+
+    Two axes — BBE drives contact-quality slots (GB%/xwOBACON), GS drives
+    role/usage slots (IP/GS, BB/9, Whiff%). AND-for-low semantics:
+
+    - "low": BBE<30 AND GS<6 — both critically thin, every structural axis
+      suspect → LLM should downgrade confidence by 2 notches
+    - "medium": BBE≤80 OR GS≤12 — at least one axis sample concerning →
+      downgrade confidence by 1 notch
+    - "none": BBE>80 AND GS>12 — both reliable, trust structural signals
+
+    None on either input → return None (caller should pass through when
+    v4 data unavailable; "low" would over-warn rookies missing Savant).
+    """
+    if bbe is None or gs is None:
+        return None
+    if bbe < 30 and gs < 6:
+        return "low"
+    if bbe <= 80 or gs <= 12:
+        return "medium"
+    return "none"
+
+
 def _apply_vs_hand_gate(raw, pa_threshold=VS_HAND_PA_THRESHOLD):
     """Transform raw vs-hand fetcher output → final emit dict (with PA gate).
 
@@ -267,12 +291,18 @@ def scan(et_dates, *, fetchers):
                 fetchers.vs_hand_fn(sp.opponent, sp.mlb_id)
                 if fetchers.vs_hand_fn else None
             )
+            v4_26 = _enrich_v4(v4_26_all.get(sp.mlb_id, {}))
+            sample_warning = (
+                compute_sample_warning(bbe=v4_26.get("bbe"), gs=v4_26.get("gs"))
+                if v4_26.get("v4_available") else None
+            )
             candidates_out.append({
                 **_starter_to_summary(sp),
                 "percent_owned": pct_by_name.get(sp.name, "—"),
                 "opener_verdict": classify_opener(log),
                 "opponent_14d": {"ops": ops, "tier": tier_opponent(ops)},
-                "v4_2026": _enrich_v4(v4_26_all.get(sp.mlb_id, {})),
+                "sample_warning": sample_warning,
+                "v4_2026": v4_26,
                 "v4_2025": _enrich_v4(v4_25_all.get(sp.mlb_id, {})),
                 "vs_hand_2026": _apply_vs_hand_gate(vs_hand_raw),
             })

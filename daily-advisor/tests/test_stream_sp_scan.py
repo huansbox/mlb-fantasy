@@ -10,6 +10,7 @@ from stream_sp_scan import (
     _apply_vs_hand_gate,
     _enrich_v4,
     classify_opener,
+    compute_sample_warning,
     cross_check_fa,
     parse_schedule,
     scan,
@@ -702,3 +703,150 @@ class TestScanVsHand:
         )
         scan(["2026-05-15"], fetchers=fetchers)
         assert captured == [("CHC", 680732)]
+
+
+class TestComputeSampleWarning:
+    """2026 sample-confidence warning (issue 013, AND-for-low).
+
+    - "low": BBE<30 AND GS<6 (both critically thin → every structural axis suspect)
+    - "medium": BBE≤80 OR GS≤12 (at least one axis sample concerning)
+    - "none": BBE>80 AND GS>12 (both reliable)
+    """
+
+    def test_alexander_both_thin_returns_low(self):
+        # Alexander 2026: BBE 0 + GS 1 → both fail → low
+        assert compute_sample_warning(bbe=0, gs=1) == "low"
+
+    def test_mcdonald_bbe_mid_gs_thin_returns_medium(self):
+        # McDonald 2026: BBE 65 + GS 4 → BBE not <30 so not double-thin → medium
+        assert compute_sample_warning(bbe=65, gs=4) == "medium"
+
+    def test_springs_bbe_full_gs_mid_returns_medium(self):
+        # Springs 2026: BBE 183 + GS 11 → BBE pass, GS in 6-12 → medium
+        assert compute_sample_warning(bbe=183, gs=11) == "medium"
+
+    def test_both_pass_returns_none(self):
+        # BBE 100 + GS 15 → both pass → none
+        assert compute_sample_warning(bbe=100, gs=15) == "none"
+
+    @pytest.mark.parametrize(
+        "bbe,gs,expected",
+        [
+            # BBE boundary at 29/30 (with non-thin GS so only BBE axis matters)
+            (29, 15, "medium"),  # BBE<30 alone → not low (GS pass) → medium
+            (30, 15, "medium"),  # BBE=30 in 30-80 → medium
+            # BBE boundary at 80/81 (with high GS so only BBE axis matters)
+            (80, 13, "medium"),  # BBE=80 still ≤80 → medium
+            (81, 13, "none"),    # BBE>80 and GS>12 → none
+            # GS boundary at 5/6 (with high BBE so only GS axis matters)
+            (100, 5, "medium"),  # GS<6 alone → not low (BBE pass) → medium
+            (100, 6, "medium"),  # GS=6 in 6-12 → medium
+            # GS boundary at 12/13 (with high BBE)
+            (100, 12, "medium"),  # GS=12 still ≤12 → medium
+            (100, 13, "none"),    # GS>12 and BBE>80 → none
+            # AND-low boundary: BBE=29 + GS=5 → both thin → low
+            (29, 5, "low"),
+            # AND-low boundary: BBE=29 + GS=6 → only BBE thin → medium
+            (29, 6, "medium"),
+            # AND-low boundary: BBE=30 + GS=5 → only GS thin → medium
+            (30, 5, "medium"),
+        ],
+    )
+    def test_boundary_buckets(self, bbe, gs, expected):
+        assert compute_sample_warning(bbe=bbe, gs=gs) == expected
+
+    def test_none_inputs_return_none_warning(self):
+        # v4 unavailable / missing bbe-or-gs → caller should pass None, we return None
+        assert compute_sample_warning(bbe=None, gs=10) is None
+        assert compute_sample_warning(bbe=50, gs=None) is None
+        assert compute_sample_warning(bbe=None, gs=None) is None
+
+
+class TestScanSampleWarning:
+    """e2e scan emits sample_warning top-level key on each candidate."""
+
+    def _basic_schedule(self):
+        return {"dates": [{"games": [{
+            "teams": {
+                "away": {
+                    "team": {"id": 145},
+                    "probablePitcher": {"id": 680732, "fullName": "Sean Burke"},
+                },
+                "home": {
+                    "team": {"id": 112},
+                    "probablePitcher": {"id": 9999, "fullName": "Owned Cub"},
+                },
+            },
+        }]}]}
+
+    def test_candidate_with_full_sample_emits_none(self):
+        # Burke 2026 snapshot: BBE 130 + GS 6 → BBE pass, GS=6 in 6-12 → medium
+        burke_v4 = {
+            "ip_gs": 5.11, "whiff_pct": 19.5, "bb9": 2.04,
+            "gb_pct": 41.5, "xwobacon": 0.354,
+            "g": 8, "gs": 6, "ip": 44.0, "bbe": 130,
+            "era": 3.68, "xera": 3.79,
+        }
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            v4_data={680732: burke_v4},
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["sample_warning"] == "medium"
+
+    def test_candidate_low_warning_when_both_axes_thin(self):
+        # Alexander-shaped: BBE 0 + GS 1
+        v4 = {
+            "ip_gs": 4.0, "whiff_pct": 20.0, "bb9": 5.0,
+            "gb_pct": 38.0, "xwobacon": 0.380,
+            "g": 1, "gs": 1, "ip": 4.0, "bbe": 0,
+            "era": 6.00, "xera": 5.50,
+        }
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            v4_data={680732: v4},
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["sample_warning"] == "low"
+
+    def test_candidate_none_warning_when_both_pass(self):
+        # Full-rotation late-season: BBE 200 + GS 20
+        v4 = {
+            "ip_gs": 6.0, "whiff_pct": 28.0, "bb9": 2.5,
+            "gb_pct": 48.0, "xwobacon": 0.340,
+            "g": 20, "gs": 20, "ip": 120.0, "bbe": 200,
+            "era": 3.50, "xera": 3.60,
+        }
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            v4_data={680732: v4},
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["sample_warning"] == "none"
+
+    def test_candidate_with_v4_unavailable_emits_none_warning(self):
+        # v4 data 抓不到 → bbe/gs 不存在 → sample_warning=None（不是 "low"）
+        fetchers = _build_fetchers(
+            schedule=self._basic_schedule(),
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+            v4_data={},  # 沒 Burke 的 v4 → _enrich_v4 走 unavailable 路徑
+        )
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        c = result["2026-05-15"]["candidates"][0]
+        assert c["v4_2026"]["v4_available"] is False
+        # v4 unavailable 時 sample_warning 也應該是 None — 沒材料判斷信心
+        assert c["sample_warning"] is None

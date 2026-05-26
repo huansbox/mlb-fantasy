@@ -157,6 +157,10 @@ Helper 回 JSON dict，含 4 key：
 
 ## Step 4：綜合判斷 + verdict
 
+### 樣本信心校正（讀 scan candidates JSON 的 `sample_warning`）
+
+> `sample_warning="low"` 或 `"medium"` 時，**v4 結構訊號（Sum / 5-slot percentile / 雙年 prior）信心降一檔**。須短期 game log（近 N 場 ERA / QS / 對手 pattern / vs hand split）獨立支撐才能維持 verdict；單靠結構訊號升 ✅ 不安全。`"none"` 或 `null` 不需特別處理。
+
 ### 推/不推門檻（baseline）
 
 > 對手等級一律指「回歸判斷後」（14d 主錨，7d 校正方向）— 不是 raw 7d。ERA 量級用「約」，是近 N 場產出的粗略 band，非硬切點。

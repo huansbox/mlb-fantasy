@@ -15,13 +15,15 @@
    - 只標 2026 樣本信心
    - 2025 不標（agent review 結論：去年 BBE 已固定不會變，標 warning 多餘 noise）
 
-2. **計算規則**：
+2. **計算規則**（**AND-for-low**：實作對齊時釐清的語意，e2e 樣本為 ground truth）：
    - **BBE source**：`v4_2026.bbe`（batted-ball events，現 scan 已有此欄 line 105-106）
    - **場數 source**：`v4_2026.gs`（GS 數，現 scan 已有此欄）
+   - 兩維度對應的 5-slot 軸不同：BBE 撐 GB% / xwOBACON 兩軸，GS 撐 IP/GS / Whiff% / BB/9 三軸。單邊 thin = 部分軸不可信；雙邊 thin = 全部軸不可信。
    - 門檻：
-     - BBE <30 **或** GS <6 → `"low"`
-     - BBE 30-80 **或** GS 6-12 → `"medium"`
-     - 否則 → `"none"`
+     - BBE <30 **AND** GS <6 → `"low"`（兩維度同時 thin，所有結構訊號降權 2 檔）
+     - 否則若 BBE ≤80 **OR** GS ≤12 → `"medium"`（單邊 thin，降權 1 檔）
+     - BBE >80 **AND** GS >12 → `"none"`（兩邊充足，結構訊號可信）
+   - **v4 unavailable**（`v4_2026.v4_available == false`）→ `sample_warning = null`（沒材料判斷，不應預設 low 導致過度警告）
 
 3. **SOP 改動**：
    - `.claude/commands/stream-sp-deep.md` Step 4 prompt 加文字指引（≤80 字）：
@@ -36,32 +38,34 @@
 ## Acceptance criteria
 
 ### Scan 機械層
-- [ ] `stream_sp_scan.py` 加 sample_warning 計算（reuse `v4_2026.bbe` + `v4_2026.gs`）+ tests（~6 cases）：
-  - [ ] BBE <30 → "low"（如 BBE=0 / 29）
-  - [ ] GS <6 → "low"（如 GS=2 / 5）
-  - [ ] **邊界 BBE=29 (low) vs BBE=30 (medium)** 分桶正確
-  - [ ] **邊界 GS=5 (low) vs GS=6 (medium)** 分桶正確
-  - [ ] **邊界 BBE=80 (medium) vs BBE=81 (none)** 分桶正確
-  - [ ] BBE ≥80 且 GS ≥12 → "none"
-  - [ ] BBE / GS 邏輯為 OR（任一觸發即降級）
-- [ ] candidates JSON schema 含 `sample_warning` top-level key（字串，非 dict）
-- [ ] **不改 Sum 計算或 verdict mechanical rule**（verify Step 2-6 過濾規則 byte-identical）
-- [ ] **不改 scan 機械層 filter**（Rotation gate / Sum ≥15 hard floor 邏輯 unchanged）
+- [x] `stream_sp_scan.py` 加 sample_warning 計算（reuse `v4_2026.bbe` + `v4_2026.gs`）+ tests（20 cases）：
+  - [x] 雙軸雙 thin → "low"（BBE=0/GS=1）
+  - [x] 單軸 thin（BBE 中段 + GS<6）→ "medium"（McDonald 65/4）
+  - [x] 單軸 thin（BBE >80 + GS 6-12）→ "medium"（Springs 183/11）
+  - [x] **AND-low 邊界 BBE=29 + GS=5 → "low"** vs **BBE=29 + GS=6 → "medium"** vs **BBE=30 + GS=5 → "medium"**
+  - [x] **BBE 邊界 BBE=29/GS≥6 (medium) vs BBE=30 (medium) vs BBE=80 (medium) vs BBE=81/GS≥13 (none)**
+  - [x] **GS 邊界 GS=5/BBE≥30 (medium) vs GS=6 (medium) vs GS=12 (medium) vs GS=13/BBE>80 (none)**
+  - [x] BBE >80 AND GS >12 → "none"
+  - [x] BBE 或 GS None（v4 unavailable）→ sample_warning=None
+- [x] candidates JSON schema 含 `sample_warning` top-level key（字串，非 dict）
+- [x] **不改 Sum 計算或 verdict mechanical rule**（Step 2-6 過濾規則未動 — 仍是 v4_available / rotation_gate / sum_score / opener_verdict 四條規則）
+- [x] **不改 scan 機械層 filter**（Rotation gate / Sum ≥15 hard floor 邏輯 unchanged）
 
 ### Skill 層
-- [ ] `.claude/commands/stream-sp-deep.md` Step 4 prompt 加 sample_warning 處理指引（≤80 字）
-- [ ] `.claude/commands/stream-sp.md` Step 7 報告主表選擇性加 sample_warning column（如 SP 有 medium/low 才顯示，none 不顯示）
+- [x] `.claude/commands/stream-sp-deep.md` Step 4 prompt 加 sample_warning 處理指引（≤80 字）
+- [x] `.claude/commands/stream-sp.md` Step 7 報告主表選擇性加 sample_warning column（如 SP 有 medium/low 才標 `⚠️ low/medium`，none/null 用 `—`；當天全表都 none/null 整欄可省略）
 
 ### E2E sanity check
-- [ ] CLAUDE.md「檔案索引」更新 stream_sp_scan.py 條目（新增 sample_warning 欄位說明）
-- [ ] 跑一次 e2e 驗證以本 session 觀察對齊：
-  - McDonald 2026: BBE 65 + GS 4 → `"medium"`（GS<6 觸發）
-  - Alexander 2026: BBE 0 + GS 1 → `"low"`（兩者皆觸發）
-  - Springs 2026: BBE 183 + GS 11 → `"medium"`（GS 6-12 觸發）
-  - Mikolas 2026: BBE 158 + GS 6 → `"medium"`（GS 6-12 觸發）
-  - Cameron 2026: BBE 150 + GS 9 → `"medium"`（GS 6-12 觸發）
-  - Rea 2026: BBE 171 + GS 8 → `"medium"`（GS 6-12 觸發）
-  - （注意 5/26 多數 SP 仍是 medium 階段，「none」門檻 GS≥12 + BBE≥80 對應 ~6 月 SP 才滿）
+- [x] CLAUDE.md「檔案索引」更新 stream_sp_scan.py 條目（新增 sample_warning 欄位說明 + AND-for-low 語意）
+- [x] 單元測試覆蓋 issue 給的 6 個 e2e SP 樣本邏輯（AND-for-low 規則下）：
+  - Alexander 2026 (BBE=0/GS=1) → `"low"` ✓（雙軸雙 thin）
+  - McDonald 2026 (BBE=65/GS=4) → `"medium"` ✓（BBE 不夠 thin，未觸發 low）
+  - Springs 2026 (BBE=183/GS=11) → `"medium"` ✓（BBE pass，GS=11 in 6-12）
+  - Mikolas 2026 (BBE=158/GS=6) → `"medium"` ✓（GS=6 in 6-12）
+  - Cameron 2026 (BBE=150/GS=9) → `"medium"` ✓
+  - Rea 2026 (BBE=171/GS=8) → `"medium"` ✓
+- [ ] VPS e2e 跑一次驗證（feat merge 後）：用 `python3 stream_sp_scan.py --et-dates {未來 ET 日} --pretty` 確認 candidates 含 sample_warning 欄
+- （注意 5/26 多數 SP 仍是 medium 階段，「none」門檻 BBE>80 AND GS>12 對應 ~6 月後段 SP 才滿）
 
 ## HITL gate（上線後觀察）
 
