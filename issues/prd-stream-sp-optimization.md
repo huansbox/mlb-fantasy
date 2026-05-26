@@ -1,5 +1,6 @@
 # Stream-SP Skill Optimization PRD
 
+> **Status**: ✅ Closed 2026-05-26 — Stage 1 (4/4) + Stage 2 (1/1) merged，完成標準全勾。HITL gate（015 hard rules 2 週觀察）轉為 follow-up，記錄於 `docs/stream-sp-hard-rules-observations.md`（待建）。
 > **Type**: Optimization PRD（非新功能，是 evaluation logic + 工程改進）
 > **Origin**: 2026-05-26 session — 跑完 4 位 SP 深評（McDonald / Springs / Cameron / Rea）後產出 11 條建議，3 agent review 後修正成 6 條落地項
 > **Scope**: `/stream-sp` + `/stream-sp-deep` 兩個 skill + 後端機械層 (`daily-advisor/stream_sp_scan.py` + `daily-advisor/mlb_query.py`)
@@ -70,10 +71,14 @@ Stage 1 起手意向順序（用戶決定）：**015 → 012 → 013 → 014 →
 
 ## Stage 1 完成標準
 
-- [ ] 012-015 全部 merged 到 master
-- [ ] 跑 `/stream-sp` 至少 3 輪驗證 candidates JSON 含 vs_hand_2026 + sample_warning
-- [ ] 跑 `/stream-sp-deep` 至少 1 輪驗證 SOP hard rules 觸發（C3 + C4 各一次）
-- [ ] 跑補查模式至少 2 次驗證 pending_diff 正確分類
+- [x] 012-015 全部 merged 到 master
+- [x] 跑 `/stream-sp` 至少 3 輪驗證 candidates JSON 含 vs_hand_2026 + sample_warning — 5/25 / 5/26 / 5/27 三輪 pending file 已含 vs_hand_2026 + sample_warning 欄位
+- [x] 跑 `/stream-sp-deep` 至少 1 輪驗證 SOP hard rules 觸發（C3 + C4 各一次）— C3: Cameron 5/27（NYY 30d→7d -.130 但 vs LHP .788 → 維持 ⚠️ 不升 ✅）；C4: Rea 5/28（近 6 場 6.10 ERA + 5/17 對 CWS 弱打 4ER → floor risk 高 ❌）
+- [x] 跑補查模式至少 2 次驗證 pending_diff 正確分類 — 5/26 07:22（ET 5/26 5 場 TBD → 3 公布 + 2 仍 TBD，含 Canning→Vásquez 替換 + Burke 認領 lost_to_others）/ 5/26 07:35（ET 5/27 + 5/28 recheck）
+
+## Follow-up（PRD 外）
+
+- [ ] **015 HITL gate 2 週觀察**（2026-05-26 起算，至 ~2026-06-09）— 觀察 C3 + C4 hard rule 觸發次數 + override / 誤殺紀錄。撤退門檻見 `issues/015-sop-deep-hard-rules.md` HITL gate 段。記錄檔案 `docs/stream-sp-hard-rules-observations.md`（待建）。
 
 ## Stage 2 完成標準
 
