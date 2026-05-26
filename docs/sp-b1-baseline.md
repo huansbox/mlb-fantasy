@@ -126,6 +126,7 @@ Per `docs/sp-b1-cutover-design.md` §4 + PRD §"Further Notes". Numeric threshol
 - **Sparse #149 fixture**: rationale-derived raw values only; many 5-slot percentiles null. Spike P1 match on this case may overstate consensus (LLMs may converge on Ragans regardless because his cited weakness signals are stark — but also may diverge if missing fields produce hedging). Treat #149 result as anchor reference, not aggregate-defining.
 - **FA fixture pool size mismatch**: #149 production had 12 FA; reconstruction kept 4 (Mize/McCullers/Lambert/Fedde). Smaller pool may inflate consensus if borderline candidates dropped from reconstruction were the disagreement source.
 - **Subscription rate limit**: 56 calls in one run. Spread spike across 2-3 sessions if rate-limit guards trip.
+- **Spike vs production disagreement (2026-05-26 observed)**: production daily issues 5/20-5/26 report SP `p1_match` rate 7/7 = 100%, but the spike (same date range, captured payload) shows only 3/6 ≈ 50%. B1 prompts (issues 005/006) were committed 2026-05-07 so both should run on B1 layer. Possible causes to investigate post-cutover: (a) captured payload subtly differs from what production actually sent to `claude -p` (e.g., date interpolation, ordering); (b) production cron LLM seeded differently than spike's parallel runs. Not blocking cutover — flag for week-1 observation period.
 
 ## Reproducing the spike
 
