@@ -21,14 +21,14 @@
 
 ## 落地藍圖
 
-### Stage 1（強 ROI · 3 vertical slices + 1 SOP refinement）
+### Stage 1（強 ROI · 3 vertical slices + 1 SOP refinement）— ✅ 4/4 merged 2026-05-26
 
-- **015 sop-deep-hard-rules**（US3 + US4）— **SOP refinement**（不是嚴格 vertical slice，純 SOP 文字升 hard rule，30 分鐘可完，熱身用）
-- **014 scan-auto-diff-pending**（US2）— `--pending-file` + pending_parser + emit pending_diff
-- **012 scan-add-vs-hand-split**（US1）— scan emit vs_hand_2026 + SOP 強弱表改 vs hand + PA<400 sample gate
-- **013 scan-add-sample-warning-tag**（US5）— scan emit sample_warning tag（**2026 only**）+ deep skill prompt 指引（非機械 demote）
+- **015 sop-deep-hard-rules**（US3 + US4）— **SOP refinement**（不是嚴格 vertical slice，純 SOP 文字升 hard rule，30 分鐘可完，熱身用）— ✅ commit `0407d5c`
+- **012 scan-add-vs-hand-split**（US1）— scan emit vs_hand_2026 + SOP 強弱表改 vs hand + PA<400 sample gate — ✅ commit `c350e3d`
+- **013 scan-add-sample-warning-tag**（US5）— scan emit sample_warning tag（**2026 only**）+ deep skill prompt 指引（非機械 demote）— ✅ commit `7e50f46`
+- **014 scan-auto-diff-pending**（US2）— `--pending-file` + pending_parser + emit pending_diff — ✅ commit `366365e`
 
-### Stage 2（次優先 · 1 個 vertical slice）
+### Stage 2（次優先 · 1 個 vertical slice）— ⏳ 0/1
 
 - **016 deep-batch-cli-and-comparison-raw**（US6）— mlb_query.py deep_batch + 比較表 raw JSON（**不依賴 014 pending_parser**，獨立可平行起跑，但建議排最後做避免 SOP 改動 stale）
 
