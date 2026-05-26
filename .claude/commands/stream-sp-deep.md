@@ -86,6 +86,10 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 -c "import jso
 - **不要用「連續 vs 非連續」二分**判定 outlier — 非連續但重複的崩盤（例：8 場內 2 次 ER≥4）一樣是 floor risk，不能因為「不相鄰」就當成單一 outlier 抹掉。
 - 看的是崩盤的**頻率 + 性質**：1 次孤立、前後皆穩 → floor 風險低；2 次以上，或都伴隨短局 / 多 HR → floor 風險高。
 
+> **Hard rule**：近 6 場對「弱打 vs SP 慣用手 OPS ≤.680」隊伍崩盤（ER≥4）→ floor risk「高」。觸發條件須滿足任一：(a) 近 6 場崩盤 ≥2 次，或 (b) 1 次崩盤 + 近 N 場 ERA ≥4.50。例外：PC<70 + IP<4 控管短局（PC 觸頂限制）不計入崩盤。
+>
+> Why: Rea 5/28（近 6 場 6.10 ERA + 對 CWS 4.2IP/4ER 5/17）vs Springs 4/19（單次 5IP/7ER/4HR 但後續 ERA 3.94 + SEA vs LHP .592 強訊號）— OR 雙條件避免單事件誤殺強訊號。
+
 ### 1d：近 N 場 ERA / QS rate
 
 **Default N=6**。若 game log 有明顯分界 — 例「開季 2 場 ER ≥5 → 後續 ER ≤3 連續」這種 inflection point，改用「分界後」的 N，**但 N 必須 ≥ 4 才有統計意義**（< 4 樣本太小，仍用 N=6 全季尾段）。
@@ -118,6 +122,10 @@ Helper 回 JSON dict，含 4 key：
 | `vs_hand` | season vs SP 慣用手 split — `pa` / `avg` / `obp` / `ops` / `k_pct` / `bb_pct` / `hand`（"R" or "L"）|
 
 ### 2b：讀完看
+
+> **Hard rule**：7d 與 14d 落差 ≥.080 + 7d 樣本 ≤6 場 → **強制 14d 為錨**，不可單獨依 7d 升 verdict。例外：明確 lineup 變動 / 主力傷退 / 換投手教練 / 球隊風格重大改變這類獨立支撐才能 override。
+>
+> Why: Cameron 5/27（NYY 30d→7d -.130 cool 但 vs LHP .788 強底盤 + 4/18 fingerprint）— LLM 違反 soft rule 升 ⚠️ 後事後判定該維持 ❌。
 
 - **趨勢方向**：7d vs 14d vs 30d OPS 是惡化 / 持平 / 回升？
   - ⚠️ **7d 是 ~6 場的噪音樣本**。讀 7d 必對照 14d/30d：7d 顯著偏離 14d 時，往「即將均值回歸」方向解讀，**不可把 7d 極端值本身當成對手實力**。窗口塌陷 / 熱化越陡（30d→14d→7d 落差越大）→ 越可能反彈 / 回落，不是越弱 / 越強。趨勢判斷以 14d 為主錨，7d 只用來定方向。
