@@ -261,7 +261,75 @@ def _apply_vs_hand_gate(raw, pa_threshold=VS_HAND_PA_THRESHOLD):
     }
 
 
-def scan(et_dates, *, fetchers):
+def compute_pending_diff(pending_evaluations, scan_result_for_date):
+    """Diff pending evaluations vs today's scan for one ET date.
+
+    Slot-based matching: each pending eval has (name, team, is_home). We look
+    up the (team, is_home) slot in today's scan and bucket by outcome:
+
+    - **still_starting**: same SP at the slot, in candidates or owned_by_me
+      (FA-or-mine + still starting)
+    - **lost_to_others**: same SP at the slot, in owned_by_others
+      (聯盟認領)
+    - **replaced**: different SP at the slot (incl. new=None when slot is TBD)
+    - **no_longer_scheduled**: that team has no slot today (球隊雨延 / 沒打)
+
+    Slot keying disambiguates homonyms (Clay Holmes NYM vs Grant Holmes ATL).
+    """
+    starters_by_slot: dict = {}  # (team, is_home) → {"name", "bucket"}
+    for bucket in ("candidates", "owned_by_me", "owned_by_others"):
+        for sp in scan_result_for_date.get(bucket, []):
+            starters_by_slot[(sp["team"], sp["is_home"])] = {
+                "name": sp["name"], "bucket": bucket,
+            }
+
+    tbd_slots: set = set()
+    for t in scan_result_for_date.get("tbd_games", []):
+        side = t.get("side")
+        if side in ("away", "both"):
+            tbd_slots.add((t["away"], False))
+        if side in ("home", "both"):
+            tbd_slots.add((t["home"], True))
+
+    teams_playing = (
+        {team for (team, _) in starters_by_slot}
+        | {team for (team, _) in tbd_slots}
+    )
+
+    still: list = []
+    lost: list = []
+    replaced: list = []
+    gone: list = []
+    for ev in pending_evaluations:
+        slot = (ev["team"], ev["is_home"])
+        starter = starters_by_slot.get(slot)
+        if starter and starter["name"] == ev["name"]:
+            if starter["bucket"] == "owned_by_others":
+                lost.append(ev["name"])
+            else:
+                still.append(ev["name"])
+        elif starter:
+            replaced.append({
+                "old": ev["name"], "new": starter["name"], "team": ev["team"],
+            })
+        elif slot in tbd_slots:
+            replaced.append({
+                "old": ev["name"], "new": None, "team": ev["team"],
+            })
+        elif ev["team"] not in teams_playing:
+            gone.append(ev["name"])
+        else:
+            # Team plays today but pending side has no slot — defensive fallback
+            gone.append(ev["name"])
+    return {
+        "still_starting": still,
+        "lost_to_others": lost,
+        "replaced": replaced,
+        "no_longer_scheduled": gone,
+    }
+
+
+def scan(et_dates, *, fetchers, pending_data=None):
     result = {}
     for et_date in et_dates:
         sched_json = fetchers.schedule_fn(et_date)
@@ -313,6 +381,17 @@ def scan(et_dates, *, fetchers):
             "owned_by_me": [_starter_to_summary(s) for s in cross.owned_by_me],
             "owned_by_others": [_starter_to_summary(s) for s in cross.owned_by_others],
         }
+
+    if pending_data is not None:
+        diff: dict = {}
+        for et_date in et_dates:
+            day_pending = pending_data.get(et_date)
+            day_scan = result.get(et_date)
+            if day_pending and day_scan:
+                diff[et_date] = compute_pending_diff(
+                    day_pending.get("evaluations", []), day_scan,
+                )
+        result["pending_diff"] = diff
     return result
 
 
@@ -534,20 +613,39 @@ def build_real_fetchers():
 def main():
     import argparse
     import json as _json
+    import sys
+    from pathlib import Path
 
     parser = argparse.ArgumentParser(
-        description="Stream SP scan — pipeline Step 2-6 (schedule + FA cross-check + v4 + opener filter + opponent strength)",
+        description="Stream SP scan — pipeline Step 2-6 (schedule + FA cross-check + v4 + opener filter + opponent strength + optional pending diff)",
     )
     parser.add_argument(
         "--et-dates", required=True,
         help="comma-separated ET dates, e.g. 2026-05-14,2026-05-15",
+    )
+    parser.add_argument(
+        "--pending-file",
+        help="path to stream-sp-pending.md — when given, emit top-level pending_diff key",
     )
     parser.add_argument("--pretty", action="store_true", help="pretty-print JSON")
     args = parser.parse_args()
 
     et_dates = [d.strip() for d in args.et_dates.split(",") if d.strip()]
     fetchers = build_real_fetchers()
-    result = scan(et_dates, fetchers=fetchers)
+
+    pending_data = None
+    if args.pending_file:
+        pf = Path(args.pending_file)
+        if pf.exists():
+            from pending_parser import parse_pending  # type: ignore[import-not-found]
+            pending_data = parse_pending(pf.read_text(encoding="utf-8"))
+        else:
+            print(
+                f"Warning: --pending-file {args.pending_file} not found, "
+                "skipping pending_diff", file=sys.stderr,
+            )
+
+    result = scan(et_dates, fetchers=fetchers, pending_data=pending_data)
     indent = 2 if args.pretty else None
     print(_json.dumps(result, indent=indent, ensure_ascii=False, default=str))
 

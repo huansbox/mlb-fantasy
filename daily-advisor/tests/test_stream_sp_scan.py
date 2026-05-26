@@ -10,6 +10,7 @@ from stream_sp_scan import (
     _apply_vs_hand_gate,
     _enrich_v4,
     classify_opener,
+    compute_pending_diff,
     compute_sample_warning,
     cross_check_fa,
     parse_schedule,
@@ -850,3 +851,170 @@ class TestScanSampleWarning:
         assert c["v4_2026"]["v4_available"] is False
         # v4 unavailable 時 sample_warning 也應該是 None — 沒材料判斷信心
         assert c["sample_warning"] is None
+
+
+# ── Pending diff (issue 014) ────────────────────────────────────────────────
+
+
+def _scan_day(
+    *,
+    candidates=(),
+    owned_by_me=(),
+    owned_by_others=(),
+    tbd_games=(),
+):
+    """Stub a scan_result_for_date dict for compute_pending_diff tests."""
+    def _starter_summary(name, team, is_home):
+        return {
+            "name": name, "mlb_id": 0, "team": team,
+            "opponent": "XXX", "is_home": is_home,
+        }
+    return {
+        "tbd_games": list(tbd_games),
+        "candidates": [_starter_summary(*c) for c in candidates],
+        "owned_by_me": [_starter_summary(*c) for c in owned_by_me],
+        "owned_by_others": [_starter_summary(*c) for c in owned_by_others],
+    }
+
+
+class TestComputePendingDiff:
+    def test_still_starting_when_pending_sp_in_candidates(self):
+        # Alexander 在 candidates 仍是 FA + 仍 starter
+        pending = [{"name": "Jason Alexander", "team": "HOU", "is_home": False}]
+        day = _scan_day(candidates=[("Jason Alexander", "HOU", False)])
+        diff = compute_pending_diff(pending, day)
+        assert diff == {
+            "still_starting": ["Jason Alexander"],
+            "lost_to_others": [],
+            "replaced": [],
+            "no_longer_scheduled": [],
+        }
+
+    def test_lost_to_others_when_pending_sp_in_owned_by_others(self):
+        # Burke 被聯盟認領 → 出現在 owned_by_others
+        pending = [{"name": "Sean Burke", "team": "CWS", "is_home": True}]
+        day = _scan_day(owned_by_others=[("Sean Burke", "CWS", True)])
+        diff = compute_pending_diff(pending, day)
+        assert diff["lost_to_others"] == ["Sean Burke"]
+        assert diff["still_starting"] == []
+
+    def test_replaced_when_slot_has_different_starter(self):
+        # Canning (SD home) 原評估，但 SD home 今天換 Vásquez
+        pending = [{"name": "Griffin Canning", "team": "SD", "is_home": True}]
+        day = _scan_day(candidates=[("Randy Vásquez", "SD", True)])
+        diff = compute_pending_diff(pending, day)
+        assert diff["replaced"] == [
+            {"old": "Griffin Canning", "new": "Randy Vásquez", "team": "SD"},
+        ]
+        assert diff["still_starting"] == []
+
+    def test_no_longer_scheduled_when_team_absent(self):
+        # 該 SP 的球隊今天根本沒比賽（雨延等）
+        pending = [{"name": "Some SP", "team": "BAL", "is_home": True}]
+        day = _scan_day(candidates=[("Other SP", "NYY", False)])
+        diff = compute_pending_diff(pending, day)
+        assert diff["no_longer_scheduled"] == ["Some SP"]
+
+    def test_replaced_with_null_new_when_slot_becomes_tbd(self):
+        # 原 starter 拉下但替補未公布 → slot TBD → 視為 replaced, new=null
+        pending = [{"name": "Pulled SP", "team": "NYY", "is_home": True}]
+        day = _scan_day(tbd_games=[{"away": "BOS", "home": "NYY", "side": "home"}])
+        diff = compute_pending_diff(pending, day)
+        assert diff["replaced"] == [
+            {"old": "Pulled SP", "new": None, "team": "NYY"},
+        ]
+
+    def test_homonym_disambiguated_by_team_slot(self):
+        # 邊界：pending = Clay Holmes (NYM home)，今天 Grant Holmes 在 ATL away (FA)
+        # 不可因「Holmes 在 candidates」就標 still_starting
+        pending = [{"name": "Clay Holmes", "team": "NYM", "is_home": True}]
+        day = _scan_day(
+            candidates=[("Grant Holmes", "ATL", False)],
+            owned_by_others=[("Replacement", "NYM", True)],
+        )
+        diff = compute_pending_diff(pending, day)
+        # NYM home 今天是 Replacement (不是 Clay)，視為 replaced
+        assert diff["replaced"] == [
+            {"old": "Clay Holmes", "new": "Replacement", "team": "NYM"},
+        ]
+        assert diff["still_starting"] == []
+        assert diff["lost_to_others"] == []
+
+    def test_multiple_pending_sps_routed_to_correct_buckets(self):
+        # 5/26 場景：4 位 pending，3 still + 1 lost + 1 replaced + 0 gone
+        pending = [
+            {"name": "Jason Alexander", "team": "HOU", "is_home": False},
+            {"name": "Kyle Freeland", "team": "COL", "is_home": False},
+            {"name": "Sean Burke", "team": "CWS", "is_home": True},
+            {"name": "Griffin Canning", "team": "SD", "is_home": True},
+        ]
+        day = _scan_day(
+            candidates=[
+                ("Jason Alexander", "HOU", False),
+                ("Kyle Freeland", "COL", False),
+                ("Randy Vásquez", "SD", True),
+            ],
+            owned_by_others=[("Sean Burke", "CWS", True)],
+        )
+        diff = compute_pending_diff(pending, day)
+        assert sorted(diff["still_starting"]) == ["Jason Alexander", "Kyle Freeland"]
+        assert diff["lost_to_others"] == ["Sean Burke"]
+        assert diff["replaced"] == [
+            {"old": "Griffin Canning", "new": "Randy Vásquez", "team": "SD"},
+        ]
+        assert diff["no_longer_scheduled"] == []
+
+
+class TestScanPendingDiffEmission:
+    """Top-level `pending_diff` key emission in scan() output (issue 014)."""
+
+    def _basic_fetchers_with_burke_as_fa(self):
+        schedule = {"dates": [{"games": [{
+            "teams": {
+                "away": {
+                    "team": {"id": 145},
+                    "probablePitcher": {"id": 680732, "fullName": "Sean Burke"},
+                },
+                "home": {
+                    "team": {"id": 112},
+                    "probablePitcher": {"id": 9999, "fullName": "Owned Cub"},
+                },
+            },
+        }]}]}
+        return _build_fetchers(
+            schedule=schedule,
+            fa_entries=[FAEntry(name="Sean Burke", percent_owned="25%")],
+            game_logs={680732: [GameLog("d", 1, 5.0)] * 6},
+            team_ops={"CHC": 0.702},
+        )
+
+    def test_no_pending_data_omits_pending_diff_key(self):
+        # 不給 pending_data → JSON 不含 pending_diff key
+        fetchers = self._basic_fetchers_with_burke_as_fa()
+        result = scan(["2026-05-15"], fetchers=fetchers)
+        assert "pending_diff" not in result
+
+    def test_pending_data_given_emits_pending_diff_with_overlap_date(self):
+        # 給 pending_data + ET 日重疊 → diff 被計算
+        fetchers = self._basic_fetchers_with_burke_as_fa()
+        pending_data = {
+            "2026-05-15": {
+                "tbd_games": [],
+                "evaluations": [{"name": "Sean Burke", "team": "CWS", "is_home": False}],
+            },
+        }
+        result = scan(["2026-05-15"], fetchers=fetchers, pending_data=pending_data)
+        assert "pending_diff" in result
+        assert result["pending_diff"]["2026-05-15"]["still_starting"] == ["Sean Burke"]
+
+    def test_pending_data_given_but_no_overlap_emits_empty_dict(self):
+        # 給 pending_data 但無日期重疊 → emit empty dict（表示 pending mode 開啟但無對應）
+        fetchers = self._basic_fetchers_with_burke_as_fa()
+        pending_data = {
+            "2026-05-30": {
+                "tbd_games": [],
+                "evaluations": [{"name": "Other", "team": "NYY", "is_home": True}],
+            },
+        }
+        result = scan(["2026-05-15"], fetchers=fetchers, pending_data=pending_data)
+        assert result["pending_diff"] == {}

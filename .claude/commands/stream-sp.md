@@ -81,13 +81,23 @@ ET 2026-05-09：14 場 / 12 TBD
 對 Step 0/1 確定的 ET 日期清單，一次呼叫（`bin/vps-run.sh` 自動處理 SSH 間歇卡死的 timeout + retry，見 `issues/vps-ssh-handshake-hang.md`）：
 
 ```bash
-bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan.py --et-dates 2026-05-14,2026-05-15 2>/dev/null'
+bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan.py --et-dates 2026-05-14,2026-05-15 --pending-file stream-sp-pending.md 2>/dev/null'
 ```
+
+`--pending-file`（issue 014）讓 scan 自動 diff pending file 該 ET 日的 evaluations vs 當天 scan 結果，避免補查模式手動掃 schedule 變動 / 失效 SP。**補查模式必加**，首次評估 / 重跑模式也可加（pending 無該 ET 日 → 對應 diff 不出現）。檔案不存在 → log warning + 跳過 pending_diff，scan 仍正常跑。
 
 `stdout = JSON`，schema：
 
 ```json
 {
+  "pending_diff": {                       // ← 只在 --pending-file 給定時才存在
+    "2026-05-15": {
+      "still_starting": ["Jason Alexander", "Kyle Freeland"],
+      "lost_to_others": ["Sean Burke"],
+      "replaced": [{"old": "Griffin Canning", "new": "Randy Vásquez", "team": "SD"}],
+      "no_longer_scheduled": []
+    }
+  },
   "2026-05-15": {
     "tbd_games": [
       {"away": "PHI", "home": "PIT", "side": "both|away|home"}
@@ -176,26 +186,37 @@ WebSearch 結論：
 - **真先發 + 預期 IP ≥ 5** → 過關進主表
 - **Opener / piggyback / 沒拉長 → 預期 IP ≤ 4** → 移到「已過濾 / Opener 排除」段（QS 機率太低，串流 ROI 差）
 
-### 補查模式：對照 pending TBD list
+### 補查模式：用 pending_diff 偵測失效 SP（issue 014）
 
-scan 對 `--et-dates` 給的所有日期都跑完整流程（**不**做 TBD-only filter — scan 不讀 pending file）。**補查模式下 LLM 拿到 JSON 後**：
-- 對照 `daily-advisor/stream-sp-pending.md` 該 ET 日的 TBD list
-- candidates 中對應 pending TBD 的 starter 視為「新評」（Step 7 報告 SP 名前加 🆕 標記）
-- TBD list 中已不在 `tbd_games` 的場次 = starter 已公布 → 該 starter 應出現在 candidates / owned_by_me / owned_by_others 三者之一
+scan 對 `--et-dates` 給的所有日期都跑完整流程，**並**讀 `--pending-file` 自動算 pending vs 今日 diff。**補查模式下 LLM 拿到 JSON 後**：
 
-scan 不知道 pending file 存在，pending diff 是 LLM 的職責。
+- 對照 `tbd_games` vs pending file 該 ET 日的 TBD list — 已不在 `tbd_games` 的場次 = starter 已公布
+- 新公布的 starter（在 candidates）視為「新評」（Step 7 報告 SP 名前加 🆕 標記）
+- 從 `pending_diff[et_date]` 讀失效 SP（不再手動 cross-check candidates / owned_by_others）：
+  - `still_starting` — 舊評帶回，仍 valid
+  - `lost_to_others` — 標註「已被聯盟認領」，舊評帶回時加註記
+  - `replaced` — 標註「換 starter」（`old` → `new`，若 `new: null` 則表示原 starter 拉下但替補未公布），舊評移到「已過濾」段或標 invalid
+  - `no_longer_scheduled` — 標註「球隊今天沒打」，舊評移到「已過濾」段
+
+**Fallback**：若 scan JSON 沒有 `pending_diff` key（舊 scan 版本 / `--pending-file` 漏給），LLM 退回手動 cross-check candidates / owned_by_others / tbd_games。
 
 ## Step 7：整合報告
 
-### 補查模式：合併呈現舊 evaluations + 新評
+### 補查模式：合併呈現舊 evaluations + 新評（用 pending_diff 過濾失效）
 
 **僅補查模式（Step 0b 走補查模式 + 該 ET 日有舊 pending）才執行此段**：
 
 1. 從 pending file 讀回該 ET 日 `### 已評估` 表格的 row（舊評）。**「舊評」嚴格僅指此表格內容，不含上次或當次報告的「已過濾」段（Sum<15 hard floor / Rotation gate / Owned 別隊 / Owned 自家）**。已過濾的候選不持久化、不帶回 — 它們是結構性結論，補查時新評同樣的 filter 邏輯會再排除一次。
-2. 新評的 row 在 SP 名前面加 `🆕` 標記
-3. 合併新舊兩份清單，按 v4 Sum26 由高到低排序
-4. 在主表「FA 真先發候選」中合併呈現（**不分舊/新兩段**，只用 🆕 標記區分）
-5. 報告開頭加一行：「補查 ET {日期}：新評 {N} 位（🆕 標記），舊評 {M} 位帶回」
+2. **從 scan JSON 的 `pending_diff[et_date]` 篩選舊評**：
+   - `still_starting` 內的 SP — 舊評帶回，無註記
+   - `lost_to_others` 內的 SP — 舊評帶回，名後加「（已被別隊認領）」標註
+   - `replaced` 內的 SP — 舊評移到「已過濾 / 已換 starter」段（顯示 `old → new`，`new=null` 顯示「→ TBD」）
+   - `no_longer_scheduled` 內的 SP — 舊評移到「已過濾 / 球隊今日無賽」段
+   - **若 scan JSON 缺 `pending_diff` key**（舊 scan / 漏給 `--pending-file`）→ fallback 舊邏輯：手動 cross-check 每個 pending SP 是否在 candidates / owned_by_others / tbd_games，沒命中視為 no_longer_scheduled
+3. 新評的 row 在 SP 名前面加 `🆕` 標記
+4. 合併新舊兩份清單（過濾掉失效舊評後），按 v4 Sum26 由高到低排序
+5. 在主表「FA 真先發候選」中合併呈現（**不分舊/新兩段**，只用 🆕 標記區分）
+6. 報告開頭加一行：「補查 ET {日期}：新評 {N} 位（🆕 標記），舊評 {M} 位帶回（{X} 位失效：{lost_to_others/replaced/no_longer_scheduled 摘要}）」
 
 **特殊情況：補查無新 starter 公布（新評 = 0）**
 
