@@ -506,12 +506,19 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 - [ ] **Severino transformation 驗證**（觀察中，啟動 2026-05-02）：v4 機械層季線 Sum 25 被前 5 場污染，近 2 場 transformation level（ERA 1.32 / BB/9 1.97 P80+ / IP/GS 6.83 P90+）。下 2 場驗證 BB ≤2 / IP ≥6 / 主場 ER ≤2，全通過從 borderline 轉正式 anchor；任一失守降回觀察。詳見 `waiver-log.md` 「隊上觀察」段
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **SP 21d Δ xwOBACON 絕對門檻校準**（v4 cutover 後 1-2 個月）：v4 上線後 Python `_factor_rolling` 暫返回 0（門檻借 batter 風險太大、SP 池 n~18 算 P25/P50/P75 不可信），原始 Δ + BBE 餵 Claude 用絕對量級提示判斷（|Δ| <0.030 / 0.030-0.050 / ≥0.050）。校準路徑：累積 1-2 個月後從 GitHub Issue archive 反推全期 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。詳見 `docs/sp-framework-v4-balanced.md` §「Step 2 — Urgency 排序」決策 1/4。
-- [ ] **B1 cutover — 觀察期執行中**（2026-05-26 cutover 上線，觀察期 4 週至 2026-06-22）：SP Phase 6 已對齊 Batter v4 thin。完整脈絡 `docs/sp-b1-cutover-design.md`，PRD `issues/prd.md`，觀察期 SOP `docs/sp-b1-observation.md`。
+- [ ] **SP B2 thin + collapse cutover**（2026-05-27 設計凍結，待動工）— PRD `issues/prd-sp-b2-thin.md`；10 vertical slices `issues/017-026`。**將取代 B1 觀察期**（issue 025 cutover commit 上線後 B1 觀察期實質終止）。
+  - **設計要點**：(1) 砍 2025 prior 走 thin mechanical layer (2) collapse Phase 6 multi-agent → single-LLM 2-step（Step A rank+classify / Step B verdict）(3) M1/M4' 觀察期機制廢退，改用 backtest 自動化（Use Case A）+ weekly_review human spot check (4) anchor 機制（cant_cut + 新 `weekly_anchor_sp`）取代 slump hold
+  - **Day-1 可平行動工**：017 (anchor_filter) / 018 (payload_slimmer) / 019 (metrics_reader) / 022 (design docs)
+  - **依賴順序**：017 → 020 → 021 → {023, 024} → 025 cutover；017 → 026 平行；022 獨立先做
+  - **進度**：017 / 018 / 019 / 020 / 021 / 022 / 023 / 024 / 025 / 026（全 pending）
+  - **追蹤方式**：每 issue acceptance criteria checklist 勾選；完成在 issue 頂端加 `## Status ✅ Completed YYYY-MM-DD (commit hash)`；commit message 寫 `feat(sp-b2): close issue NNN — ...`
+  - **Backlog 不算本 milestone**：Backtest Use Case B（xwOBACON 校準）4-6 週後數據累積觸發；`/weekly-anchor` skill；CLAUDE.md cleanup Task 2
+- [ ] **B1 cutover — 觀察期執行中**（2026-05-26 cutover 上線，觀察期 4 週至 2026-06-22）：SP Phase 6 已對齊 Batter v4 thin。完整脈絡 `docs/sp-b1-cutover-design.md`，PRD `issues/prd.md`，觀察期 SOP `docs/sp-b1-observation.md`。**將被 B2 cutover (issue 025) 取代** — B1 撤退門檻 (M1/M4') 在 B2 設計上會 saturate，B2 改用 backtest + spot check。
   - **進度（2026-05-26）**：001-008 ✅ 完成；009 ✅ VPS pull + reader smoke 過，等明天 cron 首次 emit 新欄位
   - **008 baseline 結果**：M1 SP 57.1% / M1 FA 42.9% / M4' SP+FA 42.9%（top-pair only）。M4 (any-pair) baseline 100% saturated → 退役改用 M4'。撤退門檻：M1 < 0.036 OR M4' > 75% 連 2 週
   - **每週日跑**：`bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 metrics_reader.py --days 7'`→ 結果記進 `docs/sp-b1-observation.md` Weekly log → 比對撤退門檻
   - **2026-05-27 早上首件 acceptance**：`gh issue view <最新> -R huansbox/mlb-fantasy` 確認 body 結尾 `<!-- phase6_metrics ... -->` 含 `sp_p1_pair_borderline` + `fa_top1_pair_borderline` 兩個新欄位
-  - **動 SP / Phase 6 / fa_compute / _phase6_sp / 5 個 sp prompt 之前**：先確認觀察期 4 週是否還在執行中，避免衝突
+  - **B2 cutover 上線前**：B1 觀察期繼續執行；B2 issue 025 cutover 完成後本 TODO 條目關閉
 - [ ] **011 stream-sp-deep e2e parity**（HITL，2026-05-26 補追蹤）：010 已 merged 半個月但 011 parity 驗證未做。對齊 2026-05-16 prior session 三 SP 深評（Cade Cavalli vs BAL / Chris Paddack vs CLE / Chris Bassitt vs WSH）— 重跑 refactored skill 與當時手算數字比對（game log / 對手 7d-14d-30d OPS / vs RHP split）。Divergence 要 root cause 文件化。詳見 [`issues/011-stream-sp-deep-e2e-parity.md`](issues/011-stream-sp-deep-e2e-parity.md)。
 - [ ] **player-eval-sp.md 4 處 SSH 改 vps-run.sh wrapper**（2026-05-20 拆出 issue，2026-05-26 補追蹤）：F2 wrapper 已上但 `docs/player-eval-sp.md` 4 處裸 SSH（含 2 處 `python3 << EOF` here-doc）未納入。`/player-eval` 是高頻 skill 受同一 SSH handshake 卡死影響。Here-doc 經多層解析 quoting 存活率低，需轉 VPS 端腳本後再納入。詳見 [`issues/player-eval-sp-ssh-wrapper.md`](issues/player-eval-sp-ssh-wrapper.md)。
 - [ ] **SP / Batter 框架對稱性檢視**（B1 cutover 已對齊 SP，2026-05-26 SP 上線）：原 batter Phase 6 multi-agent 上線時觸發 → 已先動 SP（基於 lazy 引用 Sum 觀察）。Batter Phase 6 上線時要重評是否仍按原計畫升 batter，或 batter 留 thin（已對稱無需動）。
