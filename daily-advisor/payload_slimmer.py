@@ -1,8 +1,9 @@
-"""LLM-safe Phase 6 SP payload slimming.
+"""LLM-safe SP payload slimming for B2 thin pipeline.
 
-B1 keeps raw SP signals visible to the LLM while removing mechanical anchors
-that can short-circuit independent reasoning: v4 Sum, urgency factors, and
-evaluation verdict tags.
+Keeps raw SP signals visible to the LLM while removing mechanical anchors that
+short-circuit independent reasoning: v4 Sum, urgency factors, 2025 prior data,
+and obsolete evaluation verdict tags. B2 thin design: 2026-only data, expanded
+2026/21d-based tag whitelist.
 """
 
 from __future__ import annotations
@@ -25,7 +26,21 @@ _V4_REVERSE = {"bb9", "xwobacon"}
 
 _PA_TAGS = {"✅ 球隊主力", "⚠️ 上場有限"}
 _SAMPLE_TAGS = {"⚠️ 樣本小", "⚠️ 短局", "⚠️ IL 短期", "⚠️ Swingman 角色"}
-_ALLOWED_TAGS = _PA_TAGS | _SAMPLE_TAGS
+_ADD_TAGS_2026 = {
+    "✅ 深投型",
+    "✅ GB 重型",
+    "✅ K 壓制",
+    "✅ 撿便宜運氣",
+    "✅ 近況確認",
+}
+_WARN_TAGS_2026 = {
+    "⚠️ xwOBACON 極端",
+    "⚠️ K 壓制不足",
+    "⚠️ Command 警示",
+    "⚠️ 賣高運氣",
+    "⚠️ 近況下滑",
+}
+_ALLOWED_TAGS = _PA_TAGS | _SAMPLE_TAGS | _ADD_TAGS_2026 | _WARN_TAGS_2026
 
 
 def _v4_percentile(value, metric: str) -> int | None:
@@ -82,17 +97,16 @@ def _filtered_tags(entry: dict) -> tuple[list[str], list[str]]:
 
 
 def slim_entry(full_entry: dict, role: Role) -> dict:
-    """Return a B1 LLM-safe payload for one SP entry.
+    """Return a B2 LLM-safe payload for one SP entry.
 
     Args:
-        full_entry: Full my-team or FA entry from the Phase 6 compute layer.
+        full_entry: Full my-team or FA entry from the SP compute layer.
         role: ``"my_team"`` or ``"fa"``. FA role keeps ownership fields.
     """
     if role not in ("my_team", "fa"):
         raise ValueError(f"unknown payload role: {role}")
 
     sv4 = full_entry.get("savant_v4") or {}
-    prior = full_entry.get("prior_stats") or {}
     bbe = sv4.get("bbe", full_entry.get("bbe"))
     add_tags, warn_tags = _filtered_tags(full_entry)
     pa_tags = [t for t in add_tags + warn_tags if t in _PA_TAGS]
@@ -116,10 +130,6 @@ def slim_entry(full_entry: dict, role: Role) -> dict:
                 "k9": sv4.get("k9"),
                 "whip": sv4.get("whip"),
             },
-        },
-        "prior_v4": {
-            "ip": prior.get("ip"),
-            "slots": _slot_metrics(prior),
         },
         "rolling_21d": _rolling_payload(full_entry, sv4),
         "pa_tags": pa_tags,

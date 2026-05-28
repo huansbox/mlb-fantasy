@@ -1,5 +1,7 @@
 # SP B1 Cutover — Observation Period SOP
 
+> **Superseded** by [`docs/sp-b2-cutover-design.md`](sp-b2-cutover-design.md). B1 observation period aborted at B2 cutover — M1/M4' metrics retired with multi-agent collapse. Kept for archival reference.
+
 > Issue: `issues/009-b1-production-cutover.md` · Baseline: `docs/sp-b1-baseline.md` · Design: `docs/sp-b1-cutover-design.md`
 
 ## Status
@@ -21,14 +23,15 @@
 
 Both rules are OR-combined: either firing trips the retreat. M4 (any-pair) rule retired — baseline saturated 100%.
 
-## Weekly review SOP (every Sunday)
+## Weekly review SOP (every Sunday) — RETIRED
+
+> **Retired**: `metrics_reader.py` deleted in B2 cutover (issue 019, commit `050dc82`). M1/M4' metrics retired with Phase 6 multi-agent collapse. The commands below no longer run. Replaced by `backtest_track.py` (issue 024) + `/weekly-review` Phase 1D human spot check (issue 026). See `docs/sp-b2-cutover-design.md` §"Quality Monitoring".
 
 ```bash
-cd /opt/mlb-fantasy/daily-advisor
-python3 metrics_reader.py --days 7
+# RETIRED — no longer runnable post-B2:
+# cd /opt/mlb-fantasy/daily-advisor
+# python3 metrics_reader.py --days 7
 ```
-
-Or locally via `bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 metrics_reader.py --days 7'`.
 
 Output is JSON. Compare against thresholds:
 

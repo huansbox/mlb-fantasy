@@ -162,19 +162,30 @@ class TestPickWeakestV4SP:
         assert actual == sum_score
         return profile
 
-    def test_sum_hard_floor_boundary(self):
+    def test_b2_no_sum_hard_floor_all_pool_members_included(self):
+        """B2 thin: Sum ≥40 hard floor removed; all eligible SPs enter pool."""
         players = [
             self._sp("Sum39", self._profile_for_sum(39)),
             self._sp("Sum40", self._profile_for_sum(40)),
             self._sp("Sum41", self._profile_for_sum(41)),
         ]
-        weakest, excluded = pick_weakest_v4_sp(players, n=4)
+        weakest, excluded = pick_weakest_v4_sp(players, n=3)
 
-        assert [p["name"] for p in weakest] == ["Sum39"]
-        assert weakest[0]["score"] == 39
+        assert [p["name"] for p in weakest] == ["Sum39", "Sum40", "Sum41"]
+        assert [p["score"] for p in weakest] == [39, 40, 41]
         assert excluded == []
 
-    def test_cant_cut_precedes_sum_filter(self):
+    def test_default_n_is_3(self):
+        """B2 default n=3 (down from B1 n=4) — eligible pool typically 3-5 SPs."""
+        players = [
+            self._sp(f"S{i}", self._profile_for_sum(39)) for i in range(5)
+        ]
+        # explicitly call without n to verify default
+        weakest, _ = pick_weakest_v4_sp(players)
+        assert len(weakest) == 3
+
+    def test_cant_cut_anchor_excluded(self):
+        """cant_cut routes through anchor_filter (list, case-insensitive)."""
         player = self._sp(
             "Protected Low Sum",
             {"ip_gs": 5.33, "whiff_pct": 26.5, "bb9": 3.38,
@@ -182,16 +193,44 @@ class TestPickWeakestV4SP:
         )
         weakest, excluded = pick_weakest_v4_sp(
             [player],
-            n=4,
-            cant_cut={"protected low sum"},
+            n=3,
+            cant_cut=["protected low sum"],
         )
 
         assert weakest == []
         assert excluded == []
 
-    def test_bbe_filter_precedes_sum_filter(self):
+    def test_weekly_anchor_excluded(self):
+        """B2 new: weekly_anchor_sp routes through same anchor_filter."""
+        player = self._sp(
+            "Weekly Anchor",
+            {"ip_gs": 5.33, "whiff_pct": 26.5, "bb9": 3.38,
+             "gb_pct": 40.8, "xwobacon": 0.424},
+        )
+        weakest, excluded = pick_weakest_v4_sp(
+            [player],
+            n=3,
+            weekly_anchor=["weekly anchor"],
+        )
+        assert weakest == []
+
+    def test_both_anchor_lists_combined(self):
+        """cant_cut + weekly_anchor both remove from pool."""
+        a = self._sp("CantCutGuy", self._profile_for_sum(39))
+        b = self._sp("WeeklyGuy", self._profile_for_sum(39))
+        c = self._sp("OpenGuy", self._profile_for_sum(39))
+        weakest, _ = pick_weakest_v4_sp(
+            [a, b, c],
+            n=3,
+            cant_cut=["CantCutGuy"],
+            weekly_anchor=["WeeklyGuy"],
+        )
+        assert [p["name"] for p in weakest] == ["OpenGuy"]
+
+    def test_bbe_filter_still_applied(self):
+        """BBE<30 → low_confidence_excluded (unchanged from B1)."""
         player = self._sp("Low BBE High Sum", self._profile_for_sum(41), bbe=29)
-        weakest, excluded = pick_weakest_v4_sp([player], n=4)
+        weakest, excluded = pick_weakest_v4_sp([player], n=3)
 
         assert weakest == []
         assert excluded == [{
@@ -200,6 +239,16 @@ class TestPickWeakestV4SP:
             "bbe": 29,
             "note": "BBE 小樣本，驗證期暫不排序",
         }]
+
+    def test_sum_ascending_order_preserved(self):
+        """Pool sorted by Sum ascending — lowest Sum first."""
+        players = [
+            self._sp("Mid", self._profile_for_sum(40)),
+            self._sp("High", self._profile_for_sum(41)),
+            self._sp("Low", self._profile_for_sum(39)),
+        ]
+        weakest, _ = pick_weakest_v4_sp(players, n=3)
+        assert [p["name"] for p in weakest] == ["Low", "Mid", "High"]
 
 
 # ── rotation_gate_v4 ──
@@ -496,18 +545,20 @@ class TestComputeFaTagsV4Sp:
             "IP/GS": 4, "Whiff%": 2, "BB/9": 3, "GB%": 2, "xwOBACON": 4,
         }
 
-    def test_win_gate_fail_returns_empty_tags(self):
+    def test_win_gate_fail_still_computes_tags_b2(self):
+        """B2: tags computed regardless of win_gate; payload_slimmer filters."""
         from fa_compute import compute_fa_tags_v4_sp
         anchor = self._make_player("A", 20,
             {"IP/GS": 4, "Whiff%": 4, "BB/9": 4, "GB%": 4, "xwOBACON": 4})
         fa = self._make_player("B", 23,
             {"IP/GS": 5, "Whiff%": 4, "BB/9": 5, "GB%": 4, "xwOBACON": 5})
-        # Sum diff = 3 < 5 → gate fail
+        # Sum diff = 3 < 5 → gate fails, but tags still computed
         result = compute_fa_tags_v4_sp(fa, anchor)
         assert result["win_gate_passed"] is False
-        assert result["add_tags"] == []
-        assert result["warn_tags"] == []
-        assert result["sum_diff"] == 3  # diff still computed for diagnostics
+        assert result["sum_diff"] == 3
+        # add_tags / warn_tags are computed, not short-circuited to empty
+        assert isinstance(result["add_tags"], list)
+        assert isinstance(result["warn_tags"], list)
 
     def test_win_gate_pass_computes_tags(self):
         from fa_compute import compute_fa_tags_v4_sp

@@ -157,7 +157,6 @@ def _sp_bbe_excluded(bbe: int) -> bool:
 # docs/batter-framework-upgrade-design.md §3.1.
 _BATTER_BBE_MIN = 40
 _BATTER_SUM_HARD_FLOOR = 25  # Sum >=25 → strong, not a drop candidate
-_SP_SUM_HARD_FLOOR = 40  # Sum >=40 → strong, not a drop candidate (B1 default)
 
 
 def _batter_bbe_excluded(bbe: int) -> bool:
@@ -233,10 +232,8 @@ def pick_weakest(
 
 
 # Prior IP <20 → too small a sample to count as v4 SP prior data.
-# CLAUDE.md rule: "2025 Sum 雙年檢核（需 2025 IP ≥50）" for Slump hold gate,
-# but the base Sum scoring also skips on <20 IP to avoid 5-IP noise.
+# Base Sum scoring skips on <20 IP to avoid 5-IP noise.
 _PRIOR_IP_MIN = 20
-_PRIOR_IP_SLUMP_HOLD_MIN = 50
 
 # Luck tag (xERA-ERA diff) needs enough BBE for xERA to be stable.
 # BBE <40 → suppress luck tag to avoid mislabeling崩盤中 cases as 賣高運氣
@@ -251,8 +248,9 @@ def compute_urgency(
 ) -> dict:
     """Batter v4 thin passthrough — no factors, no Slump hold.
 
-    SP path uses compute_urgency_v4_sp (4-factor + Slump hold). Slump hold for
-    batter is handled by cant_cut list (docs/batter-framework-upgrade-design.md §1.2).
+    SP path uses `pick_weakest_v4_sp` directly (B2 thin — no urgency machinery;
+    see `docs/sp-b2-cutover-design.md`). Slump hold for batter is handled by
+    cant_cut list (docs/batter-framework-upgrade-design.md §1.2).
 
     Each weakest entry should include:
         score         — 2026 Sum (from pick_weakest)
@@ -625,31 +623,15 @@ def luck_tag_v4(
 
 
 def v4_add_tags_sp(fa: dict) -> list[str]:
-    """v4 ✅ tags for SP FA candidate.
+    """v4 ✅ tags for SP FA candidate (B2 thin — 2026-only signals).
 
     Expects fa dict with:
       savant_v4: {ip_gs, whiff_pct, bb9, gb_pct, xwobacon, xera, era, bbe}
-      prior_stats: 2025 data for 雙年菁英 check
       rolling_21d: optional {xwobacon, bbe}
     """
     tags = []
     sv = fa.get("savant_v4") or {}
-    prior = fa.get("prior_stats") or {}
     rolling = fa.get("rolling_21d") or {}
-
-    # ✅ 雙年菁英 — 2025 v4 Sum ≥ 40 AND 2025 IP ≥ 50
-    prior_ip = prior.get("ip")
-    if prior_ip and prior_ip >= 50:
-        prior_v4_data = {
-            "ip_gs": prior.get("ip_gs"),
-            "whiff_pct": prior.get("whiff_pct"),
-            "bb9": prior.get("bb9"),
-            "gb_pct": prior.get("gb_pct"),
-            "xwobacon": prior.get("xwobacon"),
-        }
-        prior_sum, _ = compute_sum_score_v4_sp(prior_v4_data)
-        if prior_sum >= 40:
-            tags.append("✅ 雙年菁英")
 
     # ✅ 深投型 — IP/GS > 5.7
     if sv.get("ip_gs") and sv["ip_gs"] > 5.7:
@@ -679,16 +661,14 @@ def v4_add_tags_sp(fa: dict) -> list[str]:
 
 
 def v4_warn_tags_sp(fa: dict) -> list[str]:
-    """v4 ⚠️ tags for SP FA candidate."""
+    """v4 ⚠️ tags for SP FA candidate (B2 thin — 2026-only signals)."""
     tags = []
     sv = fa.get("savant_v4") or {}
-    prior = fa.get("prior_stats") or {}
     rolling = fa.get("rolling_21d") or {}
     gate = fa.get("rotation_gate")
 
     bbe = sv.get("bbe") or 0
     ip_2026 = sv.get("ip") or 0
-    prior_ip = prior.get("ip")
 
     # ⚠️ 樣本小 — BBE < 30 OR IP < 20 (strong warning)
     if bbe < 30 or ip_2026 < 20:
@@ -725,21 +705,6 @@ def v4_warn_tags_sp(fa: dict) -> list[str]:
         s_x = sv.get("xwobacon")
         if r_x is not None and s_x is not None and (r_x - s_x) >= 0.035:
             tags.append("⚠️ 近況下滑")
-
-    # ⚠️ Breakout 待驗 — 2025 Sum < 25 或無 prior
-    if not prior or not prior.get("ip"):
-        tags.append("⚠️ Breakout 待驗")
-    else:
-        prior_v4_data = {
-            "ip_gs": prior.get("ip_gs"),
-            "whiff_pct": prior.get("whiff_pct"),
-            "bb9": prior.get("bb9"),
-            "gb_pct": prior.get("gb_pct"),
-            "xwobacon": prior.get("xwobacon"),
-        }
-        prior_sum, _ = compute_sum_score_v4_sp(prior_v4_data)
-        if prior_sum < 25:
-            tags.append("⚠️ Breakout 待驗")
 
     il_tag = _status_warn_tag(fa.get("status"))
     if il_tag:
@@ -808,9 +773,8 @@ def compute_fa_tags_v4_sp(fa_player: dict, anchor_player: dict) -> dict:
             anchor_name: str,
         }
 
-    Note: when win_gate_passed is False, add_tags and warn_tags are
-    returned empty (gate fail = no point computing tags). Claude is told
-    via prompt that gate-fail FAs are pre-filtered as "not worth taking".
+    B2 thin: add_tags/warn_tags computed for all FAs regardless of win_gate;
+    filtering responsibility moves to payload_slimmer._ALLOWED_TAGS.
     """
     sum_diff = fa_player["score"] - anchor_player["score"]
     anchor_bd = anchor_player.get("breakdown") or {}
@@ -820,134 +784,65 @@ def compute_fa_tags_v4_sp(fa_player: dict, anchor_player: dict) -> dict:
     positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
     win_gate_passed = sum_diff >= 5 and positive_count >= 3
 
-    if not win_gate_passed:
-        return {
-            "sum_diff": sum_diff,
-            "breakdown_diff": breakdown_diff,
-            "win_gate_passed": False,
-            "add_tags": [],
-            "warn_tags": [],
-            "anchor_name": anchor_player["name"],
-        }
-
     return {
         "sum_diff": sum_diff,
         "breakdown_diff": breakdown_diff,
-        "win_gate_passed": True,
+        "win_gate_passed": win_gate_passed,
         "add_tags": v4_add_tags_sp(fa_player),
         "warn_tags": v4_warn_tags_sp(fa_player),
         "anchor_name": anchor_player["name"],
     }
 
 
-# ── SP v4 picker + urgency (5 indicators × 0-50 Sum) ──
-# Urgency factors (per docs/sp-framework-v4-balanced.md §「Step 2 — Urgency 排序」):
-#   1. 2026 v4 Sum bucket (_factor_2026_sum_v4)
-#   2. 2025 prior v4 Sum bucket + slump-hold gate (Sum≥40 + IP≥50)
-#   3. 21d Δ xwOBACON — returns 0 (Python doesn't score; see CLAUDE.md TODO)
-#   4. Luck regression (xera-era ± 0.81, BBE≥40) — _factor_luck_regression_v4
-# Same BBE<30 low_confidence_excluded gate as before (Savant signal stability).
-
-
-def _factor_2026_sum_v4(sum_2026: int) -> int:
-    """v4 SP urgency factor (1): 2026 v4 Sum bucket (0-50 range).
-
-    < 15 = +5, 15-22 = +4, 23-30 = +3, 31-38 = +2, 39-44 = +1, ≥ 45 = +0.
-    Per docs/sp-framework-v4-balanced.md §「Step 2 — Urgency 排序」table.
-    """
-    if sum_2026 < 15:
-        return 5
-    if sum_2026 <= 22:
-        return 4
-    if sum_2026 <= 30:
-        return 3
-    if sum_2026 <= 38:
-        return 2
-    if sum_2026 <= 44:
-        return 1
-    return 0
-
-
-def _factor_2025_sum_v4(sum_2025: int) -> int:
-    """v4 SP urgency factor (2): 2025 v4 prior Sum bucket.
-
-    Slump hold (≥40 + IP≥50) is detected separately by caller and excluded
-    from urgency ranking. This function only handles non-slump-hold cases:
-
-    ≥ 40 (low IP, kept for ranking) = +0  (菁英底但低樣本)
-    35-39 = +0  (灰色帶)
-    28-34 = +1
-    < 28  = +2  (結構性確認)
-    """
-    if sum_2025 == 0:
-        return 0  # no prior (or prior IP <20, zeroed by caller)
-    if sum_2025 >= 40:
-        return 0  # slump-hold gated by caller; low-IP also +0
-    if sum_2025 >= 35:
-        return 0
-    if sum_2025 >= 28:
-        return 1
-    return 2
-
-
-def _factor_luck_regression_v4(xera: float | None, era: float | None,
-                               bbe: int | None) -> int:
-    """v4 SP urgency factor (4): luck regression via xERA - ERA diff.
-
-    Replaces v2's IP/Team_G factor (Lopez 2026-04-22 triview teaching:
-    xERA-ERA -1.11 = ERA will regress, lowering drop urgency).
-
-    Threshold: ±0.81 (P70 absolute diff), gated by BBE ≥ _LUCK_TAG_BBE_MIN
-    (40, complementary to luck_tag_v4 — same gate, different output form).
-
-    diff ≤ -0.81 → -2 (ERA will rise back to xERA → less urgent to drop)
-    diff ≥ +0.81 → +2 (ERA will drop, holder will look bad → more urgent)
-    BBE < 40 or no diff → 0
-    """
-    if xera is None or era is None or bbe is None:
-        return 0
-    if bbe < _LUCK_TAG_BBE_MIN:
-        return 0
-    diff = xera - era
-    if diff <= -0.81:
-        return -2
-    if diff >= 0.81:
-        return 2
-    return 0
+# ── SP v4 picker (B2 thin — 5 indicators × 0-50 Sum) ──
+# B2 thin design (my-team pipeline): anchor_filter (cant_cut + weekly_anchor_sp)
+# → BBE<30 filter → Sum ascending sort → top-N.
+# Rotation Gate (GS=0 or IP/GS<3 excluded) lives in `_phase6_sp.py` Layer 1.5
+# and applies to the FA candidate pool only; my-team SPs are not Rotation-Gate
+# filtered (roster_config.json is the source of truth for who counts as SP).
+# No urgency machinery. No slump hold. No Sum hard floor. See
+# docs/sp-b2-cutover-design.md.
 
 
 def pick_weakest_v4_sp(
     players: list[dict],
-    n: int = 4,
-    cant_cut: set[str] | None = None,
+    n: int = 3,
+    cant_cut: list[str] | None = None,
+    weekly_anchor: list[str] | None = None,
 ) -> tuple[list[dict], list[dict]]:
-    """Pick weakest N SPs by v4 Sum asc + low_confidence_excluded.
+    """Pick weakest N SPs by v4 Sum asc (B2 thin pipeline, my-team only).
 
-    v4 differences from pick_weakest:
-    - Sum scoring uses compute_sum_score_v4_sp (5 indicators × 0-50)
-    - Reads savant_v4 dict (ip_gs/whiff_pct/bb9/gb_pct/xwobacon) instead of
-      savant_2026 (xera/xwoba/hh_pct/barrel_pct)
-    - Same BBE<30 gate as v2 (signal stability not framework-specific)
-    - Sum >=40 hard floor excludes strong SPs from drop-candidate pool
-    - SP-only (no batter line)
+    Pipeline order:
+        1. anchor_filter — drop cant_cut + weekly_anchor (invisible to caller).
+        2. BBE<30 filter → low_confidence_excluded.
+        3. v4 Sum compute (5 indicators × 0-50).
+        4. Sort by Sum ascending.
+        5. Return top-N.
+
+    Rotation Gate is NOT applied here. Pure-RP / long-relief filtering for the
+    FA candidate pool lives in `_phase6_sp.py` Layer 1.5; my-team SPs come
+    from `roster_config.json` and are trusted to be SP-eligible.
 
     Args:
-        players: list of SP dicts, each with savant_v4 + savant_2026 (BBE)
-        n: number of weakest to pick (default 4)
-        cant_cut: set of names to exclude (case-insensitive)
+        players: list of SP dicts, each with savant_v4 + savant_2026 (BBE).
+        n: number of weakest to pick (default 3 per B2 — eligible pool size
+            after anchor filtering is typically 3-5).
+        cant_cut: lifetime anchor names (list, case-insensitive name match).
+        weekly_anchor: weekly-mutable anchor names from
+            ``league.weekly_anchor_sp`` in roster_config.json.
 
     Returns:
-        (weakest, excluded) — same shape as v2 pick_weakest but with v4 Sum
+        (weakest, excluded) — weakest is top-N sorted by Sum asc, excluded is
+        the BBE<30 low-confidence list.
     """
-    cant_cut_lower = {c.lower() for c in (cant_cut or set())}
+    from anchor_filter import filter_anchors
+
+    filtered = filter_anchors(players, cant_cut, weekly_anchor)
 
     pool = []
     excluded = []
 
-    for p in players:
-        if p.get("name", "").lower() in cant_cut_lower:
-            continue
-
+    for p in filtered:
         # BBE gate uses savant_2026 (where bbe lives) — same as v2
         savant_2026 = p.get("savant_2026") or {}
         bbe = int(savant_2026.get("bbe") or 0)
@@ -967,10 +862,6 @@ def pick_weakest_v4_sp(
         score, breakdown = compute_sum_score_v4_sp(savant_v4)
         confidence = _confidence_label(bbe, "sp")
 
-        # Hard floor — Sum ≥40 is strong, not a drop candidate.
-        if score >= _SP_SUM_HARD_FLOOR:
-            continue
-
         pool.append({
             **p,
             "score": score,
@@ -981,130 +872,3 @@ def pick_weakest_v4_sp(
 
     pool.sort(key=lambda e: e["score"])
     return pool[:n], excluded
-
-
-def compute_urgency_v4_sp(weakest_n: list[dict]) -> dict:
-    """v4 SP urgency four-factor scoring for weakest-N SPs.
-
-    Factor weights per docs/sp-framework-v4-balanced.md decisions 1-4 (2026-04-25):
-        1. 2026 v4 Sum bucket (_factor_2026_sum_v4)
-        2. 2025 prior v4 Sum bucket (_factor_2025_sum_v4) + slump-hold gate
-        3. 21d Δ xwOBACON: Python returns 0 (Claude reads raw delta from prompt;
-           thresholds will be calibrated 1-2 months post-cutover, see CLAUDE.md TODO)
-        4. Luck regression (_factor_luck_regression_v4) — replaces v2 IP/TG factor
-
-    Slump-hold detection: 2025 v4 Sum ≥ 40 AND prior IP ≥ 50 → moved to
-    `slump_hold` list, NOT in `weakest_ranked` (won't be selected as anchor,
-    per design decision 4/4 in v4 doc).
-
-    Tied urgency: Python does NOT pick a winner. The Phase 6 multi-agent
-    decision layer reads the tied list and picks via Claude judgment
-    (per design decision 3/4 in v4 doc).
-
-    Each weakest entry should include:
-        score          — 2026 v4 Sum (from pick_weakest_v4_sp)
-        breakdown      — v4 5-slot breakdown (from pick_weakest_v4_sp)
-        prior_stats    — 2025 prior dict with v4 metrics (ip_gs/whiff/bb9/gb/xwobacon)
-                         — backfilled by Stage A backfill_prior_stats_v4
-        savant_v4      — current-season v4 metrics (xera/era/bbe for luck factor)
-        rolling_21d    — 21d {xwobacon, bbe} or None (Python doesn't score it,
-                         but caller passes through to Claude prompt)
-
-    Returns:
-        {
-            "weakest_ranked": [{name, urgency, factors, prior_sum, prior_ip,
-                                rolling_delta_xwobacon, rolling_bbe, ...weakest entry}],
-            "slump_hold": [{name, prior_sum, prior_ip, sum_2026, note}]
-        }
-    """
-    ranked = []
-    slump_hold = []
-
-    for w in weakest_n:
-        name = w["name"]
-        sum_2026 = w.get("score", 0)
-        prior = w.get("prior_stats") or {}
-        prior_ip = prior.get("ip")
-
-        # Compute 2025 prior v4 Sum (only valid if prior IP ≥ _PRIOR_IP_MIN)
-        notes = []
-        if prior and prior_ip is not None and prior_ip < _PRIOR_IP_MIN:
-            sum_2025 = 0
-            prior_breakdown = {}
-            notes.append(
-                f"2025 prior IP {prior_ip:.1f} <{_PRIOR_IP_MIN} 無效（樣本過小），視為無 prior"
-            )
-        elif prior and prior_ip is not None:
-            prior_v4_data = {
-                "ip_gs": prior.get("ip_gs"),
-                "whiff_pct": prior.get("whiff_pct"),
-                "bb9": prior.get("bb9"),
-                "gb_pct": prior.get("gb_pct"),
-                "xwobacon": prior.get("xwobacon"),
-            }
-            sum_2025, prior_breakdown = compute_sum_score_v4_sp(prior_v4_data)
-        else:
-            sum_2025 = 0
-            prior_breakdown = {}
-
-        # Slump hold detection: 2025 v4 Sum ≥ 40 AND IP ≥ 50
-        if sum_2025 >= 40 and prior_ip is not None and prior_ip >= _PRIOR_IP_SLUMP_HOLD_MIN:
-            slump_hold.append({
-                "name": name,
-                "mlb_id": w.get("mlb_id"),
-                "prior_sum": sum_2025,
-                "prior_ip": prior_ip,
-                "prior_breakdown": prior_breakdown,
-                "sum_2026": sum_2026,
-                "note": "菁英底，slump 候選（v4 Sum ≥40 + IP ≥50）",
-            })
-            continue
-
-        # Four factors
-        f_2026 = _factor_2026_sum_v4(sum_2026)
-        f_2025 = _factor_2025_sum_v4(sum_2025)
-        f_rolling = 0  # v4 decision 1/4: Python doesn't score 21d Δ; Claude reads raw
-        savant_v4 = w.get("savant_v4") or {}
-        f_luck = _factor_luck_regression_v4(
-            savant_v4.get("xera"),
-            savant_v4.get("era"),
-            savant_v4.get("bbe"),
-        )
-
-        urgency = f_2026 + f_2025 + f_rolling + f_luck
-
-        # Pass through 21d rolling for Claude prompt (raw, no score)
-        rolling_21d = w.get("rolling_21d") or {}
-        rolling_xwobacon = rolling_21d.get("xwobacon")
-        season_xwobacon = savant_v4.get("xwobacon")
-        rolling_delta = (
-            rolling_xwobacon - season_xwobacon
-            if rolling_xwobacon is not None and season_xwobacon is not None
-            else None
-        )
-
-        ranked.append({
-            **w,
-            "urgency": urgency,
-            "factors": {
-                "sum_2026": f_2026,
-                "sum_2025": f_2025,
-                "rolling": f_rolling,
-                "luck": f_luck,
-            },
-            "prior_sum": sum_2025,
-            "prior_ip": prior_ip,
-            "prior_breakdown": prior_breakdown,
-            "rolling_delta_xwobacon": rolling_delta,
-            "rolling_bbe": rolling_21d.get("bbe"),
-            "notes": notes,
-        })
-
-    # Per design decision 3/4: Python doesn't break ties. Sort by urgency desc;
-    # ties keep original order (caller / Claude breaks via raw material).
-    ranked.sort(key=lambda e: e["urgency"], reverse=True)
-
-    return {
-        "weakest_ranked": ranked,
-        "slump_hold": slump_hold,
-    }

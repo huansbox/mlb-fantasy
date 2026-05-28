@@ -1,5 +1,7 @@
 # SP B1 Cutover — Baseline Spike Results
 
+> **Superseded** by [`docs/sp-b2-cutover-design.md`](sp-b2-cutover-design.md). M1/M4' baselines retired with B2 multi-agent collapse. Kept for archival reference.
+
 > Issue: `issues/008-spike-fixture-baseline.md` · PRD: `issues/prd.md` · Design: `docs/sp-b1-cutover-design.md`
 
 ## Status

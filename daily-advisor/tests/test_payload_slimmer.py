@@ -1,9 +1,15 @@
-import json
+"""Tests for payload_slimmer — B2 thin schema.
+
+B2 schema (vs. B1):
+- prior_v4 field removed entirely (2026-only data path).
+- _ALLOWED_TAGS expanded: 2026-based + 21d-based evaluation tags now pass through.
+- Still forbidden: machine anchors (score / sum / urgency / factors) and the
+  2025-prior tags (✅ 雙年菁英 / ⚠️ Breakout 待驗).
+"""
 
 import pytest
 
 import payload_slimmer
-from _phase6_sp import _build_fa_classify_payload, _build_step1_payload
 
 
 FORBIDDEN_KEYS = {
@@ -15,20 +21,34 @@ FORBIDDEN_KEYS = {
     "breakdown_diff",
     "win_gate_passed",
     "anchor_name",
+    "prior_v4",
+    "prior_sum",
+    "prior_ip",
+    "prior_breakdown",
 }
+# Tags that B2 _ALLOWED_TAGS gates OUT (must never reach LLM payload).
 FORBIDDEN_TAGS = {
     "✅ 雙年菁英",
+    "⚠️ Breakout 待驗",
+}
+# Tags that B2 _ALLOWED_TAGS PASSES through (must remain visible).
+ALLOWED_TAGS = {
+    "✅ 球隊主力",
+    "⚠️ 上場有限",
+    "⚠️ 樣本小",
+    "⚠️ 短局",
+    "⚠️ IL 短期",
+    "⚠️ Swingman 角色",
     "✅ 深投型",
     "✅ GB 重型",
     "✅ K 壓制",
     "✅ 撿便宜運氣",
     "✅ 近況確認",
-    "⚠️ 賣高運氣",
     "⚠️ xwOBACON 極端",
     "⚠️ K 壓制不足",
     "⚠️ Command 警示",
+    "⚠️ 賣高運氣",
     "⚠️ 近況下滑",
-    "⚠️ Breakout 待驗",
 }
 
 
@@ -55,7 +75,7 @@ def _all_strings(obj):
 
 def _assert_no_forbidden_schema(obj):
     for d in _walk(obj):
-        assert not (set(d) & FORBIDDEN_KEYS)
+        assert not (set(d) & FORBIDDEN_KEYS), f"forbidden key in {d}"
         if "breakdown" in d:
             assert "sum" not in (d.get("breakdown") or {})
     assert not (set(_all_strings(obj)) & FORBIDDEN_TAGS)
@@ -115,15 +135,19 @@ def _full_entry(**overrides):
             "✅ GB 重型",
             "✅ K 壓制",
             "✅ 撿便宜運氣",
+            "✅ 近況確認",
         ],
         "warn_tags": [
             "⚠️ 樣本小",
             "⚠️ 短局",
             "⚠️ IL 短期",
             "⚠️ Swingman 角色",
+            "⚠️ Breakout 待驗",
             "⚠️ 賣高運氣",
             "⚠️ xwOBACON 極端",
+            "⚠️ K 壓制不足",
             "⚠️ Command 警示",
+            "⚠️ 近況下滑",
         ],
         "notes": ["manual context"],
     }
@@ -132,7 +156,7 @@ def _full_entry(**overrides):
 
 
 @pytest.mark.parametrize("role", ["my_team", "fa"])
-def test_slim_entry_removes_b1_anchor_fields_and_evaluation_tags(role):
+def test_slim_entry_removes_b2_anchor_fields_and_2025_tags(role):
     slim = payload_slimmer.slim_entry(
         _full_entry(
             pct=18,
@@ -153,8 +177,6 @@ def test_slim_entry_removes_b1_anchor_fields_and_evaluation_tags(role):
     assert slim["season_v4"]["slots"]["BB/9"] == {"raw": 3.6, "percentile": 0}
     assert slim["season_v4"]["slots"]["GB%"] == {"raw": 47.0, "percentile": 70}
     assert slim["season_v4"]["slots"]["xwOBACON"] == {"raw": 0.39, "percentile": 0}
-    assert slim["prior_v4"]["slots"]["IP/GS"] == {"raw": 5.8, "percentile": 70}
-    assert slim["prior_v4"]["slots"]["xwOBACON"] == {"raw": 0.352, "percentile": 70}
     assert slim["rolling_21d"] == {
         "xwobacon": 0.410,
         "season_xwobacon": 0.390,
@@ -166,6 +188,30 @@ def test_slim_entry_removes_b1_anchor_fields_and_evaluation_tags(role):
     assert slim["low_confidence"] is False
     assert slim["selected_pos"] == "BN"
     assert slim["status"] == "DTD"
+
+
+@pytest.mark.parametrize("role", ["my_team", "fa"])
+def test_prior_v4_field_absent_from_output(role):
+    slim = payload_slimmer.slim_entry(_full_entry(pct=18, d1=1, d3=4), role)
+    assert "prior_v4" not in slim
+
+
+def test_b2_allowed_tags_pass_through():
+    """All B2-whitelisted tags reach the slimmed payload."""
+    slim = payload_slimmer.slim_entry(_full_entry(), "my_team")
+    actual_tags = set(slim["add_tags"]) | set(slim["warn_tags"])
+    # Every fixture tag that is allowed must appear in output.
+    fixture_allowed = (
+        set(_full_entry()["add_tags"]) | set(_full_entry()["warn_tags"])
+    ) & ALLOWED_TAGS
+    assert fixture_allowed.issubset(actual_tags)
+
+
+def test_b2_forbidden_tags_filtered_out():
+    """2025-prior tags ✅ 雙年菁英 / ⚠️ Breakout 待驗 must not reach LLM."""
+    slim = payload_slimmer.slim_entry(_full_entry(), "my_team")
+    actual_tags = set(slim["add_tags"]) | set(slim["warn_tags"])
+    assert not (actual_tags & FORBIDDEN_TAGS)
 
 
 def test_slim_entry_fa_only_fields_are_role_scoped():
@@ -189,37 +235,6 @@ def test_slim_entry_marks_low_confidence_from_bbe():
     assert slim["low_confidence"] is True
 
 
-def test_phase6_builders_keep_b1_schema_clean_for_my_team_and_fa():
-    anchor = _full_entry(name="Anchor Arm")
-    fa = _full_entry(
-        name="FA Arm",
-        pct=18,
-        d1=2,
-        d3=5,
-        waiver_date="",
-        sum_diff=10,
-        breakdown_diff={"IP/GS": 2},
-        win_gate_passed=True,
-        anchor_name="Anchor Arm",
-    )
-    urgency_result = {
-        "weakest_ranked": [anchor],
-        "slump_hold": [
-            {
-                "name": "Slump Hold",
-                "prior_sum": 42,
-                "prior_ip": 150.0,
-                "prior_breakdown": {"sum": 42},
-                "sum_2026": 16,
-                "note": "菁英底，slump 候選",
-            }
-        ],
-    }
-
-    step1_payload = json.loads(_build_step1_payload(urgency_result, low_conf=[]))
-    fa_payload = json.loads(_build_fa_classify_payload(anchor, [fa]))
-
-    _assert_no_forbidden_schema(step1_payload)
-    _assert_no_forbidden_schema(fa_payload)
-    assert fa_payload["fa_candidates"][0]["pct"] == 18
-    assert fa_payload["fa_candidates"][0]["d3"] == 5
+def test_slim_entry_unknown_role_raises():
+    with pytest.raises(ValueError):
+        payload_slimmer.slim_entry(_full_entry(), "bench")  # type: ignore[arg-type]

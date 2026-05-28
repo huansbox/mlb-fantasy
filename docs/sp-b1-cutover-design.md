@@ -1,5 +1,7 @@
 # SP B1 Cutover Design — Phase 6 對齊 Batter v4 Thin
 
+> **Superseded** by [`docs/sp-b2-cutover-design.md`](sp-b2-cutover-design.md) (B2 thin + multi-agent collapse). Kept for archival reference.
+
 **狀態**：設計定稿（grill-me session 2026-05-06）
 **前置依賴**：v4 cutover 已完成（commits 至 `71aa6d9`）；Phase 6 multi-agent SP 已 production
 **對應 CLAUDE.md TODO**：
