@@ -1,9 +1,10 @@
 # SP B2 Cutover Design — Thin Mechanical Layer + 2-Step Single-LLM
 
-> **Status**: Design source of truth (post issue 022 / pre issue 025 cutover).
+> **Status**: Production live since 2026-05-28 (issue 025 cutover complete).
 > Supersedes [`docs/sp-b1-cutover-design.md`](sp-b1-cutover-design.md), [`docs/sp-b1-observation.md`](sp-b1-observation.md), [`docs/sp-b1-baseline.md`](sp-b1-baseline.md).
 >
-> **B1 reference hash**: `a9967c5` (master HEAD captured 2026-05-28 pre-B2 merge — commit `chore(waiver-log): auto-close rostered players (Spencer Horwitz)`, cron-generated and unrelated to SP B2; used only for post-revert verification, NOT as rollback target — rollback uses `git revert -m 1 <B2 merge commit>`).
+> **Cutover commit**: `95f879a` (no-ff merge of feat/sp-b2-collapse, 2026-05-28 TW 15:24). First B2 production fa-scan run verified via GitHub Issue #255.
+> **B1 reference hash**: `a9967c5` (master HEAD captured 2026-05-28 pre-B2 merge — commit `chore(waiver-log): auto-close rostered players (Spencer Horwitz)`, cron-generated and unrelated to SP B2; used only for post-revert verification, NOT as rollback target — rollback uses `git revert -m 1 95f879a`).
 
 ## Problem Statement
 
