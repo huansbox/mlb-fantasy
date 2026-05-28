@@ -259,11 +259,6 @@
 - 05-27：14d OPS .834 / Savant Δ+0.060 品質飆升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 05-28：14d OPS .810 / Savant Δ+0.071 品質飆升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 
-### Spencer Horwitz (PIT, 1B) [mlb_id:687462] — 觀察中
-觸發：Duran 14d OPS <.650 連 3 天 OR Duran Savant Δ 連 5 天 ≤-0.030 → 取代 Duran
-- 05-27：BB% P95 / xwOBA P80 / prior P70/P70 雙年確認；14d OPS 1.056 / 3HR / 9RBI / Savant Δ+0.043 全面爆發；PA-TG 3.35 主力；Barrel% P25 唯一弱項但 7×7 BB 溢價補償（fa_scan）
-- 05-28：14d OPS .982 / 3HR / Savant Δ+0.060 品質飆升；9% rising +8 市場注意中；Duran 替代 B-plan（fa_scan）
-
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
 - 05-28：xwOBA P95 / BB% P70 / Barrel% P60 + prior P80 雙年確認；14d OPS 1.123 / Savant Δ+0.078 品質飆升；33% 有搶人壓力 Duran 替代 A-plan（fa_scan）
@@ -317,6 +312,9 @@
 - 05-26：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Spencer Horwitz (PIT, 1B) — 被搶（自動偵測）
+- 2026-05-28：Yahoo ownership_type=team，從觀察中移除。
 
 ### Carlos Cortes (ATH, LF,RF) — 被搶（自動偵測）
 - 2026-05-26：Yahoo ownership_type=team，從觀察中移除。
