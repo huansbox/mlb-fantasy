@@ -89,7 +89,7 @@
 
 ## Phase 0：策略現況載入（5 min）
 
-從兩個來源彙整本週要驗證的策略項目：
+從三個來源彙整本週要驗證的策略項目：
 
 1. **`waiver-log.md` 「隊上觀察」段**：當前自家球員觀察項目（borderline anchor / 角色變化 / 限局跡象等）
    - 每個項目標記：觸發 / 啟動日期 / 驗證觸發條件 / 失守條件 / 風險
@@ -97,7 +97,13 @@
 2. **`git log --since='1 week ago' --oneline`**：上週執行的 add/drop / 重大決策 commit
    - commit message 已記錄理由，重點看「驗證指標是否如預期」
 
-**輸出**：「本週要驗證的策略項目清單」（Phase 1C 會逐一檢核）。
+3. **`roster_config.json` `league.weekly_anchor_sp` list**（SP B2 anchor 機制，見 `docs/sp-b2-cutover-design.md`）：
+   - 確認本週名單仍需要保護 — 是不是 menls in slump 已回穩 / 角色變化已穩定 / breakout 已驗證？
+   - 不再需要保護的名字 → 從 list 移除（直接編輯 JSON）
+   - 新的需要保護的名字 → 加進 list（同樣編輯 JSON）
+   - 注意：anchor 對 LLM 完全不可見，所以 list 是否包含正確的人完全由用戶決定
+
+**輸出**：「本週要驗證的策略項目清單」（Phase 1C 會逐一檢核）+ 更新後的 `weekly_anchor_sp` list。
 
 ## Phase 1A：戰績結果 + 簡短歸因（10%，5 min）
 
@@ -167,6 +173,24 @@
    - 「隊上觀察」段：已驗證 / 失守超過 2 週的項目移到「已結案」（git log 留痕）
    - 新項目從 Phase 2C 行動清單啟動時加入「隊上觀察」
 5. 記錄學習：失敗的觀察項目要寫進「學到什麼」
+
+## Phase 1D：SP B2 verdict spot check（5 min）
+
+> B2 cutover（2026-05-27）後 M1/M4' 指標退役，由 backtest 自動化（週掃，issue 024）+ 此處人工 spot check 雙層覆蓋。設計依據：`docs/sp-b2-cutover-design.md` §「Quality Monitoring」。
+
+讀取過去 7 天 SP-v4 fa-scan GitHub Issues：
+```bash
+gh issue list -R huansbox/mlb-fantasy --label fa-scan --search "SP-v4" --limit 7
+```
+
+對每個 verdict（`drop_X_add_Y` / `watch` / `pass`）做 gut check：
+- **drop_X_add_Y**：drop 的 SP 真的是 B2 候選池裡最弱嗎？add 的 FA 真的是 cross-slot edge（不是單點短期 hot）？
+- **watch**：watch_target 真的值得記？是否該升 add 或降 pass？
+- **pass**：是不是漏掉一個 worth 候選？
+
+**Surface anything that smells off** — 寫進「學到什麼」段。連續 2 週發現 verdict 系統性偏誤 → 觸發 prompt 調整或回頭看 backtest hit-rate。
+
+注意：anchor SP（cant_cut + weekly_anchor_sp）對 LLM 完全不可見，所以 verdict 永遠只涉及非 anchor SP — 看到 drop 列在 anchor list 中的 SP **是 bug**（anchor leak），立即 report。
 
 ## Phase 2A：對手摘要（5%，3 min）
 
@@ -323,14 +347,15 @@
 | Phase | 時間 | 內容 |
 |-------|------|------|
 | Step 1+2 資料準備 | 3 min | 讀 JSON（含 `review.two_week_ranks`） |
-| Phase 0 策略載入 | 5 min | waiver-log 隊上觀察 + git log 1 週 |
+| Phase 0 策略載入 | 5 min | waiver-log 隊上觀察 + git log 1 週 + `weekly_anchor_sp` review |
 | Phase 1A 戰績歸因 | 5 min | 14 類別 + 簡短分類 |
 | Phase 1B 球員狀態 | 15-20 min | **核心**，含 news check |
 | Phase 1C 策略驗證 | 5 min | 對 Phase 0 項目逐一檢核 |
+| Phase 1D SP B2 spot check | 5 min | 過去 7 天 fa-scan SP-v4 verdict gut check |
 | Phase 2A 對手摘要 | 3 min | 一張表 |
 | Phase 2B 14 類別預測 | 5 min | |
 | Phase 2C 行動清單 | 10 min | (a)~(e) |
 | Step 3 寫入 commit | 5 min | |
-| **合計** | **~60 min** | |
+| **合計** | **~65 min** | |
 
 每 4 週的深度球員回顧 +20-30 min。
