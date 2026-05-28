@@ -1,5 +1,7 @@
 # SP B1 Cutover — Observation Period SOP
 
+> **Superseded** by [`docs/sp-b2-cutover-design.md`](sp-b2-cutover-design.md). B1 observation period aborted at B2 cutover — M1/M4' metrics retired with multi-agent collapse. Kept for archival reference.
+
 > Issue: `issues/009-b1-production-cutover.md` · Baseline: `docs/sp-b1-baseline.md` · Design: `docs/sp-b1-cutover-design.md`
 
 ## Status
