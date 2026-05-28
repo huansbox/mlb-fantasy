@@ -3,7 +3,7 @@
 > **Status**: Design source of truth (post issue 022 / pre issue 025 cutover).
 > Supersedes [`docs/sp-b1-cutover-design.md`](sp-b1-cutover-design.md), [`docs/sp-b1-observation.md`](sp-b1-observation.md), [`docs/sp-b1-baseline.md`](sp-b1-baseline.md).
 >
-> **B1 reference hash**: `<filled by issue 025 pre-cutover>` (pre-B2 master HEAD; used only for post-revert verification, NOT as rollback target — rollback uses `git revert <B2 merge commit>`).
+> **B1 reference hash**: `a9967c5` (master HEAD captured 2026-05-28 pre-B2 merge — commit `chore(waiver-log): auto-close rostered players (Spencer Horwitz)`, cron-generated and unrelated to SP B2; used only for post-revert verification, NOT as rollback target — rollback uses `git revert -m 1 <B2 merge commit>`).
 
 ## Problem Statement
 
