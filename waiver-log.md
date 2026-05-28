@@ -327,6 +327,7 @@
 ### Janson Junk (MIA, SP,RP) — 被搶（自動偵測）
 - 2026-05-25：Yahoo ownership_type=team，從觀察中移除。
 - 05-27：5/27 Phase 6 watch — BB/9 P95 + xwOBACON P80 勝 Severino，但 Whiff% P0 雙年結構性 K 地板（K9 6.45），等下一場確認能否兼顧局數與三振（fa_scan）
+- 05-28：Phase 6 watch — BB/9 P95 + xwOBACON P80 勝 Severino，但 Whiff% P0 結構性弱犧牲 K 類別過大；等 Severino transformation 驗證結果（fa_scan）
 
 ### Grant Holmes (ATL, SP) — 被搶（自動偵測）
 - 2026-05-23：Yahoo ownership_type=team，從觀察中移除。
