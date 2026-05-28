@@ -181,31 +181,6 @@
       }
     },
     {
-      "name": "Kody Clemens",
-      "mlb_id": 665019,
-      "yahoo_player_key": "469.p.11309",
-      "team": "MIN",
-      "positions": [
-        "1B",
-        "2B",
-        "LF",
-        "RF"
-      ],
-      "selected_pos": "2B",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.331,
-        "barrel_pct": 12.0,
-        "hh_pct": 48.3,
-        "bb_pct": 7.5,
-        "ops": 0.715,
-        "pa_per_team_g": 2.38,
-        "pa": 386,
-        "g": 119
-      }
-    },
-    {
       "name": "Ezequiel Duran",
       "mlb_id": 677649,
       "yahoo_player_key": "469.p.11886",
@@ -218,7 +193,7 @@
         "LF"
       ],
       "selected_pos": "SS",
-      "status": "",
+      "status": "DTD",
       "prior_stats": {
         "season": 2025,
         "xwoba": 0.247,
@@ -240,7 +215,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "2B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -390,7 +365,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -501,7 +476,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -546,7 +521,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -559,6 +534,18 @@
         "ip": 112.7,
         "ip_per_gs": 5.9
       }
+    },
+    {
+      "name": "Coleman Crow",
+      "mlb_id": 689441,
+      "yahoo_player_key": "469.p.60222",
+      "team": "MIL",
+      "positions": [
+        "SP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": null
     }
   ],
   "teams": {
