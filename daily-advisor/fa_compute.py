@@ -248,8 +248,9 @@ def compute_urgency(
 ) -> dict:
     """Batter v4 thin passthrough — no factors, no Slump hold.
 
-    SP path uses compute_urgency_v4_sp (4-factor + Slump hold). Slump hold for
-    batter is handled by cant_cut list (docs/batter-framework-upgrade-design.md §1.2).
+    SP path uses `pick_weakest_v4_sp` directly (B2 thin — no urgency machinery;
+    see `docs/sp-b2-cutover-design.md`). Slump hold for batter is handled by
+    cant_cut list (docs/batter-framework-upgrade-design.md §1.2).
 
     Each weakest entry should include:
         score         — 2026 Sum (from pick_weakest)

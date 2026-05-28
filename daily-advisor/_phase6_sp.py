@@ -199,6 +199,8 @@ def _validate_step_b(parsed: dict, eligible_names: list[str],
             return f"Step B drop name invalid for drop_X_add_Y: {drop!r}"
         if not add or add not in fa_names:
             return f"Step B add name invalid for drop_X_add_Y: {add!r}"
+        if watch_target is not None:
+            return "Step B drop_X_add_Y must have null watch_target"
     elif action == "watch":
         if drop is not None or add is not None:
             return "Step B watch must have null drop/add"
@@ -344,7 +346,8 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
 def _run_step_a(payload: str, eligible_names: list[str], fa_names: list[str],
                 env, args, h: dict, label: str) -> dict | None:
     """Call Step A with parse + schema validation; 1 retry on failure. Return
-    parsed dict or None (caller defaults to pass + alert)."""
+    parsed dict or None (caller routes to _emit_b2_pass which sends the
+    single Telegram alert for the whole step failure)."""
     prompt = _load_prompt("step_a")
     full = f"{prompt}\n\n---\n\n{payload}"
     for attempt in (1, 2):
@@ -354,10 +357,12 @@ def _run_step_a(payload: str, eligible_names: list[str], fa_names: list[str],
             err = _validate_step_a(parsed, eligible_names, fa_names)
             if err is None:
                 return parsed
-            _alert(h, env, args, f"[{label}] Step A schema invalid (attempt {attempt}): {err}")
+            # Log to stderr only; single Telegram alert from caller after exhaustion
+            print(f"[{label}] Step A schema invalid (attempt {attempt}): {err}",
+                  file=sys.stderr)
         else:
-            _alert(h, env, args,
-                   f"[{label}] Step A JSON parse failed (attempt {attempt}): {result.error or 'no parse'}")
+            print(f"[{label}] Step A JSON parse failed (attempt {attempt}): "
+                  f"{result.error or 'no parse'}", file=sys.stderr)
     return None
 
 
@@ -372,21 +377,12 @@ def _run_step_b(payload: str, eligible_names: list[str], fa_names: list[str],
             err = _validate_step_b(parsed, eligible_names, fa_names)
             if err is None:
                 return parsed
-            _alert(h, env, args, f"[{label}] Step B schema invalid (attempt {attempt}): {err}")
+            print(f"[{label}] Step B schema invalid (attempt {attempt}): {err}",
+                  file=sys.stderr)
         else:
-            _alert(h, env, args,
-                   f"[{label}] Step B JSON parse failed (attempt {attempt}): {result.error or 'no parse'}")
+            print(f"[{label}] Step B JSON parse failed (attempt {attempt}): "
+                  f"{result.error or 'no parse'}", file=sys.stderr)
     return None
-
-
-def _alert(h: dict, env, args, message: str) -> None:
-    """Telegram alert + stderr log; never raises."""
-    print(message, file=sys.stderr)
-    try:
-        if h.get("notify"):
-            h["notify"](env, args, message)
-    except Exception as e:
-        print(f"  alert delivery failed: {e}", file=sys.stderr)
 
 
 # ── Output emission ──
