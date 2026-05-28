@@ -90,7 +90,7 @@
 - 05-25：14d K% 28.6 / OPS .532 冰冷第 5 週；season P80/P70/P80 結構仍強但觸發遠未達（fa_scan）
 - 05-26：14d K% 27.3 / OPS .555 冰冷第 6 週；season P80/P70/P80 結構仍強但觸發遠未達（fa_scan）
 - 05-27：14d K% 25.0 首次降破 28% 觸發半達 + OPS .652 仍未達 .700；season P80/P70/P80 結構仍強；觸發半達繼續觀察（fa_scan）
-- 05-28：14d K% 22.7 首次降破 28% + OPS .652 接近 .700；season P80/P70/P80 結構仍強；觸發半達繼續觀察（fa_scan）
+- 05-28：14d K% 22.7 首次降破 28% 觸發半達 + OPS .652 接近 .700 未達；season P80/P70/P80 結構仍強（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
 觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
@@ -177,7 +177,7 @@
 - 05-25：Swanson stop-loss Δ-0.110 day 5 — 明天觸發即行動 drop Swanson add Crawford（fa_scan）
 - 05-26：Swanson stop-loss Δ-0.110 day 5 今日到期 — 立即行動 drop Swanson add Crawford；14d OPS .648 / Savant Δ-0.052 短期冷但結構 P95/P95 菁英（fa_scan）
 - 05-27：stop-loss day 5 正式到期（Δ-0.110）— 立即行動 drop Swanson add Crawford；14d OPS .648 / Savant Δ-0.052 短期冷但結構 P95/P95 底穩（fa_scan）
-- 05-28：⚠️ 已推薦 2 天未執行；stop-loss day 5 正式到期（Δ-0.110）— 立即行動 drop Swanson add Crawford（fa_scan）
+- 05-28：stop-loss day 5 正式到期（Δ-0.110）— 立即行動 drop Swanson add Crawford（fa_scan）
 
 ### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
 觸發：立即行動
@@ -190,7 +190,7 @@
 - 05-25：⚠️ 已推薦 7 天未執行；14d OPS .665 trad 冷卻但 Savant Δ+0.004 持平 = BABIP 噪音；48% 窗口關閉中 — 立即取代 Albies（fa_scan）
 - 05-26：⚠️ 已推薦 8 天未執行；14d OPS .617 trad 冷卻但 Savant Δ+0.004 持平 = BABIP 噪音；48% owned 窗口關閉中 — 立即取代 Albies（fa_scan）
 - 05-27：⚠️ 已推薦 9 天未執行；14d OPS .606 trad 冷卻但 Savant Δ+0.009 持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 05-28：⚠️ 已推薦 10 天未執行；14d OPS .603 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
+- 05-28：14d OPS .603 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -216,7 +216,7 @@
 - 05-25：BBE 157 + xwOBA P95 兩項達標；14d OPS .937 / Savant Δ+0.050 品質上升；差客場 OPS ≥.750 最後確認（fa_scan）
 - 05-26：[傷:DTD] 14d OPS .955 / Savant Δ+0.035 品質上升；BBE 159 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
 - 05-27：[傷:DTD] 14d OPS .955 / Savant Δ+0.057 品質上升；BBE 159 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
-- 05-28：[傷:DTD] 14d OPS 1.021 / Savant Δ+0.016 品質上升；BBE 159 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
+- 05-28：14d OPS 1.021 / Savant Δ+0.016 品質上升；BBE 159 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
 
 ### Luke Raley (SEA, 1B,LF,CF,RF) [mlb_id:670042] — 觀察中
 觸發：BB% 升至 P40+ 或 14d 維持 OPS ≥1.000 連 7 天 → 升級
@@ -248,7 +248,7 @@
 - 05-25：14d OPS .741 / Savant Δ-0.008 微冷；prior triple-P95 結構不變；Duran 觸發 + Savant Δ 轉正即行動（fa_scan）
 - 05-26：14d OPS .712 / Savant Δ-0.008 幾乎轉正；Duran 觸發 + Δ 轉正即行動（fa_scan）
 - 05-27：14d OPS .712 / Savant Δ-0.008 幾乎轉正距觸發一步；Duran K% 29.8 + Savant Δ-0.040 觸發接近中（fa_scan）
-- 05-28：14d OPS .867 / Savant Δ-0.046 短期冷卻接近轉正；Duran 觸發接近中（fa_scan）
+- 05-28：14d OPS .867 回暖 / Savant Δ-0.046 短期冷但接近轉正；Duran 觸發接近中（fa_scan）
 
 ### Brett Baty (NYM, 1B,2B,3B,RF) [mlb_id:683146] — 觀察中
 觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
@@ -257,11 +257,15 @@
 - 05-25：14d OPS .853 / 2HR / 8RBI / Savant Δ+0.060 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 05-26：14d OPS .835 / Savant Δ+0.058 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 05-27：14d OPS .834 / Savant Δ+0.060 品質飆升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-28：14d OPS .810 / Savant Δ+0.071 品質飆升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
+- 05-28：14d OPS .810 / Savant Δ+0.071 品質飆升持續第 6 天；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
 - 05-28：xwOBA P95 / BB% P70 / Barrel% P60 + prior P80 雙年確認；14d OPS 1.123 / Savant Δ+0.078 品質飆升；33% 有搶人壓力 Duran 替代 A-plan（fa_scan）
+
+### Gabriel Moreno (AZ, C) [mlb_id:672515] — 觀察中
+觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
+- 05-28：xwOBA P95 / Barrel% P70 + prior P80 雙年確認；14d 3 SB 速度；PA-TG 2.20 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 
 ## 隊上觀察
 
