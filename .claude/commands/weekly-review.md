@@ -178,9 +178,9 @@
 
 > B2 cutover（2026-05-27）後 M1/M4' 指標退役，由 backtest 自動化（週掃，issue 024）+ 此處人工 spot check 雙層覆蓋。設計依據：`docs/sp-b2-cutover-design.md` §「Quality Monitoring」。
 
-讀取過去 7 天 SP-v4 fa-scan GitHub Issues：
+讀取過去 7 天 SP-v4 fa-scan GitHub Issues（`--label fa-scan` 已收斂到對的範圍；非 SP-v4 條目（batter、RP）視覺辨識略過即可）：
 ```bash
-gh issue list -R huansbox/mlb-fantasy --label fa-scan --search "SP-v4" --limit 7
+gh issue list -R huansbox/mlb-fantasy --label fa-scan --limit 7
 ```
 
 對每個 verdict（`drop_X_add_Y` / `watch` / `pass`）做 gut check：

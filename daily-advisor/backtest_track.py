@@ -47,10 +47,11 @@ _ROSTER_CONFIG = _MODULE_DIR / "roster_config.json"
 # long enough for SP signal noise to settle.
 _OBSERVATION_DAYS = 21
 
-# xwOBACON delta interpretation thresholds. Aligned with B2 prompt language
-# (|Δ| < 0.030 noise / 0.030-0.050 lean / ≥0.050 strong) until Use Case B
-# calibrates from real data.
-_HIT_DELTA = 0.030
+# `watch` action outcome threshold — xwOBACON ≤ P50 (.370) means the target
+# stayed strong enough to remain watchable. Static P50 used here pending
+# Use Case B calibration from real data; absolute-delta logic deferred to
+# the same calibration pass.
+_WATCH_HIT_XWOBACON = 0.370
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +109,11 @@ def classify_outcome(verdict: B2Verdict, post_drop: float | None,
     Hit logic per action (xwOBACON LOWER = better SP):
       - drop_X_add_Y: hit iff post_add < post_drop (FA actually outproduced
                        the dropped SP). Marginal benefit = post_drop - post_add.
-      - watch:        hit iff post_target xwOBACON improved (delta ≤ -_HIT_DELTA)
-                       or stayed strong. Marginal benefit not defined → None.
+      - watch:        hit iff watch target's xwOBACON stayed below P50
+                       threshold (`_WATCH_HIT_XWOBACON`) — i.e. remained
+                       watchable. Marginal benefit not defined → None.
+                       (`post_add` parameter carries the watch-target value
+                       in this branch; see callers in run_weekly_summary.)
       - pass:         neutral (no observable comparison from pass action alone).
 
     Missing data on either side → neutral (we don't punish the verdict for
@@ -124,11 +128,9 @@ def classify_outcome(verdict: B2Verdict, post_drop: float | None,
         label = "hit" if benefit > 0 else "miss"
         return VerdictOutcome(verdict=verdict, outcome_label=label, marginal_benefit=benefit)
     if verdict.action == "watch":
-        if post_add is None:  # post_add here is the watch_target trajectory snapshot
+        if post_add is None:  # post_add here is the watch_target xwOBACON snapshot
             return VerdictOutcome(verdict=verdict, outcome_label="neutral", marginal_benefit=None)
-        # For watch we judge "did the target stay watchable?" — simple proxy:
-        # xwOBACON below the strong-SP threshold ≈ .370 (P50) qualifies as hit
-        label = "hit" if post_add <= 0.370 else "miss"
+        label = "hit" if post_add <= _WATCH_HIT_XWOBACON else "miss"
         return VerdictOutcome(verdict=verdict, outcome_label=label, marginal_benefit=None)
     return VerdictOutcome(verdict=verdict, outcome_label="neutral", marginal_benefit=None)
 

@@ -22,12 +22,19 @@ Two simultaneous refactors deployed atomically:
 ### Refactor 1 — Thin mechanical layer (mirrors Batter v4 thin, production since 2026-04-28)
 
 ```
-roster → anchor_filter → BBE<30 filter → Rotation Gate → Sum ascending → top-3
-                                                                            │
-                                                                            ▼
-                                                                    eligible pool
-                                                                  (LLM sees only this)
+my-team SPs → anchor_filter → BBE<30 filter → Sum ascending → top-3
+              (fa_compute.pick_weakest_v4_sp)                   │
+                                                                ▼
+                                                          eligible pool
+                                                       (LLM sees only this)
+
+FA candidates → Rotation Gate (GS=0 / IP-per-GS<3) → quality filter → FA pool
+                (_phase6_sp.py Layer 1.5)                              │
+                                                                       ▼
+                                                                LLM-visible FAs
 ```
+
+Rotation Gate is applied to the FA pool only; my-team SPs are sourced from `roster_config.json` and trusted to be SP-eligible (so a roster entry like a swingman or RP-eligible player is not auto-filtered out).
 
 - **Anchors invisible to LLM**: `cant_cut` (lifetime) and `weekly_anchor_sp` (weekly-mutable) both routed through a single `anchor_filter.filter_anchors()` call at the entry of `pick_weakest_v4_sp`. Anchors never appear in roster snapshot, never enter candidate pool, never reach LLM context.
 - **2026-only data**: 2025 prior reading removed from SP path. `compute_2025_sum` retained for batter (already batter-only via hardcoded `key_map`).

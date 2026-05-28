@@ -795,8 +795,11 @@ def compute_fa_tags_v4_sp(fa_player: dict, anchor_player: dict) -> dict:
 
 
 # ── SP v4 picker (B2 thin — 5 indicators × 0-50 Sum) ──
-# B2 thin design: anchor_filter (cant_cut + weekly_anchor_sp) → BBE<30 filter →
-# Rotation Gate (GS=0 or IP/GS<3 excluded) → Sum ascending sort → top-N.
+# B2 thin design (my-team pipeline): anchor_filter (cant_cut + weekly_anchor_sp)
+# → BBE<30 filter → Sum ascending sort → top-N.
+# Rotation Gate (GS=0 or IP/GS<3 excluded) lives in `_phase6_sp.py` Layer 1.5
+# and applies to the FA candidate pool only; my-team SPs are not Rotation-Gate
+# filtered (roster_config.json is the source of truth for who counts as SP).
 # No urgency machinery. No slump hold. No Sum hard floor. See
 # docs/sp-b2-cutover-design.md.
 
@@ -807,7 +810,7 @@ def pick_weakest_v4_sp(
     cant_cut: list[str] | None = None,
     weekly_anchor: list[str] | None = None,
 ) -> tuple[list[dict], list[dict]]:
-    """Pick weakest N SPs by v4 Sum asc (B2 thin pipeline).
+    """Pick weakest N SPs by v4 Sum asc (B2 thin pipeline, my-team only).
 
     Pipeline order:
         1. anchor_filter — drop cant_cut + weekly_anchor (invisible to caller).
@@ -815,6 +818,10 @@ def pick_weakest_v4_sp(
         3. v4 Sum compute (5 indicators × 0-50).
         4. Sort by Sum ascending.
         5. Return top-N.
+
+    Rotation Gate is NOT applied here. Pure-RP / long-relief filtering for the
+    FA candidate pool lives in `_phase6_sp.py` Layer 1.5; my-team SPs come
+    from `roster_config.json` and are trusted to be SP-eligible.
 
     Args:
         players: list of SP dicts, each with savant_v4 + savant_2026 (BBE).

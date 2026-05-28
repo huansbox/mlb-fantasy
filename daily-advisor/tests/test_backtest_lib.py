@@ -23,15 +23,21 @@ from _backtest_lib import (
 
 # ── parse_b2_verdict ──
 
+# Body template mirrors actual _phase6_sp._emit_b2_final format: parts joined
+# by "\n\n", so the gap between the === header and the JSON object is a blank
+# line (two newlines). Earlier regression: regex required single \n and missed
+# every real Issue body silently.
 _VALID_BODY_TEMPLATE = """
 [SP-v4] B2 verdict: drop_X_add_Y
 
 Pfaadt structurally better.
 
 === SP-v4 B2 Step A ===
+
 {step_a_json}
 
 === SP-v4 B2 Step B (final verdict) ===
+
 {step_b_json}
 """
 
@@ -43,6 +49,23 @@ def _body(step_b_obj: dict, step_a_obj: dict | None = None) -> str:
         step_a_json=json.dumps(sa, ensure_ascii=False),
         step_b_json=json.dumps(step_b_obj, ensure_ascii=False),
     )
+
+
+def _body_from_emit(step_b_obj: dict, step_a_obj: dict | None = None) -> str:
+    """Recreate the exact byte-for-byte format that _emit_b2_final produces.
+
+    Direct mirror of _phase6_sp.py line 442 (`"\\n\\n".join(full_raw_parts)`).
+    Regression test against the regex's actual production input shape.
+    """
+    import json
+    sa = step_a_obj or {"my_team_rank": [], "fa_classify": []}
+    parts = [
+        "=== SP-v4 B2 Step A ===",
+        json.dumps(sa, ensure_ascii=False, indent=2, default=str),
+        "=== SP-v4 B2 Step B (final verdict) ===",
+        json.dumps(step_b_obj, ensure_ascii=False, indent=2, default=str),
+    ]
+    return "\n\n".join(parts)
 
 
 class TestParseB2Verdict:
@@ -99,6 +122,21 @@ class TestParseB2Verdict:
         # B1 issues used Phase 6 multi-agent format, not Step B
         b1_body = "[FA Scan SP-v4] drop Nola add Pfaadt — Phase 6 multi-agent"
         assert parse_b2_verdict(b1_body, date(2026, 5, 20)) is None
+
+    def test_matches_actual_emit_format_with_double_newline(self):
+        """Regression: _emit_b2_final joins parts with '\\n\\n'. Earlier
+        regex required single '\\n' after === header and silently dropped
+        every real production Issue body."""
+        body = _body_from_emit({
+            "action": "drop_X_add_Y", "drop": "Nola",
+            "add": "Pfaadt", "watch_target": None,
+            "reason": "Sum +18",
+        })
+        v = parse_b2_verdict(body, date(2026, 5, 27))
+        assert v is not None
+        assert v.action == "drop_X_add_Y"
+        assert v.drop == "Nola"
+        assert v.add == "Pfaadt"
 
 
 # ── parse_issue_date ──

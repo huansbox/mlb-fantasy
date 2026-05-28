@@ -51,10 +51,11 @@ class ResolvedPlayer:
 # ── B2 issue body parsing ──
 
 # Matches the "=== SP-v4 B2 Step B (final verdict) ===" raw dump block inside
-# Issue bodies. The orchestrator (_emit_b2_final) emits this verbatim via
-# `_publish`'s full_raw — for archive purposes it includes the JSON verdict.
+# Issue bodies. The orchestrator (_emit_b2_final) joins parts with "\n\n", so
+# the gap between the === header and the JSON object is at least 2 newlines;
+# `\s+` absorbs any whitespace count (1+) defensively.
 _STEP_B_BLOCK_RE = re.compile(
-    r"===\s*SP-v4\s+B2\s+Step\s+B\s+\(final\s+verdict\)\s*===\s*\n(\{.*?\})\s*(?:\n\s*===|$)",
+    r"===\s*SP-v4\s+B2\s+Step\s+B\s+\(final\s+verdict\)\s*===\s+(\{.*?\})\s*(?:\n\s*===|$)",
     re.DOTALL,
 )
 
