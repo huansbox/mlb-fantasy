@@ -267,6 +267,10 @@
 觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
 - 05-28：xwOBA P95 / Barrel% P70 + prior P80 雙年確認；14d 3 SB 速度；PA-TG 2.20 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 
+### Trevor McDonald (SF, SP,RP) [mlb_id:686790] — 觀察中
+觸發：B2 2-step add
+- 05-29：Trevor McDonald wins 3 of 5 slots over Crow by wide margins: IP/GS 5.8 P70 vs P0, BB/9 1.86 P95 (Crow also P95 but McDonald has 84 BBE vs Crow's 0), GB% 60.7 P95 vs null. McDonald's xwOBACON P70 and W（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
