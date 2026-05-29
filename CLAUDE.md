@@ -121,7 +121,7 @@
 - 「不動也是策略」— FA 未明顯優於現有球員 → 不換
 - 轉隊確認：球員目前球隊 = 數據球隊？不符就重新評估
 - 12 隊聯賽 xwOBA > P90 的 FA 基本不存在 → 出現代表 drop 失誤
-- **投手 selected_pos（SP/BN/P/RP）不影響品質評估** — 投手會在 SP/BN 間輪換調度（當天先發放 SP、已先發過放 BN 等下次輪值），BN ≠「非主力」「占位」。drop 理由只能來自結構面（v4 Sum / 雙年 prior / 樣本可信度 / 運氣訊號 / 21d 趨勢 / Rotation gate）。打者才適用「BN = 角色脈絡」判斷
+- **投手 selected_pos（SP/BN/P/RP）不影響品質評估** — 投手會在 SP/BN 間輪換調度（當天先發放 SP、已先發過放 BN 等下次輪值），BN ≠「非主力」「占位」。drop 理由只能來自結構面（v4 Sum / 雙年 prior / 樣本可信度 / 運氣訊號 / 21d 趨勢 / Rotation gate）。打者才適用「BN = 角色脈絡」判斷。**亦不可用 selected_pos 推測「本週是否上場/貢獻」** — drop/評估投手前查當週 probable starts（實證輪值，如 `mlb_query.py deep` / FanGraphs probables grid）。Why：2026-05-29 用「Pallante 在 BN = 本週沒先發 = drop 零損失」誤判，實則他當天就先發（BN 只是 SP 過多時的輪調暫存）；查 probable 後正解反而是 drop 當天先發但近況最差的 Detmers
 - **SP 評估必用 v4 5-slot（IP/GS / Whiff% / BB/9 / GB% / xwOBACON）** — HH% / xERA / xwOBA 是 v2 已退役指標（2026-04-28 cutover），不可作 SP drop 判斷依據；任何不在 5-slot 的百分位只是 context，**不是 first-order signal**。Why：2026-05-04 用 HH% P5 反向誤判 Holmes 結構性弱，但 v4 xwOBACON 只 P40，當天 Phase 6 也沒排 worst 4。How to apply：判 SP 前先讀同一天 fa-scan SP-v4 GitHub Issue（`gh issue list -R huansbox/mlb-fantasy --label fa-scan`）作 anchor；逆向質疑 Phase 6 需要強反證（如 IL 標籤遺漏這類具體事件），**不是百分位 lens 差異**。
 
 ### 打者評估（v4 thin — raw + agent 自由 reasoning）
