@@ -255,15 +255,6 @@
 - 05-28：14d OPS .576 / Savant Δ-0.046 品質下滑；Duran 觸發接近中（fa_scan）
 - 05-29：14d OPS .576 / Savant Δ-0.046 品質下滑；Sheets 升級為 Duran 替代 A-plan，Gorman 降為 C-plan（fa_scan）
 
-### Trent Grisham (NYY, CF) [mlb_id:663757] — 觀察中
-觸發：Duran 14d OPS <.650 連 3 天 + Grisham Savant Δ 轉正 → 取代 Duran
-- 05-23：xwOBA P80 / BB% P95 / Barrel% P95 + prior triple-P95 雙年菁英；14d OPS .762 / Savant Δ-0.069 短期冷卻；vs Duran（triple-P0 prior）結構差距懸殊但 Duran trad 尚未跌（fa_scan）
-- 05-24：14d OPS .762 / Savant Δ-0.036 短期冷卻；prior triple-P95 結構不變；Duran 觸發 + Savant Δ 轉正即行動（fa_scan）
-- 05-25：14d OPS .741 / Savant Δ-0.008 微冷；prior triple-P95 結構不變；Duran 觸發 + Savant Δ 轉正即行動（fa_scan）
-- 05-26：14d OPS .712 / Savant Δ-0.008 幾乎轉正；Duran 觸發 + Δ 轉正即行動（fa_scan）
-- 05-27：14d OPS .712 / Savant Δ-0.008 幾乎轉正距觸發一步；Duran K% 29.8 + Savant Δ-0.040 觸發接近中（fa_scan）
-- 05-28：14d OPS .867 回暖 / Savant Δ-0.046 短期冷但接近轉正；Duran 觸發接近中（fa_scan）
-
 ### Brett Baty (NYM, 1B,2B,3B,RF) [mlb_id:683146] — 觀察中
 觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
 - 05-23：xwOBA P60 / BB% P60 / Barrel% P60 season 偏低但 14d Savant Δ+0.086 品質飆升 + prior P80/P80 有底；11% rising +3 市場注意中（fa_scan）
@@ -337,6 +328,9 @@
 - 05-26：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Trent Grisham (NYY, CF) — 被搶（自動偵測）
+- 2026-05-29：Yahoo ownership_type=team，從觀察中移除。
 
 ### Spencer Horwitz (PIT, 1B) — 被搶（自動偵測）
 - 2026-05-28：Yahoo ownership_type=team，從觀察中移除。
