@@ -278,6 +278,7 @@
 ### Trevor McDonald (SF, SP,RP) [mlb_id:686790] — 觀察中
 觸發：B2 2-step add
 - 05-29：Trevor McDonald wins 3 of 5 slots over Crow by wide margins: IP/GS 5.8 P70 vs P0, BB/9 1.86 P95 (Crow also P95 but McDonald has 84 BBE vs Crow's 0), GB% 60.7 P95 vs null. McDonald's xwOBACON P70 and W（fa_scan）
+- 05-30：Trevor McDonald dominates Severino across 3 of 5 slots: IP/GS 5.8 P70 vs 5.22 P25, BB/9 1.86 P95 vs 4.45 P0, GB% 60.7 P95 vs 43.7 P50. xwOBACON is close (P70 vs P50, both adequate). McDonald has 84 BB（fa_scan）
 
 ## 隊上觀察
 
