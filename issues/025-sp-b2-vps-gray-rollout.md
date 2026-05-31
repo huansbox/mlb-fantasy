@@ -80,7 +80,7 @@ Atomic cutover with gray rollout safety. Capture B1 reference hash, merge `feat/
 
 **Follow-on (not gating this issue):**
 - Backtest first-run success verification → today TW 14:00 onward (issue 024 / `docs/sp-decisions-backtest.md`)
-- `#263` live signal `drop Severino → add Trevor McDonald` intersects the "Severino transformation 驗證" watch — needs a separate `/player-eval` decision
+- `#263` live signal `drop Severino → add Trevor McDonald`: resolved — user dropped Severino (added José A. Ferrer + Bryan King, NOT McDonald; roster_sync commit `365dbae`). Severino transformation watch closed.
 
 ## Blocked by
 
