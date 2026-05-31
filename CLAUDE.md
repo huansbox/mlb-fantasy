@@ -472,13 +472,11 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
-| `docs/handoff-il-na-filter.md` | FA IL/NA 過濾機制 handoff（2026-05-05）— ✅ Part 1 已完成 merged（commits `87bf243` / `e69555b` / `5113932`）；附加 Task `yahoo_query.py savant v4 SP 升級` 仍待辦 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/rp-svh-metrics.md` | **RP-SV+H 評估 SOP 唯一規格依據** — production-first 大名單產生 / 三軸 rank-sum 候選池縮減 / LLM 層輸入設計。`/rp-svh` skill 引用此處 |
 | `issues/rp-svh-sop.md` | RP-SV+H SOP 落地規劃 issue（A 機械層 / B skill / C 整合退役）— 8 個開放決策 2026-05-19 定案 |
 | `docs/player-eval-sp.md` | `/player-eval` skill 的 SP 子流程（2026-05-09 從 SKILL.md 抽出 + 升級）— 21d xwOBACON Δ / IP/Team_G / 3 年 pitch arsenal / vs L/R splits 為必做；SP brand bias 觸發 + 5 條 decisive signals 走雙條件確認（避免 RP↔SP 角色變化誤判）|
 | `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
-| `docs/handoff-yahoo-names-filter.md` | Yahoo `--names` filter CLI 層 handoff（2026-05-13）— ✅ 全部完成（function 層 commit `b672713`，CLI 層 + `query_fa()` helper commit `f688f48`） |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
