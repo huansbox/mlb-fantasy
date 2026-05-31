@@ -1,7 +1,80 @@
 """Unit tests for roster_sync helpers."""
 from unittest.mock import patch
 
-from roster_sync import _count_missing_fields, search_mlb_id
+from roster_sync import (
+    _count_missing_fields,
+    classify_empty_diff,
+    search_mlb_id,
+)
+
+
+# ── classify_empty_diff: watermark-advance bug guard ──
+#
+# When new transactions exist but the roster diff is empty, decide whether the
+# watermark may advance. Guards the documented bug (5/8 May→Lambert) where a
+# Yahoo add/drop visible in the transaction log but not yet reflected in the
+# roster snapshot got its watermark advanced and was permanently skipped.
+
+NOW = 1_000_000
+LAG = 7200  # 2h default mirror of MAX_ROSTER_LAG_SECONDS
+
+
+def _tx(ts, *actions):
+    """Build a transaction dict with given player actions."""
+    return {"timestamp": ts, "type": "add/drop",
+            "players": [{"name": f"P{i}", "action": a} for i, a in enumerate(actions)]}
+
+
+def test_classify_addrop_within_lag_window_retries():
+    """add/drop tx seen seconds ago but not reflected → retry (don't advance)."""
+    txns = [_tx(NOW - 60, "add")]
+    assert classify_empty_diff(txns, NOW, LAG) == "retry"
+
+
+def test_classify_addrop_past_lag_window_alerts():
+    """add/drop tx unreflected beyond the lag window → give up + alert."""
+    txns = [_tx(NOW - LAG - 1, "add")]
+    assert classify_empty_diff(txns, NOW, LAG) == "advance_alert"
+
+
+def test_classify_addrop_at_exact_boundary_still_retries():
+    """now - oldest == max_lag is NOT past the window (strict >), so retry."""
+    txns = [_tx(NOW - LAG, "drop")]
+    assert classify_empty_diff(txns, NOW, LAG) == "retry"
+
+
+def test_classify_no_addrop_action_advances():
+    """A transaction with no add/drop player action has no roster impact."""
+    txns = [_tx(NOW - 60, "trade")]
+    assert classify_empty_diff(txns, NOW, LAG) == "advance"
+
+
+def test_classify_empty_players_advances():
+    """No players at all → nothing to reflect → advance."""
+    txns = [{"timestamp": NOW - 60, "type": "commish", "players": []}]
+    assert classify_empty_diff(txns, NOW, LAG) == "advance"
+
+
+def test_classify_action_case_insensitive():
+    """Yahoo action casing must not defeat the add/drop detection."""
+    txns = [_tx(NOW - 60, "Add")]
+    assert classify_empty_diff(txns, NOW, LAG) == "retry"
+    txns = [_tx(NOW - 60, "DROP")]
+    assert classify_empty_diff(txns, NOW, LAG) == "retry"
+
+
+def test_classify_uses_oldest_unreflected_tx():
+    """With multiple txns, the OLDEST add/drop drives the lag decision."""
+    # newest is recent, oldest is past the window → past window wins (alert)
+    txns = [_tx(NOW - 30, "add"), _tx(NOW - LAG - 100, "drop")]
+    assert classify_empty_diff(txns, NOW, LAG) == "advance_alert"
+
+
+def test_classify_missing_action_key_treated_as_no_impact():
+    """A player dict without an 'action' key must not crash; counts as no impact."""
+    txns = [{"timestamp": NOW - 60, "type": "add/drop",
+             "players": [{"name": "X"}]}]
+    assert classify_empty_diff(txns, NOW, LAG) == "advance"
 
 
 def test_count_missing_fields_all_complete():

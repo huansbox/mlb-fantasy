@@ -183,6 +183,41 @@ def has_new_transactions(transactions, last_sync_ts):
     return any(tx["timestamp"] > last_sync_ts for tx in transactions)
 
 
+# Max time to keep retrying when an add/drop transaction is visible in the
+# Yahoo transaction log but not yet reflected in the roster snapshot
+# (read-after-write consistency lag). Beyond this, give up + alert rather than
+# loop forever. With a */15 cron this is ~8 retries.
+MAX_ROSTER_LAG_SECONDS = 2 * 3600
+
+
+def classify_empty_diff(new_txns, now_ts, max_lag_seconds=MAX_ROSTER_LAG_SECONDS):
+    """Decide what to do when new transactions exist but the roster diff is empty.
+
+    Guards the watermark-advance bug (5/8 May→Lambert): a Yahoo add/drop can
+    appear in the transaction log before the roster snapshot reflects it.
+    Advancing .last_sync then permanently skips that transaction.
+
+    Returns:
+      "retry"         — add/drop tx not yet reflected, still within the lag
+                        window; caller must NOT advance the watermark so the
+                        next cron run re-checks.
+      "advance_alert" — add/drop tx unreflected past max_lag_seconds; give up,
+                        advance the watermark, and alert (manual check needed).
+      "advance"       — no add/drop impact to reflect; safe to advance.
+    """
+    has_addrop = any(
+        (p.get("action") or "").lower() in ("add", "drop")
+        for tx in new_txns
+        for p in tx.get("players", [])
+    )
+    if not has_addrop:
+        return "advance"
+    oldest = min((tx["timestamp"] for tx in new_txns), default=now_ts)
+    if now_ts - oldest > max_lag_seconds:
+        return "advance_alert"
+    return "retry"
+
+
 # ── Task 4: Diff logic ──
 
 
@@ -781,9 +816,27 @@ def run_daily(league_key, my_key, token, config, env, dry_run):
     dropped = diff["dropped"]
 
     if not added and not dropped:
-        # Transactions detected but roster unchanged (e.g. pending waiver).
-        # Update last_sync so we don't re-check these transactions.
-        print("Transactions detected but roster unchanged. Done.", file=sys.stderr)
+        # New transactions exist but the roster diff is empty. This is the
+        # watermark-advance bug surface: a Yahoo add/drop visible in the
+        # transaction log but not yet reflected in the roster snapshot. If we
+        # advance .last_sync here, that transaction is permanently skipped.
+        decision = classify_empty_diff(new_txns, int(time.time()))
+        if decision == "retry":
+            print("Transactions detected but roster snapshot not yet reflecting "
+                  "them (Yahoo lag). Not advancing watermark; will retry next run.",
+                  file=sys.stderr)
+            return  # do NOT write_last_sync — next cron re-checks
+        if decision == "advance_alert":
+            msg = ("[roster_sync] add/drop transaction seen but never reflected in "
+                   f"roster after >{MAX_ROSTER_LAG_SECONDS // 3600}h — advancing "
+                   "watermark to avoid an infinite retry loop. Manual check needed.")
+            print(msg, file=sys.stderr)
+            send_telegram(msg, env)
+            write_last_sync(int(time.time()))
+            return
+        # decision == "advance": no add/drop roster impact (e.g. vetoed trade,
+        # commish note) — safe to advance so we don't re-check it.
+        print("Transactions detected but no roster impact. Done.", file=sys.stderr)
         write_last_sync(int(time.time()))
         return
 
