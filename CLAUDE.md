@@ -441,6 +441,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 ### 檔案索引
 
+> 本表只列耐久檔（腳本 / evergreen 設計 / source-of-truth doc）。handoff 等過渡文件**不進此表** — active 進「待辦」、done 即刪、`glob docs/handoff-*` 可尋。
+
 | 文件 | 用途 |
 |------|------|
 | `bin/vps-run.sh` | SSH 到 VPS 的 timeout + retry wrapper（本機↔VPS 路徑間歇丟包，見 `issues/vps-ssh-handshake-hang.md`）。`bash bin/vps-run.sh [--no-retry] '<remote cmd>'`，純讀指令會 retry、寫檔/git 走 `--no-retry`。skill 的 SSH step 與本機手動 VPS 指令都走它 |
@@ -476,7 +478,6 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `docs/rp-svh-metrics.md` | **RP-SV+H 評估 SOP 唯一規格依據** — production-first 大名單產生 / 三軸 rank-sum 候選池縮減 / LLM 層輸入設計。`/rp-svh` skill 引用此處 |
 | `issues/rp-svh-sop.md` | RP-SV+H SOP 落地規劃 issue（A 機械層 / B skill / C 整合退役）— 8 個開放決策 2026-05-19 定案 |
 | `docs/player-eval-sp.md` | `/player-eval` skill 的 SP 子流程（2026-05-09 從 SKILL.md 抽出 + 升級）— 21d xwOBACON Δ / IP/Team_G / 3 年 pitch arsenal / vs L/R splits 為必做；SP brand bias 觸發 + 5 條 decisive signals 走雙條件確認（避免 RP↔SP 角色變化誤判）|
-| `docs/handoff-claude-md-cleanup.md` | CLAUDE.md cleanup handoff（2026-05-04）— Task 1（v2 SP code 完整移除）✅ 2026-05-05 完成；Task 2（playbook 段抽出）待辦 |
 | `daily-advisor/yahoo-api-reference.md` | Yahoo Fantasy API 端點參考 |
 | `daily-advisor/calc_percentiles_2026.py` | 百分位分布計算工具（Week 6-8 更新 2026 百分位表時使用） |
 | `daily-advisor/calc_v4_percentiles.py` | v4 框架 2025 SP 百分位計算（IP/GS / Whiff% / BB/9 / GB% / xwOBACON；n=178/115）|
@@ -484,41 +485,18 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `daily-advisor/backfill_prior_stats_v4.py` | v4 cutover 前置：把 2025 `whiff_pct` / `gb_pct` / `xwobacon` backfill 進 roster_config.json（reuse `sp_data_fetchers`，idempotent，新進 SP 也可跑） |
 | `daily-advisor/_tools/_trade_lookup.py` | 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較） |
 | `daily-advisor/_tools/_trade_batter_rank.py` | 交易打者排名掃描（目標打者 vs 11 隊全打者 wRC+ 排名，找交易候選隊伍） |
-| `docs/fa_scan-claude-decision-layer-design.md` | **Phase 6 設計（Claude 決策層 + multi-agent review）+ §7 七題詳化（2026-04-26）— 與 v4 cutover 同波完成（D1=A 鎖定）** |
-| `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）** |
-| `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
-| `docs/v4-cutover-plan.md` | **v4 cutover Stage A-F step-by-step 實作計畫（2026-04-25）— Stage A-D 完成，E parallel 並行中（04-28 起），動 Stage F 前讀** |
-| `docs/savant-xwobacon-endpoint-research.md` | 21d xwOBACON 端點研究（2026-04-25）— **驚喜 finding：不需新 endpoint，savant_rolling.py 4 行 patch 即可**（已實作 commit `621a5d2`）|
-| `docs/phase6-multi-agent-spike.md` | Phase 6 multi-agent spike 計畫 + 結果（2026-04-25 plan / 04-26 跑完）— P1 共識 100%，§7.2 放寬為「P1 match 即收斂」（borderline gate Sum 差 <5 才強制 step 3 review） |
-| `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— v4 cutover 後 1-2 月觸發實作 |
-| `docs/savant-smoke-test-design.md` | Savant 端點 daily smoke test design（2026-04-25）— v4 cutover 前後實作 |
+| `docs/sp-framework-v4-balanced.md` | **SP 評估 v4 設計定稿（5-slot balanced Sum + Rotation gate pre-filter + 時間尺度分層）— B2 仍用此 5-slot 指標** |
 | `docs/sp-b2-cutover-design.md` | **SP B2 cutover 設計定稿（current source of truth）— thin mechanical + 2-step single-LLM + anchor (cant_cut + weekly_anchor_sp) + backtest 監控** |
-| `docs/sp-b1-cutover-design.md` | **Superseded** — B1 設計（2026-05-06）保留作歷史脈絡參考 |
+| `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
+| `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— Use Case B（xwOBACON 校準）待辦引用 |
 | `issues/prd-sp-b2-thin.md` + `issues/017-026-*.md` | **B2 cutover PRD + 10 個 vertical slice issues**（2026-05-27 prd-to-issues 拆出）|
-| `issues/prd.md` + `issues/001-009-*.md` | **B1 cutover PRD + 9 個 vertical slice issues**（2026-05-06，已退役）|
+| 歷史設計文件（已 superseded/退役，內容仍在 disk，glob `docs/`+`issues/` 可尋）| `fa_scan-claude-decision-layer-design`（Phase 6 multi-agent → B2 已改 single-LLM）· `v4-cutover-plan`（v4→B1→B2 早過完）· `phase6-multi-agent-spike` · `savant-xwobacon-endpoint-research`（finding 已實作 `621a5d2`）· `savant-smoke-test-design` · `sp-b1-cutover-design` · `issues/prd.md`+`001-009`（B1 cutover）|
 
 ## 待辦
 
-
-
 - [ ] **Roster freshness pipeline — `classify_empty_diff` prod retry 分支被動觀察**（non-blocking）：整合驗證已於 2026-05-31 收尾（Item 1 SessionStart hook 真 fire / Item 2 `/sync-roster` 端到端 / Item 3 cron 新排程 fire 全 PASS）。唯一未在 prod 驗的是 `classify_empty_diff` 的 retry/advance_alert 分支 — 邏輯已被 8 單測覆蓋，只能等未來某次真實異動撞上 Yahoo read-after-write lag 才觸發。被動觀察：異動後若 `/var/log/roster-sync.log` 出現 `roster snapshot not yet reflecting ... will retry`（而非誤推進浮水印漏抓），即 prod 驗證成功。
-- [ ] **/emerging-batter + /emerging-batter-deep skill 落地**（2026-05-14 設計定稿，跨電腦進行中）：對稱 SP 路徑 /stream-sp + /stream-sp-deep，補 batter 短期決策 gap。主軸 role change detection（不是 hot streak），14 天觀察期 + graduation 雙路徑。設計 doc 含完整 Step 結構、訊號門檻、pending file schema、6 條尚待決定細節、7 步驟落地清單（預估 4-6 小時 + 1-2 週觀察期）。Reuse `yahoo_query.py fa` + `savant_rolling.json` + `roster_config.json`，無新外部依賴。詳見 [`docs/emerging-batter-design.md`](docs/emerging-batter-design.md)。
-  - **進度（2026-05-14）**：
-    - ✅ **Step 1**：TDD 寫 `daily-advisor/emerging_batter_scan.py`（40 tests pass，345 既有測試無 regression）。含 pure signal functions / classify_candidate / scan orchestrator / build_real_fetchers + CLI。`scan()` 用 `_last_known_team` slot 模式（test fetcher 沒此 attr 自動 skip，production fetcher 用 closure mutate）讓單一 scan 同時支援 fixture / production。Production 邊界（Yahoo API + MLB Stats API + savant_rolling.json + fa_history.json）按 stream_sp_scan.py 慣例不做 TDD test，e2e Step 6 才驗。
-    - ⏳ **Step 2-3**：`.claude/commands/emerging-batter.md` + `-deep.md`（仿 `.claude/commands/stream-sp.md` 結構）。Step 0/1/7/8 由 LLM 處理（pending file 讀寫 / 範圍解析 / 整合報告 / 寫回觀察），Step 2-6 是 `python3 emerging_batter_scan.py --pretty` 機械層輸出。
-    - ⏳ **Step 4**：建 `daily-advisor/emerging-batter-pending.md` 空檔 + schema 範本（設計 doc §「Pending file Schema」已給範本）。
-    - ⏳ **Step 5**：CLAUDE.md「檔案索引」加 `emerging_batter_scan.py` 條目；如 Yahoo `position=B` 預設 page_size=50 後實測不夠（pool 可能 ~80 active batter），調 `fa_pool_fn` 內 `page_size=50` 數字。
-    - ⏳ **Step 6**：VPS e2e 驗證（`scp emerging_batter_scan.py root@107.175.30.172:/opt/mlb-fantasy/daily-advisor/` 後 `ssh root@... "cd /opt/mlb-fantasy/daily-advisor && python3 emerging_batter_scan.py --pretty"`）。預期 ~30s（50 個 FA × MLB API gameLog + team byDateRange）。**檢查**：role_change_candidates / hot_streak_candidates / filtered 四桶分布合理，沒爆 exception。注意 `_resolve_mlb_id` 對不在 roster + 不在 savant_rolling 的 FA 會 call `search_mlb_id`（每 call ~100ms），若 FA pool 大半 unknown → 跑超過 60s 才正常。
-    - ⏳ **Step 7**：觀察期 1-2 週後 review role_change vs hot_streak 命中率對比（設計 doc §「尚待決定」決策 4）。
-  - **跨電腦續做注意**：
-    - 跨電腦狀態：commit `git pull` 後就拿到全部（emerging_batter_scan.py / test / 本 handoff），無 VPS 端待同步檔案。Step 6 e2e 才需要 push 到 VPS。
-    - position_saturated 目前回 `False`（hook 預留，落地觀察 1-2 週再實作；設計 doc §「尚待決定」決策 2 有定義「簡單 cap：同位置 active ≥2 且 ≥ season Sum 25 → 飽和」）。
-    - team_games_window 用 MLB Stats API `/teams/{id}/stats?stats=byDateRange&...&gamesPlayed`，每隊 cache。fallback 為 `days`（若 API miss）— 對 PA/TG=3.5 門檻容差小（球隊 14d 通常 12-14 場）。
-    - cant_cut 名單從 `league.cant_cut` (name list) → 透過 `roster_config.batters/pitchers` lookup 解為 mlb_id set。實務上 cant_cut batter 不會出現在 FA pool，此 filter hook 主要防 Yahoo API leak。
-    - 訊號門檻 (`PA_TG_STARTER=3.5` / `PA_TG_JUMP_MIN=1.0` / `OWNED_DELTA_3D_MIN=5.0` / `OWNED_DELTA_7D_MIN=10.0` / `PERF_OPS_MIN=0.650` / `HOT_STREAK_XWOBA_P75=0.326` / `HOT_STREAK_BARREL_P75=11.2` / `HOT_STREAK_BBE_MIN=25` / `PCT_OWNED_MAX=40`) 在 `emerging_batter_scan.py` 頂層常數，設計 doc §「訊號門檻定義」對應。落地觀察期若門檻需調整改頂層常數即可。
-    - skill md 結構參考 `.claude/commands/stream-sp.md`（已 git tracked，跨電腦可見）。設計 doc §「/emerging-batter — 找候選」§「/emerging-batter-deep — 指名深評」分別給 Step 結構藍圖。
+- [ ] **/emerging-batter + /emerging-batter-deep skill 落地**（2026-05-14 設計定稿，跨電腦進行中）：對稱 SP 路徑，補 batter 短期決策 gap（主軸 role change detection，非 hot streak）。**進度**：Step 1（機械層 `emerging_batter_scan.py` TDD 40 tests）✅；Step 2-7（skill md / pending 檔 / e2e / 觀察期）⏳。完整 Step 進度 + 跨電腦續做 gotchas（position_saturated / team_games_window / 門檻常數）見 [`docs/emerging-batter-design.md`](docs/emerging-batter-design.md) §「落地進度」。
 - [ ] **RP-SV+H SOP — 並行驗證 + 退役舊 --rp**（2026-05-19 落地）：機械層 `rp_svh_scan.py`（TDD 43 tests）+ `/rp-svh` skill 已實作（A2 `--names` accent/apostrophe 正規化 / A3 `sp_data_fetchers` saves-holds-blownSaves-SVO parse 同波完成）。8 個開放決策定案：rank-sum 軸 3 = **30d SV+H 累積**（非球隊勝率/場次數 — 3 agent 發想後選定，player-level 且與 BB/9 / whiff% 正交）、三軸等權、top-4（cutoff 並列納入）、純 skill 觸發無 cron、incumbent 比較交 LLM 自由 reasoning、趨勢訊號 out-of-scope。**剩餘**：① VPS 部署 + e2e 驗證（feat 分支 merge 後 VPS git pull）② 與舊 `fa_scan.py --rp` cron 並行 1-2 週比對（驗收：新 SOP 是否漏掉舊 scan 抓到的真候選 + verdict 是否合理）③ 通過後 C1 完全退役 `fa_scan.py` RP 殘留（grep `_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `_fmt_roster_pitcher_rp` / `prompt_fa_scan_rp.txt` / `--rp` flag）。完整脈絡見 [`issues/rp-svh-sop.md`](issues/rp-svh-sop.md)。
-- [ ] **CLAUDE.md cleanup Task 2（剩餘）**：抽出其他「不常用 + 多行」段成 playbook。本 session 已抽 系統架構（→ `docs/architecture.md`）+ 壓縮 v4 cutover archive（-49 行）。剩候選：檔案索引（~30 lines，每天查得到不建議拉）/ 執行環境（~15 lines，行數不夠）。Task 1 ✅ 2026-05-05 完成。詳見 [`docs/handoff-claude-md-cleanup.md`](docs/handoff-claude-md-cleanup.md)。
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **Backtest Use Case B（xwOBACON 校準）**（4-6 週數據累積後觸發）：設計參考 `docs/sp-decisions-backtest-automation.md` Use Case B。校準路徑：累積後從 GitHub Issue archive 反推 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。
 - [ ] **B2 backtest cron 首跑驗證（2026-05-31 TW 14:00 首跑）**：SP B2 cutover + 24-48h 監控已收尾（issue 025 closed 2026-05-31 — #255/#259/#263 三天乾淨、anchor 隱形、無 rollback）。`cron_backtest.sh`（commit `e55fbd5`，Sun 06:00 UTC）首跑就在今天 TW 14:00。**剩餘**：今晚或明早確認首跑成功 — `docs/sp-decisions-backtest.md` 應有新增段（目前最後更新 04-30）+ VPS git log 應有自動 commit；若無變更或 cron 沒跑，查 backtest log。明天週一 `/weekly-review` session 即可看到新增段。Rollback（contingency，未觸發）: `git revert -m 1 95f879a`。

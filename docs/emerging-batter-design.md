@@ -411,3 +411,21 @@ CLI：`python3 emerging_batter_scan.py 2>/dev/null` 純 JSON stdout。
 | 7 | 觀察期 1-2 週後 review：role change vs hot streak 命中率對比 | — |
 
 依賴：無新外部資源；reuse `yahoo_query.py fa` + `savant_rolling.json` + `roster_config.json`。
+
+## 落地進度（2026-05-14，跨電腦進行中）
+
+- ✅ **Step 1**：TDD 寫 `daily-advisor/emerging_batter_scan.py`（40 tests pass，345 既有測試無 regression）。含 pure signal functions / classify_candidate / scan orchestrator / build_real_fetchers + CLI。`scan()` 用 `_last_known_team` slot 模式（test fetcher 沒此 attr 自動 skip，production fetcher 用 closure mutate）讓單一 scan 同時支援 fixture / production。Production 邊界（Yahoo API + MLB Stats API + savant_rolling.json + fa_history.json）按 stream_sp_scan.py 慣例不做 TDD test，e2e Step 6 才驗。
+- ⏳ **Step 2-3**：`.claude/commands/emerging-batter.md` + `-deep.md`（仿 `.claude/commands/stream-sp.md` 結構）。Step 0/1/7/8 由 LLM 處理（pending file 讀寫 / 範圍解析 / 整合報告 / 寫回觀察），Step 2-6 是 `python3 emerging_batter_scan.py --pretty` 機械層輸出。
+- ⏳ **Step 4**：建 `daily-advisor/emerging-batter-pending.md` 空檔 + schema 範本（本 doc §「Pending file Schema」已給範本）。
+- ⏳ **Step 5**：CLAUDE.md「檔案索引」加 `emerging_batter_scan.py` 條目；如 Yahoo `position=B` 預設 page_size=50 後實測不夠（pool 可能 ~80 active batter），調 `fa_pool_fn` 內 `page_size=50` 數字。
+- ⏳ **Step 6**：VPS e2e 驗證（`scp emerging_batter_scan.py root@107.175.30.172:/opt/mlb-fantasy/daily-advisor/` 後 `ssh root@... "cd /opt/mlb-fantasy/daily-advisor && python3 emerging_batter_scan.py --pretty"`）。預期 ~30s（50 個 FA × MLB API gameLog + team byDateRange）。**檢查**：role_change_candidates / hot_streak_candidates / filtered 四桶分布合理，沒爆 exception。注意 `_resolve_mlb_id` 對不在 roster + 不在 savant_rolling 的 FA 會 call `search_mlb_id`（每 call ~100ms），若 FA pool 大半 unknown → 跑超過 60s 才正常。
+- ⏳ **Step 7**：觀察期 1-2 週後 review role_change vs hot_streak 命中率對比（§「尚待決定」決策 4）。
+
+### 跨電腦續做注意
+
+- 跨電腦狀態：commit `git pull` 後就拿到全部（emerging_batter_scan.py / test），無 VPS 端待同步檔案。Step 6 e2e 才需要 push 到 VPS。
+- position_saturated 目前回 `False`（hook 預留，落地觀察 1-2 週再實作；§「尚待決定」決策 2 有定義「簡單 cap：同位置 active ≥2 且 ≥ season Sum 25 → 飽和」）。
+- team_games_window 用 MLB Stats API `/teams/{id}/stats?stats=byDateRange&...&gamesPlayed`，每隊 cache。fallback 為 `days`（若 API miss）— 對 PA/TG=3.5 門檻容差小（球隊 14d 通常 12-14 場）。
+- cant_cut 名單從 `league.cant_cut` (name list) → 透過 `roster_config.batters/pitchers` lookup 解為 mlb_id set。實務上 cant_cut batter 不會出現在 FA pool，此 filter hook 主要防 Yahoo API leak。
+- 訊號門檻 (`PA_TG_STARTER=3.5` / `PA_TG_JUMP_MIN=1.0` / `OWNED_DELTA_3D_MIN=5.0` / `OWNED_DELTA_7D_MIN=10.0` / `PERF_OPS_MIN=0.650` / `HOT_STREAK_XWOBA_P75=0.326` / `HOT_STREAK_BARREL_P75=11.2` / `HOT_STREAK_BBE_MIN=25` / `PCT_OWNED_MAX=40`) 在 `emerging_batter_scan.py` 頂層常數，§「訊號門檻定義」對應。落地觀察期若門檻需調整改頂層常數即可。
+- skill md 結構參考 `.claude/commands/stream-sp.md`（已 git tracked，跨電腦可見）。本 doc §「/emerging-batter — 找候選」§「/emerging-batter-deep — 指名深評」分別給 Step 結構藍圖。
