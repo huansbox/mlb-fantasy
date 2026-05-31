@@ -472,6 +472,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
+| `docs/handoff-roster-freshness-pipeline.md` | Roster 新鮮度 pipeline handoff（2026-05-31）— 兩層同步 + `/sync-roster` 已 deploy；下個 session 驗 SessionStart hook 真 fire + `/sync-roster` 端到端。含測試清單 / debug / rollback |
 | `docs/handoff-il-na-filter.md` | FA IL/NA 過濾機制 handoff（2026-05-05）— ✅ Part 1 已完成 merged（commits `87bf243` / `e69555b` / `5113932`）；附加 Task `yahoo_query.py savant v4 SP 升級` 仍待辦 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/rp-svh-metrics.md` | **RP-SV+H 評估 SOP 唯一規格依據** — production-first 大名單產生 / 三軸 rank-sum 候選池縮減 / LLM 層輸入設計。`/rp-svh` skill 引用此處 |
@@ -503,6 +504,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 
 
+- [ ] **Roster freshness pipeline — 下個 session 驗整合行為**（2026-05-31 落地）：兩層同步 + `/sync-roster` 已 deploy（cron `7,22,37,52` live + 浮水印 bug 修 + SessionStart hook）。單元邏輯 + cron fire + hook auto-pull/gate 都已實證。**剩驗**：① SessionStart hook 真的在開場 fire（看開場有無 `[roster-sync]` 狀態行）② `/sync-roster` 端到端實跑。完整測試清單 + debug 步驟 + rollback 見 [`docs/handoff-roster-freshness-pipeline.md`](docs/handoff-roster-freshness-pipeline.md)。
 - [ ] **/emerging-batter + /emerging-batter-deep skill 落地**（2026-05-14 設計定稿，跨電腦進行中）：對稱 SP 路徑 /stream-sp + /stream-sp-deep，補 batter 短期決策 gap。主軸 role change detection（不是 hot streak），14 天觀察期 + graduation 雙路徑。設計 doc 含完整 Step 結構、訊號門檻、pending file schema、6 條尚待決定細節、7 步驟落地清單（預估 4-6 小時 + 1-2 週觀察期）。Reuse `yahoo_query.py fa` + `savant_rolling.json` + `roster_config.json`，無新外部依賴。詳見 [`docs/emerging-batter-design.md`](docs/emerging-batter-design.md)。
   - **進度（2026-05-14）**：
     - ✅ **Step 1**：TDD 寫 `daily-advisor/emerging_batter_scan.py`（40 tests pass，345 既有測試無 regression）。含 pure signal functions / classify_candidate / scan orchestrator / build_real_fetchers + CLI。`scan()` 用 `_last_known_team` slot 模式（test fetcher 沒此 attr 自動 skip，production fetcher 用 closure mutate）讓單一 scan 同時支援 fixture / production。Production 邊界（Yahoo API + MLB Stats API + savant_rolling.json + fa_history.json）按 stream_sp_scan.py 慣例不做 TDD test，e2e Step 6 才驗。
