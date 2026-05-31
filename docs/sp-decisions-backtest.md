@@ -232,3 +232,15 @@
 - **2026-04-23 創建**：初版，涵蓋 9 筆歷史決策 + 元回測框架
 - 後續每次 SP 重大決策 → 新增條目
 - 每 2-4 週回測 session → 更新「後續走勢」欄位
+
+## Weekly Backtest 2026-05-31 (no verdicts)
+
+- Window: last 7 days; post-verdict observation: 21 days
+- Total verdicts parsed: 0 (actionable: 0)
+- Hit rate: —
+
+By action:
+- `drop_X_add_Y` n=0 (actionable 0) hit_rate=—
+- `watch` n=0 (actionable 0) hit_rate=—
+- `pass` n=0 (actionable 0) hit_rate=—
+
