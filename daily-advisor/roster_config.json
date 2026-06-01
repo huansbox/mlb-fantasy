@@ -366,7 +366,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -406,7 +406,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "RP",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -463,29 +463,6 @@
         "era": 5.31,
         "ip": 162.7,
         "ip_per_gs": 5.2
-      }
-    },
-    {
-      "name": "Kevin Kelly",
-      "mlb_id": 687330,
-      "yahoo_player_key": "469.p.12768",
-      "team": "TB",
-      "positions": [
-        "RP"
-      ],
-      "selected_pos": "RP",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 6.39,
-        "xwoba_allowed": 0.381,
-        "hh_pct_allowed": 52.8,
-        "barrel_pct_allowed": 15.7,
-        "bbe": 127,
-        "era": 5.9,
-        "k_per_9": 7.94,
-        "ip_per_team_g": 0.24,
-        "ip": 39.7
       }
     },
     {
@@ -554,6 +531,29 @@
         "k_per_9": 9.13,
         "ip_per_team_g": 0.42,
         "ip": 68.0
+      }
+    },
+    {
+      "name": "Gregory Soto",
+      "mlb_id": 642397,
+      "yahoo_player_key": "469.p.10882",
+      "team": "PIT",
+      "positions": [
+        "RP"
+      ],
+      "selected_pos": "RP",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.85,
+        "xwoba_allowed": 0.305,
+        "hh_pct_allowed": 37.9,
+        "barrel_pct_allowed": 4.0,
+        "bbe": 174,
+        "era": 4.18,
+        "k_per_9": 10.44,
+        "ip_per_team_g": 0.37,
+        "ip": 60.3
       }
     }
   ],
