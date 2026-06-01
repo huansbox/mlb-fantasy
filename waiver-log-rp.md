@@ -23,7 +23,34 @@
   本週對手 BAL×3 / NYY×3 皆強隊（多 small-margin 局）→ hold 機會穩定，但 TB committee
   仍無 SV 路徑（落後 Jax / Baker / Cleavinger）。
 
+### José A. Ferrer（SEA, RP）— hold 上升（2026-06-01 eval）
+
+- **2026-06-01 [eval] vs Soto/King（只看 SV+H，drop 一人）**：結論 = **hold（留）**。
+- 本季 SV+H 10、ERA 1.75 / WHIP 1.25 / K 22。季中由 WSH 交易至 SEA（換 Harry Ford + Issac Lyon）。
+- role 上升：Dipoto 稱 Mariners「No.1 bullpen target」、定位 7-8 局 setup（左投版 Matt Brash）、
+  fastball 觸 100 mph、近況好（剛 close out vs ATL）。closer = Andrés Muñoz → hold 為主、SV 偶有。
+- 本週賽程 3 home NYM + 3 away DET（中等）。role 軌跡向上，留著。
+
+### Bryan King（HOU, RP）— ⚠️ 建議 drop（2026-06-01 eval）
+
+- **2026-06-01 [eval] vs Soto/Ferrer（只看 SV+H，drop 一人）**：結論 = **建議 drop，撿 FA Gregory Soto**。
+- 本季 SV+H 11、ERA 2.84 / WHIP 1.30 / K 19 — 三者數據全墊底（WHIP 最高、K 最少）。
+- **drop 主因（role 下降）**：HOU 明確要分散其 high-leverage 使用、「為第七局找別人」 → SV+H 機會
+  結構性下滑；去年被操過頭（"leaking oil" / workload-health 疑慮）。closer = Hader，無 SV 路徑。
+- 本週賽程是唯一優勢（6 場全主場打 PIT/ATH 弱旅 → hold 環境最佳），但屬單週 noise + role 比重
+  下降會抵消（hold 機會分流給別人），不足以保位。
+
 ## FA 觀察中
+
+### Gregory Soto（PIT, RP）— ✅ 建議撿（換 King，2026-06-01 eval）
+
+- **2026-06-01 [eval] vs King/Ferrer（只看 SV+H，drop 一人）**：結論 = **明顯優於 King，建議 drop King 撿 Soto（FA $0）**。
+- 本季 SV+H 13（三者最高）、ERA 1.95 / WHIP **0.76** / K 32 — ratio + K 俱佳。46% owned（市場已認證）。
+- **選他理由**：三者唯一往 closer 走（save 上限 > setup hold）；近 9 場 8 場無失分、11:2 K:BB；
+  教練 Don Kelly 偏好 closer 選項（雖 noncommittal）。
+- **監看點**：① **trade risk** — PIT 賣家 + 左投 closer = 7 月 deadline 熱門標的，換隊後 SV+H 角色或波動。
+  ② closer 角色未完全坐穩 + 本週 PIT 客場打 HOU/ATL 強旅 → 本週 save 產量可能僅 0-2，價值看中期兌現。
+- **触發條件**：撿下後若 closer 角色坐實 → 成 incumbent benchmark 之一；若 7 月被交易 → 重評新隊角色。
 
 ### Rico Garcia（BAL, RP）— 短期 SV 窗口
 
