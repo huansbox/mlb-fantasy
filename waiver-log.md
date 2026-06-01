@@ -266,21 +266,6 @@
 - 05-31：14d OPS .813 / Savant Δ-0.004 持平；BBE 164 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-01：[傷:DTD] 14d OPS .813 / Savant Δ-0.004 持平；BBE 168 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
 
-### Luke Raley (SEA, 1B,LF,CF,RF) [mlb_id:670042] — 觀察中
-觸發：BB% 升至 P40+ 或 14d 維持 OPS ≥1.000 連 7 天 → 升級
-- 05-20：xwOBA P95 / Barrel% P95 / 14d OPS 1.143 / 5HR / 14RBI 爆發；但 BB% P25 結構弱 7×7 懲罰大 + prior P60 非雙年菁英；27% rising +12 市場在搶（fa_scan）
-- 05-21：14d OPS 1.120 / 5HR / 14RBI 爆發 + 27% rising +11；但 BB% P25 結構弱 7×7 懲罰大 + prior P60；觸發未達（BB% <P40）（fa_scan）
-- 05-22：14d OPS 1.120 / 5HR / 14RBI 爆發持續；但 BB% P25 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-23：14d OPS .988 / 4HR / 11RBI 爆發持續；但 BB% P25 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-24：14d OPS 1.125 / 4HR / 11RBI 爆發持續；但 BB% 5.71 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-25：14d OPS .845 / 2HR / Savant Δ-0.003 持平；BB% 5.52 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-26：14d OPS .960 / 3HR / Savant Δ-0.003 持平；BB% 5.33 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-27：14d OPS .970 / 3HR / Savant Δ-0.049 品質下滑；BB% 5.3 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-28：14d OPS .908 / 3HR / Savant Δ-0.067 品質下滑；BB% 5.2 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-29：14d OPS .908 / 3HR / Savant Δ-0.067 品質下滑；BB% 5.2 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-30：14d OPS .908 / 3HR / Savant Δ-0.142 品質崩；BB% 5.1 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-- 05-31：14d OPS .951 / 3HR / Savant Δ-0.131 品質崩；BB% 5.0 P0 結構弱 7×7 懲罰大；觸發未達（BB% <P40）（fa_scan）
-
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 OR Savant Δ 連 5 天負值 → 取代 Duran
 - 05-21：xwOBA P70 / BB% P80 / Barrel% P70 三項均衡 + PA-TG 3.71 全職；14d OPS .810 / Savant Δ+0.084 品質飆升；prior P45/P80/P60 BB% 跨年確認；5% 零壓力（fa_scan）
@@ -324,13 +309,6 @@
 - 05-30：14d OPS .781 / 3SB 速度；PA-TG 2.27 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 05-31：14d OPS .803 / 2HR / 11RBI / 3SB 全面；PA-TG 2.30 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-01：14d OPS .880 / 2HR / 11RBI / 3SB 全面；PA-TG 2.28 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-
-### Trevor McDonald (SF, SP,RP) [mlb_id:686790] — 觀察中
-觸發：B2 2-step add
-- 05-29：Trevor McDonald wins 3 of 5 slots over Crow by wide margins: IP/GS 5.8 P70 vs P0, BB/9 1.86 P95 (Crow also P95 but McDonald has 84 BBE vs Crow's 0), GB% 60.7 P95 vs null. McDonald's xwOBACON P70 and W（fa_scan）
-- 05-30：Trevor McDonald dominates Severino across 3 of 5 slots: IP/GS 5.8 P70 vs 5.22 P25, BB/9 1.86 P95 vs 4.45 P0, GB% 60.7 P95 vs 43.7 P50. xwOBACON is close (P70 vs P50, both adequate). McDonald has 84 BB（fa_scan）
-- 05-31：McDonald dominates Montero on 4 of 5 slots: IP/GS 5.8 P70 vs 5.5 P50, Whiff% 26.4 P60 vs 17.7 P0, BB/9 1.86 P95 vs 2.45 P60, GB% 60.7 P95 vs 33.5 P0. Montero's lone advantage is xwOBACON P95 vs P70, b（fa_scan）
-- 06-01：Trevor McDonald wins 3 of 5 slots decisively over Cantillo: IP/GS 5.8 P70 vs 4.83 P0, BB/9 1.86 P95 vs 4.81 P0, GB% 60.7 P95 vs 44.7 P60. Whiff% is a wash (both P60), xwOBACON slight Cantillo edge (.3（fa_scan）
 
 ### Joc Pederson (TEX, Util) [mlb_id:592626] — 觀察中
 觸發：PA-TG ≥3.0 連 5 天 + %owned 突破 10% → 升級
@@ -389,6 +367,12 @@
 - 05-30：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Luke Raley (SEA, 1B,LF,CF,RF) — 被搶（自動偵測）
+- 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
+
+### Trevor McDonald (SF, SP,RP) — 被搶（自動偵測）
+- 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
 
 ### Trent Grisham (NYY, CF) — 被搶（自動偵測）
 - 2026-05-29：Yahoo ownership_type=team，從觀察中移除。
