@@ -4,62 +4,48 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-05-29
-- recorded_at: 2026-05-28T12:52:00+08:00
-- last_recheck_at: 2026-05-29T07:05:00+08:00
+## ET 2026-06-01
+- recorded_at: 2026-06-01T12:38:21+08:00
+- last_recheck_at: —
 
 ### TBD 場次（待補查）
-- TOR @ BAL (TOR away TBD)
-- BOS @ CLE (BOS away TBD)
+- CWS @ MIN (CWS away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Coleman Crow | MIL away | HOU (.674) | 1% | 22/— | <P25·<P25·**>P90**·—·**>P90** | ✅ 已 claim（本隊）| 2026-05-29 補查：已進本隊（scan owned_by_me）。原 ⚠️ 條件推 candidate 已撿下，今晚 vs HOU 先發。 |
-| Chris Paddack | CIN home | ATL (.65) | 1% | 20/17 | <P25·P25-40·P40-50·P40-50·P50-60 | ❌ 不推 (deep) | 維持 pending verdict（差異訊號更明確）。近 6 場 ERA **7.27** + QS **0/6** deep crisis + 2 次 collapse（STL 5ER + PHI 7ER）→ floor risk hard rule trigger。ATL 7d .515 是 cold noise（hard rule 強制 14d 為錨）→ 回歸後 30d .700 / vs RHP .765 屬「中-強」級；4/15 對 ATL 客場已是 4.2IP/2ER 短局。luck_tag ✅ 撿便宜（xERA 4.33）已破功 — 結構面跟不上實際表現。 |
-| Slade Cecconi | CLE home | BOS (.777) | 5% | 19/27 | P25-40·<P25·P40-50·**P60-70**·P25-40 | ❌ 不推（已被別隊認領）| 2026-05-29 補查：scan owned_by_others 出現，已被聯盟撿走。原 ❌ 不推結論不變，現已非 FA。 |
-| Kyle Leahy | STL home | CHC (.656) | 7% | 15/20 | <P25·P40-50·<P25·**P60-70**·<P25 | ❌ 不推 | luck_tag **⚠️ 賣高運氣** (ERA 4.44 / xERA 6.34 差 -1.90) — 真實結構 xERA 6.34 deep crisis；2026 5 軸 3 個 <P25 + 2025 IP/GS 3.0 顯示 reliever 出身；雖對手 .656 🟢 但結構崩潰風險過高。 |
+
+_（本次無通過過濾的 FA 候選）_
 
 ### 備註
-- 2026-05-28 12:52 首次評估：4 位通過 Rotation gate + Sum ≥15 + true_starter（Coleman Crow WebSearch 確認真先發補 Henderson IL 缺）。已過濾：Andrew Alvarez（Rotation gate 🚫 G=4/GS=0 pure reliever）+ Lucas Giolito（Sum 13 hard floor，GS=2 樣本小 + 雙年 11）+ Erick Fedde（Sum 12 hard floor，5 軸 4 個 <P25 + 雙年低）+ 別隊 12 位（含 Carlos Rodón / Zac Gallen / George Kirby / Logan Webb / Zack Wheeler）+ 本隊 2 位（Kolek @ TEX / Severino home vs NYY）。
-- TBD 9 場（多為 away SP TBD），建議 TW 5/29 早上 9-10 點呼叫 `/stream-sp 補查` 補查。
-- **Coleman Crow 唯一條件推但樣本零**：MLB.com 報補 Logan Henderson IL 缺，預期 ~5 IP。雙 elite 軸（BB/9 + xwOBACON）但 BBE=0 + 2025 無 MLB 數據 → 結構訊號信心低。建議：1) 是否 ERA/WHIP 已輸定 → 撿；有翻盤空間 → pass，2) `/stream-sp-deep Coleman Crow` 看 MIL 兩場 game log + HOU 對 RHP rookie 歷史。
-- 2026-05-28 13:05 deep eval（3 位候選：Bassitt 跨日 5/28 + Crow 5/29 + Paddack 5/29）：
-  - **Bassitt (ET 5/28，不在本 pending 範圍)**：⚠️ 偏推 → ❌ 不推 (deep)。差異訊號 = 近 6 場 ERA 5.17 + **對弱打 4 次崩盤**（PIT 6ER / KC 5ER / MIA 4ER / WSH 4ER）+ floor risk hard rule trigger。Pending 5-slot Sum 25 28 prior 撐底反映不到近場結構崩
-  - **Crow**：⚠️ 條件推 → ⚠️ 條件推 (deep)。差異訊號 = 近 2 場 ERA 2.61 無 collapse + HOU 14d/30d 持平 .674（hard rule lock 14d 為錨，7d .803 是 spike noise）；但樣本警告 + 雙年無 prior 維持條件推（不升 ✅）
-  - **Paddack**：❌ 不推 → ❌ 不推 (deep)。差異訊號 = 近 6 場 ERA **7.27** + QS 0/6 deep crisis + 2 次 collapse + ATL 7d .515 是 cold noise（hard rule lock 14d 為錨）→ 回歸後對手仍中-強級；維持不推結論成立
-- 排序：**Crow > Bassitt >> Paddack**。Crow 對 ERA/WHIP 翻盤無風險（賭 BB/9 elite 複製）；Bassitt 雖 Sum 25 28 撐但近 6 場崩盤太頻繁，QS/W 期望都低於 30%；Paddack 結構 + 近況 + 對手 + 運氣四方向全壞
-- 用戶決策建議：① ERA/WHIP 有翻盤空間 → 只 Crow ② ERA/WHIP 已輸定 + 堆 IP/W/K → 也只 Crow（Bassitt QS 30% 不值得） ③ FAAB 預算緊 → Crow $0 FA 撿即可
-- _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
+- 2026-06-01 12:38 首次評估：唯一 FA 候選 Kyle Freeland (COL @ LAA) Sum26 **11** < 15 hard floor 排除（5 軸 IP/GS <P25 + GB <P25 + xwOBACON <P25，ERA 8.08 / xERA 6.67 雙崩，luck_tag ✅ 撿便宜失效因 xERA 本身 deep crisis）。TBD 1 場（CWS away SP 未公布；MIN 已公布 Joe Ryan 別隊持有）。owned_by_others 16 位（含 Sandy Alcantara / Jacob deGrom / Joe Ryan）。建議 TW 6/1 晚上補查 CWS SP（時效至 ET 6/1 13:00 = TW 6/2 01:00）。
+- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
 
-## ET 2026-05-30
-- recorded_at: 2026-05-28T13:22:08+08:00
-- last_recheck_at: 2026-05-29T07:20:00+08:00
+## ET 2026-06-02
+- recorded_at: 2026-06-01T12:38:21+08:00
+- last_recheck_at: 2026-06-01T12:46:13+08:00
 
 ### TBD 場次（待補查）
-- SD @ WSH (WSH home TBD)
-- SF @ COL (COL home TBD)
-- PHI @ LAD (PHI away TBD)
+- MIA @ WSH (MIA away TBD)
+- TOR @ ATL (ATL home TBD)
+- NYM @ SEA (NYM away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Roki Sasaki | LAD home | PHI (.635) | 39% | 17/15 | <P25·**P80-90**·<P25·P40-50·<P25 | ⚠️ 條件推 (deep) | 維持 pending verdict。深評確認：近 4 場 3.52 ERA（5/02 inflection 後）+ 2 QS + 5/17 對 LAA 7IP/1ER/8K dominant fingerprint；PHI vs RHP .685 弱-中 + 14d/7d 一致 .635/.628 冷期（30d→7d Δ -.075 非 spike）；floor risk 低（無對弱打崩盤）。短局型 IP/GS <P25 限 QS 機率 ~35-40%，故不升 ✅。 |
-| 🆕 Kumar Rocker | TEX home | KC (.595) | 10% | 21/20 | <P25·P40-50·<P25·**P80-90**·P40-50 | ⚠️ 條件推 (deep) | 維持 pending verdict。深評確認：對位最甜 — KC 14d .595 / 7d .616 一致冷期 + vs RHP .691 弱-中 ∩ Rocker「吃弱打」pattern（對弱線 PIT/ATH/COL **3/4 QS**，對中線 0/4）；GB% P80-90 ∩ KC 低 power 抑 ER；無 luck 扭曲。風險：IP/GS 4.7 短局限 QS ~50-55% + 近 6 場 2 次崩盤（DET 2IP/5ER、HOU 4ER，但都非對弱打 → hard rule 未觸發，floor 中-高下修）+ BB/9 <P25。 |
-| Brandon Sproat | MIL away | HOU (.684) | 6% | 16/22 | <P25·P60-70·<P25·P50-60·<P25 | ❌ 不推 (deep) | 反轉 pending verdict ⚠️ → ❌。差異訊號 = 近 6 場 **0/6 QS** + 5.20 ERA + 4 連場 IP<5 fragile；BB/9 5.44 失控（近 4 場 16BB/18IP）+ HOU 7d .834/R/G 6.2 hot lineup（hard rule lock 14d 為錨 .684 中，但 vs RHP .722 季線回歸方向不利）；客場 + LAD 後手感差（5/24 4IP/3ER/4BB）。luck_tag ✅ 撿便宜唯一加分但結構 P<25 撐不起。 |
-| Brady Singer | CIN home | ATL (.653) | 13% | 16/19 | <P25·P25-40·**P70-80**·P25-40·<P25 | ❌ 不推 (deep) | 維持 pending verdict。深評強化：floor risk **hard rule trigger 高**（近 6 場對弱打 PIT/WSH/CLE 3 次崩盤/準崩 + 近 6 場 ERA **6.67** ≥4.50 OR 雙條件全 trigger）；ATL 14d .653 cool 看似友善但 vs RHP .765 季線 1342 PA 強底盤 + 7d .489 是 cold noise（hard rule lock 14d）→ 回歸窗口往上；5/17 對 CLE 弱打 4IP/5ER/3HR fingerprint。 |
+| Trevor McDonald | SF away | MIL (.628) | 11% | 43/46 | P70-80·P60-70·**>P90**·**>P90**·P70-80 | ⚠️ 條件推 (deep) | 深評降評。近 5 場 ERA 4.34（非強推 ≤3.50）+ 5/22 對 CWS 弱打 3.2IP/7ER 崩盤（0BB/0HR cluster luck 孤立，前後 ATH/AZ 皆 QS）+ GS=5 小樣本（medium）讓 Sum 43 信心降一檔；MIL 14d .628 冷但 vs RHP .713 季線中等（回歸往上）。仍當日最佳串流（QS ~50-55% + BB/9/GB% 雙 >P90）|
+| Miles Mikolas | WSH home | MIA (.641) | 1% | 18/20 | <P25·<P25·P60-70·P70-80·<P25 | ❌ 不推 (deep) | 深評維持。近 6 場 ERA 3.33 近況回穩（比 season 5.72 好）但 **0/12 QS** + IP/GS 4.17 從未投滿 6 局 + K9 5.72 低三振 = fragile 天花板鎖死；MIA 弱（vs RHP .695）但只 hedge ERA/WHIP，QS/K/W 全拿不到 |
+| Noah Cameron | KC away | CIN (.753) | 18% | 17/29 | P25-40·P50-60·P50-60·<P25·<P25 | ❌ 不推 | 無 elite 軸 + 對手 CIN 🟡 + vs LHP .761 偏強；2025 Sum 29 較佳但今年回落 + luck ⚠️ 賣高 |
+| Bubba Chandler | PIT away | HOU (.681) | 62% | 15/27 | <P25·P50-60·**<P25**·<P25·P50-60 | ❌ 不推 | BB/9 6.23 控球失控（<P25）+ WHIP 1.52 + Sum 剛過 floor；高 %own 但結構撐不起 |
 
 ### 備註
-- 2026-05-28 13:22 首次評估：3 位通過 Rotation gate + Sum ≥15 + true_starter（無 opener 待確認）。已過濾：Brandon Young (BAL home vs TOR, Sum 13 hard floor — 5 軸 4 個 <P25 雙年低 + 雖 xwOBACON P80-90 elite 但 luck_tag ⚠️ 賣高運氣 ERA 3.47/xERA 4.28 真實結構接近 4.28) + 別隊 11 位（含 Michael King / Bryan Woo / Seth Lugo / Trey Yesavage / Drew Rasmussen / Ryan Weathers）+ 本隊 3 位（Messick home vs BOS / Pallante home vs CHC / Ginn home vs NYY）。
-- TBD 11 場（多為 5/30 才公布的 starter），建議 TW 5/29 晚上或 5/30 早上 9-10 點呼叫 `/stream-sp 補查` 補查。
-- 2026-05-28 13:28 deep eval（3 位候選 Sasaki + Sproat + Singer）：
-  - **Sasaki**：⚠️ 條件推 → ⚠️ 維持 (deep)。差異訊號 = 近 4 場 3.52 ERA inflection（5/02 後）+ 5/17 LAA 7IP/1ER/8K fingerprint + PHI vs RHP .685 主錨弱-中 + floor risk 低；短局型 IP/GS <P25 限 QS ~35-40% 不升 ✅
-  - **Sproat**：⚠️ 條件推 → **❌ 不推 (deep)**。差異訊號 = 近 6 場 **0/6 QS** + 5.20 ERA + 4 連場 IP<5 fragile + BB/9 5.44 失控 + HOU 7d .834/R/G 6.2 hot lineup（hard rule lock 14d .684 但 vs RHP .722 季線回歸方向不利）；luck_tag 撿便宜結構 P<25 撐不起
-  - **Singer**：❌ 不推 → ❌ 維持 (deep)。差異訊號強化 = floor risk **hard rule trigger 高**（近 6 場對弱打 3 次崩盤/準崩 + ERA 6.67 OR 雙條件全 trigger）+ ATL vs RHP .765 季線強底盤 + 5/17 對 CLE 弱打 4IP/5ER/3HR fingerprint
-- 排序：**Sasaki > Sproat >> Singer**。Sasaki 對 ERA/WHIP 翻盤較好（floor 低 + 主場 + K elite）；Sproat 短局 + 0 QS 串流 ROI 差；Singer 結構+表現+對手+floor 四方向全壞
-- 用戶決策建議：① ERA/WHIP 有翻盤空間 → 只 Sasaki ② ERA/WHIP 已輸定 + 堆 IP/W/K → 也只 Sasaki（Sproat 0/6 QS + 4.61 IP/GS 期望差於 Sasaki）③ FAAB 預算緊 → Sasaki $0 FA 撿即可 ④ Crow（5/29）已 claim 則 5/30 Sasaki 順位串疊
-- 2026-05-29 07:20 deep eval（1 位候選 Rocker，補查新評帶出）：
-  - **Rocker**：⚠️ 條件推 → ⚠️ 維持 (deep)。深評確認訊號 = 對位最甜（KC 14d .595/7d .616 一致冷期 ∩ Rocker「吃弱打」pattern 對弱線 3/4 QS）+ GB% P80-90 抑 ER；floor 中-高（近 6 場 2 崩盤但非對弱打，hard rule 未觸發）+ 短局 IP/GS 4.7 限 QS ~50-55% → 不升 ✅
-  - 排序（5/30 全候選）：**Rocker ≈ Sasaki >> Sproat >> Singer**。Rocker 對手更弱（KC .595 < PHI .635）+ QS 期望高 + 雙年 Sum 穩 → ERA/WHIP/W/IP floor 較佳；Sasaki K elite（Whiff P80-90）→ 追 K 選他。兩者互補 $0 FA 主場
-- 用戶決策建議（含 Rocker）：① 缺 ERA/WHIP/W/IP → Rocker（對位最甜）② 缺 K（contested）→ Sasaki ③ 要單撿綜合期望略穩 → Rocker
-- _（free-form 區，用戶可手寫「已 claim X $Y」「想下週再評估 Z」等註記。AI 讀進來但不主動覆寫。）_
+- 2026-06-02 首次評估（recorded 2026-06-01 12:38）：4 位通過 Rotation gate + Sum ≥15 + true_starter。已過濾：Steven Matz (TB home vs DET, Sum26 **12** hard floor — 2026 5 軸 3 個 <P25；2025 是 reliever GS 2/G 53 rotation_gate 🚫，2026 才轉先發但結構未跟上) + 別隊 21 位（含 Jack Flaherty / Aaron Nola / Logan Gilbert / Nathan Eovaldi / Dustin May）+ 本隊 1 位（Joey Cantillo @ NYY）。
+- TBD 3 場（MIA / ATL / NYM SP 未公布），建議 TW 6/2 早上 9-10 點呼叫 `/stream-sp 補查` 補查。
+- 排序：**McDonald >> Mikolas ≈ Cameron ≈ Chandler**。McDonald 唯一推薦（Sum 43 + 雙 >P90 + 對手最弱）；其餘三位 Sum <19 結構偏弱，僅滿足「對手不硬」單條件。
+- 用戶決策建議：① 缺 ERA/WHIP/QS/W → McDonald（對位 + 結構雙優，賭樣本小不崩）② 不想賭 rookie 小樣本（GS=5）→ 本日 pass，等 TBD 補查或看 fa_scan worst SP ③ McDonald 對 GB/控球維度最穩（BB/9 + GB% 雙 >P90），floor 相對高
+- 2026-06-01 12:46 deep eval（2 位候選 McDonald + Mikolas）：
+  - **Trevor McDonald**：✅ 推 → **⚠️ 條件推 (deep)**。差異訊號 = 近 5 場 ERA 4.34（非強推 ≤3.50）+ 5/22 對 CWS 弱打 3.2IP/7ER 崩盤（0BB/0HR cluster luck 孤立，前後 5/16 ATH + 5/27 AZ 皆 QS）+ GS=5 樣本小（medium）讓 Sum 43 信心降一檔；MIL 14d .628 冷但 vs RHP .713 季線中等（回歸往上）。仍當日最佳串流（QS ~50-55% + BB/9/GB% 雙 >P90 技術底盤）
+  - **Miles Mikolas**：❌ 不推 → ❌ 維持 (deep)。差異訊號 = 近 6 場 ERA 3.33 近況回穩（比 season 5.72 好）但 **0/12 QS** + IP/GS 4.17 從未投滿 6 局 + K9 5.72 低三振 = fragile 天花板鎖死；MIA 弱（vs RHP .695）但只 hedge ERA/WHIP，QS/K/W 全拿不到
+- 排序：**McDonald >> Mikolas**。McDonald QS ~50-55% + Sum 43 結構菁英 + IP/GS 5.8 全面優於 Mikolas（QS ~5-10% 短局型）；雖 Mikolas 近 6 場 ERA 3.33 < McDonald 4.34 且對手略弱（.695 < .713），但串流要的 IP/QS/K/W 四項 Mikolas 全弱，只 hedge ERA/WHIP
+- 用戶決策建議（deep 後）：① 缺 QS/W/IP/K → McDonald（唯一合理目標，賭 GS=5 小樣本不崩）② 只 hedge ERA/WHIP 不在意 counting → McDonald 仍較優（4.34 ERA 多受 CWS 單場 cluster 拉抬，去掉後 4 場 ER 僅 7）③ 不想賭 rookie 樣本 → 本日 pass 等 TBD 補查
+- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
