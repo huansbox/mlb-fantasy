@@ -314,6 +314,7 @@
 - 05-29：Trevor McDonald wins 3 of 5 slots over Crow by wide margins: IP/GS 5.8 P70 vs P0, BB/9 1.86 P95 (Crow also P95 but McDonald has 84 BBE vs Crow's 0), GB% 60.7 P95 vs null. McDonald's xwOBACON P70 and W（fa_scan）
 - 05-30：Trevor McDonald dominates Severino across 3 of 5 slots: IP/GS 5.8 P70 vs 5.22 P25, BB/9 1.86 P95 vs 4.45 P0, GB% 60.7 P95 vs 43.7 P50. xwOBACON is close (P70 vs P50, both adequate). McDonald has 84 BB（fa_scan）
 - 05-31：McDonald dominates Montero on 4 of 5 slots: IP/GS 5.8 P70 vs 5.5 P50, Whiff% 26.4 P60 vs 17.7 P0, BB/9 1.86 P95 vs 2.45 P60, GB% 60.7 P95 vs 33.5 P0. Montero's lone advantage is xwOBACON P95 vs P70, b（fa_scan）
+- 06-01：Trevor McDonald wins 3 of 5 slots decisively over Cantillo: IP/GS 5.8 P70 vs 4.83 P0, BB/9 1.86 P95 vs 4.81 P0, GB% 60.7 P95 vs 44.7 P60. Whiff% is a wash (both P60), xwOBACON slight Cantillo edge (.3（fa_scan）
 
 ### Joc Pederson (TEX, Util) [mlb_id:592626] — 觀察中
 觸發：PA-TG ≥3.0 連 5 天 + %owned 突破 10% → 升級
