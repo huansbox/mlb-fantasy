@@ -11,3 +11,13 @@ __pycache__/
 .claude/*
 !.claude/commands/
 !.claude/settings.json
+
+# Local Netlify folder
+.netlify
+
+# Scout site — 產物與資料快照由 /xingxiu skill 重生，不進版控
+scout-site/
+daily-advisor/_tools/_scout_all.json
+
+# Playwright MCP scratch
+.playwright-mcp/
