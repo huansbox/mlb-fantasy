@@ -184,18 +184,34 @@ def has_new_transactions(transactions, last_sync_ts):
 
 
 # Max time to keep retrying when an add/drop transaction is visible in the
-# Yahoo transaction log but not yet reflected in the roster snapshot
-# (read-after-write consistency lag). Beyond this, give up + alert rather than
-# loop forever. With a */15 cron this is ~8 retries.
-MAX_ROSTER_LAG_SECONDS = 2 * 3600
+# Yahoo transaction log but not yet reflected in the roster snapshot. Beyond
+# this, give up + alert rather than loop forever.
+#
+# Two distinct delays land here; the window must cover the LARGER one:
+#   1. read-after-write lag (seconds–minutes): the txn log updates before the
+#      roster snapshot does.
+#   2. next-day-effective add/drop (~24h): this is a Daily-Tomorrow league, so a
+#      waiver claim processed at the ET-3AM run is recorded with that day's
+#      timestamp but only lands on the roster on the NEXT ET date.
+#      fetch_full_roster defaults to today-in-ET, so the swap stays invisible to
+#      the diff until the ET date rolls over — up to ~24h after the txn ts.
+# The original 2h value (read-after-write only) gave up before case 2 could
+# reflect, advanced the watermark past the txn, and permanently skipped it
+# (Buehler add / McDonald drop, recorded 6/2 07:12 UTC, effective ET 6/3). 30h
+# covers next-day-effective + slack while still bounding the loop. With a */15
+# cron the worst case is ~120 silent retries before an alert (each ~1-2s; the
+# retry path sends no Telegram, only advance_alert does).
+MAX_ROSTER_LAG_SECONDS = 30 * 3600
 
 
 def classify_empty_diff(new_txns, now_ts, max_lag_seconds=MAX_ROSTER_LAG_SECONDS):
     """Decide what to do when new transactions exist but the roster diff is empty.
 
     Guards the watermark-advance bug (5/8 May→Lambert): a Yahoo add/drop can
-    appear in the transaction log before the roster snapshot reflects it.
-    Advancing .last_sync then permanently skips that transaction.
+    appear in the transaction log before the roster snapshot reflects it —
+    either read-after-write lag (seconds) or a next-day-effective claim in this
+    Daily-Tomorrow league (~24h; see MAX_ROSTER_LAG_SECONDS). Advancing
+    .last_sync before the roster reflects it permanently skips that transaction.
 
     Returns:
       "retry"         — add/drop tx not yet reflected, still within the lag

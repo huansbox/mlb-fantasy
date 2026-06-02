@@ -2,6 +2,7 @@
 from unittest.mock import patch
 
 from roster_sync import (
+    MAX_ROSTER_LAG_SECONDS,
     _count_missing_fields,
     classify_empty_diff,
     search_mlb_id,
@@ -68,6 +69,19 @@ def test_classify_uses_oldest_unreflected_tx():
     # newest is recent, oldest is past the window → past window wins (alert)
     txns = [_tx(NOW - 30, "add"), _tx(NOW - LAG - 100, "drop")]
     assert classify_empty_diff(txns, NOW, LAG) == "advance_alert"
+
+
+def test_lag_window_covers_next_day_effective_claim():
+    """The live window must keep retrying through a next-day-effective add/drop.
+
+    Regression for Buehler (6/2→6/3): a Daily-Tomorrow waiver claim is recorded
+    with one ET date's timestamp but only lands on the roster the next ET date,
+    ~24h later. If MAX_ROSTER_LAG_SECONDS drops below that the watermark advances
+    past the txn and the swap is permanently skipped. Pin the real constant.
+    """
+    txns = [_tx(NOW - 24 * 3600, "add", "drop")]  # 24h old, not yet reflected
+    assert classify_empty_diff(txns, NOW, MAX_ROSTER_LAG_SECONDS) == "retry"
+    assert MAX_ROSTER_LAG_SECONDS >= 24 * 3600
 
 
 def test_classify_missing_action_key_treated_as_no_impact():
