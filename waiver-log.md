@@ -112,30 +112,6 @@
 - 06-01：⚡ K% 20.4 + OPS .822 兩條件連 3 天同時達成 — 觸發升級為取代候選；vs Duran prior 全 P0 + K% 25.5，結構碾壓確認（fa_scan）
 - 06-02：⚡ K% 19.2 + OPS .822 兩條件連 4 天同時達成 — 正式升級取代候選 vs Duran；觸發改為：Duran 14d OPS <.750 連 3 天 → 執行（fa_scan）
 
-### Curtis Mead (WSH, 1B,2B,3B) [mlb_id:678554] — 觀察中
-觸發：BBE 達 80 + xwOBA 維持 P90+ → 升級取代候選
-- 05-09：Season P95/P95/P70 全面強但 prior P40/P0/P0 純 breakout 零支持；14d OPS .900 + 9BB；1% 零壓力（fa_scan）
-- 05-10：14d OPS .900 / 9BB 爆發 + Savant Δ+0.030 品質上升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
-- 05-11：14d OPS .785 / Savant Δ+0.082 品質飆升；BBE 69 距 80 門檻仍遠；1% 零壓力（fa_scan）
-- 05-12：14d OPS .785 / Savant Δ+0.081 品質飆升；BBE 70 距 80 門檻仍遠；1% 零壓力（fa_scan）
-- 05-13：14d OPS .785 / Savant Δ+0.081 品質飆升持續；BBE 70 距 80 門檻差 10；1% 零壓力（fa_scan）
-- 05-14：14d OPS .856 / Savant Δ+0.051 品質飆升持續；BBE 70 距 80 門檻差 10；1% 零壓力（fa_scan）
-- 05-15：14d OPS .856 / Savant Δ+0.056 品質飆升持續；BBE 71 距 80 門檻差 9；1% 零壓力（fa_scan）
-- 05-19：BBE 75 距 80 門檻差 5；14d OPS 1.041 / Savant Δ+0.063 持續飆升；預計 ~5 天內達標（fa_scan）
-- 05-20：BBE 77→距 80 門檻差 3；14d OPS 1.041 / Savant Δ+0.068 持續飆升；1% 零壓力（fa_scan）
-- 05-21：BBE 77→距 80 門檻差 3；14d OPS .799 / Savant Δ+0.086 持續飆升；1% 零壓力 預計 ~3-5 天達標（fa_scan）
-- 05-22：⚠️ BBE 80 觸發達標 + xwOBA P95 達標；但 PA-TG 2.39 上場有限 + prior P40/P0/P0 零支撐 → 觸發升級至「PA-TG ≥2.8 連 5 天 + xwOBA 維持 P80+」（fa_scan）
-- 05-23：BBE 83 已過 80 + xwOBA P95 達標；但 PA-TG 2.44 上場有限 + prior P40/P0/P0；觸發升級至 PA-TG ≥2.8 連 5 天 + xwOBA 維持 P80+（fa_scan）
-- 05-24：BBE 87 已過 80 + xwOBA P95 達標；但 PA-TG 2.40 上場有限；觸發升級至 PA-TG ≥2.8 連 5 天 + xwOBA 維持 P80+（fa_scan）
-- 05-25：BBE 87 已過 80 + xwOBA P95；14d OPS .838 / 10BB 穩健；但 PA-TG 2.43 觸發遠未達 2.8（fa_scan）
-- 05-26：BBE 91 已過 80 + xwOBA P95；14d OPS .974 / 9BB 穩健；但 PA-TG 2.47 觸發遠未達 2.8（fa_scan）
-- 05-27：BBE 95 已過 80 + xwOBA P95；14d OPS .911 / 11BB 穩健；但 PA-TG 2.52 觸發遠未達 2.8；6% rising +5 市場注意中（fa_scan）
-- 05-28：BBE 97 + xwOBA P95；14d OPS .911 / 9BB 穩健；PA-TG 2.54 觸發遠未達 2.8；7% rising +7 市場注意中（fa_scan）
-- 05-29：BBE 97 + xwOBA P95；14d OPS .911 / 9BB 穩健；PA-TG 2.54 觸發遠未達 2.8；7% rising +7 市場注意中（fa_scan）
-- 05-30：BBE 99 信心已足；14d OPS 1.029 / 10BB / 4HR 全面；PA-TG 2.59 觸發遠未達 2.8；8% rising +7 市場注意中（fa_scan）
-- 05-31：BBE 102 信心已足 + xwOBA P95；14d OPS 1.040 / 4HR / 9BB 全面；PA-TG 2.58 觸發遠未達 2.8；15% rising +8 市場注意中（fa_scan）
-- 06-01：BBE 103 信心已足 + xwOBA P95；14d OPS .978 / 4HR / 10RBI / 9BB 全面；PA-TG 2.60 觸發遠未達 2.8；22% explosive +15/3d 市場搶人中（fa_scan）
-
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
 - 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
@@ -384,6 +360,9 @@
 - 05-30：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
+- 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
 
 ### Luke Raley (SEA, 1B,LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
