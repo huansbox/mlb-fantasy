@@ -62,33 +62,6 @@
 - 06-02：Nootbaar 回歸第 9 天；14d Savant Δ-0.137 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 - 06-03：Nootbaar 回歸第 10 天；14d Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 
-### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
-觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
-- 05-05：xwOBA P80 / BB% P95 雙年菁英確認（prior P95/P95）；14d 12 BB / 62 PA；PA-TG 4.00 全職；vs Albies 三項全勝（結構差距 50 百分位點 BB%）（fa_scan）
-- 05-06~05-08：DTD → IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.160 觸發遠未達
-- 05-09：IL10 持續；xwOBA P80 / BB% P95 雙年菁英結構不變；Albies 14d OPS 1.124 觸發條件遠未達（fa_scan）
-- 05-10：IL10 持續；season P80/P95 結構不變；Albies 14d OPS 1.003 觸發遠未達（fa_scan）
-- 05-11：IL10 持續；season P80/P95 結構不變；Albies 14d OPS .935 觸發條件遠未達（fa_scan）
-- 05-12：IL10 持續；season P80/P95 結構不變；Albies 14d OPS .935 觸發條件遠未達（fa_scan）
-- 05-13：IL10 持續；season P80/P95 結構不變；55% dropping -2；Albies 14d OPS .835 觸發條件遠未達（fa_scan）
-- 05-14：IL10 持續；season P80/P95 結構不變；55% dropping -2；Albies 14d OPS .814 觸發條件遠未達（fa_scan）
-- 05-15：IL10 持續；season P80/P95 結構不變；55% dropping -1；Albies 14d OPS .696 接近觸發但未達 .600（fa_scan）
-- 05-19：Albies 14d OPS .424 觸發條件早已 met；05-19 仍待確認是否解除 IL10 — 若健康即行動 drop Albies add Torres（fa_scan）
-- 05-20：IL10 持續；Albies 14d OPS .356 觸發早已 met — 等 IL 解除即行動（若 McLain 已被搶）（fa_scan）
-- 05-21：IL10 持續；Albies 觸發早已 met — 若 McLain 被搶 + IL 解除即行動（Manzardo 優先因健康）（fa_scan）
-- 05-22：IL10 持續；Albies 觸發早已 met — McLain 健康優先取代 Albies；Torres 降為 Albies 替補 C-plan（等 IL 解除 + McLain 被搶才行動）（fa_scan）
-- 05-23：IL10 持續；Albies 觸發早已 met — McLain 健康優先取代 Albies；Torres 降為 C-plan（等 IL 解除 + McLain 被搶才行動）（fa_scan）
-- 05-24：IL10 持續；Albies 觸發早已 met — McLain 健康優先取代 Albies；Torres 降為 C-plan（fa_scan）
-- 05-25：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-26：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-27：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-28：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-29：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-30：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 05-31：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 06-01：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 健康優先；Torres C-plan（fa_scan）
-- 06-02：IL10 持續；14d OPS .753 / 12BB 回暖；Albies 觸發早已 met — McLain 降為 B-plan，Horwitz 升為 A-plan；Torres 維持 C-plan（fa_scan）
-
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
 - 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
@@ -315,13 +288,6 @@
 - 06-02：14d OPS .887 / 2HR / 10RBI / 3SB 全面；PA-TG 2.29 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-03：14d OPS .904 / 2HR / 10RBI / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 
-### Joc Pederson (TEX, Util) [mlb_id:592626] — 觀察中
-觸發：PA-TG ≥3.0 連 5 天 + %owned 突破 10% → 升級
-- 05-30：P95/P95/P55 + prior P60/P80 有底；14d OPS 1.147 / 4HR / 8BB 爆發；PA-TG 2.88 邊緣 + 2% owned platoon DH 風險（fa_scan）
-- 05-31：P80/P95/P55 + prior P60/P80 有底；14d OPS 1.176 / 5HR / 8BB 爆發；PA-TG 2.91 邊緣 + 3% owned platoon DH 風險；觸發未達（fa_scan）
-- 06-01：14d OPS 1.129 / 5HR / 7BB 爆發；PA-TG 2.95 接近 3.0 + 5% rising +3；觸發接近但未達（fa_scan）
-- 06-02：14d OPS 1.110 / 5HR / 6BB 爆發持續；PA-TG 2.97 接近 3.0 + 7% rising +5；觸發接近但未達（PA-TG <3.0）（fa_scan）
-
 ### Zebby Matthews (MIN, SP) [mlb_id:805673] — 觀察中
 觸發：B2 2-step watch
 - 06-03：Zebby Matthews shows a 3-slot edge over Buehler (IP/GS P70 vs P0, BB/9 P95 vs P40, xwOBACON P95 vs P25) with a strong buy-low xERA 3.0 vs ERA 4.63. However, only 4 GS and 65 BBE warrant caution — samp（fa_scan）
@@ -380,6 +346,12 @@
 - 06-03：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Gleyber Torres (DET, 2B) — 被搶（自動偵測）
+- 2026-06-03：Yahoo ownership_type=team，從觀察中移除。
+
+### Joc Pederson (TEX, Util) — 被搶（自動偵測）
+- 2026-06-03：Yahoo ownership_type=team，從觀察中移除。
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
