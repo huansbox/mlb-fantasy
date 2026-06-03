@@ -308,6 +308,10 @@
 - 06-01：14d OPS 1.129 / 5HR / 7BB 爆發；PA-TG 2.95 接近 3.0 + 5% rising +3；觸發接近但未達（fa_scan）
 - 06-02：14d OPS 1.110 / 5HR / 6BB 爆發持續；PA-TG 2.97 接近 3.0 + 7% rising +5；觸發接近但未達（PA-TG <3.0）（fa_scan）
 
+### Zebby Matthews (MIN, SP) [mlb_id:805673] — 觀察中
+觸發：B2 2-step watch
+- 06-03：Zebby Matthews shows a 3-slot edge over Buehler (IP/GS P70 vs P0, BB/9 P95 vs P40, xwOBACON P95 vs P25) with a strong buy-low xERA 3.0 vs ERA 4.63. However, only 4 GS and 65 BBE warrant caution — samp（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
