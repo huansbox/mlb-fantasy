@@ -163,6 +163,7 @@
       "team": "CIN",
       "positions": [
         "1B",
+        "2B",
         "LF",
         "RF"
       ],
@@ -227,6 +228,28 @@
         "pa_per_team_g": 4.17,
         "pa": 675,
         "g": 154
+      }
+    },
+    {
+      "name": "Gleyber Torres",
+      "mlb_id": 650402,
+      "yahoo_player_key": "469.p.10236",
+      "team": "DET",
+      "positions": [
+        "2B"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.363,
+        "barrel_pct": 8.2,
+        "hh_pct": 39.0,
+        "bb_pct": 13.5,
+        "ops": 0.745,
+        "pa_per_team_g": 3.88,
+        "pa": 628,
+        "g": 145
       }
     }
   ],
@@ -366,7 +389,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "RP",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -381,20 +404,6 @@
         "whiff_pct": 19.5,
         "gb_pct": 31.4,
         "xwobacon": 0.377
-      }
-    },
-    {
-      "name": "Peter Lambert",
-      "mlb_id": 663567,
-      "yahoo_player_key": "469.p.10467",
-      "team": "HOU",
-      "positions": [
-        "SP"
-      ],
-      "selected_pos": "SP",
-      "status": "",
-      "prior_stats": {
-        "gb_pct": 45.6
       }
     },
     {
@@ -429,7 +438,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -495,7 +504,7 @@
       "positions": [
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -534,26 +543,25 @@
       }
     },
     {
-      "name": "Trevor McDonald",
-      "mlb_id": 686790,
-      "yahoo_player_key": "469.p.60389",
-      "team": "SF",
+      "name": "Walker Buehler",
+      "mlb_id": 621111,
+      "yahoo_player_key": "469.p.10509",
+      "team": "SD",
       "positions": [
-        "SP",
-        "RP"
+        "SP"
       ],
       "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
-        "xera": 3.21,
-        "xwoba_allowed": 0.28,
-        "hh_pct_allowed": 38.6,
-        "barrel_pct_allowed": 4.5,
-        "bbe": 44,
-        "era": 1.8,
-        "ip": 15.0,
-        "ip_per_gs": 6.5
+        "xera": 5.41,
+        "xwoba_allowed": 0.355,
+        "hh_pct_allowed": 37.8,
+        "barrel_pct_allowed": 9.5,
+        "bbe": 400,
+        "era": 4.93,
+        "ip": 126.0,
+        "ip_per_gs": 5.0
       }
     }
   ],
