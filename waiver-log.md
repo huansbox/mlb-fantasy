@@ -31,6 +31,7 @@
 - 05-31：14d OPS .170 崩盤 10+ 天 / K% 31.0；PA-TG 2.68 未達 3.0；platoon second tier 不行動 — 接近結案（fa_scan）
 - 06-01：14d OPS .191 崩盤 10+ 天；PA-TG 2.67 未達 3.0；platoon second tier 不行動 — 接近結案（fa_scan）
 - 06-02：14d OPS .234 崩盤 10+ 天；PA-TG 2.73 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
+- 06-03：14d OPS .341 崩盤 10+ 天；PA-TG 2.72 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -59,6 +60,7 @@
 - 05-31：Nootbaar 回歸第 7 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中 — 接近結案（fa_scan）
 - 06-01：Nootbaar 回歸第 8 天；14d OPS .595 / Savant Δ-0.137 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 - 06-02：Nootbaar 回歸第 9 天；14d Savant Δ-0.137 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
+- 06-03：Nootbaar 回歸第 10 天；14d Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 
 ### Gleyber Torres (DET, 2B) [mlb_id:650402] — 觀察中
 觸發：Albies 14d OPS <.800 或 Torres %owned 突破 70% → 立即取代 Albies
@@ -111,6 +113,7 @@
 - 05-31：⚡ K% 20.4 + OPS .876 — 兩條件連 2 天同時達成；待連 3 天確認穩定後升級取代候選（fa_scan）
 - 06-01：⚡ K% 20.4 + OPS .822 兩條件連 3 天同時達成 — 觸發升級為取代候選；vs Duran prior 全 P0 + K% 25.5，結構碾壓確認（fa_scan）
 - 06-02：⚡ K% 19.2 + OPS .822 兩條件連 4 天同時達成 — 正式升級取代候選 vs Duran；觸發改為：Duran 14d OPS <.750 連 3 天 → 執行（fa_scan）
+- 06-03：⚡ K% 18.9 + OPS .834 + Savant Δ+0.056 品質確認；兩條件連 5 天同時達成；正式取代候選 vs Duran；觸發：Duran 14d OPS <.750 連 3 天 → 執行（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
@@ -135,6 +138,7 @@
 - 05-31：season xwOBA P55 / Barrel% P55；14d OPS .522 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
 - 06-01：season xwOBA P55 / Barrel% P50；14d OPS .522 退散第 4 週；錨點 = 隊上最弱 2B/UTIL — 接近結案（fa_scan）
 - 06-02：14d OPS .529 退散第 5 週；xwOBA P55 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
+- 06-03：14d OPS .529 退散第 5 週；xwOBA P50 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
 
 ### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級為 2B/UTIL 補強候選
@@ -158,6 +162,7 @@
 - 05-31：14d OPS .526 / K% 39.0 spike 惡化；prior P95 slump 候選但 OPS 觸發 .800 遠未達（fa_scan）
 - 06-01：14d OPS .526 / K% 39.0 spike 惡化第 3 週；prior P95 slump 候選但觸發 .800 遠未達 — 接近結案（fa_scan）
 - 06-02：14d OPS .526 / K% 39.0 spike 第 4 週；觸發 .800 遠未達 — 建議結案（fa_scan）
+- 06-03：14d OPS .526 / K% 39.0 spike 第 4 週；觸發 .800 遠未達 — 建議結案（fa_scan）
 
 ### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
@@ -178,6 +183,7 @@
 - 05-31：14d OPS .914 / 3HR 菁英驗證持續；PA-TG 2.12 上場有限觸發遠未達 2.5（fa_scan）
 - 06-01：14d OPS .771 / 2HR 菁英驗證持續；PA-TG 2.15 上場有限觸發遠未達 2.5（fa_scan）
 - 06-02：14d OPS .771 / 2HR；PA-TG 2.15 上場有限觸發遠未達 2.5（fa_scan）
+- 06-03：14d OPS .861 / 3HR；PA-TG 2.20 上場有限觸發遠未達 2.5（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -198,6 +204,7 @@
 - 05-31：⚠️ stop-loss day 5 已觸發 5 天未執行；14d OPS .784 / 4HR；季線 P95/P95 結構底穩 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-01：⚠️ 已推薦 6 天未執行；stop-loss day 5 觸發 5 天；14d OPS .755 / 4HR；季線 P95/P95 結構底穩 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-02：⚠️ 已推薦 7 天未執行；stop-loss day 5 觸發 6 天；14d OPS .729 / K% 31.0 短期冷但季線 P95/P95 底穩 — 立即行動 drop Swanson add Crawford（fa_scan）
+- 06-03：⚠️ 已推薦 8 天未執行；stop-loss day 5 觸發 7 天；14d OPS .673 / K% 29.3 短期冷但季線 P80/P95 底穩；16% rising +4 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 
 ### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
 觸發：立即行動
@@ -216,6 +223,7 @@
 - 05-31：⚠️ 已推薦 13 天未執行；14d OPS .589 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
 - 06-01：⚠️ 已推薦 14 天未執行；14d OPS .597 trad 冷但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
 - 06-02：⚠️ 已推薦 15 天未執行；14d Savant xwOBA 0.162（Δ-0.147）品質崩盤（非純 BABIP 噪音）；0% 零壓力；Horwitz 更強即時替代 — 降為 B-plan vs Albies（fa_scan）
+- 06-03：14d OPS .449 / Savant xwOBA 0.196（Δ-0.112）品質真崩；降為 B-plan vs Albies（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -234,6 +242,7 @@
 - 05-31：14d OPS .845 / 3HR 穩健；Savant Δ+0.006 持平；7% 零壓力；McLain B-plan 維持（fa_scan）
 - 06-01：14d OPS .878 / 3HR 穩健；K% 45.8 spike 警訊；7% 零壓力；McLain B-plan 維持（fa_scan）
 - 06-02：14d OPS .878 / 3HR 穩健但 K% 45.8 spike 警訊加劇；Horwitz 升級取代 A-plan 後 Manzardo 降為 C-plan（fa_scan）
+- 06-03：14d OPS .985 / 4HR 穩健但 K% 44.2 spike 警訊加劇；C-plan 維持（fa_scan）
 
 ### TJ Rumfield (COL, 1B) [mlb_id:681198] — 觀察中
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
@@ -252,6 +261,7 @@
 - 05-31：14d OPS .813 / Savant Δ-0.004 持平；BBE 164 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-01：[傷:DTD] 14d OPS .813 / Savant Δ-0.004 持平；BBE 168 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
 - 06-02：[傷:DTD] 14d OPS .887 / Savant Δ-0.032 品質下滑；BBE 168 + xwOBA P80 兩項達標；差客場 OPS ≥.750 + DTD 清除（fa_scan）
+- 06-03：14d OPS .944 / Savant Δ-0.021 品質微下滑；BBE 169 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 OR Savant Δ 連 5 天負值 → 取代 Duran
@@ -268,6 +278,7 @@
 - 05-31：14d OPS .522 / Savant Δ-0.094 品質下滑第 3 天；Sheets 升級為 Duran 替代 A-plan，Gorman 降為 C-plan（fa_scan）
 - 06-01：14d OPS .487 / Savant Δ-0.124 品質崩盤第 4 天；Sheets 升級為 Duran 替代 A-plan，Gorman C-plan — 自身觸發接近失效（fa_scan）
 - 06-02：14d OPS .454 / Savant Δ-0.127 品質崩盤第 5 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
+- 06-03：14d OPS .475 / Savant Δ-0.189 品質崩盤第 6 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
 
 ### Brett Baty (NYM, 1B,2B,3B,RF) [mlb_id:683146] — 觀察中
 觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
@@ -282,6 +293,7 @@
 - 05-31：14d OPS .716 / Savant Δ+0.032 品質上升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 06-01：14d OPS .648 / Savant Δ+0.029 品質上升持續但弱化；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
 - 06-02：14d OPS .598 / Savant Δ-0.026 品質下滑；prior P80 有底但觸發 xwOBA P70+ 從未達成 — 接近結案（fa_scan）
+- 06-03：14d OPS .626 / Savant Δ-0.034 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
 
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
@@ -291,6 +303,7 @@
 - 05-31：xwOBA P80 / BB% P80 / Barrel% P60 + prior P80 雙年確認；14d OPS 1.019 / 4HR / Savant Δ+0.038 品質飆升；29% dropping -4；Duran 14d OPS .792 觸發未達（fa_scan）
 - 06-01：14d OPS .950 / 3HR / Savant Δ-0.072 品質下滑（trad 強 Savant 弱 = BABIP 有利）；28% dropping -3；Duran 14d OPS .845 觸發 <.650 未達（fa_scan）
 - 06-02：14d OPS .950 / 3HR 但 Savant Δ-0.066 品質下滑（trad 強 Savant 弱 = BABIP 有利回歸中）；25% dropping -5；Duran 14d OPS .920 觸發 <.650 未達（fa_scan）
+- 06-03：14d OPS .947 / 4HR 但 Savant Δ-0.082 品質下滑（trad 強 Savant 弱 = BABIP 有利回歸中）；23% dropping -6；Duran 14d OPS .836 觸發 <.650 未達（fa_scan）
 
 ### Gabriel Moreno (AZ, C) [mlb_id:672515] — 觀察中
 觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
@@ -300,6 +313,7 @@
 - 05-31：14d OPS .803 / 2HR / 11RBI / 3SB 全面；PA-TG 2.30 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-01：14d OPS .880 / 2HR / 11RBI / 3SB 全面；PA-TG 2.28 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-02：14d OPS .887 / 2HR / 10RBI / 3SB 全面；PA-TG 2.29 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
+- 06-03：14d OPS .904 / 2HR / 10RBI / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 
 ### Joc Pederson (TEX, Util) [mlb_id:592626] — 觀察中
 觸發：PA-TG ≥3.0 連 5 天 + %owned 突破 10% → 升級
@@ -348,6 +362,7 @@
 - 05-26：stop-loss day 5 到期（Δ-0.110）；14d OPS .430 / Savant xwOBA .202 持續崩；行動：今日 drop add Crawford（fa_scan）
 - 05-30：stop-loss day 5 已觸發 4 天；14d OPS .506 / Savant xwOBA .221 持續崩 — 行動：drop add Crawford（fa_scan）
 - 06-02：stop-loss day 5 觸發 7 天；14d OPS .544 / Savant Δ-0.118 品質崩盤持續 — 行動：drop add Crawford（fa_scan）
+- 06-03：stop-loss day 5 觸發 7 天；14d OPS .514 / Savant Δ-0.111 品質崩盤持續 — 行動：drop add Crawford（fa_scan）
 
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 傷情追蹤（左手腕扭傷）
 觸發：進 IL → 放 IL 格 + 評估替補捕手；或 DTD 恢復先發 → 移除追蹤
@@ -362,6 +377,7 @@
 - 05-24：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 - 05-26：IL10 持續（左手腕扭傷）；season P95/P95/P95 菁英；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
 - 05-30：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前最後數據；等回歸 + DTD 清除再評（fa_scan）
+- 06-03：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
 
@@ -445,6 +461,7 @@
 
 ### Nathaniel Lowe (CIN, 1B) — 被搶（自動偵測）
 - 2026-05-06：Yahoo ownership_type=team，從觀察中移除。
+- 06-03：Season P95/P80/P80 三項菁英；14d OPS .902 + Savant Δ+0.042；prior P55/P70 breakout 待驗；PA-TG 2.42 上場有限是硬傷；5% 零壓力（fa_scan）
 
 ### Spencer Steer (CIN, 1B,LF) — 被搶（自動偵測）
 - 2026-05-05：Yahoo ownership_type=team，從觀察中移除。
