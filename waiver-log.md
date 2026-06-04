@@ -292,6 +292,10 @@
 觸發：B2 2-step watch
 - 06-03：Zebby Matthews shows a 3-slot edge over Buehler (IP/GS P70 vs P0, BB/9 P95 vs P40, xwOBACON P95 vs P25) with a strong buy-low xERA 3.0 vs ERA 4.63. However, only 4 GS and 65 BBE warrant caution — samp（fa_scan）
 
+### Casey Mize (DET, SP) [mlb_id:663554] — 觀察中
+觸發：B2 2-step add
+- 06-04：Mize beats Buehler in 3 of 5 slots: Whiff% P80 vs P0, xwOBACON P95 vs P25, BB/9 P70 vs P40; IP/GS P25 vs P0 also favors Mize. IL15 is a risk but Mize's 123 BBE / 9 GS sample is credible, 21d xwOBACON（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
