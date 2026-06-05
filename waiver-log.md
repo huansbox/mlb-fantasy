@@ -384,6 +384,7 @@
 
 ### Trevor McDonald (SF, SP,RP) — 被搶（自動偵測）
 - 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
+- 06-05：Trevor McDonald beats Buehler on all 5 slots: IP/GS 5.67 (P60) vs 4.81 (P0), Whiff% P60 vs P0, BB/9 P60 vs P40, GB% P95 vs P60, xwOBACON P80 vs P25. McDonald has 99 BBE (credible sample), 6 GS in 6 G（fa_scan）
 
 ### Trent Grisham (NYY, CF) — 被搶（自動偵測）
 - 2026-05-29：Yahoo ownership_type=team，從觀察中移除。
