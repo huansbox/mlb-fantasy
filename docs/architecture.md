@@ -17,7 +17,6 @@ fa_scan.py（FA 市場分析唯一入口）
   ├─ 每日：Batter + SP 並行 threading（Python compute + Claude 文字化）
   │   └─ fa_compute.py: pick_weakest / compute_urgency / compute_fa_tags (Layer 4)
   │   └─ Claude 只做 定性 reason + 邊界 case flag + 觀察中變化 (Layer 5)
-  ├─ 週一：--rp 模式（RP 獨立掃描；仍保留 Claude Pass 1 單階段）
   ├─ 每日 TW 15:15：--snapshot-only（%owned 快照 + watchlist 清理）
   ├─ 被讀取：weekly_review.py（scan_summary）
   └─ 被更新：waiver-log.md（觀察中球員追蹤）
@@ -30,6 +29,12 @@ stream_sp_scan.py（/stream-sp skill 機械層；非 cron，skill 觸發）
   ├─ 輸出：純 JSON to stdout（LLM 拿來寫報告 + 更新 pending file）
   ├─ 被讀取：/stream-sp skill（Step 2-6 整合）
   └─ 不更新任何 state（pending file 由 LLM 在 Step 8 寫）
+
+rp_svh_scan.py（/rp-svh skill 機械層；非 cron，skill 觸發）
+  ├─ 流程：MLB 全聯盟 14d SV+H 排行 → Yahoo FA 交叉 → 三軸 rank-sum（BB/9 · whiff% · 30d SV+H）top-N
+  ├─ 輸出：純 JSON to stdout（LLM 做角色安全 news check + verdict）
+  ├─ 被讀取：/rp-svh skill
+  └─ 取代舊 fa_scan.py --rp 週掃（2026-06-05 退役）；球員追蹤：waiver-log-rp.md
 
 roster_config.json（陣容唯一來源）
   ├─ 球員名 / mlb_id / yahoo_player_key / positions / team / prior_stats

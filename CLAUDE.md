@@ -317,7 +317,7 @@ Step B 一次 call 讀 Step A JSON **加上同樣 slim pool**（不是只看 Ste
 
 - **機械層**：`rp_svh_scan.py`（TDD 43 tests）；**LLM 層**：`/rp-svh` skill。
 - **唯一規格依據**：`docs/rp-svh-metrics.md`。球員追蹤：`waiver-log-rp.md`。落地規劃：`issues/rp-svh-sop.md`。
-- 取代舊 `fa_scan.py --rp` 週掃（v2 指標 xERA / xwOBA / HH%）— 並行 1-2 週驗證後退役。
+- 已取代舊 `fa_scan.py --rp` 週掃（v2 指標 xERA / xwOBA / HH%）；舊 `--rp` 模式 + cron 已於 2026-06-05 退役。
 - 三軸 rank-sum 是 pool 內相對排名，**不需絕對百分位門檻**（不必算 RP 百分位表）。
 - contact-quality 指標（Barrel% / xwOBACON / xERA-ERA）**不進機械層** — RP 季中 BBE 噪音過大；交 LLM 層 context-only。
 
@@ -390,7 +390,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | 順序 | 做什麼 | 說明 |
 |------|--------|------|
 | 1 | FA Scan 報告已在 12:30 自動產出（含打者 + SP） | 自動推送 |
-| 2 | `/rp-svh`：RP-SV+H 掃描（手動 session）| 取代舊 `--rp` 週掃；舊 `--rp` cron 並行 1-2 週驗證中 |
+| 2 | `/rp-svh`：RP-SV+H 掃描（手動 session）| 唯一 RP 週掃途徑（舊 `--rp` cron 已 2026-06-05 退役）|
 | 3 | `/weekly-review`：覆盤上週 + 預測本週 | 手動 session |
 | 4 | 按需：`/player-eval` 或 `/waiver-scan` | 手動 session |
 
@@ -496,7 +496,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 
 - [ ] **Roster freshness pipeline — 確認 6/3 次日生效 claim 自動同步**（2026-06-02 修復後被動觀察）：`classify_empty_diff` 的 advance_alert 分支 2026-06-02 在 prod 首次觸發（Telegram 警告），但根因**不是** read-after-write lag，而是先前沒考慮到的 **Daily-Tomorrow 次日生效 claim**：Walker Buehler waiver claim（drop Trevor McDonald）於 6/2 07:12 UTC 以當天時間戳記錄為 successful，但 roster 效果到 ET 6/3 才反映（`fetch_full_roster` 預設查 today-in-ET，swap 在日期翻轉前對 diff 隱形）。原 `MAX_ROSTER_LAG_SECONDS=2h` 在次日生效前就放棄、推進浮水印越過該交易 → 會永久漏掉。**已修**（commit `1a56c6f`）：窗口拉到 30h（次日生效 + slack），retry path 靜默重試到 ET 日期翻轉；已回退 VPS `.last_sync` 到 1780384367 重新曝光該交易，dry-run 確認走 retry 不 advance_alert。**剩餘被動觀察**：6/3 04:07 UTC（= 12:07 TW）首班 cron 後，確認 config 自動 +Buehler / -McDonald + git auto-commit + Telegram 通知（查 `/var/log/roster-sync.log` 或 git log）。若沒同步，查 log。
 - [ ] **/emerging-batter + /emerging-batter-deep skill 落地**（2026-05-14 設計定稿，跨電腦進行中）：對稱 SP 路徑，補 batter 短期決策 gap（主軸 role change detection，非 hot streak）。**進度**：Step 1（機械層 `emerging_batter_scan.py` TDD 40 tests）✅；Step 2-7（skill md / pending 檔 / e2e / 觀察期）⏳。完整 Step 進度 + 跨電腦續做 gotchas（position_saturated / team_games_window / 門檻常數）見 [`docs/emerging-batter-design.md`](docs/emerging-batter-design.md) §「落地進度」。
-- [ ] **RP-SV+H SOP — 並行驗證 + 退役舊 --rp**（2026-05-19 落地）：機械層 `rp_svh_scan.py`（TDD 43 tests）+ `/rp-svh` skill 已實作（A2 `--names` accent/apostrophe 正規化 / A3 `sp_data_fetchers` saves-holds-blownSaves-SVO parse 同波完成）。8 個開放決策定案：rank-sum 軸 3 = **30d SV+H 累積**（非球隊勝率/場次數 — 3 agent 發想後選定，player-level 且與 BB/9 / whiff% 正交）、三軸等權、top-4（cutoff 並列納入）、純 skill 觸發無 cron、incumbent 比較交 LLM 自由 reasoning、趨勢訊號 out-of-scope。**剩餘**：① VPS 部署 + e2e 驗證（feat 分支 merge 後 VPS git pull）② 與舊 `fa_scan.py --rp` cron 並行 1-2 週比對（驗收：新 SOP 是否漏掉舊 scan 抓到的真候選 + verdict 是否合理）③ 通過後 C1 完全退役 `fa_scan.py` RP 殘留（grep `_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `_fmt_roster_pitcher_rp` / `prompt_fa_scan_rp.txt` / `--rp` flag）。完整脈絡見 [`issues/rp-svh-sop.md`](issues/rp-svh-sop.md)。
+- [ ] **RP-SV+H SOP — 並行驗證 + 退役舊 --rp**（2026-05-19 落地）：機械層 `rp_svh_scan.py`（TDD 43 tests）+ `/rp-svh` skill 已實作（A2 `--names` accent/apostrophe 正規化 / A3 `sp_data_fetchers` saves-holds-blownSaves-SVO parse 同波完成）。8 個開放決策定案：rank-sum 軸 3 = **30d SV+H 累積**（非球隊勝率/場次數 — 3 agent 發想後選定，player-level 且與 BB/9 / whiff% 正交）、三軸等權、top-4（cutoff 並列納入）、純 skill 觸發無 cron、incumbent 比較交 LLM 自由 reasoning、趨勢訊號 out-of-scope。**進度**：③ C1 完全退役 `fa_scan.py` RP 殘留已於 2026-06-05 完成（`refactor/retire-fa-scan-rp`：移除 `_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `build_roster_for_pass1` + 連帶死碼島 `build_roster_summary` 等 / `prompt_fa_scan_rp.txt` / `--rp` flag + VPS cron 行），② 並行 1-2 週比對由 `issues/prd-claude-p-cost-simplification.md` 決策直接退役取代（並行窗 ~2.5 週已過）。**剩餘**：① 被動確認 `/rp-svh` 為唯一 RP 週掃 production 途徑（skill 走 VPS vps-run.sh，已是生產路徑）。完整脈絡見 [`issues/rp-svh-sop.md`](issues/rp-svh-sop.md)。
 - [ ] **waiver-log 新進條目 mlb_id 正確性驗證**（進階，已根治 auto-close 端，但 NEW 入口仍可能寫錯 mlb_id）：`_update_waiver_log_locked` NEW 行走 `search_mlb_id(name)` 補 mlb_id，同名同姓仍可能取到第一個（錯的）。建議 NEW 時走 Yahoo API 交叉驗證 team / position 匹配
 - [ ] **Backtest Use Case B（xwOBACON 校準）**（4-6 週數據累積後觸發）：設計參考 `docs/sp-decisions-backtest-automation.md` Use Case B。校準路徑：累積後從 GitHub Issue archive 反推 SP 21d Δ xwOBACON **絕對門檻**（例如「|Δ| ≥0.040 後續 70% 應驗 → 改門檻 0.040」），改 prompt 文字不改 code。
 - [ ] **B2 backtest cron 首跑驗證（2026-05-31 TW 14:00 首跑）**：SP B2 cutover + 24-48h 監控已收尾（issue 025 closed 2026-05-31 — #255/#259/#263 三天乾淨、anchor 隱形、無 rollback）。`cron_backtest.sh`（commit `e55fbd5`，Sun 06:00 UTC）首跑就在今天 TW 14:00。**剩餘**：今晚或明早確認首跑成功 — `docs/sp-decisions-backtest.md` 應有新增段（目前最後更新 04-30）+ VPS git log 應有自動 commit；若無變更或 cron 沒跑，查 backtest log。明天週一 `/weekly-review` session 即可看到新增段。Rollback（contingency，未觸發）: `git revert -m 1 95f879a`。
