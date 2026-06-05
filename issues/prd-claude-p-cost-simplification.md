@@ -3,6 +3,11 @@
 > grill-me session 2026-06-05 對齊。背景觸發：Anthropic 6/15 programmatic credit pool 改動。
 > 本 pass = **必要性砍除，不動 model**。model 降級為 Phase 2（見 Out of Scope）。
 
+## 進度
+
+- ✅ **2026-06-05 — `--rp` 退役完成**（Solution 1 + C1 死碼清除）：branch `refactor/retire-fa-scan-rp`。移除 VPS cron「FA Scan RP」stanza（止血，下週一起不跑）+ `fa_scan.py` RP 殘碼（`_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `build_roster_for_pass1` / `--rp` flag）+ 連帶浮現的既有死碼島（`build_roster_summary` 等 roster-summary display helpers，grep 證實 0 live caller）+ 刪 `prompt_fa_scan_rp.txt` + 文檔同步（CLAUDE.md / README / architecture）。共用 `_classify_fa_type` / `_format_fa_pitcher` rp 分支保留（每日掃描仍用來排除 RP）。code review 通過。
+- ⏳ **待處理**：日報 2 合 1（Solution 2）+ 排程平日/假日分流（Solution 3）+ 更正 `project_claude_p_subscription` 記憶（US 13）+ Phase 2 model 降級（Out of Scope）。
+
 ## Problem Statement
 
 2026-06-15 起，Anthropic 把 `claude -p`（headless Claude Code）與 Agent SDK 的用量從訂閱方案的一般額度，改為扣**獨立月度 credit pool**：Max 5x = $100/月、按 full API rate 計價、**不滾存、用完即停**
@@ -19,7 +24,7 @@
 
 在不犧牲決策品質的前提下，砍掉「真正不必要」的 headless `claude -p` 呼叫，把月度 credit 消耗壓低、拉開與 $100 上限的餘裕。本 pass 只做**必要性砍除**（移除 waste、不拿品質換成本）：
 
-1. **退役 `--rp` 週掃** —— 已被互動式 `/rp-svh` skill（不計 credit）取代，直接停。
+1. **退役 `--rp` 週掃** —— 已被互動式 `/rp-svh` skill（不計 credit）取代，直接停。✅ 2026-06-05 完成（見「進度」段）。
 2. **日報 2 份合併成 1 份/日** —— 速報（TW 22:15）+ 最終報（TW 05:00）原本各自覆蓋「日場 / 夜場」兩種賽程 regime；合併成單一報，靠**排程隨星期幾追當天主賽程**，避免兩份重複的固定開銷。保留 LLM（內容做簡化）。
 3. **排程改平日/假日分流** —— 賽程實測證實平日 83% 夜場、假日 80% 日場，最早鎖點差異大；單一固定時間無法同時服務，故分流。
 
@@ -84,7 +89,7 @@
 - **Model 降級（Opus→Sonnet/Haiku）**：Phase 2，獨立決策 / 獨立 PR。待必要性砍除上線並觀察一段時間後再評各 call site 的品質容忍度（fa_scan SP/batter 有 `cron_backtest` 週級監控可抓回歸）。
 - **改直連 Anthropic API**：否決（$100 免費 credit 用不完，直連是花真錢省免費資源）。
 - **fa_scan batter / SP 的 LLM 層改動**：不動。
-- **`--rp` 相關死碼的完整 grep 清除（C1）**：可併入本 pass 亦可走既有 rp-svh-sop 待辦，非必須同批。
+- **`--rp` 相關死碼的完整 grep 清除（C1）**：可併入本 pass 亦可走既有 rp-svh-sop 待辦，非必須同批。✅ 2026-06-05 已併入本 pass 完成。
 
 ## Further Notes
 
