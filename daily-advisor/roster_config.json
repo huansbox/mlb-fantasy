@@ -41,7 +41,7 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "1B",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -130,7 +130,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "Util",
+      "selected_pos": "2B",
       "status": ""
     },
     {
@@ -216,7 +216,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "2B",
+      "selected_pos": "1B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -389,7 +389,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -415,7 +415,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "SP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -482,8 +482,8 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
-      "status": "",
+      "selected_pos": "NA",
+      "status": "NA",
       "prior_stats": {
         "season": 2025,
         "xera": 4.3,
@@ -550,7 +550,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -562,6 +562,29 @@
         "era": 4.93,
         "ip": 126.0,
         "ip_per_gs": 5.0
+      }
+    },
+    {
+      "name": "Sean Burke",
+      "mlb_id": 680732,
+      "yahoo_player_key": "469.p.12418",
+      "team": "CWS",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.96,
+        "xwoba_allowed": 0.342,
+        "hh_pct_allowed": 42.7,
+        "barrel_pct_allowed": 10.4,
+        "bbe": 393,
+        "era": 4.22,
+        "ip": 134.3,
+        "ip_per_gs": 4.7
       }
     }
   ],
