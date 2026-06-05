@@ -315,14 +315,6 @@
 - 06-04：14d OPS .904 / 2HR / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-05：14d OPS .783 / 2HR / 1SB；PA-TG 2.39 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
 
-### Zebby Matthews (MIN, SP) [mlb_id:805673] — 觀察中
-觸發：B2 2-step watch
-- 06-03：Zebby Matthews shows a 3-slot edge over Buehler (IP/GS P70 vs P0, BB/9 P95 vs P40, xwOBACON P95 vs P25) with a strong buy-low xERA 3.0 vs ERA 4.63. However, only 4 GS and 65 BBE warrant caution — samp（fa_scan）
-
-### Casey Mize (DET, SP) [mlb_id:663554] — 觀察中
-觸發：B2 2-step add
-- 06-04：Mize beats Buehler in 3 of 5 slots: Whiff% P80 vs P0, xwOBACON P95 vs P25, BB/9 P70 vs P40; IP/GS P25 vs P0 also favors Mize. IL15 is a risk but Mize's 123 BBE / 9 GS sample is credible, 21d xwOBACON（fa_scan）
-
 ### Dominic Canzone (SEA, LF,RF) [mlb_id:686527] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
 - 06-04：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限（fa_scan）
@@ -396,6 +388,12 @@
 - 06-04：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Zebby Matthews (MIN, SP) — 被搶（自動偵測）
+- 2026-06-05：Yahoo ownership_type=team，從觀察中移除。
+
+### Casey Mize (DET, SP) — 被搶（自動偵測）
+- 2026-06-05：Yahoo ownership_type=team，從觀察中移除。
 
 ### Gleyber Torres (DET, 2B) — 被搶（自動偵測）
 - 2026-06-03：Yahoo ownership_type=team，從觀察中移除。
