@@ -30,7 +30,7 @@
 - `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
 - `daily-advisor/daily_advisor.py` — 每日速報/最終報產生器（MLB Stats API + Savant + claude -p → Telegram 推送）
-- `daily-advisor/fa_scan.py` — FA 市場分析（每日打者+SP 兩階段 Claude / 週一 RP / %owned 快照）
+- `daily-advisor/fa_scan.py` — FA 市場分析（每日打者+SP 兩階段 Claude / %owned 快照）
 - `daily-advisor/_trade_lookup.py` — 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較）
 
 ## 核心策略
@@ -48,7 +48,6 @@
   - VPS: RackNerd Ubuntu 24.04, Python 3.12 + Claude Code 原生版
   - Cron 排程：
     - **FA Scan** UTC 04:30 每日（台灣 12:30）：打者+SP 兩階段 Claude 分析 + waiver-log 自動寫入
-    - **FA Scan --rp** UTC 04:45 每週一（台灣 12:45）：RP 獨立掃描
     - **Weekly Review** UTC 05:00 每週一（台灣 13:00）：覆盤資料準備
     - **Roster Sync** UTC 07:10 每日（台灣 15:10）：Yahoo 陣容同步
     - **FA Snapshot** UTC 07:15 每日（台灣 15:15）：%owned 快照 + watchlist 清理

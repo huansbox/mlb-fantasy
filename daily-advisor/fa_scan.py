@@ -2,11 +2,10 @@
 
 Modes:
     python fa_scan.py                   # Daily: Batter + SP scan (default)
-    python fa_scan.py --rp              # Weekly: RP scan (Monday only)
     python fa_scan.py --snapshot-only   # Daily: %owned snapshot only
     python fa_scan.py --cleanup         # Manual: clean rostered watchlist players
 
-Cron: 每天 TW 12:30 (UTC 04:30)。--rp 僅週一。--snapshot-only 每天 TW 15:15。
+Cron: 每天 TW 12:30 (UTC 04:30)。--snapshot-only 每天 TW 15:15。
 """
 
 import argparse
@@ -547,12 +546,6 @@ SCAN_QUERIES = [
     ("SP-BW", "status=A;position=SP;sort=AR;sort_type=biweekly;count=30"),
 ]
 
-# RP queries (--rp weekly mode only)
-RP_QUERIES = [
-    ("RP-AR", "status=A;position=RP;sort=AR;count=10", "biweekly"),
-    ("RP-BW", "status=A;position=RP;sort=AR;sort_type=biweekly;count=10", "biweekly"),
-]
-
 # Yahoo status values for FA we hard-exclude by default. IL10/IL15/DTD/empty
 # stay in the pool — IL10/IL15 get a soft warn tag downstream (fa_compute).
 _INACTIVE_STATUS = frozenset({"IL60", "NA"})
@@ -1042,343 +1035,6 @@ def enrich_layer3(filtered, savant_2026, config, savant_prior=True):
 
     print(f"  Layer 3: {len(filtered)} → {len(enriched)} enriched", file=sys.stderr)
     return enriched
-
-
-# ── Roster data for Pass 1 ──
-
-
-def build_roster_for_pass1(config, savant_2026, player_type="batter"):
-    """Build roster data string for Pass 1 (Claude picks weakest players).
-
-    Args:
-        player_type: "batter", "sp", or "rp"
-
-    Returns formatted string with bottom N players sorted by quality.
-    """
-    # Exclude IL/IL+/NA and can't-cut players — they can't be dropped
-    cant_cut = {n.lower() for n in config.get("league", {}).get("cant_cut", [])}
-
-    def _is_replaceable(p):
-        if not is_active(p):
-            return False
-        if p.get("name", "").lower() in cant_cut:
-            return False
-        return True
-
-    if player_type == "batter":
-        players = [p for p in config.get("batters", []) if _is_replaceable(p)]
-        hide_top = 5
-        sort_key = "xwoba"
-        higher_better = True
-    elif player_type == "rp":
-        players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "RP" and _is_replaceable(p)]
-        hide_top = 0  # show all RP (only 2)
-        sort_key = "xera"
-        higher_better = False
-    else:
-        players = [p for p in config.get("pitchers", [])
-                   if pitcher_type(p) == "SP" and _is_replaceable(p)]
-        hide_top = 3
-        sort_key = "xera"
-        higher_better = False
-
-    # Get Savant data for sorting
-    scored = []
-    for p in players:
-        mlb_id = p.get("mlb_id")
-        if not mlb_id:
-            continue
-        savant = _extract_savant_by_id(mlb_id, player_type if player_type == "batter" else "sp", savant_2026)
-        val = savant.get(sort_key) if savant else None
-        # Fallback to prior year
-        if val is None or val == 0:
-            prior = p.get("prior_stats", {})
-            val = prior.get(sort_key, prior.get("xwoba", prior.get("xera")))
-        scored.append({"player": p, "savant": savant, "sort_val": val})
-
-    # Sort: batter by xwOBA asc (worst first), SP/RP by xERA desc (worst first)
-    scored.sort(key=lambda x: x["sort_val"] or (0 if higher_better else 999),
-                reverse=(not higher_better))
-
-    # Hide top N (strongest)
-    shown = scored[:-hide_top] if hide_top and len(scored) > hide_top else scored
-
-    # Format output
-    pt = "pitcher" if player_type != "batter" else "batter"
-    lines = []
-    for item in shown:
-        p = item["player"]
-        s = item["savant"] or {}
-        name = p["name"]
-        team = p["team"]
-        pos = "/".join(p.get("positions", [])) if player_type == "batter" else player_type.upper()
-
-        parts = [f"{name}({team}) {pos}"]
-
-        if player_type == "batter":
-            if s.get("xwoba"):
-                parts.append(f"xwOBA {s['xwoba']:.3f} {pctile_tag(s['xwoba'], 'xwoba')}")
-            if s.get("bb_pct") is not None:
-                parts.append(f"BB% {s['bb_pct']:.1f}% {pctile_tag(s['bb_pct'], 'bb_pct')}")
-            if s.get("barrel_pct"):
-                parts.append(f"Barrel% {s['barrel_pct']:.1f}% {pctile_tag(s['barrel_pct'], 'barrel_pct')}")
-            if s.get("hh_pct"):
-                parts.append(f"HH% {s['hh_pct']:.1f}% {pctile_tag(s['hh_pct'], 'hh_pct')}")
-            parts.append(f"BBE {s.get('bbe', 0)}")
-        else:
-            if s.get("xera"):
-                parts.append(f"xERA {s['xera']:.2f} {pctile_tag(s['xera'], 'xera', 'pitcher')}")
-            if s.get("xwoba"):
-                parts.append(f"xwOBA {s['xwoba']:.3f} {pctile_tag(s['xwoba'], 'xwoba', 'pitcher')}")
-            if s.get("hh_pct"):
-                parts.append(f"HH% {s['hh_pct']:.1f}% {pctile_tag(s['hh_pct'], 'hh_pct', 'pitcher')}")
-            parts.append(f"BBE {s.get('bbe', 0)}")
-
-        lines.append("  " + " | ".join(parts))
-
-    label = {"batter": "打者", "sp": "SP", "rp": "RP"}[player_type]
-    header = f"[{label}] 以下為可能被替換的球員（由弱到強）："
-    return header + "\n" + "\n".join(lines)
-
-
-# ── Roster summary ──
-
-
-def build_roster_summary(config, savant_2026=None):
-    """Build roster summary: 2026 Statcast primary, 2025 prior_stats as auxiliary."""
-    lines = [
-        "--- 我的陣容（由弱到強，最強已隱藏）---",
-        "  排序依據：打者 xwOBA / SP xERA（2026 優先，無 2026 用 2025）",
-    ]
-
-    def _get_sort_key_batter(b):
-        s26 = _lookup_roster_savant(b, "batter", savant_2026)
-        if s26 and s26.get("xwoba"):
-            return s26["xwoba"]
-        return b.get("prior_stats", {}).get("xwoba", 0)
-
-    def _get_sort_key_sp(p):
-        """SP rank by v4 4-slot Sum ascending (weakest first).
-
-        Layer 2 / Phase 6 already speaks v4; matching the same lens here
-        keeps the "weakest SP" ranking consistent with what the multi-agent
-        review actually evaluates. 2026 live league CSVs first, fall back
-        to 2025 prior_stats backfill for SPs without 2026 sample.
-        """
-        v4 = None
-        if savant_2026 and p.get("mlb_id"):
-            v4 = _extract_v4_sp_data(p["mlb_id"], savant_2026)
-        if v4 and any(v4.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon")):
-            return _calc_sp_v4_sum_4slot(v4)
-        # 2025 fallback — prior_stats already backfilled by backfill_prior_stats_v4.py
-        return _calc_sp_v4_sum_4slot(p.get("prior_stats") or {})
-
-    # Batters: sort by xwOBA ascending, hide top 5
-    batters = sorted(config["batters"], key=_get_sort_key_batter)
-    show_b = max(len(batters) - 5, 0)
-    if show_b:
-        lines.append("[打者]")
-        for b in batters[:show_b]:
-            lines.append(_fmt_roster_batter(b, savant_2026))
-
-    # SP: sort by v4 4-slot Sum ascending (weakest first), hide top 3 strongest
-    sps = [p for p in config["pitchers"] if "SP" in p.get("positions", [])]
-    sps.sort(key=_get_sort_key_sp)
-    show_sp = max(len(sps) - 3, 0)
-    if show_sp:
-        lines.append("[SP]")
-        for p in sps[:show_sp]:
-            lines.append(_fmt_roster_pitcher(p, "pitcher", savant_2026))
-
-    # RP: show all
-    rps = [p for p in config["pitchers"] if "RP" in p.get("positions", [])]
-    if rps:
-        lines.append("[RP]")
-        for p in rps:
-            lines.append(_fmt_roster_pitcher(p, "rp", savant_2026))
-
-    return "\n".join(lines)
-
-
-def _lookup_roster_savant(player, p_type, savant_2026):
-    """Look up a roster player's 2026 Savant data by mlb_id."""
-    if not savant_2026 or not player.get("mlb_id"):
-        return None
-    return _extract_savant_by_id(player["mlb_id"], p_type, savant_2026)
-
-
-def _fmt_roster_batter(b, savant_2026=None):
-    ps = b.get("prior_stats", {})
-    s26 = _lookup_roster_savant(b, "batter", savant_2026)
-    pos = "/".join(b.get("positions", []))
-
-    # Primary: 2026 if available
-    if s26 and (s26.get("xwoba") is not None or s26.get("barrel_pct") is not None):
-        bbe = s26.get("bbe", 0)
-        parts = [f"[2026 BBE {bbe}]"]
-        if s26.get("xwoba") is not None:
-            parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', 'batter')}")
-        if s26.get("barrel_pct") is not None:
-            parts.append(f"Barrel% {s26['barrel_pct']:.1f}% {pctile_tag(s26['barrel_pct'], 'barrel_pct', 'batter')}")
-        if s26.get("hh_pct") is not None:
-            parts.append(f"HH% {s26['hh_pct']:.1f}%")
-        line = f"  {b['name']}({b['team']}) {pos} — {' | '.join(parts)}"
-        # Auxiliary: 2025 one-liner
-        y25 = []
-        if ps.get("xwoba") is not None:
-            y25.append(f"xwOBA {ps['xwoba']:.3f}")
-        if ps.get("bb_pct") is not None:
-            y25.append(f"BB% {ps['bb_pct']:.1f}%")
-        if ps.get("barrel_pct") is not None:
-            y25.append(f"Barrel% {ps['barrel_pct']:.1f}%")
-        if y25:
-            line += f"\n    2025: {' | '.join(y25)}"
-        return line
-
-    # Fallback: 2025 only
-    parts = []
-    if ps.get("xwoba") is not None:
-        parts.append(f"xwOBA {ps['xwoba']:.3f} {pctile_tag(ps['xwoba'], 'xwoba', 'batter')}")
-    if ps.get("bb_pct") is not None:
-        parts.append(f"BB% {ps['bb_pct']:.1f}% {pctile_tag(ps['bb_pct'], 'bb_pct', 'batter')}")
-    if ps.get("barrel_pct") is not None:
-        parts.append(f"Barrel% {ps['barrel_pct']:.1f}% {pctile_tag(ps['barrel_pct'], 'barrel_pct', 'batter')}")
-    if ps.get("hh_pct") is not None:
-        parts.append(f"HH% {ps['hh_pct']:.1f}%")
-    if ps.get("ops"):
-        parts.append(f"OPS {ps['ops']:.3f}")
-    if ps.get("pa_per_team_g") is not None:
-        parts.append(f"PA/TG {ps['pa_per_team_g']:.2f}")
-    return f"  {b['name']}({b['team']}) {pos} — [2025] {' | '.join(parts)}"
-
-
-def _fmt_roster_pitcher(p, pt, savant_2026=None):
-    """Format roster pitcher. pt = 'pitcher' (SP, v4 5-slot) or 'rp' (v2)."""
-    if pt == "rp":
-        return _fmt_roster_pitcher_rp(p, savant_2026)
-    return _fmt_roster_pitcher_sp_v4(p, savant_2026)
-
-
-def _fmt_roster_pitcher_sp_v4(p, savant_2026=None):
-    """SP v4 5-slot display: 2026 live league CSV primary, 2025 prior fallback.
-
-    BB/9 is shown only when present (live CSV doesn't carry it; prior_stats
-    only has it if backfilled). Same for IP/GS — present in 2025 prior but
-    not in live league CSV. Layer 3 enrichment surfaces 2026 IP/GS to
-    Phase 6 separately.
-    """
-    ps = p.get("prior_stats") or {}
-    v4_2026 = _extract_v4_sp_data(p.get("mlb_id"), savant_2026) if savant_2026 else {}
-    has_2026 = any(v4_2026.get(k) is not None for k in ("whiff_pct", "gb_pct", "xwobacon"))
-
-    if has_2026:
-        bbe = v4_2026.get("bbe", 0)
-        parts = [f"[2026 BBE {bbe}]"]
-        parts.extend(_fmt_v4_sp_metric_parts(v4_2026))
-        line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
-        y25 = _fmt_v4_sp_prior_summary(ps)
-        if y25:
-            line += f"\n    2025: {y25}"
-        return line
-
-    # Fallback: 2025 prior only
-    parts = _fmt_v4_sp_metric_parts(ps, prior=True)
-    return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}" if parts else \
-        f"  {p['name']}({p['team']}) — [no v4 data]"
-
-
-def _fmt_v4_sp_metric_parts(d, prior=False):
-    """Render the v4 5-slot metric items from a dict (live or prior shape).
-
-    prior dict uses ip_per_gs (v2 backfill key), live uses ip_gs (v4 fetcher
-    key). Other keys (whiff_pct/bb9/gb_pct/xwobacon) are aligned across both.
-    """
-    parts = []
-    ip_gs = d.get("ip_per_gs") if prior else d.get("ip_gs")
-    if ip_gs is not None:
-        parts.append(f"IP/GS {ip_gs:.2f} {pctile_tag(ip_gs, 'ip_gs', 'sp_v4')}")
-    if d.get("whiff_pct") is not None:
-        parts.append(f"Whiff% {d['whiff_pct']:.1f}% {pctile_tag(d['whiff_pct'], 'whiff_pct', 'sp_v4')}")
-    if d.get("bb9") is not None:
-        parts.append(f"BB/9 {d['bb9']:.2f} {pctile_tag(d['bb9'], 'bb9', 'sp_v4')}")
-    if d.get("gb_pct") is not None:
-        parts.append(f"GB% {d['gb_pct']:.1f} {pctile_tag(d['gb_pct'], 'gb_pct', 'sp_v4')}")
-    if d.get("xwobacon") is not None:
-        parts.append(f"xwOBACON {d['xwobacon']:.3f} {pctile_tag(d['xwobacon'], 'xwobacon', 'sp_v4')}")
-    # xera-era luck signal
-    xera = d.get("xera")
-    era = d.get("era")
-    if xera is not None and era is not None:
-        diff = xera - era
-        if abs(diff) >= 0.81:
-            direction = "賣高" if diff > 0 else "buy-low"
-            sign = "+" if diff > 0 else ""
-            parts.append(f"[Δ {sign}{diff:.2f} {direction}]")
-    return parts
-
-
-def _fmt_v4_sp_prior_summary(ps):
-    """One-line 2025 prior v4 summary (auxiliary line below 2026 primary)."""
-    bits = []
-    if ps.get("ip_per_gs") is not None:
-        bits.append(f"IP/GS {ps['ip_per_gs']:.2f}")
-    if ps.get("whiff_pct") is not None:
-        bits.append(f"Whiff% {ps['whiff_pct']:.1f}%")
-    if ps.get("gb_pct") is not None:
-        bits.append(f"GB% {ps['gb_pct']:.1f}")
-    if ps.get("xwobacon") is not None:
-        bits.append(f"xwOBACON {ps['xwobacon']:.3f}")
-    return " | ".join(bits)
-
-
-def _fmt_roster_pitcher_rp(p, savant_2026=None):
-    """RP v2 display path — unchanged. RP framework v4 upgrade pending."""
-    ps = p.get("prior_stats") or {}
-    s26 = _lookup_roster_savant(p, "pitcher", savant_2026)
-    pt = "rp"
-
-    # Primary: 2026 if available
-    if s26 and (s26.get("xera") is not None or s26.get("xwoba") is not None):
-        bbe = s26.get("bbe", 0)
-        parts = [f"[2026 BBE {bbe}]"]
-        if s26.get("xera") is not None:
-            parts.append(f"xERA {s26['xera']:.2f} {pctile_tag(s26['xera'], 'xera', pt)}")
-        if s26.get("xwoba") is not None:
-            parts.append(f"xwOBA {s26['xwoba']:.3f} {pctile_tag(s26['xwoba'], 'xwoba', pt)}")
-        if s26.get("hh_pct") is not None:
-            parts.append(f"HH% {s26['hh_pct']:.1f}% {pctile_tag(s26['hh_pct'], 'hh_pct', pt)}")
-        if ps.get("k_per_9") is not None:
-            parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
-        line = f"  {p['name']}({p['team']}) — {' | '.join(parts)}"
-        y25 = []
-        if ps.get("xera") is not None:
-            y25.append(f"xERA {ps['xera']:.2f}")
-        if ps.get("xwoba_allowed") is not None:
-            y25.append(f"xwOBA {ps['xwoba_allowed']:.3f}")
-        if ps.get("hh_pct_allowed") is not None:
-            y25.append(f"HH% {ps['hh_pct_allowed']:.1f}%")
-        if y25:
-            line += f"\n    2025: {' | '.join(y25)}"
-        return line
-
-    # Fallback: 2025 only
-    parts = []
-    if ps.get("xera") is not None:
-        parts.append(f"xERA {ps['xera']:.2f} {pctile_tag(ps['xera'], 'xera', pt)}")
-    if ps.get("xwoba_allowed") is not None:
-        parts.append(f"xwOBA {ps['xwoba_allowed']:.3f} {pctile_tag(ps['xwoba_allowed'], 'xwoba', pt)}")
-    if ps.get("hh_pct_allowed") is not None:
-        parts.append(f"HH% {ps['hh_pct_allowed']:.1f}% {pctile_tag(ps['hh_pct_allowed'], 'hh_pct', pt)}")
-    if ps.get("barrel_pct_allowed") is not None:
-        parts.append(f"Barrel% {ps['barrel_pct_allowed']:.1f}%")
-    if ps.get("era") is not None:
-        parts.append(f"ERA {ps['era']:.2f}")
-    if ps.get("k_per_9") is not None:
-        parts.append(f"K/9 {ps['k_per_9']:.2f} {pctile_tag(ps['k_per_9'], 'k_per_9', 'rp')}")
-    if ps.get("ip_per_team_g") is not None:
-        parts.append(f"IP/TG {ps['ip_per_team_g']:.2f}")
-    return f"  {p['name']}({p['team']}) — [2025] {' | '.join(parts)}"
 
 
 # ── Output formatting ──
@@ -2427,7 +2083,7 @@ def _prep_my_roster_for_compute(group_type, config, savant_2026, standings, roll
             continue
         savant = _extract_savant_by_id(mlb_id, fa_type_key, savant_2026)
         if not savant:
-            # No 2026 Savant → cannot score; skip (matches build_roster_for_pass1).
+            # No 2026 Savant → cannot score; skip.
             continue
 
         mlb_2026 = fetch_mlb_season_stats(mlb_id, 2026, stat_group)
@@ -3131,26 +2787,6 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     return "\n".join(lines)
 
 
-def _build_rp_data(enriched_rps, my_rps_str, config):
-    """Build data string for RP mode Claude prompt."""
-    lines = []
-
-    framework = _extract_eval_framework()
-    if framework:
-        lines.append(f"--- 評估框架（from CLAUDE.md）---\n{framework}\n")
-
-    lines.append(f"--- 我方 RP ---\n{my_rps_str}\n")
-
-    if enriched_rps:
-        lines.append(f"--- FA RP 候選 ({len(enriched_rps)} 人) ---")
-        for p in enriched_rps:
-            lines.append(_format_fa_pitcher(p))
-    else:
-        lines.append("--- FA RP 候選: 無 ---")
-
-    return "\n".join(lines)
-
-
 # ── Mode implementations ──
 
 
@@ -3173,53 +2809,6 @@ def _run_snapshot_only(access_token, config, today_str, env):
     # Auto-cleanup rostered watchlist
     cleanup_rostered_watchlist(access_token, config, today_str, env)
     print("[FA Scan] Snapshot-only done.", file=sys.stderr)
-
-
-def _run_rp_scan(access_token, config, today_str, env, args):
-    """RP scan — weekly mode, single Claude call."""
-    print(f"[FA Scan] RP scan {today_str}...", file=sys.stderr)
-
-    try:
-        # Layer 1: Yahoo RP queries
-        snapshot = collect_fa_snapshot(access_token, config, queries=RP_QUERIES)
-
-        # Add %owned risers (7d for RP)
-        history = load_fa_history()
-        rp_risers = collect_owned_risers(history, today_str, position_filter="rp", top_n=10, days=7)
-        for r in rp_risers:
-            if r["name"] not in snapshot:
-                snapshot[r["name"]] = {"pct": r["pct"], "team": r["team"],
-                                       "position": r["position"], "stats": {}}
-
-        # Layer 2: Savant quality filter
-        savant_2026 = download_savant_csvs(2026)
-        filtered = filter_by_savant(snapshot, savant_2026)
-        rp_candidates = [p for p in filtered if p["fa_type"] == "rp"]
-
-        if not rp_candidates and not args.dry_run:
-            _notify(env, args, "[FA Scan RP] 無 RP 候選通過品質門檻")
-            return
-
-        if args.dry_run:
-            print(f"RP candidates: {len(rp_candidates)}")
-            for p in rp_candidates:
-                print(f"  {p['name']} {p['team']}")
-            return
-
-        # Layer 3: Enrich
-        enriched = enrich_layer3(rp_candidates, savant_2026, config)
-
-        # Build data + call Claude (single pass for RP)
-        my_rps = build_roster_for_pass1(config, savant_2026, player_type="rp")
-        data = _build_rp_data(enriched, my_rps, config)
-
-        prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_rp.txt")
-        advice = _call_claude(prompt_path, data)
-
-        _publish(today_str, "RP", advice, advice, data, env, args)
-
-    except Exception as e:
-        _handle_error("RP scan", e, env, args)
 
 
 def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
@@ -3543,7 +3132,6 @@ def _run_daily_scan(access_token, config, today_str, env, args):
 
 def main():
     parser = argparse.ArgumentParser(description="FA Scan — unified FA market analysis")
-    parser.add_argument("--rp", action="store_true", help="RP scan mode (weekly, Monday)")
     parser.add_argument("--snapshot-only", action="store_true", help="Only save %%owned snapshot")
     parser.add_argument("--cleanup", action="store_true", help="Clean rostered watchlist players")
     parser.add_argument("--dry-run", action="store_true", help="Layer 1+2 only, skip Claude")
@@ -3572,10 +3160,6 @@ def main():
 
     if args.cleanup:
         cleanup_rostered_watchlist(access_token, config, today_str, env)
-        return
-
-    if args.rp:
-        _run_rp_scan(access_token, config, today_str, env, args)
         return
 
     _run_daily_scan(access_token, config, today_str, env, args)
