@@ -6,7 +6,9 @@
 ## 進度
 
 - ✅ **2026-06-05 — `--rp` 退役完成**（Solution 1 + C1 死碼清除）：branch `refactor/retire-fa-scan-rp`。移除 VPS cron「FA Scan RP」stanza（止血，下週一起不跑）+ `fa_scan.py` RP 殘碼（`_run_rp_scan` / `RP_QUERIES` / `_build_rp_data` / `build_roster_for_pass1` / `--rp` flag）+ 連帶浮現的既有死碼島（`build_roster_summary` 等 roster-summary display helpers，grep 證實 0 live caller）+ 刪 `prompt_fa_scan_rp.txt` + 文檔同步（CLAUDE.md / README / architecture）。共用 `_classify_fa_type` / `_format_fa_pitcher` rp 分支保留（每日掃描仍用來排除 RP）。code review 通過。
-- ⏳ **待處理**：日報 2 合 1（Solution 2）+ 排程平日/假日分流（Solution 3）+ 更正 `project_claude_p_subscription` 記憶（US 13）+ Phase 2 model 降級（Out of Scope）。
+- ✅ **2026-06-06 — 日報 2 合 1 程式碼完成（Solution 2）**：branch `refactor/claude-p-cost-cut`（commit `1e93880`）。`daily_advisor.py` 去 `--morning` 二分 + 刪 Section 7 / `fetch_evening_advice()` + issue tag 統一為 `[日報]`；`prompt_template.txt` 兩份合併為單一 **adaptive** prompt（有實際打序用打序 / 無則 probable matchup），砍到 2 區塊（Lineup 異動 + SP 確認），移除注意事項 / 投打衝突 / 速報修正 / SP 排程備查；刪 `prompt_template_morning.txt`；`weekly_review.py` 註解一致性（**無行為改變** — 它靠 `week-N` label + 日期 token 篩 issue，不 match tag 字串）。意外收穫：lineup adaptive 本就不由 `--morning` 驅動（`fetch_lineups()` 無條件呼叫），合併比 PRD 預想乾淨。**VPS worktree 隔離驗證兩情境通過**（未來日期=無 lineup 走 probable / 今日=有 lineup 走實際打序 + 引用打序訊號），production checkout 未污染。
+  - ⚠️ **發現 — S2 與 S3 在 VPS 是「綁定 deploy」**：S2 一旦進 master，舊 cron 的 `--morning` 行（05:00 最終報）會因 argparse 不認 `--morning` 而失敗 → **S2 不可單獨 merge master，必須與 S3 cron 改動（刪舊 2 行 22:15/05:00 + 新增平日/假日行）在同一次 VPS deploy 一起上**。文檔時間表（README:32/54-55 / architecture.md:11-14 / CLAUDE.md 每日 SOP 表）也因此整批留 S3，等 cron 分鐘定案後一次寫對。
+- ⏳ **待處理**：排程平日/假日分流（Solution 3，含上述文檔時間表更新；S2 隨此批一起 merge+deploy）+ 更正 `project_claude_p_subscription` 記憶（US 13 — 本機檔案記憶目錄查無此檔，可能在 mac 機器或 cccmemory MCP，更正前需先定位 store）+ Phase 2 model 降級（Out of Scope）。
 
 ## Problem Statement
 
