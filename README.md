@@ -29,7 +29,7 @@
 - `.claude/commands/player-eval.md` — 球員評估 SOP（`/player-eval`）
 - `.claude/commands/waiver-scan.md` — Waiver wire 掃描 SOP（`/waiver-scan`，含 Yahoo FA 查詢）
 - `daily-advisor/yahoo_query.py` — Yahoo FA 查詢 CLI（skill 內部使用）
-- `daily-advisor/daily_advisor.py` — 每日速報/最終報產生器（MLB Stats API + Savant + claude -p → Telegram 推送）
+- `daily-advisor/daily_advisor.py` — 每日戰報產生器（單一 adaptive 報；MLB Stats API + Savant + claude -p → Telegram 推送）
 - `daily-advisor/fa_scan.py` — FA 市場分析（每日打者+SP 兩階段 Claude / %owned 快照）
 - `daily-advisor/_trade_lookup.py` — 聯盟 roster 掃描（隊伍查詢 / 守位覆蓋 / 位置過剩掃描 / 球員 7-cat 比較）
 
@@ -51,8 +51,8 @@
     - **Weekly Review** UTC 05:00 每週一（台灣 13:00）：覆盤資料準備
     - **Roster Sync** UTC 07:10 每日（台灣 15:10）：Yahoo 陣容同步
     - **FA Snapshot** UTC 07:15 每日（台灣 15:15）：%owned 快照 + watchlist 清理
-    - **速報** UTC 14:15（台灣 22:15）：SP 排程 + matchup 分析 + Lineup 建議
-    - **最終報** UTC 21:00（台灣 05:00）：lineup 確認 + 調整建議
+    - **日報（平日）** UTC 21:30 Mon–Fri（台灣 05:30）：ET 夜場 lineup + matchup + SP 確認（單一 adaptive 報）
+    - **日報（假日）** UTC 14:30 Sat–Sun（台灣 22:30）：ET 日場 lineup + matchup + SP 確認（單一 adaptive 報）
   - 報告自動存檔為 GitHub Issue（戰報 label: `week-N`，FA 掃描 label: `fa-scan`）
   - 更新部署：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && git pull'`
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開

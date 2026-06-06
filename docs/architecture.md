@@ -8,10 +8,11 @@ CLAUDE.md（策略大腦 + 評估框架唯一定義）
   ├─ 被讀取：所有 skill（/player-eval, /waiver-scan, /weekly-review）
   └─ 被更新：策略調整時手動改（唯一來源，skills 引用不複製）
 
-daily_advisor.py（每日戰報）
-  ├─ 速報（TW 22:15）：隔日 lineup 建議 + H2H 態勢 + SP matchup
-  ├─ 最終報（TW 05:00，--morning）：確認 lineup + 比率更新
-  └─ 輸出：Telegram 推送 + GitHub Issue 存檔
+daily_advisor.py（每日戰報，單一 adaptive 報）
+  ├─ 平日（TW 05:30 / ET Mon-Fri 夜場）：有實際打序用打序，否則 probable matchup
+  ├─ 假日（TW 22:30 / ET Sat-Sun 日場）：同上 adaptive
+  ├─ 內容：Lineup 異動（sit/start）+ SP 確認（H2H 態勢 / SP matchup）
+  └─ 輸出：Telegram 推送 + GitHub Issue 存檔（tag [日報]）
 
 fa_scan.py（FA 市場分析唯一入口）
   ├─ 每日：Batter + SP 並行 threading（Python compute + Claude 文字化）

@@ -381,9 +381,9 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 |-----------|--------|------|
 | 12:30 | FA Scan 報告產出 | 自動推送（Batter + SP） |
 | 15:15 | %owned 快照 + watchlist 清理 | 自動（--snapshot-only） |
-| 22:15 | 收速報 → 設隔日 lineup → 睡覺 | 自動推送 |
-| 05:00 | 最終報產出 | 自動推送（睡眠中） |
-| 07:00 | 起床看最終報 + FA Scan → 微調（如需要） | 兩份一起看 |
+| 平日 05:30 | 日報產出（吃 ET 夜場真實 lineup） | 睡眠中自動推送，單一 adaptive 報（合併原速報+最終報） |
+| 假日 22:30 | 日報產出（吃 ET 日場真實 lineup） | 自動推送，單一 adaptive 報 |
+| 07:00 | 起床看日報（平日晚報）+ FA Scan → 微調（如需要） | 兩份一起看 |
 
 ### 每週（週一）
 
@@ -447,7 +447,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 |------|------|
 | `bin/vps-run.sh` | SSH 到 VPS 的 timeout + retry wrapper（本機↔VPS 路徑間歇丟包，見 `issues/vps-ssh-handshake-hang.md`）。`bash bin/vps-run.sh [--no-retry] '<remote cmd>'`，純讀指令會 retry、寫檔/git 走 `--no-retry`。skill 的 SSH step 與本機手動 VPS 指令都走它 |
 | `hooks/sync-mirror.mjs` | SessionStart hook（roster 新鮮度 pipeline 第 1 層）— 開場 `git fetch origin master`，master+乾淨+可 ff 時自動 `pull --ff-only` 拉進 VPS cron 已同步的最新 roster_config.json，否則只警告。純 git 走 GitHub、不碰 VPS SSH / Yahoo。註冊於 `.claude/settings.json`。詳見「執行環境」段 |
-| `daily-advisor/daily_advisor.py` | 每日戰報（速報 TW 22:15 + 最終報 TW 05:00） |
+| `daily-advisor/daily_advisor.py` | 每日戰報（單一 adaptive 報；平日 TW 05:30 報 ET 夜場 / 假日 TW 22:30 報 ET 日場） |
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP 並行 / 週一 RP / snapshot-only） |
 | `daily-advisor/fa_compute.py` | Python 機械計算層（B2 thin SP：anchor_filter + 5-slot Sum 排序 + 2026-only ✅⚠️ tags / Batter v4 thin：Sum ≥25 filter） |
 | `daily-advisor/anchor_filter.py` | SP B2 thin pure function（cant_cut + weekly_anchor_sp 名單，accent/apostrophe/case-insensitive 名稱比對）— `pick_weakest_v4_sp` 入口單一 call site |

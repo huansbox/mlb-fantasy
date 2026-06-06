@@ -328,7 +328,7 @@ def fetch_daily_reports_metadata(week_number):
         reports = []
         for issue in issues:
             title = issue.get("title", "")
-            # Extract date from title like "[速報] Daily Report 2026-03-30"
+            # Extract date from title like "[日報] Daily Report 2026-03-30"
             date_str = ""
             for part in title.split():
                 if len(part) == 10 and part[4:5] == "-" and part[7:8] == "-":
