@@ -1024,7 +1024,7 @@ def get_fantasy_week(target_date, config):
     return monday, sunday, week_number
 
 
-def analyze(config, target_date, env=None, morning=False):
+def analyze(config, target_date, env=None):
     """Build the full data summary for claude -p."""
     season = config["league"]["season"]
     date_str = target_date.strftime("%Y-%m-%d")
@@ -1382,27 +1382,12 @@ def analyze(config, target_date, env=None, morning=False):
         lines.append("\n板凳球員 Lineup 狀態：")
         lines.extend(bench_lines)
 
-    # ── Section 7: Evening advice (morning mode only) ──
-    if morning:
-        _, _, wk = get_fantasy_week(target_date, config)
-        evening_advice = fetch_evening_advice(target_date, wk)
-        if evening_advice:
-            lines.append("\n=== 速報建議（前一晚） ===")
-            lines.append(evening_advice)
-        else:
-            lines.append("\n（速報未找到，請獨立判斷）")
-
     return "\n".join(lines)
 
 
-def call_claude(data_summary, morning=False):
+def call_claude(data_summary):
     """Call claude -p with the data summary and prompt template."""
-    if morning:
-        tmpl_path = os.path.join(SCRIPT_DIR, "prompt_template_morning.txt")
-        with open(tmpl_path, encoding="utf-8") as f:
-            prompt = f.read()
-    else:
-        prompt = load_prompt_template()
+    prompt = load_prompt_template()
     full_prompt = f"{prompt}\n\n---\n以下是今日數據：\n\n{data_summary}"
 
     result = subprocess.run(
@@ -1454,7 +1439,6 @@ def main():
     parser = argparse.ArgumentParser(description="Fantasy Baseball Daily Advisor")
     parser.add_argument("--dry-run", action="store_true", help="Only fetch data and print summary, skip claude and telegram")
     parser.add_argument("--no-send", action="store_true", help="Run claude but don't send to Telegram")
-    parser.add_argument("--morning", action="store_true", help="Morning mode: include lineup data, use morning prompt")
     parser.add_argument("--date", help="Target date YYYY-MM-DD (default: today in ET)")
     args = parser.parse_args()
 
@@ -1464,22 +1448,19 @@ def main():
     if args.date:
         target_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        # target_date = ET 的「今天」。
-        # 速報 TW 22:15 = ET 10:15 → 比賽還沒開始，用來預覽今日 matchup
-        # 最終報 TW 05:00 = ET 17:00（前一天）→ 比賽可能進行中，用來確認結果
-        # 兩者的 target_date 都是「ET 當天」，不是「明天」。
+        # target_date = ET 的「今天」（不是「明天」）。單一日報，analyze 自動 adaptive：
+        # 有實際 lineup 用打序、沒有則用 probable matchup。排程見 cron（平日晚 / 假日早）。
         target_date = datetime.now(ET).date()
 
-    mode_label = "最終報" if args.morning else "速報"
-    print(f"[{mode_label}] Fetching data for {target_date}...", file=sys.stderr)
-    data_summary = analyze(config, target_date, env, morning=args.morning)
+    print(f"[日報] Fetching data for {target_date}...", file=sys.stderr)
+    data_summary = analyze(config, target_date, env)
 
     if args.dry_run:
         print(data_summary)
         return
 
     print("Calling claude -p...", file=sys.stderr)
-    advice = call_claude(data_summary, morning=args.morning)
+    advice = call_claude(data_summary)
     if not advice:
         print("Claude returned no output.", file=sys.stderr)
         print("\n--- Raw data summary ---")
@@ -1493,7 +1474,7 @@ def main():
 
     # Archive to GitHub Issue
     _, _, week_number = get_fantasy_week(target_date, config)
-    save_github_issue(target_date, week_number, data_summary, advice, morning=args.morning)
+    save_github_issue(target_date, week_number, data_summary, advice)
 
     print("\nSending to Telegram...", file=sys.stderr)
     ok = send_telegram(advice, env)
@@ -1503,42 +1484,10 @@ def main():
         print("Failed to send.", file=sys.stderr)
 
 
-def fetch_evening_advice(target_date, week_number):
-    """Fetch the evening report's advice from GitHub Issues for the same date."""
-    repo = "huansbox/mlb-fantasy"
-    title_query = f"[速報] Daily Report — {target_date}"
-    try:
-        result = subprocess.run(
-            ["gh", "issue", "list", "--repo", repo,
-             "--label", f"week-{week_number}",
-             "--search", title_query,
-             "--json", "body", "--limit", "1"],
-            capture_output=True, text=True, encoding="utf-8", timeout=15,
-        )
-        if result.returncode != 0:
-            return None
-        issues = json.loads(result.stdout)
-        if not issues:
-            return None
-        body = issues[0]["body"]
-        # Extract advice between "## Claude Advice" and "---"
-        marker = "## Claude Advice"
-        start = body.find(marker)
-        if start == -1:
-            return None
-        start += len(marker)
-        end = body.find("\n---\n", start)
-        return body[start:end].strip() if end != -1 else body[start:].strip()
-    except Exception as e:
-        print(f"Failed to fetch evening advice: {e}", file=sys.stderr)
-        return None
-
-
-def save_github_issue(target_date, week_number, data_summary, advice, morning=False):
+def save_github_issue(target_date, week_number, data_summary, advice):
     """Save daily report as a GitHub Issue for future review."""
     repo = "huansbox/mlb-fantasy"
-    tag = "最終報" if morning else "速報"
-    title = f"[{tag}] Daily Report — {target_date}"
+    title = f"[日報] Daily Report — {target_date}"
     body = f"""## Claude Advice
 
 {advice}
