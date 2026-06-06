@@ -34,6 +34,7 @@
 - 06-03：14d OPS .341 崩盤 10+ 天；PA-TG 2.72 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
 - 06-04：14d OPS .435 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
 - 06-05：14d OPS .435 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
+- 06-06：14d OPS .510 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發 — 建議結案（fa_scan）
 
 ### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
 觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
@@ -65,6 +66,7 @@
 - 06-03：Nootbaar 回歸第 10 天；14d Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 - 06-04：Nootbaar 回歸第 11 天；14d OPS .595 / Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
 - 06-05：Nootbaar 回歸第 12 天；14d OPS .595；BB% P0 結構不變 — 建議結案（fa_scan）
+- 06-06：Nootbaar 回歸第 12 天；14d OPS .595；BB% P0 結構不變 — 建議結案（fa_scan）
 
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
@@ -93,6 +95,7 @@
 - 06-03：⚡ K% 18.9 + OPS .834 + Savant Δ+0.056 品質確認；兩條件連 5 天同時達成；正式取代候選 vs Duran；觸發：Duran 14d OPS <.750 連 3 天 → 執行（fa_scan）
 - 06-04：⚡ K% 18.5 + OPS .870 + Savant Δ+0.060 品質確認連 5 天；Duran 14d OPS .696 首次跌破 .750（day 1/3）；觸發接近中（fa_scan）
 - 06-05：⚡ K% 17.5 + OPS .821 + Savant Δ+0.041 品質確認連 5 天；Duran 14d OPS .696 首破 .750（day 1/3）；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
+- 06-06：⚡ K% 17.5 + OPS .821 + Savant Δ+0.014 品質上升連 6 天；Duran 14d OPS .648 破 .750（day 2/3）；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
@@ -120,6 +123,7 @@
 - 06-03：14d OPS .529 退散第 5 週；xwOBA P50 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
 - 06-04：14d OPS .497 退散第 5 週；xwOBA P50 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
 - 06-05：14d OPS .497 退散第 6 週；xwOBA P45 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
+- 06-06：14d OPS .521 退散第 6 週；xwOBA P50 / Barrel% P45 觸發從未達成 — 建議結案（fa_scan）
 
 ### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
 觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級為 2B/UTIL 補強候選
@@ -146,6 +150,7 @@
 - 06-03：14d OPS .526 / K% 39.0 spike 第 4 週；觸發 .800 遠未達 — 建議結案（fa_scan）
 - 06-04：14d OPS .559 / K% 35.7 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
 - 06-05：14d OPS .559 / K% 35.7 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
+- 06-06：14d OPS .563 / K% 35.2 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
 
 ### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
@@ -168,6 +173,7 @@
 - 06-02：14d OPS .771 / 2HR；PA-TG 2.15 上場有限觸發遠未達 2.5（fa_scan）
 - 06-03：14d OPS .861 / 3HR；PA-TG 2.20 上場有限觸發遠未達 2.5（fa_scan）
 - 06-05：14d OPS .736 / 2HR；PA-TG 2.24 上場有限觸發遠未達 2.5（fa_scan）
+- 06-06：14d OPS .687 / 2HR；PA-TG 2.27 上場有限觸發遠未達 2.5（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -191,6 +197,7 @@
 - 06-03：⚠️ 已推薦 8 天未執行；stop-loss day 5 觸發 7 天；14d OPS .673 / K% 29.3 短期冷但季線 P80/P95 底穩；16% rising +4 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-04：⚠️ 已推薦 9 天未執行；stop-loss day 5 觸發 8 天；14d OPS .807 / K% 30.0 短期冷但季線 P95/P95 底穩；16% rising +3 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-05：⚠️ 已推薦 10 天未執行；stop-loss day 5 觸發 8 天；14d OPS .807 / K% 30.0；季線 P95/P95 底穩；16% rising 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
+- 06-06：⚠️ 已推薦 11 天未執行；14d OPS .874 / 4HR；季線 P95/P95 底穩；16% 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 
 ### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
 觸發：立即行動
@@ -212,6 +219,7 @@
 - 06-03：14d OPS .449 / Savant xwOBA 0.196（Δ-0.112）品質真崩；降為 B-plan vs Albies（fa_scan）
 - 06-04：14d OPS .322 / Savant xwOBA 0.186（Δ-0.121）品質真崩；降為 B-plan vs Albies（fa_scan）
 - 06-05：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
+- 06-06：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -233,6 +241,7 @@
 - 06-03：14d OPS .985 / 4HR 穩健但 K% 44.2 spike 警訊加劇；C-plan 維持（fa_scan）
 - 06-04：14d OPS 1.077 / 5HR 但 K% 43.4 spike 警訊加劇；C-plan 維持（fa_scan）
 - 06-05：14d OPS 1.085 / 5HR 但 K% 42.9 spike 警訊持續加劇；C-plan 維持（fa_scan）
+- 06-06：14d OPS .898 / 3HR 但 K% 42.6 spike 警訊持續加劇；C-plan 維持（fa_scan）
 
 ### TJ Rumfield (COL, 1B) [mlb_id:681198] — 觀察中
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
@@ -254,6 +263,7 @@
 - 06-03：14d OPS .944 / Savant Δ-0.021 品質微下滑；BBE 169 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-04：14d OPS .899 / Savant Δ-0.051 品質微下滑；BBE 173 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-05：14d OPS .899 / Savant Δ-0.054 品質下滑；BBE 176 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
+- 06-06：14d OPS .742 / Savant Δ-0.052 品質下滑；BBE 176 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 OR Savant Δ 連 5 天負值 → 取代 Duran
@@ -273,6 +283,7 @@
 - 06-03：14d OPS .475 / Savant Δ-0.189 品質崩盤第 6 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
 - 06-04：14d OPS .403 / Savant Δ-0.176 品質崩盤第 6 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
 - 06-05：14d OPS .403 / Savant Δ-0.168 品質崩盤第 7 天；C-plan 自身已失效 — 建議結案（fa_scan）
+- 06-06：14d OPS .276 / K% 51.1 / Savant Δ-0.168 品質崩盤第 7 天；C-plan 自身已失效 — 建議結案（fa_scan）
 
 ### Brett Baty (NYM, 1B,2B,3B,RF) [mlb_id:683146] — 觀察中
 觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
@@ -290,6 +301,7 @@
 - 06-03：14d OPS .626 / Savant Δ-0.034 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
 - 06-04：14d OPS .488 / Savant Δ-0.054 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
 - 06-05：14d OPS .488 / Savant Δ-0.094 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
+- 06-06：14d OPS .573 / Savant Δ-0.086 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
 
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
@@ -302,6 +314,7 @@
 - 06-03：14d OPS .947 / 4HR 但 Savant Δ-0.082 品質下滑（trad 強 Savant 弱 = BABIP 有利回歸中）；23% dropping -6；Duran 14d OPS .836 觸發 <.650 未達（fa_scan）
 - 06-04：14d OPS .815 / Savant Δ-0.074 品質下滑（trad 強 Savant 弱 = BABIP 有利回歸中）；22% dropping -11；Duran 14d OPS .696 首破 .750 但 Sheets 觸發 <.650 未達 — 降為 B-plan（Cam Smith 升級為正式取代候選）（fa_scan）
 - 06-05：14d OPS .561 / Savant Δ-0.076 品質下滑（trad 強 Savant 弱 = BABIP 回歸中）；22% dropping -9；Duran 14d OPS .696 首破 .750 但 Sheets 自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
+- 06-06：14d OPS .550 / Savant Δ-0.072 品質下滑；Duran 14d OPS .648 破 .750 但 Sheets 自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
 
 ### Gabriel Moreno (AZ, C) [mlb_id:672515] — 觀察中
 觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
@@ -314,15 +327,18 @@
 - 06-03：14d OPS .904 / 2HR / 10RBI / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-04：14d OPS .904 / 2HR / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
 - 06-05：14d OPS .783 / 2HR / 1SB；PA-TG 2.39 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
+- 06-06：14d OPS .783 / 2HR / 1SB；PA-TG 2.35 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
 
 ### Dominic Canzone (SEA, LF,RF) [mlb_id:686527] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
 - 06-04：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限（fa_scan）
 - 06-05：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限觸發未達（fa_scan）
+- 06-06：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS .998 / 3HR；PA-TG 2.36 上場有限觸發未達（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
 - 06-05：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P55/P70 雙年確認；14d OPS .861 / Savant Δ+0.042 品質上升；PA-TG 3.21 全職；1% 零壓力（fa_scan）
+- 06-06：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P70 雙年確認；14d OPS .731 / 3HR；PA-TG 3.19 全職；觸發未達（14d OPS <.800 / Savant Δ 待確認）（fa_scan）
 
 ### Carson Benge (NYM, LF,CF,RF) [mlb_id:701807] — 觀察中
 觸發：BBE 達 100 + xwOBA 維持 P80+ + 14d K% 回落 <25% → 升級取代候選
@@ -331,6 +347,11 @@
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
 - 06-05：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + 無 prior + Barrel% P45（fa_scan）
+- 06-06：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + Barrel% P45 + DTD 傷觀察（fa_scan）
+
+### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 觀察中
+觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
+- 06-06：xwOBA P95 / prior P80 雙年確認；14d OPS 1.059 / 5HR / 14RBI / 2SB / Savant Δ+0.097 品質飆升；PA-TG 1.88 上場嚴重有限（fa_scan）
 
 ## 隊上觀察
 
