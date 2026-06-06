@@ -10,7 +10,7 @@
   - ⚠️ **發現 — S2 與 S3 在 VPS 是「綁定 deploy」**：S2 一旦進 master，舊 cron 的 `--morning` 行（05:00 最終報）會因 argparse 不認 `--morning` 而失敗 → **S2 不可單獨 merge master，必須與 S3 cron 改動（刪舊 2 行 22:15/05:00 + 新增平日/假日行）在同一次 VPS deploy 一起上**。文檔時間表（README:32/54-55 / architecture.md:11-14 / CLAUDE.md 每日 SOP 表）也因此整批留 S3，等 cron 分鐘定案後一次寫對。
 - ✅ **2026-06-06 — S3 排程平日/假日分流 + 文檔時間表（程式碼/文檔完成）**：cron 行定稿 — 平日晚報 `30 21 * * 1-5`（TW 05:30 / ET Mon–Fri 夜場，趕 TW 06:34 最早鎖前）+ 假日早報 `30 14 * * 6,0`（TW 22:30 / ET Sat–Sun 日場，趕 TW 00:15 最早鎖前）。兩條 cron 的 UTC day-of-week 剛好 = ET 比賽日（平日報落 ET 同日傍晚 / 假日報落 ET 同日上午，皆未跨 UTC 午夜，無跨日界線陷阱）。日報 log 統一 `daily-advisor.log`。文檔時間表整批更新（README:32/54-55 / architecture.md:11-14 / CLAUDE.md 每日 SOP 表 + 檔案索引）。caveat（US 10）：平日 getaway day（~17%，TW 01:00 鎖）會被晚報漏掉，接受不補偵測。VPS deploy 見下條。
 - ✅ **2026-06-06 — S2+S3 merge master + VPS deploy 完成**：merge commit `51bab0c` push origin master。VPS deploy 順序（避開 `--morning` argparse error 窗口）= 先 patch cron（失敗安全逐行 python，base64 經 vps-run 傳，備份 `/etc/cron.d/daily-advisor.bak`）→ 再 git pull ff 到 `51bab0c`；patch 先做使中間態為「新 cron 跑舊 code 無 flag」（無 error）。cron 落地確認：平日 `30 21 * * 1-5` + 假日 `30 14 * * 6,0`，舊 22:15/05:00 兩行已移除、其餘 6 段完整保留。dry-run 驗證新 code 無 `--morning` argparse 錯 + adaptive lineup「未公布」分支正常 fetch。**首班假日早報 14:30 UTC（TW 22:30）= deploy 後第一次真實 cron 觸發，待觀察**（Telegram 推送 + GitHub issue tag `[日報]`）。
-- ⏳ **待處理**：更正 `project_claude_p_subscription` 記憶（US 13 — 本機檔案記憶目錄查無此檔，可能在 mac 機器或 cccmemory MCP，更正前需先定位 store）+ Phase 2 model 降級（Out of Scope）。
+- ⏳ **待處理**：US 13 記憶更正 — store 已定位在 **mac file-memory**（`project_claude_p_subscription`；Windows file-memory + cccmemory MCP 皆查無）。本機 Windows 已新建正確記憶 `project_claude_p_credit_pool`（6/15 改制事實），**剩 mac session 刪除/更正舊錯誤記憶**。Phase 2 model 降級（Out of Scope）。
 
 ## Problem Statement
 
