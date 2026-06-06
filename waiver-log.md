@@ -340,10 +340,6 @@
 - 06-05：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P55/P70 雙年確認；14d OPS .861 / Savant Δ+0.042 品質上升；PA-TG 3.21 全職；1% 零壓力（fa_scan）
 - 06-06：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P70 雙年確認；14d OPS .731 / 3HR；PA-TG 3.19 全職；觸發未達（14d OPS <.800 / Savant Δ 待確認）（fa_scan）
 
-### Carson Benge (NYM, LF,CF,RF) [mlb_id:701807] — 觀察中
-觸發：BBE 達 100 + xwOBA 維持 P80+ + 14d K% 回落 <25% → 升級取代候選
-- 06-05：xwOBA P80 / HH% P70 / PA-TG 3.71 主力；14d Savant Δ+0.059 品質飆升；無 prior 新人待驗證 + 14d K% 27.4 偏高；32% rising 有搶人壓力（fa_scan）
-
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
 - 06-05：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + 無 prior + Barrel% P45（fa_scan）
@@ -409,6 +405,9 @@
 - 06-04：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Carson Benge (NYM, LF,CF,RF) — 被搶（自動偵測）
+- 2026-06-06：Yahoo ownership_type=team，從觀察中移除。
 
 ### Zebby Matthews (MIN, SP) — 被搶（自動偵測）
 - 2026-06-05：Yahoo ownership_type=team，從觀察中移除。
