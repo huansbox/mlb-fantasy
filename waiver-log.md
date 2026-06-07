@@ -349,6 +349,10 @@
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
 - 06-06：xwOBA P95 / prior P80 雙年確認；14d OPS 1.059 / 5HR / 14RBI / 2SB / Savant Δ+0.097 品質飆升；PA-TG 1.88 上場嚴重有限（fa_scan）
 
+### Peter Lambert (HOU, SP) [mlb_id:663567] — 觀察中
+觸發：B2 2-step watch
+- 06-07：Lambert wins 3 slots vs Buehler (IP/GS 5.63 P60 vs 4.81 P0, Whiff% 26.1% P60 vs 18.0% P0, xwOBACON .338 P95 vs .385 P25) with credible 138 BBE sample. However, Lambert's BB/9 4.44 P0 is a serious shar（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
