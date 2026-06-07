@@ -244,3 +244,15 @@ By action:
 - `watch` n=0 (actionable 0) hit_rate=—
 - `pass` n=0 (actionable 0) hit_rate=—
 
+
+## Weekly Backtest 2026-06-07 (no verdicts)
+
+- Window: last 7 days; post-verdict observation: 21 days
+- Total verdicts parsed: 0 (actionable: 0)
+- Hit rate: —
+
+By action:
+- `drop_X_add_Y` n=0 (actionable 0) hit_rate=—
+- `watch` n=0 (actionable 0) hit_rate=—
+- `pass` n=0 (actionable 0) hit_rate=—
+
