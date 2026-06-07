@@ -109,7 +109,7 @@
         "g": 126
       },
       "selected_pos": "CF",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Ozzie Albies",
@@ -250,6 +250,29 @@
         "pa_per_team_g": 3.88,
         "pa": 628,
         "g": 145
+      }
+    },
+    {
+      "name": "Ceddanne Rafaela",
+      "mlb_id": 678882,
+      "yahoo_player_key": "469.p.12730",
+      "team": "BOS",
+      "positions": [
+        "2B",
+        "CF"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.305,
+        "barrel_pct": 9.2,
+        "hh_pct": 38.7,
+        "bb_pct": 4.8,
+        "ops": 0.709,
+        "pa_per_team_g": 3.62,
+        "pa": 587,
+        "g": 156
       }
     }
   ],
@@ -460,7 +483,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -562,29 +585,6 @@
         "era": 4.93,
         "ip": 126.0,
         "ip_per_gs": 5.0
-      }
-    },
-    {
-      "name": "Sean Burke",
-      "mlb_id": 680732,
-      "yahoo_player_key": "469.p.12418",
-      "team": "CWS",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "BN",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.96,
-        "xwoba_allowed": 0.342,
-        "hh_pct_allowed": 42.7,
-        "barrel_pct_allowed": 10.4,
-        "bbe": 393,
-        "era": 4.22,
-        "ip": 134.3,
-        "ip_per_gs": 4.7
       }
     }
   ],
