@@ -28,12 +28,32 @@ Failure modes:
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
+import tempfile
 import threading
 import time
 from dataclasses import dataclass
 from typing import Optional
+
+
+def neutral_claude_cwd() -> str:
+    """Return a CLAUDE.md-free directory to run `claude -p` from.
+
+    Running claude from a dir with no CLAUDE.md (and the VPS has no user-level
+    ~/.claude/CLAUDE.md) suppresses project-memory auto-load, cutting ~22.5K
+    tokens of redundant context per call. The fa_scan prompts are fully
+    self-contained (eval framework embedded), so the project CLAUDE.md is pure
+    overhead here — proven equivalent output (decision + format) with vs
+    without it on a real batter payload. See
+    issues/prd-claude-p-cost-simplification.md Phase 1.5. The dir is empty and
+    only used as a cwd; the prompt + data are passed inline, so claude never
+    reads any project file from it.
+    """
+    d = os.path.join(tempfile.gettempdir(), "fa_scan_claude_cwd")
+    os.makedirs(d, exist_ok=True)
+    return d
 
 
 @dataclass
@@ -59,6 +79,7 @@ def run_single_agent(prompt: str, agent_id: str, timeout: int = 600) -> AgentRes
         result = subprocess.run(
             ["claude", "-p", prompt],
             capture_output=True, text=True, encoding="utf-8", timeout=timeout,
+            cwd=neutral_claude_cwd(),
         )
         latency = round(time.time() - t0, 2)
         err: Optional[str] = None if result.returncode == 0 else f"exit_code {result.returncode}"

@@ -1704,6 +1704,7 @@ def save_summary(advice):
 
 def _call_claude(prompt_path, data, timeout=600, retries=1):
     """Call claude -p with prompt + data. Returns advice string or raises."""
+    from _multi_agent import neutral_claude_cwd
     with open(prompt_path, encoding="utf-8") as f:
         prompt = f.read()
     if "{data}" in prompt:
@@ -1718,6 +1719,7 @@ def _call_claude(prompt_path, data, timeout=600, retries=1):
             result = subprocess.run(
                 ["claude", "-p", full_prompt],
                 capture_output=True, text=True, encoding="utf-8", timeout=timeout,
+                cwd=neutral_claude_cwd(),
             )
             if result.returncode != 0:
                 raise RuntimeError(f"claude -p failed: {result.stderr[:500]}")
