@@ -11,7 +11,7 @@
 - ✅ **2026-06-06 — S3 排程平日/假日分流 + 文檔時間表（程式碼/文檔完成）**：cron 行定稿 — 平日晚報 `30 21 * * 1-5`（TW 05:30 / ET Mon–Fri 夜場，趕 TW 06:34 最早鎖前）+ 假日早報 `30 14 * * 6,0`（TW 22:30 / ET Sat–Sun 日場，趕 TW 00:15 最早鎖前）。兩條 cron 的 UTC day-of-week 剛好 = ET 比賽日（平日報落 ET 同日傍晚 / 假日報落 ET 同日上午，皆未跨 UTC 午夜，無跨日界線陷阱）。日報 log 統一 `daily-advisor.log`。文檔時間表整批更新（README:32/54-55 / architecture.md:11-14 / CLAUDE.md 每日 SOP 表 + 檔案索引）。caveat（US 10）：平日 getaway day（~17%，TW 01:00 鎖）會被晚報漏掉，接受不補偵測。VPS deploy 見下條。
 - ✅ **2026-06-06 — S2+S3 merge master + VPS deploy 完成**：merge commit `51bab0c` push origin master。VPS deploy 順序（避開 `--morning` argparse error 窗口）= 先 patch cron（失敗安全逐行 python，base64 經 vps-run 傳，備份 `/etc/cron.d/daily-advisor.bak`）→ 再 git pull ff 到 `51bab0c`；patch 先做使中間態為「新 cron 跑舊 code 無 flag」（無 error）。cron 落地確認：平日 `30 21 * * 1-5` + 假日 `30 14 * * 6,0`，舊 22:15/05:00 兩行已移除、其餘 6 段完整保留。dry-run 驗證新 code 無 `--morning` argparse 錯 + adaptive lineup「未公布」分支正常 fetch。**首班假日早報 14:30 UTC（TW 22:30）= deploy 後第一次真實 cron 觸發，待觀察**（Telegram 推送 + GitHub issue tag `[日報]`）。
 - ⏳ **待處理**：US 13 記憶更正 — store 已定位在 **mac file-memory**（`project_claude_p_subscription`；Windows file-memory + cccmemory MCP 皆查無）。本機 Windows 已新建正確記憶 `project_claude_p_credit_pool`（6/15 改制事實），**剩 mac session 刪除/更正舊錯誤記憶**。Phase 2 model 降級（Out of Scope）。
-- ⏳ **Phase 1.5（2026-06-08）— fa_scan prompt 簡化：槓桿 1a（CLAUDE.md cwd cut）已部署、首班觀察中**：VPS 實測證實每 `claude -p` call 的 project CLAUDE.md auto-load 佔 **22.5K token**（換 cwd 可砍、決策+格式不變、不動 auth）。**1a 已 merge master + VPS pull（commit `9c5c517`），明天 TW 12:30 cron 首班生效** — 被動觀察點：首班 batter/SP `[FA Scan]` issue 正常產出 + 無 `fa-scan-error` alert（production claude call 非 json mode、不記 usage，「省」靠 A/B 邏輯保證，不再 production 量）。VPS cron 環境 `tempfile.gettempdir()=/tmp`、往上 + `~/.claude` 無 CLAUDE.md，已驗證 neutral cwd 乾淨。`--tools ""` 否決（破壞 cache）。**槓桿 2（batter output 收斂，9–11K tokens 是單一最大成本項）有 OPEN（砍哪些）待對齊 — handoff 見 [`docs/handoff-fa-scan-lever2-batter-output.md`](../docs/handoff-fa-scan-lever2-batter-output.md)**。branch `refactor/fa-scan-prompt-slim`（保留待槓桿 2）。完整量測 + 槓桿決策見文末「Phase 1.5」段。
+- ⏳ **Phase 1.5（2026-06-08）— fa_scan prompt 簡化：槓桿 1a（CLAUDE.md cwd cut）已部署、首班觀察中**：VPS 實測證實每 `claude -p` call 的 project CLAUDE.md auto-load 佔 **22.5K token**（換 cwd 可砍、決策+格式不變、不動 auth）。**1a 已 merge master + VPS pull（commit `9c5c517`），明天 TW 12:30 cron 首班生效** — 被動觀察點：首班 batter/SP `[FA Scan]` issue 正常產出 + 無 `fa-scan-error` alert（production claude call 非 json mode、不記 usage，「省」靠 A/B 邏輯保證，不再 production 量）。VPS cron 環境 `tempfile.gettempdir()=/tmp`、往上 + `~/.claude` 無 CLAUDE.md，已驗證 neutral cwd 乾淨。`--tools ""` 否決（破壞 cache）。**槓桿 2（batter output 收斂）2026-06-08 真實 payload A/B 後放棄** — 「只在實質變化時 UPDATE」的 skip 規則誘發 ~12K extended thinking（被當 output 計費）：可見輸出雖 −23%（waiver-log 17→6 行），但 output_tokens 6.7K→18–19K（2 次重現）、cost +68%，與砍成本目標相反。1a 已 captured 絕大部分省幅，batter output 不再追。branch `refactor/fa-scan-batter-output` 已 revert/刪。完整量測見文末「Phase 1.5」段。
 
 ## Problem Statement
 
@@ -144,7 +144,7 @@
 |------|------|------|------|
 | 1a CLAUDE.md | claude -p 從無 CLAUDE.md 的 cwd 跑（`subprocess.run(cwd=...)`）| **採用** | 省 22.5K/call、格式+決策不變、用現有 OAuth |
 | 1b tool | `--tools ""` | **否決** | 只砍 built-in、破壞 cache 前綴 → 不省反增 7K |
-| 2 output | 收斂 batter 輸出格式 | **採用（上修為主要）** | batter output $0.23–0.27/call = 最大成本項；字面即「prompt 簡化」；SP 走 JSON 不受影響 |
+| 2 output | 收斂 batter 輸出格式 | **放棄（2026-06-08 實測 backfire）** | skip 規則誘發 thinking → output_tokens 6.7K→18-19K、cost +68%（見下「槓桿 2 實測結論」）|
 
 `--bare` 否決：明列 skip CLAUDE.md auto-discovery，但強制 `ANTHROPIC_API_KEY`、不讀 OAuth → 跳出 $100 credit pool 改吃真錢 API，與本 PRD「續吞訂閱 credit」矛盾。換 cwd 達同效果且不動 auth（VPS root 無 user-level `~/.claude/CLAUDE.md`、`/tmp` 往上無 CLAUDE.md，故空 cwd = 零 CLAUDE.md）。
 
@@ -159,14 +159,30 @@
 ### 預期省幅
 
 - 槓桿 1a：3 call/day × ~$0.14 ≈ $0.42/day ≈ **$12.6/月**（扣同 run 內 1h cache 共用略低），零品質損失。
-- 槓桿 2：batter output 若砍 ~30%，再省 ~$0.07–0.08/call/day。
+- 槓桿 2：**放棄**（實測 backfire，見下）。原估「砍 ~30% 再省 $0.07–0.08/call」基於「output ≈ 可見文字」的錯誤假設 — 實際 skip 規則誘發 thinking 反讓 cost +68%。
 
 ### Testing
 
 - 槓桿 1a：VPS 端真實 payload proj vs 空 cwd 對照（本 session 已做，決策+格式一致）；實作後再跑一次 production dry-run 確認 fa_scan 端到端輸出不變。
 - 槓桿 2：prompt 輸出形狀（不 assert 字串）；VPS dry-run 看 batter 報仍含必要區塊（drop 排序 / ACTION / waiver-log 區塊）。
 
+### 槓桿 2 實測結論（2026-06-08 放棄）
+
+對齊「中度」砍法後實作 + VPS 真實 payload（issue #300，空 cwd 對齊 1a）配對 A/B：
+
+| metric | 舊 prompt | 新 run #1 | 新 run #2 |
+|--------|---:|---:|---:|
+| output_tokens | 6,716 | 18,209 | 19,195 |
+| 可見輸出 chars | 6,126 | 4,696 | 3,501 |
+| waiver-log 行 | 17 | 6 | 4 |
+| cost_usd | $0.429 | $0.719 | $0.506 |
+
+- **功能正確**：waiver-log skip 規則生效（17→4-6 行）、drop-rank 2 行式、結構錨點 + 決策全保留、可見輸出 −23%。
+- **但成本 backfire**：舊 prompt output_tokens(6,716) ≈ 可見字數 → 幾乎不 thinking。新 prompt output_tokens 18-19K 但可見僅 3.5-4.7K → 多出 ~12-15K **隱藏 thinking**（2 次重現，非 variance）。
+- **根因**：新規則「逐位觀察中球員比對完整 history、判斷今日 vs 最近是否實質相同、決定 skip」是對 ~20 位球員的顯式 per-item reasoning 邀請；opus 在（計費的）thinking 內執行。舊 prompt「每位都 emit UPDATE」無決策 → 無 thinking。
+- **教訓**：prompt 內要 LLM「逐項比對 + 決策」來縮短輸出，省下的可見 token 可能遠小於誘發的 thinking token → 淨虧。量測 claude -p 省幅要看 `output_tokens` 本身（會含 thinking），不能只看可見文字長度（`output_tokens >> 可見字數` = thinking 污染）。
+- **決策**：放棄槓桿 2。1a（~$13/月、零品質損失）已 captured 絕大部分省幅；batter output 不在不誘發 thinking 下可有意義地砍，剩餘安全 win（drop-rank 純排版 ~$0.25/月）太小不值得動 load-bearing production prompt。
+
 ### OPEN
 
-- 槓桿 2 砍哪些區塊 / 冗詞（候選：drop 排序三行→兩行 / PASS 段只在觸發時出 / UPDATE 行精簡）— 實作時對齊。
 - 同一次 fa_scan run 內 3 call 的 1h cache 實際共用率（影響真實月省，被動觀察 production usage）。
