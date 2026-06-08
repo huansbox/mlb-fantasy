@@ -4,7 +4,7 @@
 
 ## 聯賽格式
 
-- H2H One Win（14 類別合計，贏 8+ = 1 週勝）
+- H2H One Win（**majority rule**：贏的類別 > 輸的類別 = 1 W；相等 = T；平手類別雙方不計）
 - 打者 7 項：R, HR, RBI, SB, BB, AVG, OPS
 - 投手 7 項：IP, W, K, ERA, WHIP, QS, SV+H
 - 12 隊，Snake Draft
@@ -49,11 +49,11 @@
   - Cron 排程：
     - **FA Scan** UTC 04:30 每日（台灣 12:30）：打者+SP 兩階段 Claude 分析 + waiver-log 自動寫入
     - **Weekly Review** UTC 05:00 每週一（台灣 13:00）：覆盤資料準備
-    - **Roster Sync** UTC 07:10 每日（台灣 15:10）：Yahoo 陣容同步
+    - **Roster Sync** 每 15 分（min 7,22,37,52）：poll Yahoo transactions，有異動才更新 roster_config.json + push
     - **FA Snapshot** UTC 07:15 每日（台灣 15:15）：%owned 快照 + watchlist 清理
     - **日報（平日）** UTC 21:30 Mon–Fri（台灣 05:30）：ET 夜場 lineup + matchup + SP 確認（單一 adaptive 報）
     - **日報（假日）** UTC 14:30 Sat–Sun（台灣 22:30）：ET 日場 lineup + matchup + SP 確認（單一 adaptive 報）
   - 報告自動存檔為 GitHub Issue（戰報 label: `week-N`，FA 掃描 label: `fa-scan`）
-  - 更新部署：`ssh root@107.175.30.172 'cd /opt/mlb-fantasy && git pull'`
+  - 更新部署：`bash bin/vps-run.sh --no-retry 'cd /opt/mlb-fantasy/daily-advisor && python3 git_sync.py /opt/mlb-fantasy'`（非裸 `git pull` — 避 roster cron 每 15 分 push 的 race）
 - `draft-helper.html` 為獨立 HTML，手機瀏覽器直接開
 - `draft-sim.js` 需要 Node.js 執行
