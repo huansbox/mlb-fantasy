@@ -364,6 +364,7 @@
 ### Peter Lambert (HOU, SP) [mlb_id:663567] — 觀察中
 觸發：B2 2-step watch
 - 06-07：Lambert wins 3 slots vs Buehler (IP/GS 5.63 P60 vs 4.81 P0, Whiff% 26.1% P60 vs 18.0% P0, xwOBACON .338 P95 vs .385 P25) with credible 138 BBE sample. However, Lambert's BB/9 4.44 P0 is a serious shar（fa_scan）
+- 06-08：Lambert beats Buehler in IP/GS (5.63 P60 vs 4.81 P0), Whiff% (26.1 P60 vs 18.0 P0), and xwOBACON (0.338 P95 vs 0.385 P25) — a clear 3-slot edge. However, Lambert's BB/9 4.44 (P0) is worse than Buehler（fa_scan）
 
 ### Colton Cowser (BAL, LF,CF,RF) [mlb_id:681297] — 觀察中
 觸發：PA-TG ≥2.8 連 5 天 + xwOBA 升至 P70+ → 升級
