@@ -382,6 +382,10 @@
 - 06-07：14d OPS 1.129 / 4HR 爆發但 PA-TG 2.18 上場嚴重有限；BB% P80 / Barrel% P70 + prior Barrel% P95（fa_scan）
 - 06-08：14d OPS 1.121 / 4HR 爆發但 PA-TG 2.21 上場嚴重有限；觸發未達（fa_scan）
 
+### Shane Drohan (MIL, SP,RP) [mlb_id:675660] — 觀察中
+觸發：B2 2-step watch
+- 06-09：Cantillo's 21d xwOBACON 0.436 (+0.067 Δ, 51 BBE) confirms real deterioration, making him a valid drop candidate. However, no FA clears the bar for an add: Chad Patrick wins xwOBACON (0.339 vs 0.369) a（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
