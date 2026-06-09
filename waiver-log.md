@@ -98,6 +98,7 @@
 - 06-06：⚡ K% 17.5 + OPS .821 + Savant Δ+0.014 品質上升連 6 天；Duran 14d OPS .648 破 .750（day 2/3）；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
 - 06-07：⚡ K% 17.5 + OPS .821 連 7 天；Duran 14d OPS .648 破 .750 day 2/3 — 明天 day 3 達成即執行 drop Duran add Smith（fa_scan）
 - 06-08：⚡ K% 24.1 + OPS .820 連 7 天；Duran 14d OPS .782 破 .750 day 2/3 — 明天 day 3 達成即執行 drop Duran add Smith（fa_scan）
+- 06-09：⚡ K% 24.1 + OPS .852 連 7 天達成但 Duran 14d OPS 回彈 .782（>.750）計數器重置 day 0/3；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
 
 ### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
 觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
@@ -204,6 +205,7 @@
 - 06-06：⚠️ 已推薦 11 天未執行；14d OPS .874 / 4HR；季線 P95/P95 底穩；16% 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-07：⚠️ 已推薦 12 天未執行；14d OPS .874 / 4HR；季線 P95/P95 底穩；16% 窗口仍開 — 立即行動 drop Swanson add Crawford（fa_scan）
 - 06-08：⚠️ 已推薦 12 天未執行但 Swanson 已離隊 → 錨點更新 vs Arraez（P95/P95 vs P60/P0/P0 碾壓）；DTD 傷觀察中，清除即升級立即取代；觸發改為：DTD 清除 + 回先發 → 立即取代 Arraez（fa_scan）
+- 06-09：IL10 + DTD；Swanson 離隊後錨點 vs Arraez — 若 Pederson 先取代 Arraez 則需重新錨定；P95/P95 底穩（fa_scan）
 
 ### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
 觸發：立即行動
@@ -227,6 +229,7 @@
 - 06-05：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
 - 06-06：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
 - 06-07：14d OPS .458 / Savant xwOBA 0.169（Δ-0.136）品質崩盤持續；降為 B-plan vs Albies（fa_scan）
+- 06-09：14d Savant xwOBA 0.182（Δ-0.123）品質崩盤持續 4 週；Clemens 取代 Albies 更優 — 降為 C-plan（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -251,6 +254,7 @@
 - 06-06：14d OPS .898 / 3HR 但 K% 42.6 spike 警訊持續加劇；C-plan 維持（fa_scan）
 - 06-07：14d OPS .936 / 3HR 但 K% 39.6 spike 警訊持續加劇；C-plan 維持（fa_scan）
 - 06-08：14d OPS .895 / 3HR 但 K% 36.0 spike 警訊持續；C-plan 維持（fa_scan）
+- 06-09：14d OPS .895 / 3HR 但 K% 36.0 spike 持續；C-plan 維持（fa_scan）
 
 ### TJ Rumfield (COL, 1B) [mlb_id:681198] — 觀察中
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
@@ -275,6 +279,7 @@
 - 06-06：14d OPS .742 / Savant Δ-0.052 品質下滑；BBE 176 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-07：14d OPS .772 / Savant Δ-0.091 品質下滑；BBE 178 + xwOBA P80 兩項達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-08：14d OPS .684 / Savant Δ-0.076 品質下滑；BBE 181 + xwOBA P80 達標；差客場 OPS ≥.750 最後確認（fa_scan）
+- 06-09：14d OPS .684 / Savant Δ-0.076 品質下滑；BBE 184 + xwOBA P70 達標；差客場 OPS ≥.750 最後確認（fa_scan）
 
 ### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 OR Savant Δ 連 5 天負值 → 取代 Duran
@@ -328,6 +333,7 @@
 - 06-06：14d OPS .550 / Savant Δ-0.072 品質下滑；Duran 14d OPS .648 破 .750 但 Sheets 自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
 - 06-07：14d OPS .505 / Savant Δ-0.067 品質下滑持續；自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
 - 06-08：14d OPS .505 / Savant Δ-0.058 品質下滑持續；自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
+- 06-09：14d OPS .526 / Savant Δ-0.058 品質下滑持續；自身 B-plan 弱化中（fa_scan）
 
 ### Gabriel Moreno (AZ, C) [mlb_id:672515] — 觀察中
 觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
@@ -351,6 +357,7 @@
 - 06-06：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS .998 / 3HR；PA-TG 2.36 上場有限觸發未達（fa_scan）
 - 06-07：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.131 / 4HR；PA-TG 2.38 上場有限觸發未達（fa_scan）
 - 06-08：14d OPS 1.131 / 4HR 爆發；PA-TG 2.38 上場有限觸發未達（fa_scan）
+- 06-09：14d OPS 1.151 / 4HR + Savant Δ+0.105 爆發；PA-TG 2.40 上場有限觸發未達；7% rising +3（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -358,6 +365,7 @@
 - 06-06：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P70 雙年確認；14d OPS .731 / 3HR；PA-TG 3.19 全職；觸發未達（14d OPS <.800 / Savant Δ 待確認）（fa_scan）
 - 06-07：14d OPS .769 / 3HR / Savant Δ+0.052 品質上升；PA-TG 3.19 全職；觸發未達（14d OPS <.800）（fa_scan）
 - 06-08：14d OPS .773 / 3HR / Savant Δ+0.049 品質上升；觸發 OPS ≥.800 維持 7 天未達（fa_scan）
+- 06-09：14d OPS .773 / 3HR / Savant Δ+0.049 品質上升；觸發 OPS ≥.800 維持 7 天未達（fa_scan）
 
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -365,12 +373,14 @@
 - 06-06：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + Barrel% P45 + DTD 傷觀察（fa_scan）
 - 06-07：14d OPS .751 / 16 RBI 爆量；PA-TG 2.42 上場有限 + DTD + Barrel% P45；觸發未達（fa_scan）
 - 06-08：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + DTD；觸發未達（fa_scan）
+- 06-09：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + IL10；觸發未達（fa_scan）
 
 ### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
 - 06-06：xwOBA P95 / prior P80 雙年確認；14d OPS 1.059 / 5HR / 14RBI / 2SB / Savant Δ+0.097 品質飆升；PA-TG 1.88 上場嚴重有限（fa_scan）
 - 06-07：14d OPS 1.009 / 5HR / 2SB / Savant Δ+0.097 品質飆升；PA-TG 1.91 上場嚴重有限觸發未達（fa_scan）
 - 06-08：14d OPS 1.033 / 5HR / 2SB；PA-TG 1.94 上場嚴重有限觸發未達（fa_scan）
+- 06-09：14d OPS 1.033 / 5HR / 2SB；PA-TG 1.94 上場嚴重有限觸發未達（fa_scan）
 
 ### Peter Lambert (HOU, SP) [mlb_id:663567] — 觀察中
 觸發：B2 2-step watch
@@ -381,6 +391,7 @@
 觸發：PA-TG ≥2.8 連 5 天 + xwOBA 升至 P70+ → 升級
 - 06-07：14d OPS 1.129 / 4HR 爆發但 PA-TG 2.18 上場嚴重有限；BB% P80 / Barrel% P70 + prior Barrel% P95（fa_scan）
 - 06-08：14d OPS 1.121 / 4HR 爆發但 PA-TG 2.21 上場嚴重有限；觸發未達（fa_scan）
+- 06-09：14d OPS 1.004 / 4HR 爆發但 PA-TG 2.25 上場嚴重有限；16% explosive +10 窗口關閉中（fa_scan）
 
 ### Shane Drohan (MIL, SP,RP) [mlb_id:675660] — 觀察中
 觸發：B2 2-step watch
@@ -457,6 +468,7 @@
 
 ### Joc Pederson (TEX, Util) — 被搶（自動偵測）
 - 2026-06-03：Yahoo ownership_type=team，從觀察中移除。
+- 06-09：Season P95/P95/P60/P80 + prior P60/P80/P60 確認；14d 5HR/12RBI/OPS .940 + Savant Δ+0.013；取代 Arraez（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
@@ -497,6 +509,7 @@
 - 2026-05-19：drop Altuve → add Kody Clemens。觀察 7 天（5/12 fa_scan 首標「立即行動」，連 4 天未執行後本日落地）；xwOBA P80 / Barrel% P95 + prior P80/P80 雙年確認結構全面優於 Altuve；14d OPS .948 爆發 / 2 HR / 10 R / 1 SB。Altuve Grade 2 左腹斜肌拉傷（5/17 IL，分析師估 6-8 週 + 同側 2023 復發風險）+ 傷前 5 月 OPS .572 深度低潮 → stash 機會成本過高放生。
 - 06-07：xwOBA P80 / Barrel% P95 + prior P80 雙年確認；14d OPS .900 / 4HR / Savant Δ+0.039；BB% P25 弱點待修復（fa_scan）
 - 06-08：xwOBA P80 / Barrel% P95 + prior P80 雙年確認；14d OPS .935 / 4HR / Savant Δ+0.042 品質上升；曾在隊後被 drop 需確認原因（fa_scan）
+- 06-09：Season P80/P95/P70 + prior P80/P80 雙年確認；14d 4HR/10R/OPS .935 + Savant Δ+0.047；取代 Albies（fa_scan）
 
 ### Moisés Ballesteros (CHC, C) [mlb_id:694208] — Pass
 - 2026-05-15：觀察 17 天結案；14d OPS 從 1.456 一路崩塌至 .326（第 4 週冷卻），%owned 29% dropping -14 市場大量拋售；PA-TG 連 16 天未達 2.8 觸發；Albies 14d OPS .696 另一觸發接近但未達 — 上場時間問題 + 熱度退散雙重失敗（fa_scan）
