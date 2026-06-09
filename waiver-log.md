@@ -335,21 +335,6 @@
 - 06-08：14d OPS .505 / Savant Δ-0.058 品質下滑持續；自身降為 B-plan（Cam Smith 升級正式取代候選）（fa_scan）
 - 06-09：14d OPS .526 / Savant Δ-0.058 品質下滑持續；自身 B-plan 弱化中（fa_scan）
 
-### Gabriel Moreno (AZ, C) [mlb_id:672515] — 觀察中
-觸發：Jeffers IL 延長至 ≥3 週 + Moreno PA-TG ≥2.5 → 升級 C 補強候選
-- 05-28：xwOBA P95 / Barrel% P70 + prior P80 雙年確認；14d 3 SB 速度；PA-TG 2.20 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 05-29：xwOBA P95 / Barrel% P70 + prior P80 雙年確認；14d 3 SB 速度；PA-TG 2.20 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 05-30：14d OPS .781 / 3SB 速度；PA-TG 2.27 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 05-31：14d OPS .803 / 2HR / 11RBI / 3SB 全面；PA-TG 2.30 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 06-01：14d OPS .880 / 2HR / 11RBI / 3SB 全面；PA-TG 2.28 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 06-02：14d OPS .887 / 2HR / 10RBI / 3SB 全面；PA-TG 2.29 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 06-03：14d OPS .904 / 2HR / 10RBI / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 06-04：14d OPS .904 / 2HR / 2SB 全面；PA-TG 2.37 上場有限 + Jeffers 預計回歸 → 短窗口（fa_scan）
-- 06-05：14d OPS .783 / 2HR / 1SB；PA-TG 2.39 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
-- 06-06：14d OPS .783 / 2HR / 1SB；PA-TG 2.35 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
-- 06-07：14d OPS .679 / 1HR / 1SB；PA-TG 2.38 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
-- 06-08：14d OPS .798 / 2HR / 1SB；PA-TG 2.40 上場有限 + Jeffers IL 持續 → 短窗口（fa_scan）
-
 ### Dominic Canzone (SEA, LF,RF) [mlb_id:686527] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
 - 06-04：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限（fa_scan）
@@ -381,17 +366,6 @@
 - 06-07：14d OPS 1.009 / 5HR / 2SB / Savant Δ+0.097 品質飆升；PA-TG 1.91 上場嚴重有限觸發未達（fa_scan）
 - 06-08：14d OPS 1.033 / 5HR / 2SB；PA-TG 1.94 上場嚴重有限觸發未達（fa_scan）
 - 06-09：14d OPS 1.033 / 5HR / 2SB；PA-TG 1.94 上場嚴重有限觸發未達（fa_scan）
-
-### Peter Lambert (HOU, SP) [mlb_id:663567] — 觀察中
-觸發：B2 2-step watch
-- 06-07：Lambert wins 3 slots vs Buehler (IP/GS 5.63 P60 vs 4.81 P0, Whiff% 26.1% P60 vs 18.0% P0, xwOBACON .338 P95 vs .385 P25) with credible 138 BBE sample. However, Lambert's BB/9 4.44 P0 is a serious shar（fa_scan）
-- 06-08：Lambert beats Buehler in IP/GS (5.63 P60 vs 4.81 P0), Whiff% (26.1 P60 vs 18.0 P0), and xwOBACON (0.338 P95 vs 0.385 P25) — a clear 3-slot edge. However, Lambert's BB/9 4.44 (P0) is worse than Buehler（fa_scan）
-
-### Colton Cowser (BAL, LF,CF,RF) [mlb_id:681297] — 觀察中
-觸發：PA-TG ≥2.8 連 5 天 + xwOBA 升至 P70+ → 升級
-- 06-07：14d OPS 1.129 / 4HR 爆發但 PA-TG 2.18 上場嚴重有限；BB% P80 / Barrel% P70 + prior Barrel% P95（fa_scan）
-- 06-08：14d OPS 1.121 / 4HR 爆發但 PA-TG 2.21 上場嚴重有限；觸發未達（fa_scan）
-- 06-09：14d OPS 1.004 / 4HR 爆發但 PA-TG 2.25 上場嚴重有限；16% explosive +10 窗口關閉中（fa_scan）
 
 ### Shane Drohan (MIL, SP,RP) [mlb_id:675660] — 觀察中
 觸發：B2 2-step watch
@@ -453,6 +427,15 @@
 - 06-04：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 
 ## 已結案
+
+### Gabriel Moreno (AZ, C) — 被搶（自動偵測）
+- 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
+
+### Peter Lambert (HOU, SP) — 被搶（自動偵測）
+- 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
+
+### Colton Cowser (BAL, LF,CF,RF) — 被搶（自動偵測）
+- 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
 
 ### Carson Benge (NYM, LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-06：Yahoo ownership_type=team，從觀察中移除。
