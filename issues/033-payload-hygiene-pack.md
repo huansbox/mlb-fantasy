@@ -10,13 +10,15 @@
 
 ## Acceptance criteria
 
-- [ ] watch 球員 payload 顯示真實 %owned（不在 snapshot top 結果內者亦然），無假 0%
-- [ ] FA 候選 prior 行含 PA 與年齡（與我方候選區塊對稱）
-- [ ] 14d Savant BBE <15 不印 Δ 或標「樣本不足」
-- [ ] 14d trad 與 14d Savant 的視窗差異在 payload 有標註
-- [ ] prompt 含 %owned 語意說明一行（靜態資料字典類，非判斷規則）
-- [ ] 部署後隔日 issue payload 逐項可見；cost spot-check 無異常（input/output tokens 與前日同量級）
-- [ ] 受影響格式函式 fixture 回歸更新
+- [x] watch 球員 payload 顯示真實 %owned（不在 snapshot top 結果內者亦然），無假 0% ✅ 2026-06-10
+- [x] FA 候選 prior 行含 PA 與年齡（與我方候選區塊對稱）✅ 2026-06-10
+- [x] 14d Savant BBE <15 不印 Δ 或標「樣本不足」✅ 2026-06-10
+- [x] 14d trad 與 14d Savant 的視窗差異在 payload 有標註 ✅ 2026-06-10
+- [x] prompt 含 %owned 語意說明一行（靜態資料字典類，非判斷規則）✅ 2026-06-10
+- [ ] 部署後隔日 issue payload 逐項可見；cost spot-check 無異常（input/output tokens 與前日同量級）— ⏳ 6/11 12:30 cron 後驗證
+- [x] 受影響格式函式 fixture 回歸更新（新增 `tests/test_fa_scan_payload_hygiene.py` 20 cases）✅ 2026-06-10
+
+> 實作備註（2026-06-10，merge `fc55fae`）：watch %owned 真值來源 = 既有逐人 ownership 查詢（`_check_player_ownership`）改回傳 dict，零額外 API call；年齡 = `_fetch_ages_bulk` 對 FA+watch 一次 bulk `/people?personIds=` call；BBE floor 常數 `_SAVANT_14D_BBE_FLOOR = 15`。
 
 ## Blocked by
 
