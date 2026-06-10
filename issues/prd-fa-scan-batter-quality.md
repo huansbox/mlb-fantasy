@@ -1,7 +1,43 @@
-# PRD — fa_scan Batter 判斷品質 + 決策對帳回路
+# PRD — fa_scan Batter 判斷品質 + 決策對帳回路（主 issue）
 
-> 2026-06-10 定稿。來源：`docs/fa-scan-batter-judgment-quality.md`（品質研究 + C1 十題 grill-me 定案）+ `docs/fa-scan-batter-payload-optimization.md`（token 成本篇之 ②③④ 併入）。切法已經 agent 依 vertical-slice 原則審查修正（11 片，8 AFK / 3 HITL）。
-> 下一步：`/prd-to-issues` 切分（切分建議見文末 Further Notes）。
+> 2026-06-10 定稿。來源：`docs/fa-scan-batter-judgment-quality.md`（品質研究 + C1 十題 grill-me 定案）+ `docs/fa-scan-batter-payload-optimization.md`（token 成本篇之 ②③④ 併入）。切法已經 agent 依 vertical-slice 原則審查修正並切分為 `issues/027`-`037`（8 AFK / 3 HITL）。
+> **本檔為此計畫的主 issue** — 之後每個 session 開工先讀下方「進度看板」了解目標 / 當前進度 / handoff，完工後回寫狀態。
+
+## 進度看板（session 開工先讀本段）
+
+**工作協議**：挑 issue 前先看「開工順序」與 Blocked by → 開工時把狀態改 🔧 → 完工 merge 後改 ✅ 並附日期 + commit hash → 更新下方 Handoff 段（最後更新日期 + 一行現況）。
+
+### 狀態
+
+| Issue | Type | Blocked by | 狀態 |
+|---|---|---|---|
+| [`027-sp-backtest-repair-e2e`](027-sp-backtest-repair-e2e.md) | AFK | 無 | ⏳ 未開工 |
+| [`028-waiver-log-grammar-extension`](028-waiver-log-grammar-extension.md) | HITL | 無（**最優先部署**） | ⏳ 未開工 |
+| [`029-batter-backtest-skeleton`](029-batter-backtest-skeleton.md) | AFK | 027, 028 | ⏳ 未開工 |
+| [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ⏳ 未開工 |
+| [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ⏳ 未開工 |
+| [`032-payload-history-truncation`](032-payload-history-truncation.md) | AFK | 無（軟排序在 028 後） | ⏳ 未開工 |
+| [`033-payload-hygiene-pack`](033-payload-hygiene-pack.md) | AFK | 無 | ⏳ 未開工 |
+| [`034-pa-tg-gap-warn-tag`](034-pa-tg-gap-warn-tag.md) | AFK | 無 | ⏳ 未開工 |
+| [`035-woba-xwoba-luck-field`](035-woba-xwoba-luck-field.md) | AFK | 無 | ⏳ 未開工 |
+| [`036-fa-sort-key-debias`](036-fa-sort-key-debias.md) | AFK | 無 | ⏳ 未開工 |
+| [`037-trigger-schema-constraint`](037-trigger-schema-constraint.md) | HITL | 028（同 prompt 分批上線） | ⏳ 未開工 |
+
+### 開工順序（曆法長竿驅動）
+
+1. **028 最先做、最先部署** — batter 對帳只能讀新文法的帳，**部署日 + 21 天才有第一筆帳齡達標的帳**，它擋著全計畫關鍵路徑。部署日記錄到下方 Handoff。
+2. **027 並行** — 無依賴；修好後既有週日 cron 自動開始產出真 SP 對帳資料。
+3. **033-036 隨時可塞** — 四片獨立 AFK 小片。
+4. **029 在 027+028 合併後開工**（fixture 先行開發，cron 上線後等資料熟，「0 筆可對帳」= 合格 demo）→ **030 / 031 接續**。
+5. **032 在 028 上線後重測省幅**（結案自動化會先縮小歷史段）、**037 殿後**（與 028 分批，A/B 歸因隔離）。
+
+### Handoff（最後更新：2026-06-10）
+
+- **現況**：PRD + 11 issues 定稿並 push（`710785d`）。所有 issue 未開工。
+- **決策依據去哪讀**：完整發現 + C1 十題定案總表在 `docs/fa-scan-batter-judgment-quality.md`（動 027-030 前先讀）；payload 量測 + 截斷 A/B 證據在 `docs/fa-scan-batter-payload-optimization.md`（動 032-033 前先讀）。
+- **已驗證事實（不用重查）**：SP backtest 三破洞 — ① verdict regex 對真實 issue body（#305）實測不匹配（JSON 被 code fence + `</details>` 包住）② outcome fetch 是 `return None` stub ③ `--days 7` 取帳在 21 天觀察窗未走完就對帳；issue 存檔 raw 段含完整 waiver-log 區塊（#306 可直接當 fixture）。
+- **鐵律提醒**：解析測試 fixture 必須 `gh issue view --json body` 真實存檔，禁止手寫樣本（SP「測試全綠、production 全敗」教訓）；prompt 變更必配對 A/B 看 output_tokens（lever 2）；本機禁跑 Yahoo-touching 腳本（PreToolUse hook 會擋，VPS 指令走 `bin/vps-run.sh`）。
+- **028 部署日**：＿＿＿＿（部署後回填；+21 天 = 029 第一筆非空帳預期日）。
 
 ## Problem Statement
 
