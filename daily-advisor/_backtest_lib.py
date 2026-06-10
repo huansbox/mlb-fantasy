@@ -607,6 +607,127 @@ def judge_executed(timeline: list[RosterSnapshot], *, player_name: str,
             "match_by": None, "note": None}
 
 
+# ── Batter judge panel (issue 030) ──
+#
+# Upgrades the skeleton's pending-judge outcomes to consensus verdicts.
+# Two judges, SAME instruction, each judging the whole week's accounts in
+# one call (2 claude -p calls/week, never per-account). Forced A/B choice
+# + 明顯/勉強 margin; consensus table per PRD C1 #6. Pure functions here;
+# the claude -p boundary (run_judge_panel) lives in backtest_batter.py.
+#
+# Judges are claim-blind by design: the payload carries anonymous A/B
+# six-category production only — no names (brand bias), no kind (agreement
+# bias toward the recommendation), no PA/G (C1 #4: volume already embeds
+# in counting categories; PA invites playing-time extrapolation). The
+# mirror direction for
+# watch accounts is applied mechanically AFTER consensus (C1 #8: one
+# judging machine, two directions).
+
+JUDGE_MARGIN_CLEAR = "明顯"
+JUDGE_MARGIN_NARROW = "勉強"
+
+
+def build_judge_payload(rows: list[dict], *,
+                        window_days: int) -> tuple[str | None, list[int]]:
+    """Pack judgeable episode rows into one judge payload JSON.
+
+    A row is judgeable when its mechanical scorecard exists (both sides had
+    window data). Returns (payload_json, judgeable_row_indices); account_id
+    is the 1-based position within the judgeable subset — callers map back
+    through the index list. Returns (None, []) when nothing is judgeable.
+    """
+    accounts = []
+    indices: list[int] = []
+    for i, row in enumerate(rows):
+        card = row.get("scorecard")
+        if not card:
+            continue
+        indices.append(i)
+        cats = card["categories"]
+        accounts.append({
+            "account_id": len(indices),
+            "A": {cat: cats[cat]["player"] for cat in BATTER_CATEGORIES},
+            "B": {cat: cats[cat]["vs"] for cat in BATTER_CATEGORIES},
+        })
+    if not accounts:
+        return None, []
+    payload = json.dumps({"window_days": window_days, "accounts": accounts},
+                         ensure_ascii=False, indent=2)
+    return payload, indices
+
+
+def parse_judge_response(parsed: dict | None,
+                         expected_ids: list[int]) -> dict[int, dict] | None:
+    """Validate one judge's parsed JSON against the output contract.
+
+    Contract: {"judgments": [{"account_id", "better" ∈ {A,B},
+    "margin" ∈ {明顯,勉強}}]} with every expected account judged exactly
+    once (order-independent). Any violation — missing / extra / duplicate
+    account, abstain value, bad margin — returns None; the caller retries
+    or fails open to pending-judge. Forced choice is the contract: a "tie"
+    answer is invalid, not a soft 難分.
+    """
+    if not isinstance(parsed, dict):
+        return None
+    judgments = parsed.get("judgments")
+    if not isinstance(judgments, list):
+        return None
+    out: dict[int, dict] = {}
+    for item in judgments:
+        if not isinstance(item, dict):
+            return None
+        account_id = item.get("account_id")
+        better = item.get("better")
+        margin = item.get("margin")
+        if account_id in out:
+            return None
+        if better not in ("A", "B"):
+            return None
+        if margin not in (JUDGE_MARGIN_CLEAR, JUDGE_MARGIN_NARROW):
+            return None
+        out[account_id] = {"better": better, "margin": margin}
+    if set(out) != set(expected_ids):
+        return None
+    return out
+
+
+def judge_consensus(j1: dict, j2: dict) -> dict:
+    """Consensus table (PRD C1 #6) over two judgments.
+
+    Same pick + at least one 明顯 → adopted; same pick + both 勉強 → 難分;
+    split picks → 難分. Rationale: two same-model same-instruction judges
+    are highly correlated, so split picks are themselves 難分 evidence,
+    while a 難分 option offered directly would become an escape hatch.
+    """
+    if j1["better"] != j2["better"]:
+        return {"consensus": "難分", "winner": None}
+    if JUDGE_MARGIN_CLEAR in (j1["margin"], j2["margin"]):
+        return {"consensus": "adopted", "winner": j1["better"]}
+    return {"consensus": "難分", "winner": None}
+
+
+def map_judge_outcome(kind: str, consensus: dict) -> str:
+    """Map a consensus result to the account outcome, mirroring by kind.
+
+    replace (claim: A outproduces B): adopted A → hit; adopted B → miss;
+    難分 → 難分 (excluded from rate denominators).
+
+    watch (mirror, PRD C1 #8 — claim: A has NOT clearly outproduced B):
+    adopted A → miss (看走眼, too conservative); adopted B OR 難分 → hit
+    (看對) — for watch the 難分 verdict CONFIRMS the claim, so it enters
+    the denominator as a hit rather than being excluded.
+    """
+    winner = consensus.get("winner")
+    if kind == "replace":
+        if consensus["consensus"] != "adopted":
+            return "難分"
+        return "hit" if winner == "A" else "miss"
+    # watch
+    if consensus["consensus"] == "adopted" and winner == "A":
+        return "miss"
+    return "hit"
+
+
 # ── Hit-rate / marginal benefit aggregation ──
 
 @dataclass(frozen=True)

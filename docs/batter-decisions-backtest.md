@@ -14,13 +14,18 @@
 - **帳齡窗口**：每週日只對帳齡 ∈ [21, 28) 天的 episode — 觀察窗走完才對、每筆恰對一次（週日 stride 7）。
 - **實際產出**：建議日後 21 天，雙側六類別 **R / HR / RBI / BB / AVG / OPS**（**無 SB** — 軟 punt；**不含 PA** — 上場量已自然反映在累積項），MLB byDateRange 日期窗聚合。
 - **機械類別比數** = 稽核底稿，**不參與 hit/miss 判定**（類別輸贏二元、感知不到幅度 — RBI 20 vs 5 ≠ HR 3 vs 4 等值）。
-- **outcome 語意**：骨架階段一律 `pending-judge`。裁判合議（issue 030：2 位裁判同指示獨立、強制二選一 + 明顯/勉強標註、合議表）上線後升級為 hit / miss / 難分：
-  - **replace 帳**：FA 明顯較好 → hit（量「太衝動」病的反面）
-  - **watch 帳**（鏡像）：FA 明顯較好 → **看走眼**（太保守）；難分或 vs 較好 → 看對
+- **outcome 語意**（issue 030，已上線）：裁判合議升級為 hit / miss / 難分 —
+  - **裁判運作**：整週可判帳打包成 1 個 payload → 2 位裁判**同一份指示**（`prompt_batter_judge.txt`）各 1 次 claude -p（自 neutral cwd，**每週固定 2 calls**，非逐筆；契約違反各有 1 次 retry）。裁判看到的是**匿名 A/B 六類別產出**（A = 建議球員 / B = vs 對象）— 無姓名（防 brand bias）、無帳種（防順著建議判）、無 PA/G（C1 #4）。
+  - **裁判契約**：每帳強制二選一（A/B，不准棄權）+ 明顯/勉強標註 → 合議表：同人 + 至少一位明顯 → 採用；同人 + 雙勉強 → 難分；分歧 → 難分。
+  - **replace 帳**：採用 A → hit（量「太衝動」病的反面）；採用 B → miss；難分 → 難分（不進命中率分母）
+  - **watch 帳**（鏡像，C1 #8）：採用 A（FA 明顯較好）→ miss（**看走眼**，太保守）；採用 B 或難分 → hit（看對 — 難分即證實「還沒明顯好過」的宣稱，**計入分母**）
+  - **降級語意**：scorecard 缺漏（任一側無窗口數據）→ `no-data`；裁判連續契約違反 → panel fail-open，outcomes 留 `pending-judge` + 週報 ⚠️ 警示 — 該批帳下週會老化出 [21, 28) 窗，需手動 `--age-min/--age-max` 重跑補判。
+  - **稽核**：週報每帳並列「機械比數 + 兩位裁判判定 + 合議結果」；裁判系統性與機械比數唱反調 → 回頭修裁判 prompt（重測工具 `_tools/_judge_demo_runner.py`）。
 - **執行標註**（issue 031，已上線）：每筆帳標「是否實際執行」— 由 `roster_config.json` git 歷史機械判定（**不靠人工**）：執行窗 = episode 首日 → 末日 + 3 天 grace（涵蓋 FA add 隔日生效與 waiver claim Daily-Tomorrow 延遲生效，如 06-02 Buehler 案）。比對 **mlb_id 優先**（id 已解析時同名不同 id 不算執行 — 防同名誤判）、id 未解析才退 name 比對。狀態：`executed`（窗內進名單）/ `not-executed`（窗內未進）/ `already-rostered`（窗前已在名單，罕見）/ `unknown`（git 歷史不足以確立窗前不在籍，寧可 unknown 不給錯的 False）。週報含 executed / not-executed 分組 hit-rate（030 裁判上線前分母為 0 顯示「—」）— 量「人工否決是在加值還是誤殺好建議」（PRD user story 9）。
 
 ## 更新紀錄
 
 - **2026-06-10 創建**（issue 029 骨架）：解析 + episode + 六類別比數 + 週日 cron 端到端；outcome 全 pending-judge。
 - **2026-06-10 執行標註上線**（issue 031）：每筆帳補 executed 欄位（roster git 歷史機械判定）+ 週報 executed / not-executed 分組 hit-rate 行。真實歷史 spot-check 三例皆正確（Rafaela 06-07 add → executed / Pederson 被搶 → not-executed / Arraez 長期在籍 → already-rostered）。
-- 後續：issue 030 裁判合議升級（pending-judge → hit/miss/難分，分組 hit-rate 隨之自動出現數值）。
+- **2026-06-10 裁判合議上線**（issue 030）：pending-judge → 2 位裁判合議 verdict（hit / miss / 難分）+ 週報命中率行（replace 量太衝動 / watch 鏡像量太保守）。第一批真 claude 抽查（真實 05-15→06-04 產出，Pederson vs Arraez + Clemens vs Arraez）：2 calls 零 retry 契約全合規、判定與機械比數方向一致無唱反調。**待辦：首個非空 production 週日段（預期 2026-07-05）出來後再做一次人工抽查**（demo 兩帳都偏明顯案例，勉強/難分路徑尚未被真裁判走過）。
+- 後續：xwOBACON 門檻校準（Use Case B）等對帳資料累積 4-6 週後另案。
