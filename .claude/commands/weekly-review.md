@@ -172,7 +172,9 @@
 4. 更新 `waiver-log.md`：
    - 「隊上觀察」段：已驗證 / 失守超過 2 週的項目移到「已結案」（git log 留痕）
    - 新項目從 Phase 2C 行動清單啟動時加入「隊上觀察」
-5. 記錄學習：失敗的觀察項目要寫進「學到什麼」
+5. **「觀察中」建議結案 backlog 執行**：掃過去 7 天 fa_scan 報告（或 waiver-log 觀察中各條目尾行），fa_scan 連 3+ 天標「建議結案」的 FA 觀察條目 → 本 session 直接移到「已結案」（短 stub + 結案理由，刪除完整歷史，git log 留痕）
+   - Why：觀察中條目只進不出會讓 fa_scan payload 複利成長（歷史段佔 payload 72%，見 `docs/fa-scan-batter-payload-optimization.md`）；誤關成本低（fa_scan 隔天可重新 NEW）
+6. 記錄學習：失敗的觀察項目要寫進「學到什麼」
 
 ## Phase 1D：SP B2 verdict spot check（5 min）
 
