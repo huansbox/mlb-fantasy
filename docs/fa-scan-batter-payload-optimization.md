@@ -66,9 +66,9 @@ Caveat：本機 harness 比 VPS 肥（user CLAUDE.md + MCP tool defs → input 7
 | # | 行動 | 成本 | 效益 | 狀態 |
 |---|---|---|---|---|
 | 1 | **執行結案 backlog**（6 筆觀察中 + 隊上觀察 stale 條目）+ 把「建議結案 backlog 執行」納入 `/weekly-review` Phase 1C | 零 code | payload 歷史段立即 −~40%，停掉每日重複結案輸出 | ✅ 2026-06-10 |
-| 2 | **建議結案自動化**：LLM 連 N 天（建議 3）輸出建議結案 → 機械移到已結案（仿 auto-close rostered 模式），或 Telegram 提醒 | 中 code | 治本「只進不出」 | ⏳ |
-| 3 | **payload 讀取端歷史截斷**（waiver-log.md 檔案不動，只動 `_filter_waiver_log_by_group` 下游）：觸發 + [eval] + 最近 5 天 + 機械 counter 摘要行 | ~20–30 行 Python，零 prompt 變動 | −$3/月 + cap 複利成長 + 降低 counter 誤數；**純機械裁切，無 lever 2 的 thinking induction 風險** | ⏳ |
-| 4 | hygiene 小修：14d Savant BBE <15 不顯示或標註；prompt 加一行「%owned 為 Yahoo 全平台值，非本聯盟」（靜態資料字典說明，不誘發 thinking） | 極小 | 消除兩類已觀察誤讀 | ⏳ |
+| 2 | **建議結案自動化**：LLM 連 N 天（建議 3）輸出建議結案 → 機械移到已結案（仿 auto-close rostered 模式），或 Telegram 提醒 | 中 code | 治本「只進不出」 | ✅ 被 issue 028 CLOSE 結構化行取代（2026-06-10）— LLM 發 `CLOSE\|` → 寫入端即時搬已結案，免「連 N 天偵測」 |
+| 3 | **payload 讀取端歷史截斷**（waiver-log.md 檔案不動，只動 `_filter_waiver_log_by_group` 下游）：觸發 + [eval] + 最近 5 天 + 機械 counter 摘要行 | ~20–30 行 Python，零 prompt 變動 | −$3/月 + cap 複利成長 + 降低 counter 誤數；**純機械裁切，無 lever 2 的 thinking induction 風險** | ✅ 2026-06-10（issue 032，merge `d18207e`）— 實測觀察中段 −59.7%（028 CLOSE 先縮基數後仍超過 A/B 的 −46%） |
+| 4 | hygiene 小修：14d Savant BBE <15 不顯示或標註；prompt 加一行「%owned 為 Yahoo 全平台值，非本聯盟」（靜態資料字典說明，不誘發 thinking） | 極小 | 消除兩類已觀察誤讀 | ✅ 2026-06-10（issue 033，merge `fc55fae`） |
 | 5 | **model 降級 Sonnet**：batter 決策低風險可逆（FA add $0 即時、waiver-log 留痕），比 SP 更適合先試；配對 A/B 驗證一週 | 一行 `--model` + A/B | **最大單一槓桿 −40%（$14→$8.4/月）** | Phase 2（PRD Out of Scope，batter 先試）|
 
 ## 不做的事
@@ -81,8 +81,8 @@ Caveat：本機 harness 比 VPS 肥（user CLAUDE.md + MCP tool defs → input 7
 
 **觸發條件結構化（DSL）**：counter 由 Python 數、LLM 只負責設定/變更觸發條件。同時解決誤數問題，並為「無事件日跳過 LLM call」鋪路。與 emerging-batter pending 機制（`docs/emerging-batter-design.md`）同族，若 batter 端做 Phase 6 升級時一併考慮。
 
-## 尚待決定
+## 尚待決定（2026-06-10 全數定案）
 
-- 建議 2 的 N（連續建議結案天數門檻）：3 天 vs 5 天 — 3 天較積極，誤關可重開（NEW 行成本低）。
-- 建議 3 截斷參數：最近 5 天是 A/B 驗證值；[eval] 行無條件保留；機械 counter 摘要行的格式。
-- 建議 3 與建議 2 的先後：先做 2（治本）再看 3 是否仍需要 — 若 watch list 穩態縮到 ~8 人，3 的省幅減半。
+- ~~建議 2 的 N（連續建議結案天數門檻）~~：moot — issue 028 CLOSE 結構化行直接取代「連 N 天偵測」。
+- ~~建議 3 截斷參數~~：定案於 issue 032 — `TRUNCATE_KEEP_RECENT = 5`（A/B 驗證值）；[eval] 行無條件保留；counter 摘要行格式 = `[機械計數] counter day X/N（引自 MM-DD）`（僅引最近 5 日行內 token，過窗 stale 不引用）+ `[機械計數] 已連續建議結案 N 個掃描日`（完整歷史 trailing streak）。
+- ~~建議 3 與建議 2 的先後~~：實際順序 028（CLOSE）→ 032（截斷）；CLOSE 先縮基數後截斷實測仍 −59.7%，兩者疊加非互斥。
