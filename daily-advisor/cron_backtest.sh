@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # cron_backtest.sh — weekly B2 SP backtest auto-update wrapper.
 #
-# Runs backtest_track.py --days 7 --update-doc, then commits any change to
-# docs/sp-decisions-backtest.md back to git so the result is visible from
-# local checkouts without manual VPS pulls.
+# Runs backtest_track.py --update-doc (default reconciliation window =
+# episode age [21, 28) days; weekly Sunday stride 7 means each episode is
+# reconciled exactly once, after its 21-day observation window elapsed),
+# then commits any change to docs/sp-decisions-backtest.md back to git so
+# the result is visible from local checkouts without manual VPS pulls.
 #
 # Issue 024 shipped the script; issue 025 wires the cron entry. Mirrors
 # cron_capture_payload.sh pattern (pull-rebase via git_sync.py, run, commit,
@@ -37,7 +39,7 @@ if ! python3 daily-advisor/git_sync.py "$REPO" >> "$WRAP_LOG" 2>&1; then
     exit 2
 fi
 
-python3 daily-advisor/backtest_track.py --days 7 --update-doc >> "$RUN_LOG" 2>&1
+python3 daily-advisor/backtest_track.py --update-doc >> "$RUN_LOG" 2>&1
 bt_rc=$?
 
 if [ $bt_rc -ne 0 ]; then
