@@ -9,7 +9,10 @@ decision), selects episodes whose age is in [--age-min, --age-max) (default
 elapsed; weekly Sunday cron stride 7 means each episode reconciles exactly
 once), fetches both sides' six-category actual production (R/HR/RBI/BB/AVG/
 OPS, no SB — soft punt) over the window via MLB byDateRange, records the
-mechanical category scorecard, and appends a weekly section to
+mechanical category scorecard, annotates each episode with whether it was
+actually executed (issue 031 — judged from roster_config.json git history,
+window = episode first day → last day + grace), and appends a weekly
+section (with executed / not-executed split hit-rates) to
 `docs/batter-decisions-backtest.md`.
 
 SKELETON SEMANTICS (tracer bullet): every episode outcome is labelled
@@ -35,21 +38,26 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import subprocess
 import sys
 import urllib.request
 from datetime import date, timedelta
 from pathlib import Path
 
 from _backtest_lib import (
+    EXECUTION_GRACE_DAYS,
     BatterVerdict,
     Episode,
+    RosterSnapshot,
     batter_episode_key,
     build_roster_name_index,
     compare_batter_categories,
     dedupe_episodes,
+    judge_executed,
     parse_batter_verdicts,
     parse_bydaterange_hitting,
     parse_issue_date,
+    parse_roster_snapshot,
     resolve_id_with_fallback,
     select_due_episodes,
 )
@@ -99,6 +107,56 @@ def fetch_batter_window_stats(mlb_id: int, start_date: date,
     return parse_bydaterange_hitting(data)
 
 
+# ── Roster git-history timeline (issue 031 boundary) ──
+
+_ROSTER_REL_PATH = "daily-advisor/roster_config.json"
+
+
+def fetch_roster_timeline(since: date, repo_root: Path | None = None,
+                          rel_path: str = _ROSTER_REL_PATH,
+                          ) -> list[RosterSnapshot]:
+    """Roster membership snapshots from roster_config.json git history.
+
+    One snapshot per commit touching the config since `since`, plus the
+    last commit BEFORE `since` (the baseline judge_executed needs to
+    establish prior absence). System boundary (subprocess git) — degrades
+    to [] on any failure (shallow clone without history, non-repo cwd),
+    which judge_executed reports as executed=unknown rather than a wrong
+    False.
+    """
+    repo_root = repo_root or _REPO_ROOT
+    since_arg = f"{since.isoformat()}T00:00:00"
+
+    def git_lines(*args: str) -> list[str]:
+        proc = subprocess.run(["git", "-C", str(repo_root), *args],
+                              capture_output=True, text=True, timeout=120)
+        if proc.returncode != 0:
+            raise RuntimeError(proc.stderr.strip() or "git failed")
+        return [ln for ln in proc.stdout.splitlines() if ln.strip()]
+
+    try:
+        entries = git_lines("log", "--format=%H|%cI", f"--since={since_arg}",
+                            "--", rel_path)
+        entries += git_lines("log", "-1", "--format=%H|%cI",
+                             f"--before={since_arg}", "--", rel_path)
+        commits = []
+        for line in entries:
+            sha, _, ciso = line.partition("|")
+            commits.append((sha.strip(), ciso.strip()))
+        commits.sort(key=lambda c: c[1])  # full ISO timestamp order
+        snapshots = []
+        for sha, ciso in commits:
+            raw = git_lines("show", f"{sha}:{rel_path}")
+            config = json.loads("\n".join(raw))
+            snapshots.append(
+                parse_roster_snapshot(config, date.fromisoformat(ciso[:10])))
+        return snapshots
+    except Exception as e:  # noqa: BLE001 — boundary: degrade to unknown
+        logger.warning("roster timeline fetch failed (%s) — "
+                       "executed annotation degrades to unknown", e)
+        return []
+
+
 # ── Aggregate pipeline ──
 
 def collect_batter_verdicts(issues: list[dict]) -> list[BatterVerdict]:
@@ -117,12 +175,15 @@ def collect_batter_verdicts(issues: list[dict]) -> list[BatterVerdict]:
 
 
 def build_episode_rows(episodes: list[Episode], roster_index: dict[str, int],
+                       roster_timeline: list[RosterSnapshot],
                        *, fetch_stats, search_fn) -> list[dict]:
     """Reconcile each due episode into a pending-judge scorecard row.
 
     The observation window is anchored on the episode start date (first
-    occurrence). Boundary functions are injected so this stays
-    unit-testable without network.
+    occurrence). The execution window runs first occurrence → last
+    occurrence + grace (a recommendation keeps repeating while unexecuted,
+    so a real execution lands near the episode end). Boundary functions
+    are injected so this stays unit-testable without network.
     """
     rows: list[dict] = []
     for ep in episodes:
@@ -140,6 +201,10 @@ def build_episode_rows(episodes: list[Episode], roster_index: dict[str, int],
             missing.append(f"no window data: {v.player}")
         if vs_id is not None and vs_stats is None:
             missing.append(f"no window data: {v.vs}")
+        execution = judge_executed(
+            roster_timeline, player_name=v.player, player_id=player_id,
+            window_start=ep.start_date,
+            window_end=ep.end_date + timedelta(days=EXECUTION_GRACE_DAYS))
         rows.append({
             "start_date": ep.start_date.isoformat(),
             "end_date": ep.end_date.isoformat(),
@@ -150,9 +215,35 @@ def build_episode_rows(episodes: list[Episode], roster_index: dict[str, int],
             "vs": v.vs,
             "outcome": "pending-judge",
             "scorecard": compare_batter_categories(player_stats, vs_stats),
+            "executed": execution["executed"],
+            "execution": execution,
             "missing": missing,
         })
     return rows
+
+
+def aggregate_executed_split(rows: list[dict]) -> dict:
+    """Hit-rate split by execution status (PRD user story 9).
+
+    Measures whether the user's manual veto adds value (not-executed
+    recommendations that would have hit = 誤殺) or filters noise. Judged
+    denominator = outcomes in {hit, miss} — pending-judge (pre-030) and
+    難分 stay out, so rates appear automatically once the judge panel
+    upgrades outcomes. already-rostered counts under executed.
+    """
+    split: dict[str, dict] = {}
+    for group, value in (("executed", True), ("not_executed", False),
+                         ("unknown", None)):
+        bucket = [r for r in rows if r.get("executed") is value]
+        judged = [r for r in bucket if r.get("outcome") in ("hit", "miss")]
+        hits = [r for r in judged if r["outcome"] == "hit"]
+        split[group] = {
+            "n": len(bucket),
+            "n_judged": len(judged),
+            "n_hits": len(hits),
+            "hit_rate": (len(hits) / len(judged)) if judged else None,
+        }
+    return split
 
 
 def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
@@ -164,7 +255,8 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
                        _fetch_issues=None,
                        _fetch_stats=None,
                        _search_mlb_id=None,
-                       _roster_index=None) -> dict:
+                       _roster_index=None,
+                       _roster_timeline=None) -> dict:
     """Full pipeline: fetch issues → parse batter verdicts → dedupe episodes
     → select due episodes (age in [age_min, age_max)) → six-category
     scorecards → stats dict.
@@ -196,8 +288,17 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
             roster_config = {}
         roster_index = build_roster_name_index(roster_config)
 
+    if _roster_timeline is not None:
+        roster_timeline = _roster_timeline
+    elif due:
+        roster_timeline = fetch_roster_timeline(
+            min(e.start_date for e in due))
+    else:
+        roster_timeline = []  # nothing to judge — skip the git boundary
+
     rows = build_episode_rows(
-        due, roster_index, fetch_stats=fetch_stats, search_fn=search_fn)
+        due, roster_index, roster_timeline,
+        fetch_stats=fetch_stats, search_fn=search_fn)
 
     return {
         "run_date": today.isoformat(),
@@ -210,6 +311,8 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
         "n_replace": sum(1 for r in rows if r["kind"] == "replace"),
         "n_watch": sum(1 for r in rows if r["kind"] == "watch"),
         "n_episodes_in_lookback": len(episodes),
+        "execution_grace_days": EXECUTION_GRACE_DAYS,
+        "executed_split": aggregate_executed_split(rows),
         "date_range": _date_range(due),
         "episodes": rows,
     }
@@ -254,6 +357,7 @@ def format_batter_weekly_section(stats: dict) -> str:
         f"episodes in lookback: {stats['n_episodes_in_lookback']}){zero_marker}",
         "- Outcome: all **pending-judge** — 裁判合議（issue 030）上線後升級為 "
         "hit/miss；機械類別比數僅為稽核底稿，不參與判定",
+        _fmt_executed_split_line(stats),
     ]
     rows = stats.get("episodes") or []
     if rows:
@@ -272,10 +376,43 @@ def format_batter_weekly_section(stats: dict) -> str:
             missing = f"（{'; '.join(ep['missing'])}）" if ep["missing"] else ""
             lines.append(
                 f"- {ep['start_date']} ({ep['n_occurrences']}d) {target} "
-                f"→ 機械比數 {card_str} → **{ep['outcome']}**{missing}"
+                f"→ 機械比數 {card_str} → **{ep['outcome']}** "
+                f"{_fmt_execution_marker(ep.get('execution'))}{missing}"
             )
     lines.append("")
     return "\n".join(lines) + "\n"
+
+
+def _fmt_executed_split_line(stats: dict) -> str:
+    split = stats.get("executed_split") or aggregate_executed_split(
+        stats.get("episodes") or [])
+
+    def rate(group: dict) -> str:
+        if group["hit_rate"] is None:
+            return "—"
+        return f"{group['hit_rate']:.0%}（{group['n_hits']}/{group['n_judged']}）"
+
+    e, n, u = split["executed"], split["not_executed"], split["unknown"]
+    unknown_str = f" / unknown {u['n']}" if u["n"] else ""
+    return (
+        f"- Executed split（issue 031，roster git 歷史機械判定；"
+        f"執行窗 = episode 首日 → 末日 + {stats.get('execution_grace_days', EXECUTION_GRACE_DAYS)}d）: "
+        f"executed {e['n']}（hit-rate {rate(e)}）/ "
+        f"not-executed {n['n']}（hit-rate {rate(n)}）{unknown_str}"
+    )
+
+
+def _fmt_execution_marker(execution: dict | None) -> str:
+    if not execution:
+        return "〔execution unknown〕"
+    status = execution.get("status")
+    if status == "executed":
+        return f"〔executed {execution['matched_date']}〕"
+    if status == "already-rostered":
+        return f"〔already rostered {execution['matched_date']}〕"
+    if status == "not-executed":
+        return "〔not executed〕"
+    return "〔execution unknown〕"
 
 
 def append_to_batter_doc(section_md: str, doc_path: Path | None = None) -> None:

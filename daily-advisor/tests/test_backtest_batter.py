@@ -334,6 +334,9 @@ class TestPipeline:
             # Real roster_config contains the very players these verdicts
             # name (Arraez is on-roster) — inject empty for determinism.
             _roster_index={},
+            # Execution annotation has its own suite
+            # (test_execution_annotation.py) — empty timeline → unknown.
+            _roster_timeline=[],
         )
 
     def test_due_replace_episode_gets_pending_judge_scorecard(self):
@@ -417,6 +420,7 @@ class TestFormatSection:
                 "Joc Pederson": 1001, "Kody Clemens": 1002,
                 "Luis Arraez": 2001}.get(name),
             _roster_index={},
+            _roster_timeline=[],
         )
 
     def test_section_lists_episodes_with_scorecards(self):

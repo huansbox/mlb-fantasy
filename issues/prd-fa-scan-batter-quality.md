@@ -15,7 +15,7 @@
 | [`028-waiver-log-grammar-extension`](028-waiver-log-grammar-extension.md) | HITL | 無（**最優先部署**） | ✅ 2026-06-10（merge `c549fe0`，已部署） |
 | [`029-batter-backtest-skeleton`](029-batter-backtest-skeleton.md) | AFK | 027, 028 | ✅ 2026-06-10（merge `0e94cf7`） |
 | [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ⏳ 未開工（已解鎖） |
-| [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ⏳ 未開工（已解鎖） |
+| [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ✅ 2026-06-10（雲端 session 完工，PR 待 merge — merge 後請補 hash） |
 | [`032-payload-history-truncation`](032-payload-history-truncation.md) | AFK | 無（軟排序在 028 後） | ⏳ 未開工 |
 | [`033-payload-hygiene-pack`](033-payload-hygiene-pack.md) | AFK | 無 | ⏳ 未開工 |
 | [`034-pa-tg-gap-warn-tag`](034-pa-tg-gap-warn-tag.md) | AFK | 無 | ⏳ 未開工 |
@@ -34,6 +34,7 @@
 ### Handoff（最後更新：2026-06-10）
 
 - **現況**：**029 完工 merge（`0e94cf7`，2026-06-10）— batter 對帳骨架端到端打穿**：`_backtest_lib` 新增 batter 純函式層（028 文法 verdict 解析：ACTION→replace / 7 欄 NEW 帶 vs→watch，UPDATE/CLOSE/舊 6 欄不可對帳；episode key 取代/立即取代不拆帳；byDateRange 解析含「重複相同 splits」API quirk 去重 + 跨隊交易比率重算；六類別比數 R/HR/RBI/BB/AVG/OPS 無 SB）+ `backtest_batter.py` CLI（outcome 一律 pending-judge，週報 append `docs/batter-decisions-backtest.md`）+ `cron_backtest.sh` 擴充週日一次跑 SP + batter（單邊失敗仍 commit 健康側）。41 tests；對真實 archive dry-run 過（42 天 ~80 份 issue body 零誤報、輸出「0 筆可對帳」段 = 合格骨架輸出）。**曆法預期：batter 首筆新文法帳 = 2026-06-11 cron 產生，帳齡 21 達標日 ~07-02，首個可能非空週日段 = 2026-07-05**；SP 端首個非空 regular 段仍 = 2026-06-21；06-14 兩邊 0 筆屬正確行為。VPS 無需手動部署（每日 cron pull 會在 06-14 前帶上新 wrapper）。**030（裁判合議，HITL）/ 031（執行標註，AFK，可與 030 平行）已解鎖**。029 解析端注意：真實 production 新文法 issue（06-11 起）出現後，應補一份真實 production fixture 進 `test_backtest_batter.py`（目前新文法用 028 配對 A/B 的真實 LLM 輸出 `ab_028_b_result.json` 代位）。027 詳情：三破洞全修（header 定位 + 平衡大括號解析 / Savant outcome 補實 + MLB API id fallback / 帳齡 [21,28) episode 對帳）、5 個真實 issue fixture（#254/259/276/280/305）。028 詳情見下方「028 部署日」段。既存無關失敗：`test_pending_parser` 的活檔 fixture 漂移（master 同樣 fail，另案小修）。
+- **031 完工（2026-06-10，雲端 session，PR 待 merge）**：executed 判定純函式（`_backtest_lib.judge_executed` + `parse_roster_snapshot`，mlb_id 優先防同名、歷史不足 → unknown 不給錯 False）+ git 邊界 `fetch_roster_timeline`（baseline = since 前最後 commit）+ row `executed`/`execution` 欄位 + 週報「Executed split」行（030 上線前 hit-rate 顯示「—」，hit/miss 進分母即自動有值）。真實歷史 spot-check 三例正確（Rafaela executed / Pederson not-executed / Arraez already-rostered）。測試獨立檔 `tests/test_execution_annotation.py`（26 cases）避免與 030 撞 `test_backtest_batter.py`；`backtest_batter.py` 變更為加法（rows / stats / 一行 section），030 合併時若有衝突以兩邊並存為原則。詳見 031 issue「實作備註」。
 - **030/031 平行衝突提醒**：兩片都會動 `backtest_batter.py` 的週報段（031 加 executed 欄位 + executed/not-executed 分組 hit-rate；030 把 pending-judge 升級合議 verdict）。031 規劃丟雲端 Claude Code 自主跑（AFK、純 git 歷史判定、不碰 Yahoo/VPS，產出走 PR）— **開工 030 前先確認 031 的 PR 已 merge**（或反向先做完一片再開另一片），避免同檔衝突。
 - **決策依據去哪讀**：完整發現 + C1 十題定案總表在 `docs/fa-scan-batter-judgment-quality.md`（動 027-030 前先讀）；payload 量測 + 截斷 A/B 證據在 `docs/fa-scan-batter-payload-optimization.md`（動 032-033 前先讀）。
 - **已驗證事實（不用重查）**：SP backtest 三破洞 — ① verdict regex 對真實 issue body（#305）實測不匹配（JSON 被 code fence + `</details>` 包住）② outcome fetch 是 `return None` stub ③ `--days 7` 取帳在 21 天觀察窗未走完就對帳；issue 存檔 raw 段含完整 waiver-log 區塊（#306 可直接當 fixture）。

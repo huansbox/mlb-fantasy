@@ -510,6 +510,103 @@ def compare_batter_categories(player_stats: dict | None,
             "categories": categories}
 
 
+# ── Execution annotation (issue 031) ──
+#
+# Each reconciled episode is annotated "was this recommendation actually
+# executed?" — judged mechanically from roster_config.json git history
+# (did the add/watch target enter our roster within the episode window +
+# grace?), never by hand. Pure functions here; the git boundary
+# (fetch_roster_timeline) lives in backtest_batter.py.
+
+#: Days after the episode's LAST occurrence still counted as execution.
+#: Covers FA add latency (same/next day) and waiver claims with
+#: Daily-Tomorrow delayed roster effect (claim day X, roster commit X+1,
+#: cf. the 2026-06-02 Buehler case) — a recommendation keeps repeating
+#: while unexecuted, so a real execution lands near the episode end.
+EXECUTION_GRACE_DAYS = 3
+
+
+@dataclass(frozen=True)
+class RosterSnapshot:
+    """Roster membership at one roster_config.json commit.
+
+    snap_date is the committer date (UTC date portion) — roster_sync
+    commits from the VPS within 15 minutes of the Yahoo transaction, so
+    commit date ≈ roster-effect date (grace window absorbs the rest).
+    """
+    snap_date: date
+    mlb_ids: frozenset
+    names: frozenset  # normalized via name_match.normalize_name
+
+
+def parse_roster_snapshot(config: dict, snap_date: date) -> RosterSnapshot:
+    """Build a membership snapshot from one roster_config.json payload."""
+    ids: set[int] = set()
+    names: set[str] = set()
+    for section in ("batters", "pitchers"):
+        for player in config.get(section) or []:
+            if player.get("mlb_id"):
+                ids.add(int(player["mlb_id"]))
+            if player.get("name"):
+                names.add(_normalize(player["name"]))
+    return RosterSnapshot(snap_date=snap_date, mlb_ids=frozenset(ids),
+                          names=frozenset(names))
+
+
+def judge_executed(timeline: list[RosterSnapshot], *, player_name: str,
+                   player_id: int | None, window_start: date,
+                   window_end: date) -> dict:
+    """Did the recommended player enter our roster within the window?
+
+    Match policy: when player_id is known, ONLY mlb_id counts — a same-name
+    different-id roster entry is a homonym, not an execution (the documented
+    search_mlb_id first-hit failure mode). Name matching is the fallback for
+    unresolved ids only. Both window endpoints are inclusive.
+
+    Status semantics:
+      - executed:        absent at baseline, present in an in-window snapshot
+      - not-executed:    absent at baseline and throughout the window
+                         (no commits in window = no roster change — valid)
+      - already-rostered: present in the last snapshot BEFORE the window
+                         (executed=True; should be rare — stale verdict)
+      - unknown:         executed=None — empty timeline, or no snapshot
+                         before window_start (shallow history: prior
+                         absence cannot be established)
+    """
+    norm = _normalize(player_name) if player_name else ""
+
+    def member(snap: RosterSnapshot) -> str | None:
+        if player_id is not None:
+            return "mlb_id" if player_id in snap.mlb_ids else None
+        return "name" if norm and norm in snap.names else None
+
+    snaps = sorted(timeline, key=lambda s: s.snap_date)
+    if not snaps:
+        return {"executed": None, "status": "unknown", "matched_date": None,
+                "match_by": None, "note": "no roster history available"}
+    before = [s for s in snaps if s.snap_date < window_start]
+    if not before:
+        return {"executed": None, "status": "unknown", "matched_date": None,
+                "match_by": None,
+                "note": "no snapshot before window — prior absence unknown"}
+    baseline = before[-1]
+    matched = member(baseline)
+    if matched:
+        return {"executed": True, "status": "already-rostered",
+                "matched_date": baseline.snap_date.isoformat(),
+                "match_by": matched,
+                "note": "already in roster before the recommendation window"}
+    for snap in snaps:
+        if window_start <= snap.snap_date <= window_end:
+            matched = member(snap)
+            if matched:
+                return {"executed": True, "status": "executed",
+                        "matched_date": snap.snap_date.isoformat(),
+                        "match_by": matched, "note": None}
+    return {"executed": False, "status": "not-executed", "matched_date": None,
+            "match_by": None, "note": None}
+
+
 # ── Hit-rate / marginal benefit aggregation ──
 
 @dataclass(frozen=True)
