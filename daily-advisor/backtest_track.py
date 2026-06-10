@@ -53,7 +53,7 @@ from _backtest_lib import (
     dedupe_episodes,
     parse_b2_verdict,
     parse_issue_date,
-    resolve_player,
+    resolve_id_with_fallback,
     select_due_episodes,
     verdict_episode_key,
 )
@@ -227,21 +227,6 @@ def collect_verdicts(issues: list[dict]) -> list[B2Verdict]:
     return verdicts
 
 
-def _resolve_id(name: str | None, roster_index: dict[str, int],
-                search_fn) -> int | None:
-    """roster_config lookup first, MLB Stats API search fallback.
-
-    Dropped SPs and FA watch/add targets are usually NOT in the current
-    roster_config — without the API fallback they would all classify
-    neutral (the pre-repair failure mode)."""
-    if not name:
-        return None
-    resolved = resolve_player(name, roster_index)
-    if resolved.mlb_id is not None:
-        return resolved.mlb_id
-    return search_fn(name)
-
-
 def build_episode_outcomes(episodes: list[Episode], roster_index: dict[str, int],
                            *, fetch_xwobacon, search_fn) -> list[VerdictOutcome]:
     """Classify each due episode using its representative (first) verdict.
@@ -252,8 +237,8 @@ def build_episode_outcomes(episodes: list[Episode], roster_index: dict[str, int]
     outcomes: list[VerdictOutcome] = []
     for ep in episodes:
         v: B2Verdict = ep.first
-        drop_id = _resolve_id(v.drop, roster_index, search_fn)
-        add_id = _resolve_id(v.add or v.watch_target, roster_index, search_fn)
+        drop_id = resolve_id_with_fallback(v.drop, roster_index, search_fn)
+        add_id = resolve_id_with_fallback(v.add or v.watch_target, roster_index, search_fn)
 
         post_drop = (
             fetch_xwobacon(drop_id, ep.start_date) if drop_id else None
