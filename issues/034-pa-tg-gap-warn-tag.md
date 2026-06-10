@@ -10,10 +10,12 @@ FA 與其比較 anchor 的上場量（PA/Team_G）差距達門檻（初版 ≥1.
 
 ## Acceptance criteria
 
-- [ ] tag 計算為純函式（落差 ≥1.0 → ⚠️），單測含邊界（剛好 1.0 / 任一側缺 PA-TG / 落差反向不打）
-- [ ] Pederson 型 fixture 驗證：FA PA-TG 3.06 vs anchor 4.27 → 打出警示
-- [ ] tag 納入 payload 顯示（含 tag whitelist 若適用）
-- [ ] 部署後隔日 issue payload 對符合條件的 FA 可見該 tag
+- [x] tag 計算為純函式（落差 ≥1.0 → ⚠️），單測含邊界（剛好 1.0 / 任一側缺 PA-TG / 落差反向不打）✅ 2026-06-10
+- [x] Pederson 型 fixture 驗證：FA PA-TG 3.06 vs anchor 4.27 → 打出警示 ✅ 2026-06-10
+- [x] tag 納入 payload 顯示（batter 路徑 warn_tags 直通 `_fmt_fa_block_batter_v4` minimal_tags；payload_slimmer whitelist 為 SP-only 不適用）✅ 2026-06-10
+- [ ] 部署後隔日 issue payload 對符合條件的 FA 可見該 tag — ⏳ 6/11 12:30 cron 後驗證
+
+> 實作備註（2026-06-10，merge `57abeec`）：`fa_compute.pa_tg_gap_warn` 純函式（tag 內嵌數值 `⚠️ 上場量落差 (PA-TG 3.06 vs anchor 4.27)`）；wire 在 `compute_fa_tags`，win gate 兩側都打（誠實 tag 不受 gate 影響，watch/pass 條目也可見）；屬一般 ⚠️（非 strong）→ 擋 立即取代、不強制 觀察。已知侷限（B3，036 處理）：anchor 固定 vs P1。
 
 ## Blocked by
 
