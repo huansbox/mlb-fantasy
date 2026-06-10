@@ -12,7 +12,7 @@
 | Issue | Type | Blocked by | 狀態 |
 |---|---|---|---|
 | [`027-sp-backtest-repair-e2e`](027-sp-backtest-repair-e2e.md) | AFK | 無 | ✅ 2026-06-10（merge `4daefa7`） |
-| [`028-waiver-log-grammar-extension`](028-waiver-log-grammar-extension.md) | HITL | 無（**最優先部署**） | 🔧 開工中（文法定版對齊中） |
+| [`028-waiver-log-grammar-extension`](028-waiver-log-grammar-extension.md) | HITL | 無（**最優先部署**） | ✅ 2026-06-10（merge `c549fe0`，已部署） |
 | [`029-batter-backtest-skeleton`](029-batter-backtest-skeleton.md) | AFK | 027, 028 | ⏳ 未開工 |
 | [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ⏳ 未開工 |
 | [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ⏳ 未開工 |
@@ -33,11 +33,11 @@
 
 ### Handoff（最後更新：2026-06-10）
 
-- **現況**：027 完工 merge（`4daefa7`，2026-06-10）— 三破洞全修（header 定位 + 平衡大括號解析 / Savant outcome 補實 + MLB API id fallback / 帳齡 [21,28) episode 對帳）、episode 去重泛型純函式已落 `_backtest_lib.dedupe_episodes`（029 直接 import）、5 個真實 issue fixture（#254/259/276/280/305）、cron wrapper 改 `--update-doc` 無 `--days`。**曆法預期：SP 端首個非空 regular 週報段 = 2026-06-21**（05-28 起的 episode 屆時帳齡達 21）；06-14 跑 0 筆屬正確行為。028 開工中 — 文法定版三題（ACTION 範圍 / CLOSE 搬移 / vs 欄位位置）對齊中。既存無關失敗：`test_pending_parser` 的活檔 fixture 漂移（master 同樣 fail，另案小修）。
+- **現況**：027 完工 merge（`4daefa7`，2026-06-10）— 三破洞全修（header 定位 + 平衡大括號解析 / Savant outcome 補實 + MLB API id fallback / 帳齡 [21,28) episode 對帳）、episode 去重泛型純函式已落 `_backtest_lib.dedupe_episodes`（029 直接 import）、5 個真實 issue fixture（#254/259/276/280/305）、cron wrapper 改 `--update-doc` 無 `--days`。**曆法預期：SP 端首個非空 regular 週報段 = 2026-06-21**（05-28 起的 episode 屆時帳齡達 21）；06-14 跑 0 筆屬正確行為。**028 完工部署（`c549fe0`，2026-06-10）— 曆法長竿已立**：文法 / A/B 證據 / 部署後驗證項見下方「028 部署日」段。**029 已解鎖**（blocked by 027+028 皆 ✅；fixture 先行開發可立即開工，「0 筆可對帳」= 合格 demo，第一筆非空帳預期 2026-07-01）。既存無關失敗：`test_pending_parser` 的活檔 fixture 漂移（master 同樣 fail，另案小修）。
 - **決策依據去哪讀**：完整發現 + C1 十題定案總表在 `docs/fa-scan-batter-judgment-quality.md`（動 027-030 前先讀）；payload 量測 + 截斷 A/B 證據在 `docs/fa-scan-batter-payload-optimization.md`（動 032-033 前先讀）。
 - **已驗證事實（不用重查）**：SP backtest 三破洞 — ① verdict regex 對真實 issue body（#305）實測不匹配（JSON 被 code fence + `</details>` 包住）② outcome fetch 是 `return None` stub ③ `--days 7` 取帳在 21 天觀察窗未走完就對帳；issue 存檔 raw 段含完整 waiver-log 區塊（#306 可直接當 fixture）。
 - **鐵律提醒**：解析測試 fixture 必須 `gh issue view --json body` 真實存檔，禁止手寫樣本（SP「測試全綠、production 全敗」教訓）；prompt 變更必配對 A/B 看 output_tokens（lever 2）；本機禁跑 Yahoo-touching 腳本（PreToolUse hook 會擋，VPS 指令走 `bin/vps-run.sh`）。
-- **028 部署日**：＿＿＿＿（部署後回填；+21 天 = 029 第一筆非空帳預期日）。
+- **028 部署日**：**2026-06-10**（+21 天 = 029 第一筆非空帳預期日 = **2026-07-01**）。文法定版（HITL 三題皆選推薦案）：ACTION 行只在取代/立即取代時出（觀察 vs 由 NEW 新欄帶）；CLOSE 整條連歷史搬移；vs 欄插在觸發條件後、摘要前（7 欄，6 欄舊格式向後相容）。配對 A/B 證據：output_tokens +52% 但可見輸出 +48% 等比成長（tokens/char 4.87→5.00 持平，非 lever 2 thinking 誘發）、核心決策一致（P1 Arraez + Pederson 立即取代兩邊同）、B 的 CLOSE 建議與 06-10 手動結案完全吻合；真實 B 輸出 round-trip 新寫入端 = 11 UPDATE 落地 + 7 條 stale CLOSE 優雅 SKIP。Runner 在 `daily-advisor/_tools/_ab_028_runner.py`（037 A/B 可重用）。**部署後驗證**：6/11 12:30 cron 第一班看 production issue 區塊出現新行型 + waiver-log 寫入無解析錯誤（Telegram 報警覆蓋）。**既存小毛病（非 028 造成，待小修）**：球員條目已在「已結案」段時 NEW/UPDATE 會殭屍寫入到已結案條目下（如 Pederson 被搶條目下的 06-09/06-10 行）— 修法 = NEW/UPDATE 查找範圍限縮觀察中＋隊上觀察。
 
 ## Problem Statement
 
