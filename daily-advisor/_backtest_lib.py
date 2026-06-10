@@ -1,8 +1,15 @@
-"""_backtest_lib — shared pure-function primitives for SP decision backtest.
+"""_backtest_lib — shared pure-function primitives for decision backtests.
 
-Use Case A (issue 024): backtest_track.py — read B2 fa-scan SP-v4 issues,
-extract verdicts, join with subsequent SP performance, output hit-rate +
-marginal benefit. Per docs/sp-decisions-backtest-automation.md §7.
+Two consumers share this library (PRD: episode dedup / age selection /
+resolution written once, not twice):
+
+- SP   (issue 024/027): backtest_track.py — B2 fa-scan SP-v4 issues →
+  Step B verdicts → episodes → post-verdict Savant xwOBACON → hit-rate.
+- Batter (issue 029): backtest_batter.py — batter fa-scan issues →
+  waiver-log block verdicts (issue-028 grammar) → episodes → 21-day
+  six-category actual production (R/HR/RBI/BB/AVG/OPS, no SB) →
+  mechanical scorecard, outcome pending-judge until the judge panel
+  (issue 030) upgrades it.
 
 Use Case B (xwOBACON threshold calibration, future): explicitly deferred to
 4-6 weeks post-cutover. Same primitives will be reused.
@@ -185,6 +192,22 @@ def resolve_player(name: str, roster_index: dict[str, int],
     return ResolvedPlayer(name=name, mlb_id=None, source="unresolved")
 
 
+def resolve_id_with_fallback(name: str | None, roster_index: dict[str, int],
+                             search_fn) -> int | None:
+    """roster_config lookup first, injected MLB Stats API search fallback.
+
+    Dropped players and FA add/watch targets are usually NOT in the current
+    roster_config — without the API fallback they would all classify
+    neutral (the pre-027 SP failure mode). Shared by both backtest CLIs.
+    """
+    if not name:
+        return None
+    resolved = resolve_player(name, roster_index)
+    if resolved.mlb_id is not None:
+        return resolved.mlb_id
+    return search_fn(name)
+
+
 # ── Episode dedup + reconciliation-age selection ──
 #
 # Shared by the SP backtest (backtest_track.py) and the batter backtest
@@ -271,6 +294,220 @@ def select_due_episodes(episodes: list[Episode], *, on_date: date,
         e for e in episodes
         if age_min <= (on_date - e.start_date).days < age_max
     ]
+
+
+# ── Batter waiver-log verdict parsing (issue 029) ──
+#
+# Verdict source = the ```waiver-log``` fenced block at the tail of batter
+# fa-scan issues (issue-028 grammar). Reconciled accounts per PRD C1 #2:
+# 取代/立即取代 (ACTION lines) + 觀察 (7-field NEW lines with a vs target).
+# UPDATE / CLOSE / pre-028 6-field NEW rows are not reconcilable — the first
+# reconcilable account exists only after the 028 deploy (2026-06-10).
+# Field-split rules mirror the writer (fa_scan.apply_waiver_log_block).
+
+# Mirrors fa_scan._ACTION_TYPES — kept local so this module stays free of
+# the fa_scan import graph (Yahoo/Savant production deps).
+_BATTER_ACTION_TYPES = ("立即取代", "取代")
+
+_WAIVER_BLOCK_RE = re.compile(r"```waiver-log[ \t]*\r?\n(.*?)```", re.DOTALL)
+
+#: Six reconciled categories (league 7×7 batter cats minus SB — soft punt).
+BATTER_CATEGORIES = ("R", "HR", "RBI", "BB", "AVG", "OPS")
+
+
+@dataclass(frozen=True)
+class BatterVerdict:
+    """One reconcilable batter recommendation from a waiver-log block.
+
+    kind: "replace" (取代/立即取代 — claim: player outproduces vs) or
+    "watch" (觀察 — claim: player has NOT clearly outproduced vs yet;
+    mirror-judged per PRD C1 #8). `vs` is the my-team comparison target.
+    """
+    issue_date: date
+    kind: str
+    player: str
+    vs: str
+    replace_type: str | None  # 取代 / 立即取代 — replace kind only
+
+
+def extract_waiver_log_block(issue_body: str) -> str | None:
+    """Return the first ```waiver-log``` fenced block body, stripped.
+
+    Batter issues carry exactly one block (verified on production archive);
+    SP issues carry none. Line-ending agnostic (gh --json body may carry
+    \\r\\n). Returns None when no block exists, "" for an empty block
+    (prompt spec: 無任何行動 → 空區塊).
+    """
+    if not issue_body:
+        return None
+    m = _WAIVER_BLOCK_RE.search(issue_body)
+    if m is None:
+        return None
+    return m.group(1).strip()
+
+
+def parse_batter_verdicts(issue_body: str, issue_date: date) -> list[BatterVerdict]:
+    """Extract reconcilable batter verdicts from one issue body.
+
+    Two passes mirroring the writer: ACTION lines are collected first so a
+    same-block NEW for the same player emits ONE replace verdict, never an
+    additional watch. Document order preserved; duplicates (same episode
+    key) within a block collapse to the first occurrence.
+    """
+    block = extract_waiver_log_block(issue_body)
+    if not block:
+        return []
+    lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
+
+    actions: dict[str, tuple[str, str]] = {}
+    for line in lines:
+        parts = line.split("|")
+        if parts[0] != "ACTION" or len(parts) < 4:
+            continue
+        name, rtype, vs = parts[1].strip(), parts[2].strip(), parts[3].strip()
+        if rtype not in _BATTER_ACTION_TYPES or not name or not vs:
+            continue
+        actions.setdefault(name, (rtype, vs))
+
+    verdicts: list[BatterVerdict] = []
+    seen: set[tuple] = set()
+
+    def _emit(v: BatterVerdict) -> None:
+        key = batter_episode_key(v)
+        if key not in seen:
+            seen.add(key)
+            verdicts.append(v)
+
+    for line in lines:
+        parts = line.split("|")
+        if parts[0] == "ACTION" and len(parts) >= 4:
+            name = parts[1].strip()
+            if name in actions:
+                rtype, vs = actions[name]
+                _emit(BatterVerdict(issue_date=issue_date, kind="replace",
+                                    player=name, vs=vs, replace_type=rtype))
+        elif parts[0] == "NEW" and len(parts) >= 7:
+            # 7-field row (issue 028) — parts[5] is the vs column. Pre-028
+            # 6-field rows (len 6) carry no vs and are not reconcilable.
+            name, vs = parts[1].strip(), parts[5].strip()
+            if name and vs and name not in actions:
+                _emit(BatterVerdict(issue_date=issue_date, kind="watch",
+                                    player=name, vs=vs, replace_type=None))
+    return verdicts
+
+
+def batter_episode_key(verdict: BatterVerdict) -> tuple:
+    """Episode identity for batter verdicts: kind + normalized name pair.
+
+    replace_type intensity (取代 vs 立即取代) does NOT split episodes —
+    same comparison claim, different urgency. watch and replace on the same
+    pair ARE distinct accounts (different claims, mirrored hit directions).
+    Names normalized so day-to-day accent drift doesn't split a chain.
+    """
+    return (verdict.kind, _normalize(verdict.player), _normalize(verdict.vs))
+
+
+# ── Batter six-category window stats (issue 029) ──
+
+
+def _safe_float(value) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _stat_int(stat: dict, key: str) -> int:
+    try:
+        return int(stat.get(key, 0) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def parse_bydaterange_hitting(data: dict) -> dict | None:
+    """Parse a person byDateRange hitting response into six-category stats.
+
+    Returns {"R","HR","RBI","BB","AVG","OPS","G"} or None when the window
+    contains no games (empty splits — IL / not yet called up / future).
+
+    MLB API quirk (pinned by real fixture): a single-team player may get
+    DUPLICATE identical splits — dedupe by content before aggregating, or
+    counting categories double. A mid-window trade yields one split per
+    team: counting categories are summed and AVG/OPS recomputed from summed
+    components (ratios must not be averaged).
+    """
+    splits = (data.get("stats") or [{}])[0].get("splits") or []
+    unique, seen = [], set()
+    for s in splits:
+        fingerprint = json.dumps(
+            {"team": (s.get("team") or {}).get("id"), "stat": s.get("stat")},
+            sort_keys=True, default=str)
+        if fingerprint not in seen:
+            seen.add(fingerprint)
+            unique.append(s)
+    if not unique:
+        return None
+    if len(unique) == 1:
+        st = unique[0].get("stat", {})
+        return {
+            "R": _stat_int(st, "runs"),
+            "HR": _stat_int(st, "homeRuns"),
+            "RBI": _stat_int(st, "rbi"),
+            "BB": _stat_int(st, "baseOnBalls"),
+            "AVG": _safe_float(st.get("avg")),
+            "OPS": _safe_float(st.get("ops")),
+            "G": _stat_int(st, "gamesPlayed"),
+        }
+
+    def total(key: str) -> int:
+        return sum(_stat_int(s.get("stat", {}), key) for s in unique)
+
+    hits, ab = total("hits"), total("atBats")
+    bb, hbp, sf, tb = (total("baseOnBalls"), total("hitByPitch"),
+                       total("sacFlies"), total("totalBases"))
+    avg = round(hits / ab, 4) if ab else None
+    obp_den = ab + bb + hbp + sf
+    obp = (hits + bb + hbp) / obp_den if obp_den else None
+    slg = tb / ab if ab else None
+    ops = round(obp + slg, 4) if obp is not None and slg is not None else None
+    return {
+        "R": total("runs"), "HR": total("homeRuns"), "RBI": total("rbi"),
+        "BB": bb, "AVG": avg, "OPS": ops, "G": total("gamesPlayed"),
+    }
+
+
+def compare_batter_categories(player_stats: dict | None,
+                              vs_stats: dict | None) -> dict | None:
+    """Six-category mechanical scorecard, from the FA/watch player's side.
+
+    This is the audit baseline for the judge panel (issue 030) — recorded
+    but NOT used to auto-classify hit/miss (PRD C1 #5: category wins are
+    binary and magnitude-blind; RBI 20-vs-5 must not equal HR 3-vs-4).
+    Returns None when either side has no window data; categories with an
+    unparseable value on either side are marked "no-data" and excluded
+    from the W/L/T counts.
+    """
+    if player_stats is None or vs_stats is None:
+        return None
+    categories: dict[str, dict] = {}
+    wins = losses = ties = 0
+    for cat in BATTER_CATEGORIES:
+        a, b = player_stats.get(cat), vs_stats.get(cat)
+        if a is None or b is None:
+            categories[cat] = {"player": a, "vs": b, "result": "no-data"}
+            continue
+        if a > b:
+            result = "win"
+            wins += 1
+        elif a < b:
+            result = "loss"
+            losses += 1
+        else:
+            result = "tie"
+            ties += 1
+        categories[cat] = {"player": a, "vs": b, "result": result}
+    return {"wins": wins, "losses": losses, "ties": ties,
+            "categories": categories}
 
 
 # ── Hit-rate / marginal benefit aggregation ──
