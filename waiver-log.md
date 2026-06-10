@@ -370,6 +370,7 @@
 ### Shane Drohan (MIL, SP,RP) [mlb_id:675660] — 觀察中
 觸發：B2 2-step watch
 - 06-09：Cantillo's 21d xwOBACON 0.436 (+0.067 Δ, 51 BBE) confirms real deterioration, making him a valid drop candidate. However, no FA clears the bar for an add: Chad Patrick wins xwOBACON (0.339 vs 0.369) a（fa_scan）
+- 06-10：Drohan shows a 3-slot edge over Buehler (Whiff% 27.1 vs 17.3, BB/9 2.63 vs 3.18, xwOBACON .328 vs .389) with 106 BBE, but his 3 GS/13 G swingman role severely caps SP-slot volume (IP/W/QS), and his 21（fa_scan）
 
 ## 隊上觀察
 
