@@ -334,7 +334,9 @@ def enrich_watch_players(watchlist, savant_2026, config):
             "position": w["position"],
             "mlb_id": mlb_id,
             "fa_type": fa_type,
-            "pct": w.get("pct", 0),
+            # None (not 0) when %owned is genuinely unknown — a fake 0% in a
+            # 12-team league reads as "free pickup" to the LLM (issue 033 A1).
+            "pct": w.get("pct"),
             "status": w.get("status", ""),
             "ownership_type": w.get("ownership_type", ""),
             "source": "watch",
@@ -383,8 +385,13 @@ def _check_player_ownership(name, league_key, access_token, expected_team=None):
     because LAD Muncy is rostered by someone). See CLAUDE.md TODO
     'waiver-log auto-close mlb_id 驗證'.
 
-    Returns ownership_type: 'freeagents', 'waivers', 'team', or None on
-    error / no matching player.
+    Issue 033: the same call now also returns percent_owned + status, so
+    watch players outside the SCAN_QUERIES top results get their true
+    %owned instead of a fabricated 0% (judgment-quality doc A1).
+
+    Returns dict {ownership_type, pct, status} — ownership_type one of
+    'freeagents', 'waivers', 'team'; pct int or None when Yahoo omits it.
+    None on error / no matching player.
     """
     players_data = _search_players(name, league_key, access_token)
     if not players_data:
@@ -401,12 +408,21 @@ def _check_player_ownership(name, league_key, access_token, expected_team=None):
             continue
         od = api_get(
             f"/league/{league_key}/players;player_keys={player_key}"
-            f";out=ownership",
+            f";out=percent_owned,ownership",
             access_token,
         )
         p2 = extract_player_info(
             od["fantasy_content"]["league"][1]["players"]["0"]["player"])
-        return p2.get("ownership_type", "")
+        po = p2.get("percent_owned")
+        try:
+            pct = int(float(po)) if po is not None else None
+        except (TypeError, ValueError):
+            pct = None
+        return {
+            "ownership_type": p2.get("ownership_type", ""),
+            "pct": pct,
+            "status": p2.get("status", ""),
+        }
     # No matching player (name + team) found — treat as unknown, not FA
     return None
 
@@ -455,10 +471,10 @@ def cleanup_rostered_watchlist(access_token, config, today_str, env=None):
     rostered = []
     for w in watchlist:
         try:
-            ownership = _check_player_ownership(
+            own = _check_player_ownership(
                 w["name"], league_key, access_token,
                 expected_team=w.get("team"))
-            if ownership == "team":
+            if own and own["ownership_type"] == "team":
                 rostered.append(w)
                 print(f"  Rostered: {w['name']} ({w.get('team','?')})", file=sys.stderr)
             time.sleep(0.5)
@@ -2361,15 +2377,21 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
     else:
         if savant_25:
             prior_bb_pct = None
+            prior_pa = savant_25.get("pa")
             if mlb_25:
                 pa25 = int(mlb_25.get("plateAppearances", 0) or 0)
                 bb25 = int(mlb_25.get("baseOnBalls", 0) or 0)
                 if pa25 > 0:
                     prior_bb_pct = round(bb25 / pa25 * 100, 2)
+                if not prior_pa:
+                    prior_pa = pa25 or None
             prior_stats = {
                 "xwoba": savant_25.get("xwoba"),
                 "bb_pct": prior_bb_pct,
                 "barrel_pct": savant_25.get("barrel_pct"),
+                # Issue 033: sample size for the prior — a P0 prior over 600 PA
+                # and over 150 PA mean different things for breakout judgment.
+                "pa": prior_pa,
             }
 
     mid_str = str(p.get("mlb_id", ""))
@@ -2712,6 +2734,29 @@ def _fetch_14d_trad_bulk(players: list[dict], season: int = 2026) -> dict:
     return out
 
 
+def _fetch_ages_bulk(players: list[dict]) -> dict:
+    """Bulk fetch current age for players via MLB people endpoint.
+
+    One API call for the whole list. Returns {mlb_id_str: int_age}; players
+    missing from the response (or on API error) are simply absent — callers
+    render age only when known (issue 033: FA prior 行補年齡).
+    """
+    ids = sorted({str(p["mlb_id"]) for p in players if p.get("mlb_id")})
+    if not ids:
+        return {}
+    try:
+        data = mlb_api_get(f"/people?personIds={','.join(ids)}")
+    except Exception as e:
+        print(f"  _fetch_ages_bulk failed: {e}", file=sys.stderr)
+        return {}
+    out = {}
+    for person in data.get("people", []):
+        age = person.get("currentAge")
+        if age is not None and person.get("id") is not None:
+            out[str(person["id"])] = int(age)
+    return out
+
+
 def _fmt_pctile(value, metric: str) -> str:
     """Format value with batter pctile for the data block (e.g. '.290 P35')."""
     if value is None:
@@ -2747,6 +2792,31 @@ def _fmt_xwoba_delta_batter(rolling_xwoba, season_xwoba) -> str:
     return f" (Δ{delta:+.3f}{direction})"
 
 
+# 14d Savant rolling sample floor — below this the xwOBA/Δ is noise and gets
+# replaced by an explicit 樣本不足 marker instead of relying on the LLM to
+# "remember to discount" (issue 033: #306 printed Teoscar BBE 1 / Δ-0.059).
+_SAVANT_14D_BBE_FLOOR = 15
+
+
+def _fmt_14d_savant_line(rolling_savant: dict, season_xwoba,
+                          indent: str) -> str | None:
+    """Render the 14d Savant rolling line with BBE floor gate.
+
+    Returns None when there is no rolling xwOBA at all (line omitted).
+    BBE < _SAVANT_14D_BBE_FLOOR → 樣本不足 marker, no xwOBA/Δ printed.
+    """
+    rolling = rolling_savant or {}
+    rolling_xwoba = rolling.get("xwoba")
+    if rolling_xwoba is None:
+        return None
+    bbe = int(rolling.get("bbe", 0) or 0)
+    if bbe < _SAVANT_14D_BBE_FLOOR:
+        return (f"{indent}14d Savant: 樣本不足 (BBE {bbe} "
+                f"<{_SAVANT_14D_BBE_FLOOR}，xwOBA/Δ 不顯示)")
+    delta_str = _fmt_xwoba_delta_batter(rolling_xwoba, season_xwoba)
+    return f"{indent}14d Savant: xwOBA {rolling_xwoba:.3f}{delta_str} / BBE {bbe}"
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None) -> list[str]:
     """Render one batter (anchor or watch) as raw + percentile + 14d trad.
@@ -2780,9 +2850,6 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
 
     # 14d block — combine Savant rolling + trad gameLog
     trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
-    rolling_xwoba = rolling_savant.get("xwoba")
-    rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
-    delta_xwoba_str = _fmt_xwoba_delta_batter(rolling_xwoba, sv.get("xwoba"))
     if trad:
         season_k_pct = sv.get("k_pct")
         k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
@@ -2793,14 +2860,9 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
             f"BB {trad['bb']} / K {trad['k']} (K% {trad['k_pct']:.1f}{spike_str}) / "
             f"PA {trad['pa']} / BBE {trad['bbe']}"
         )
-        if rolling_xwoba is not None:
-            lines.append(
-                f"  14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
-            )
-    elif rolling_xwoba is not None:
-        lines.append(
-            f"  14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
-        )
+    savant_line = _fmt_14d_savant_line(rolling_savant, sv.get("xwoba"), "  ")
+    if savant_line:
+        lines.append(savant_line)
 
     if prior:
         prior_parts = [
@@ -2820,8 +2882,14 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
 
 def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
                              trad_14d: dict | None,
-                             owned: dict | None) -> list[str]:
-    """Render one FA / watch batter as raw + percentile + 14d trad + %owned."""
+                             owned: dict | None,
+                             age: int | None = None) -> list[str]:
+    """Render one FA / watch batter as raw + percentile + 14d trad + %owned.
+
+    age: current age from _fetch_ages_bulk — rendered on the prior line so
+    breakout-vs-fluke priors have the age context (issue 033, 23 歲二年生
+    跳級 vs 31 歲 fluke 的先驗完全不同).
+    """
     name = entry.get("name", "?")
     team = entry.get("team", "")
     # Position intentionally not surfaced — design §1.2 + §3.4 evaluate on
@@ -2869,9 +2937,6 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     lines.append(f"   Season 2026: {' / '.join(season_parts)}")
 
     trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
-    rolling_xwoba = rolling_savant.get("xwoba")
-    rolling_bbe = int(rolling_savant.get("bbe", 0) or 0)
-    delta_xwoba_str = _fmt_xwoba_delta_batter(rolling_xwoba, sv.get("xwoba"))
     if trad:
         season_k_pct = sv.get("k_pct")
         k_spike = trad["k_pct"] - season_k_pct if season_k_pct is not None else None
@@ -2882,24 +2947,22 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
             f"BB {trad['bb']} / K {trad['k']} (K% {trad['k_pct']:.1f}{spike_str}) / "
             f"PA {trad['pa']} / BBE {trad['bbe']}"
         )
-        if rolling_xwoba is not None:
-            lines.append(
-                f"   14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
-            )
-    elif rolling_xwoba is not None:
-        lines.append(
-            f"   14d Savant: xwOBA {rolling_xwoba:.3f}{delta_xwoba_str} / BBE {rolling_bbe}"
-        )
+    savant_line = _fmt_14d_savant_line(rolling_savant, sv.get("xwoba"), "   ")
+    if savant_line:
+        lines.append(savant_line)
 
+    age_part = f" / 年齡 {age}" if age is not None else ""
     if prior:
         prior_parts = [
             f"xwOBA {_fmt_pctile(prior.get('xwoba'), 'xwoba')}",
             f"BB% {_fmt_pctile(prior.get('bb_pct'), 'bb_pct')}",
             f"Barrel% {_fmt_pctile(prior.get('barrel_pct'), 'barrel_pct')}",
         ]
-        lines.append(f"   Prior 2025: {' / '.join(prior_parts)}")
+        if prior.get("pa"):
+            prior_parts.append(f"PA {prior['pa']}")
+        lines.append(f"   Prior 2025: {' / '.join(prior_parts)}{age_part}")
     else:
-        lines.append("   Prior 2025: 無資料 (新人 or 上季 PA 不足)")
+        lines.append(f"   Prior 2025: 無資料 (新人 or 上季 PA 不足){age_part}")
     return lines
 
 
@@ -2919,6 +2982,13 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     """
     lines = []
 
+    # Issue 033 ④: the two "14d" windows have different sample bases — make
+    # the difference explicit instead of leaving the Δ basis mismatch hidden.
+    lines.append(
+        "> 視窗註記：「14d」trad = 最近 14 場（場次窗，約 15-17 日曆天）；"
+        "「14d Savant」= 最近 14 個日曆天（日曆窗）。兩者樣本基底不同。"
+    )
+
     weakest_pool = urgency_result.get("weakest_ranked", [])
     fa_history = load_fa_history()
     today_str = max(fa_history.keys()) if fa_history else ""
@@ -2926,6 +2996,8 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     # Bulk fetch 14d trad — anchor + FA + watch
     trad_subjects = list(weakest_pool) + list(fa_tagged) + list(watch_tagged)
     trad_14d = _fetch_14d_trad_bulk(trad_subjects)
+    # Issue 033 ②: current age for FA + watch prior context (one bulk call)
+    ages = _fetch_ages_bulk(list(fa_tagged) + list(watch_tagged))
 
     # ── 我方候選 drop ──
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
@@ -2948,7 +3020,8 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for idx, f in enumerate(fa_sorted, start=1):
             owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
                 if today_str else None
-            lines.extend(_fmt_fa_block_batter_v4(f, idx, trad_14d, owned))
+            lines.extend(_fmt_fa_block_batter_v4(
+                f, idx, trad_14d, owned, age=ages.get(str(f.get("mlb_id", "")))))
     else:
         lines.append("\n--- FA 打者候選: 無通過品質門檻 ---")
 
@@ -2958,7 +3031,8 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for w in watch_tagged:
             owned = enrich_owned_trend(w.get("name", ""), fa_history, today_str) \
                 if today_str else None
-            lines.extend(_fmt_fa_block_batter_v4(w, None, trad_14d, owned))
+            lines.extend(_fmt_fa_block_batter_v4(
+                w, None, trad_14d, owned, age=ages.get(str(w.get("mlb_id", "")))))
 
     # ── %owned 升幅 ──
     group_changes = [
@@ -3198,13 +3272,21 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     print(f"  Ownership check: {len(watchlist)} watch players...", file=sys.stderr)
     for w in watchlist:
         try:
-            ownership = _check_player_ownership(
+            own = _check_player_ownership(
                 w["name"], league_key, access_token,
                 expected_team=w.get("team"))
-            if ownership == "team":
+            if own and own["ownership_type"] == "team":
                 print(f"  Watch skip (rostered): {w['name']} ({w.get('team','?')})", file=sys.stderr)
                 rostered_names.add(w["name"])
             else:
+                # Issue 033: keep the true per-player %owned / status from the
+                # same ownership call — watch players outside SCAN_QUERIES top
+                # results previously fell back to a fabricated 0%.
+                if own:
+                    if own.get("pct") is not None:
+                        w["pct"] = own["pct"]
+                    w["status"] = own.get("status", "")
+                    w["ownership_type"] = own.get("ownership_type", "")
                 still_fa.append(w)
         except Exception as e:
             print(f"  Ownership check failed for {w['name']}: {e}", file=sys.stderr)
@@ -3213,18 +3295,19 @@ def _run_daily_scan(access_token, config, today_str, env, args):
     watchlist = still_fa
 
     # Inject %owned + status + ownership_type from snapshot into watchlist
-    # before snapshot_no_watch filter. Without this, enrich_watch_players falls
-    # back to defaults and reports show 0% / no injury / no waiver tag for watch
-    # players, misleading downstream LLM reasoning (e.g. "0% in 12-team = free
-    # pickup" or recommending a player who is actually DTD on waivers).
-    # Watch players not in SCAN_QUERIES top results stay None.
+    # (snapshot is the same-day Yahoo source; overrides the per-player values
+    # above when present). Without either source, enrich_watch_players would
+    # report 0% / no injury / no waiver tag for watch players, misleading
+    # downstream LLM reasoning (e.g. "0% in 12-team = free pickup" or
+    # recommending a player who is actually DTD on waivers). Watch players
+    # missing from both sources stay pct=None → rendered as "?%" (honest).
     for w in watchlist:
         if w["name"] in snapshot:
             w["pct"] = snapshot[w["name"]]["pct"]
             w["status"] = snapshot[w["name"]].get("status", "")
             w["ownership_type"] = snapshot[w["name"]].get("ownership_type", "")
-        else:
-            print(f"  Watch pct/status unknown (not in snapshot top results): {w['name']}", file=sys.stderr)
+        elif w.get("pct") is None:
+            print(f"  Watch pct/status unknown (ownership check + snapshot both missed): {w['name']}", file=sys.stderr)
 
     # Remove watch players from snapshot to avoid duplication
     watch_names = {w["name"] for w in watchlist}
