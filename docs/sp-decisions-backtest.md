@@ -256,3 +256,31 @@ By action:
 - `watch` n=0 (actionable 0) hit_rate=—
 - `pass` n=0 (actionable 0) hit_rate=—
 
+
+## Weekly Backtest 2026-06-10 (2026-05-28 ~ 2026-06-09)
+
+- Episode age window: [0, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- ⚠️ **OVERRIDE DEMO RUN** — non-default age window (--age-min 0 --age-max 28); episodes younger than 21 days have NOT completed their observation window. Not comparable with regular weekly sections.
+- Episodes due this run: 12 (actionable: 5; episodes in lookback: 12)
+- Hit rate: 100%
+- Average marginal benefit (xwOBACON Δ favoring add): +0.0912
+
+By action:
+- `drop_X_add_Y` n=6 (actionable 4) hit_rate=100%
+- `watch` n=3 (actionable 1) hit_rate=100%
+- `pass` n=3 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-05-28 (1d) `pass` pass → **neutral**
+- 2026-05-29 (1d) `drop_X_add_Y` drop Coleman Crow → add Trevor McDonald → **hit**, Δ +0.066
+- 2026-05-30 (1d) `drop_X_add_Y` drop Luis Severino → add Trevor McDonald → **neutral**
+- 2026-05-31 (1d) `drop_X_add_Y` drop Keider Montero → add Trevor McDonald → **hit**, Δ +0.013
+- 2026-06-01 (1d) `drop_X_add_Y` drop Joey Cantillo → add Trevor McDonald → **hit**, Δ +0.171
+- 2026-06-02 (1d) `pass` pass → **neutral**
+- 2026-06-03 (1d) `watch` watch Zebby Matthews → **hit**
+- 2026-06-04 (1d) `drop_X_add_Y` drop Walker Buehler → add Casey Mize → **neutral**
+- 2026-06-05 (1d) `drop_X_add_Y` drop Walker Buehler → add Trevor McDonald → **hit**, Δ +0.115
+- 2026-06-06 (1d) `pass` pass → **neutral**
+- 2026-06-07 (2d) `watch` watch Peter Lambert → **neutral**
+- 2026-06-09 (2d) `watch` watch Shane Drohan → **neutral**
+

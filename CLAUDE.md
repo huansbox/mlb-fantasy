@@ -293,7 +293,7 @@ Step B 一次 call 讀 Step A JSON **加上同樣 slim pool**（不是只看 Ste
 #### 品質監控（取代退役的 M1/M4'）
 
 兩層機制：
-- **Backtest 自動化（Use Case A，issue 024 + 025）**：週日 UTC 06:00 = TW 14:00 cron 跑 `cron_backtest.sh` wrapper（git pull → `daily-advisor/backtest_track.py --days 7 --update-doc` → 若 doc 變更則 commit/push）→ 算 hit-rate + marginal benefit 追加進 `docs/sp-decisions-backtest.md`（隔天 Monday `/weekly-review` 人工 session 即可看到新增段）。首跑 2026-05-31。慢但高訊號（週級）。
+- **Backtest 自動化（Use Case A，issue 024 + 025；027 修復端到端）**：週日 UTC 06:00 = TW 14:00 cron 跑 `cron_backtest.sh` wrapper（git pull → `daily-advisor/backtest_track.py --update-doc` → 若 doc 變更則 commit/push）→ 算 hit-rate + marginal benefit 追加進 `docs/sp-decisions-backtest.md`（隔天 Monday `/weekly-review` 人工 session 即可看到新增段）。對帳對象 = 帳齡 ∈ [21, 28) 天的 episode（同組 verdict 相鄰日去重，從首日起算觀察窗；週日 stride 7 → 每筆恰對一次）。首跑 2026-05-31（空殼）；027 修復後首個非空 regular 段預期 2026-06-21。慢但高訊號（週級）。
 - **`/weekly-review` 人工 spot check（issue 026）**：每週看過去 7 天 SP verdict gut check + 檢視 `league.weekly_anchor_sp` list 是否還有效。快但主觀（日級）。
 
 兩層覆蓋日與季的時間尺度。
@@ -455,7 +455,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `daily-advisor/prompt_sp_b2_step_a.txt` | B2 Step A prompt — my-team rank P1-P3 + FA classify worth/borderline/not_worth |
 | `daily-advisor/prompt_sp_b2_step_b.txt` | B2 Step B prompt — 讀 Step A JSON + full slim pool → drop_X_add_Y / watch / pass verdict |
 | `daily-advisor/git_sync.py` | cron 腳本共用的 git 同步 helper — `pull_rebase_with_recovery()` 自動修復「未追蹤檔與上游同路徑碰撞」（內容相同才整批移除重試，不同則中止報警）。fa_scan / roster_sync / weekly_review import 用，`cron_capture_payload.sh` + `cron_backtest.sh` 走 CLI（`python3 git_sync.py REPO_ROOT`，exit 0=ok / 2=fail）。背景見 `docs/handoff-vps-git-sync-fix.md` |
-| `daily-advisor/cron_backtest.sh` | B2 backtest 週日 cron wrapper（issue 025 補上）— git_sync.py pull → `backtest_track.py --days 7 --update-doc` → 若 `docs/sp-decisions-backtest.md` 變更則 commit/push origin master。Exit code: 0 ok / 2 pull failure / 3 push failure。Cron: `0 6 * * 0 root ...`（UTC，= TW 14:00 週日）|
+| `daily-advisor/cron_backtest.sh` | B2 backtest 週日 cron wrapper（issue 025 補上，027 改用帳齡窗口預設）— git_sync.py pull → `backtest_track.py --update-doc`（預設帳齡 [21, 28) episode 對帳；`--age-min 0` 為 demo/backfill override）→ 若 `docs/sp-decisions-backtest.md` 變更則 commit/push origin master。Exit code: 0 ok / 2 pull failure / 3 push failure。Cron: `0 6 * * 0 root ...`（UTC，= TW 14:00 週日）|
 | `daily-advisor/tests/test_git_sync.py` | git_sync 單元 + 整合測試（11 cases — parse_blocking_files 純函式 5 + 真 git repo 整合 6 涵蓋 clean pull / 同檔自動修復 / 異檔中止 / all-or-nothing 部分相符 / CLI exit code） |
 | `daily-advisor/tests/test_fa_compute.py` | fa_compute 單元測試（85 cases 覆蓋百分位分桶 + 四因子 + 標籤 + fixture 回歸） |
 | `daily-advisor/stream_sp_scan.py` | `/stream-sp` skill Step 2-6 機械層（TDD 72 tests）— schedule parse + Yahoo FA cross-check + v4 5-slot enrich + opener filter + 對手 14d + 對手 vs SP 慣用手 OPS（`vs_hand_2026`，PA<400 自動 fallback 季全 OPS + `low_pa_fallback` flag）+ `sample_warning` 2026 樣本信心 tag（BBE<30 AND GS<6 → `"low"`；其餘 BBE≤80 OR GS≤12 → `"medium"`；BBE>80 AND GS>12 → `"none"`；v4 unavailable → null。AND-for-low，**機械層不 demote verdict**，僅供 LLM 信心校正用）+ `--pending-file` 補查模式自動 diff（issue 014，emit top-level `pending_diff` key — 4 桶 still_starting/lost_to_others/replaced/no_longer_scheduled）→ JSON。CLI: `python3 stream_sp_scan.py --et-dates YYYY-MM-DD[,YYYY-MM-DD] [--pending-file PATH]`。skill 觸發 / 非 cron。e2e ~5s |
