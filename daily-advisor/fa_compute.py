@@ -352,6 +352,27 @@ def _compute_batter_warn_tags(fa: dict) -> list[str]:
     return tags
 
 
+# Issue 034: FA vs anchor PA/Team_G gap threshold — platoon trap light
+# interception. Proven case: Pederson (3.06) recommended over Arraez (4.27)
+# = -28% weekly PA with no mechanical signal (judgment-quality doc A3).
+_PA_TG_GAP_THRESHOLD = 1.0
+
+
+def pa_tg_gap_warn(fa_pa_tg, anchor_pa_tg,
+                   threshold: float = _PA_TG_GAP_THRESHOLD) -> str | None:
+    """⚠️ 上場量落差 when the FA plays meaningfully less than the anchor it
+    would replace (anchor − FA ≥ threshold, default 1.0 PA/Team_G).
+
+    Pure function. Either side missing → None (no fabricated signal).
+    Reverse direction (FA plays more) → None.
+    """
+    if fa_pa_tg is None or anchor_pa_tg is None:
+        return None
+    if anchor_pa_tg - fa_pa_tg >= threshold:
+        return f"⚠️ 上場量落差 (PA-TG {fa_pa_tg:.2f} vs anchor {anchor_pa_tg:.2f})"
+    return None
+
+
 def _decision_from_tags(add_tags: list[str], warn_tags: list[str]) -> str:
     """Upgrade decision per CLAUDE.md + fixture behavior.
 
@@ -396,6 +417,14 @@ def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerTyp
     fa_bd = fa_player.get("breakdown") or {}
     breakdown_diff = {k: fa_bd.get(k, 0) - anchor_bd.get(k, 0) for k in fa_bd}
 
+    # Issue 034: relative playing-time gap vs anchor — honesty tag, computed
+    # regardless of win gate so watch/pass entries surface it in payload too.
+    fa_pa_tg = (fa_player.get("derived") or {}).get("pa_per_tg")
+    if fa_pa_tg is None:
+        fa_pa_tg = (fa_player.get("prior_stats") or {}).get("pa_per_team_g")
+    anchor_pa_tg = (anchor_player.get("derived") or {}).get("pa_per_tg")
+    gap_warn = pa_tg_gap_warn(fa_pa_tg, anchor_pa_tg)
+
     # Win gate: Sum diff ≥3 且 at least 2 metrics ≥0
     positive_count = sum(1 for d in breakdown_diff.values() if d >= 0)
     win_gate_passed = sum_diff >= 3 and positive_count >= 2
@@ -406,13 +435,15 @@ def compute_fa_tags(fa_player: dict, anchor_player: dict, player_type: PlayerTyp
             "breakdown_diff": breakdown_diff,
             "win_gate_passed": False,
             "add_tags": [],
-            "warn_tags": [],
+            "warn_tags": [gap_warn] if gap_warn else [],
             "decision": "pass",
             "anchor_name": anchor_player["name"],
         }
 
     add_tags = _compute_batter_add_tags(fa_player)
     warn_tags = _compute_batter_warn_tags(fa_player)
+    if gap_warn:
+        warn_tags.append(gap_warn)
 
     decision = _decision_from_tags(add_tags, warn_tags)
 

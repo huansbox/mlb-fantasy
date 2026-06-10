@@ -10,6 +10,7 @@ from fa_compute import (
     compute_urgency,
     format_sp_breakdown_human,
     metric_to_score,
+    pa_tg_gap_warn,
     pick_weakest,
     score_to_percentile_label,
     value_to_pctile,
@@ -368,6 +369,109 @@ class TestFaTagsBatter:
         assert "⚠️ 樣本小" not in result["warn_tags"]
         assert "⚠️ Breakout 待驗" not in result["warn_tags"]
         assert "⚠️ 近況下滑" not in result["warn_tags"]
+
+
+class TestPaTgGapWarn:
+    """Issue 034 — platoon trap light interception.
+
+    FA playing meaningfully less than the anchor it would replace (PA/Team_G
+    gap ≥1.0) gets a mechanical ⚠️ tag. Proven case: Pederson (platoon, PA-TG
+    3.06) recommended as 立即取代 over Arraez (everyday, 4.27) = -28% weekly
+    PA with no interception (judgment-quality doc A3).
+    """
+
+    # ── pure function boundaries ──
+
+    def test_fires_at_exact_threshold(self):
+        tag = pa_tg_gap_warn(3.0, 4.0)  # gap exactly 1.0
+        assert tag is not None
+        assert "上場量落差" in tag
+
+    def test_no_tag_just_below_threshold(self):
+        assert pa_tg_gap_warn(3.01, 4.0) is None  # gap 0.99
+
+    def test_no_tag_when_fa_side_missing(self):
+        assert pa_tg_gap_warn(None, 4.27) is None
+
+    def test_no_tag_when_anchor_side_missing(self):
+        assert pa_tg_gap_warn(3.06, None) is None
+
+    def test_no_tag_reverse_direction(self):
+        # FA plays MORE than anchor → no warn
+        assert pa_tg_gap_warn(4.5, 3.0) is None
+
+    def test_pederson_case_fires_with_values_in_tag(self):
+        tag = pa_tg_gap_warn(3.06, 4.27)
+        assert tag is not None
+        assert "3.06" in tag
+        assert "4.27" in tag
+
+    # ── compute_fa_tags integration ──
+
+    def _anchor_everyday(self):
+        return {
+            "name": "Arraez",
+            "score": 11,
+            "breakdown": {"xwOBA": 7, "BB%": 1, "Barrel%": 6},
+            "savant_2026": {"xwoba": 0.320, "bb_pct": 5.0, "barrel_pct": 9.0,
+                            "bbe": 50},
+            "derived": {"pa_per_tg": 4.27},
+        }
+
+    def _platoon_fa(self):
+        # Strong-quality platoon bat: PA-TG 3.06 sits between the absolute
+        # gates (≥3.5 主力 / <2.5 上場有限) — only the relative gap catches it.
+        fa = {
+            "name": "Pederson",
+            "savant_2026": {"xwoba": 0.370, "bb_pct": 14.0, "barrel_pct": 14.0,
+                            "bbe": 80},
+            "prior_stats": {"xwoba": 0.370, "bb_pct": 14.1, "barrel_pct": 14.2},
+            "rolling_14d": None,
+            "derived": {"pa_per_tg": 3.06},
+        }
+        score, breakdown = compute_sum_score(fa["savant_2026"], "batter")
+        fa["score"] = score
+        fa["breakdown"] = breakdown
+        return fa
+
+    def test_pederson_fixture_gets_warn_and_no_immediate_replace(self):
+        result = compute_fa_tags(self._platoon_fa(), self._anchor_everyday(),
+                                 "batter")
+        assert any("上場量落差" in t for t in result["warn_tags"])
+        # warn tag blocks 立即取代 (which requires 0 ⚠️); not a strong warn
+        # so 取代/觀察 still possible per add tags
+        assert result["decision"] != "立即取代"
+
+    def test_no_warn_when_anchor_has_no_derived(self):
+        anchor = self._anchor_everyday()
+        del anchor["derived"]
+        result = compute_fa_tags(self._platoon_fa(), anchor, "batter")
+        assert not any("上場量落差" in t for t in result["warn_tags"])
+
+    def test_gap_warn_visible_even_when_win_gate_fails(self):
+        # Honesty tag is independent of the win gate — watch players (decision
+        # pass) still surface the gap warning in payload.
+        weak_fa = {
+            "name": "WeakPlatoon",
+            "savant_2026": {"xwoba": 0.250, "bb_pct": 4.0, "barrel_pct": 3.0,
+                            "bbe": 60},
+            "prior_stats": {},
+            "rolling_14d": None,
+            "derived": {"pa_per_tg": 2.6},
+        }
+        score, breakdown = compute_sum_score(weak_fa["savant_2026"], "batter")
+        weak_fa["score"] = score
+        weak_fa["breakdown"] = breakdown
+        result = compute_fa_tags(weak_fa, self._anchor_everyday(), "batter")
+        assert result["decision"] == "pass"
+        assert result["win_gate_passed"] is False
+        assert any("上場量落差" in t for t in result["warn_tags"])
+
+    def test_no_gap_warn_for_everyday_fa(self):
+        fa = self._platoon_fa()
+        fa["derived"] = {"pa_per_tg": 4.0}  # gap 0.27 < 1.0
+        result = compute_fa_tags(fa, self._anchor_everyday(), "batter")
+        assert not any("上場量落差" in t for t in result["warn_tags"])
 
 
 class TestBatterIlShortWarn:
