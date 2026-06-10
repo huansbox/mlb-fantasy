@@ -352,6 +352,31 @@ def _compute_batter_warn_tags(fa: dict) -> list[str]:
     return tags
 
 
+# Issue 035: batter luck significance — 2025 |wOBA−xwOBA| P70 (bip ≥ 50,
+# n=486, derived by calc_woba_gap_pctiles.py). Counterpart of the SP
+# xERA−ERA tag (significant at |diff| ≥ 0.81 = P70+).
+_WOBA_GAP_SIG_THRESHOLD = 0.023
+
+
+def compute_woba_gap(woba, xwoba, bbe, bbe_floor: int = 40,
+                     threshold: float = _WOBA_GAP_SIG_THRESHOLD) -> dict | None:
+    """Batter luck field: actual vs expected quality gap.
+
+    gap = wOBA − xwOBA, rounded to 3 — positive means actual outperforms
+    expected (運氣偏多 / sell-high side), negative is the buy-low side.
+
+    Pure function. Returns {"gap": float, "significant": bool} or None when
+    either value is missing or BBE is below the floor (no luck judgment
+    mid-collapse on tiny samples — SP BBE ≥40 gate precedent).
+    """
+    if woba is None or xwoba is None:
+        return None
+    if bbe is None or bbe < bbe_floor:
+        return None
+    gap = round(woba - xwoba, 3)
+    return {"gap": gap, "significant": abs(gap) >= threshold}
+
+
 # Issue 034: FA vs anchor PA/Team_G gap threshold — platoon trap light
 # interception. Proven case: Pederson (3.06) recommended over Arraez (4.27)
 # = -28% weekly PA with no mechanical signal (judgment-quality doc A3).

@@ -365,6 +365,10 @@ def _extract_savant_row(row, player_type):
     if "est_woba" in row:
         result["xwoba"] = float(row.get("est_woba", 0) or 0)
         result["pa"] = int(row.get("pa", 0) or 0)
+        # Actual wOBA (same expected_statistics CSV) — wOBA−xwOBA luck field
+        # for batters (issue 035). Empty cell stays None.
+        woba = row.get("woba")
+        result["woba"] = float(woba) if woba else None
         if player_type == "pitcher":
             xera = row.get("xera")
             result["xera"] = float(xera) if xera else 0

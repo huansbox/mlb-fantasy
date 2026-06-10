@@ -8,7 +8,7 @@ from savant_rolling import _aggregate_pitches
 
 
 def _row(game_date, at_bat_number, events="", xwoba=None, launch_speed=None,
-         launch_speed_angle=None):
+         launch_speed_angle=None, woba_value=None, woba_denom=None):
     """Build a minimal pitch-level CSV row dict for tests."""
     return {
         "game_date": game_date,
@@ -17,6 +17,8 @@ def _row(game_date, at_bat_number, events="", xwoba=None, launch_speed=None,
         "estimated_woba_using_speedangle": "" if xwoba is None else str(xwoba),
         "launch_speed": "" if launch_speed is None else str(launch_speed),
         "launch_speed_angle": "" if launch_speed_angle is None else str(launch_speed_angle),
+        "woba_value": "" if woba_value is None else str(woba_value),
+        "woba_denom": "" if woba_denom is None else str(woba_denom),
     }
 
 
@@ -91,6 +93,42 @@ def test_aggregate_xwobacon_skips_missing_xwoba_value():
     # bbe_count=2, sum_xwoba_on_bbe=0.5 → xwobacon = 0.5 / 2 = 0.25
     assert result["xwobacon"] == 0.25
     assert result["bbe"] == 2
+
+
+# ── Issue 035: actual rolling wOBA (woba_value / woba_denom) ──
+
+
+def test_aggregate_woba_from_woba_value_denom():
+    """woba = Σ woba_value / Σ woba_denom over PA-ending events."""
+    rows = [
+        _row("2026-04-01", 1, events="single", xwoba=0.5,
+             woba_value=0.9, woba_denom=1),
+        _row("2026-04-01", 2, events="strikeout", woba_value=0.0, woba_denom=1),
+        _row("2026-04-01", 3, events="walk", woba_value=0.69, woba_denom=1),
+    ]
+    result = _aggregate_pitches(rows)
+    # woba = (0.9 + 0.0 + 0.69) / 3 = 0.53
+    assert result["woba"] == 0.53
+
+
+def test_aggregate_woba_none_when_columns_missing():
+    """Old fixtures / CSVs without woba columns → woba stays None (graceful)."""
+    rows = [
+        _row("2026-04-01", 1, events="single", xwoba=0.5),
+    ]
+    result = _aggregate_pitches(rows)
+    assert result.get("woba") is None
+
+
+def test_aggregate_woba_skips_zero_denom_events():
+    """woba_denom=0 events (e.g. sac bunt) excluded from denominator."""
+    rows = [
+        _row("2026-04-01", 1, events="single", xwoba=0.5,
+             woba_value=0.9, woba_denom=1),
+        _row("2026-04-01", 2, events="sac_bunt", woba_value=0.0, woba_denom=0),
+    ]
+    result = _aggregate_pitches(rows)
+    assert result["woba"] == 0.9
 
 
 def test_aggregate_xwobacon_present_for_pitcher_view():
