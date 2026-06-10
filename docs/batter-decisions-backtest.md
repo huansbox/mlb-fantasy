@@ -17,9 +17,10 @@
 - **outcome 語意**：骨架階段一律 `pending-judge`。裁判合議（issue 030：2 位裁判同指示獨立、強制二選一 + 明顯/勉強標註、合議表）上線後升級為 hit / miss / 難分：
   - **replace 帳**：FA 明顯較好 → hit（量「太衝動」病的反面）
   - **watch 帳**（鏡像）：FA 明顯較好 → **看走眼**（太保守）；難分或 vs 較好 → 看對
-- **執行標註**（issue 031）：每筆帳將標「是否實際執行」（roster git 歷史機械判定），累積後比 executed vs not 命中率。
+- **執行標註**（issue 031，已上線）：每筆帳標「是否實際執行」— 由 `roster_config.json` git 歷史機械判定（**不靠人工**）：執行窗 = episode 首日 → 末日 + 3 天 grace（涵蓋 FA add 隔日生效與 waiver claim Daily-Tomorrow 延遲生效，如 06-02 Buehler 案）。比對 **mlb_id 優先**（id 已解析時同名不同 id 不算執行 — 防同名誤判）、id 未解析才退 name 比對。狀態：`executed`（窗內進名單）/ `not-executed`（窗內未進）/ `already-rostered`（窗前已在名單，罕見）/ `unknown`（git 歷史不足以確立窗前不在籍，寧可 unknown 不給錯的 False）。週報含 executed / not-executed 分組 hit-rate（030 裁判上線前分母為 0 顯示「—」）— 量「人工否決是在加值還是誤殺好建議」（PRD user story 9）。
 
 ## 更新紀錄
 
 - **2026-06-10 創建**（issue 029 骨架）：解析 + episode + 六類別比數 + 週日 cron 端到端；outcome 全 pending-judge。
-- 後續：issue 030 裁判合議升級、issue 031 執行標註。
+- **2026-06-10 執行標註上線**（issue 031）：每筆帳補 executed 欄位（roster git 歷史機械判定）+ 週報 executed / not-executed 分組 hit-rate 行。真實歷史 spot-check 三例皆正確（Rafaela 06-07 add → executed / Pederson 被搶 → not-executed / Arraez 長期在籍 → already-rostered）。
+- 後續：issue 030 裁判合議升級（pending-judge → hit/miss/難分，分組 hit-rate 隨之自動出現數值）。
