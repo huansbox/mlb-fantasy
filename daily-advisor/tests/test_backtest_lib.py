@@ -1,102 +1,120 @@
 """TDD tests for _backtest_lib — pure functions only.
 
-Production fetchers (Savant / Yahoo / MLB Stats API) are not covered here —
-they are system boundaries validated by e2e backtest_track.py runs against
-real GitHub Issues.
+Production fetchers (Savant / gh / MLB Stats API) are not covered here —
+they are injected boundaries (see test_backtest_track.py for pipeline tests).
+
+FIXTURE IRON RULE (PRD Testing Decisions, issue 027): all parse tests run
+against REAL production issue bodies archived via
+`gh issue view <N> -R huansbox/mlb-fantasy --json number,title,createdAt,body`
+into tests/fixtures/issue_<N>_sp_v4.json. Hand-written template samples are
+forbidden as primary fixtures — the original `_STEP_B_BLOCK_RE` passed 33
+hand-written tests while matching ZERO production bodies (code fence +
+</details> wrapper; "tests green, production dead", found 2026-06-10).
+Synthetic bodies below are demoted to boundary cases only and are explicitly
+marked as NOT representative of production format.
 """
 
-from datetime import date
+import json
+from datetime import date, timedelta
+from pathlib import Path
 
 import pytest
 
 from _backtest_lib import (
     B2Verdict,
+    Episode,
     ResolvedPlayer,
     VerdictOutcome,
     aggregate_hit_rate,
     build_roster_name_index,
+    dedupe_episodes,
     parse_b2_verdict,
     parse_issue_date,
     resolve_player,
+    select_due_episodes,
+    verdict_episode_key,
 )
 
-
-# ── parse_b2_verdict ──
-
-# Body template mirrors actual _phase6_sp._emit_b2_final format: parts joined
-# by "\n\n", so the gap between the === header and the JSON object is a blank
-# line (two newlines). Earlier regression: regex required single \n and missed
-# every real Issue body silently.
-_VALID_BODY_TEMPLATE = """
-[SP-v4] B2 verdict: drop_X_add_Y
-
-Pfaadt structurally better.
-
-=== SP-v4 B2 Step A ===
-
-{step_a_json}
-
-=== SP-v4 B2 Step B (final verdict) ===
-
-{step_b_json}
-"""
+FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 
 
-def _body(step_b_obj: dict, step_a_obj: dict | None = None) -> str:
-    import json
-    sa = step_a_obj or {"my_team_rank": [], "fa_classify": []}
-    return _VALID_BODY_TEMPLATE.format(
-        step_a_json=json.dumps(sa, ensure_ascii=False),
-        step_b_json=json.dumps(step_b_obj, ensure_ascii=False),
-    )
+def _load_fixture(number: int):
+    """Load a real production issue fixture → (body, issue_date)."""
+    raw = (FIXTURE_DIR / f"issue_{number}_sp_v4.json").read_text(encoding="utf-8")
+    data = json.loads(raw)
+    return data["body"], parse_issue_date(data["createdAt"])
 
 
-def _body_from_emit(step_b_obj: dict, step_a_obj: dict | None = None) -> str:
-    """Recreate the exact byte-for-byte format that _emit_b2_final produces.
+# ── parse_b2_verdict — REAL production fixtures (primary suite) ──
 
-    Direct mirror of _phase6_sp.py line 442 (`"\\n\\n".join(full_raw_parts)`).
-    Regression test against the regex's actual production input shape.
-    """
-    import json
-    sa = step_a_obj or {"my_team_rank": [], "fa_classify": []}
-    parts = [
-        "=== SP-v4 B2 Step A ===",
-        json.dumps(sa, ensure_ascii=False, indent=2, default=str),
-        "=== SP-v4 B2 Step B (final verdict) ===",
-        json.dumps(step_b_obj, ensure_ascii=False, indent=2, default=str),
-    ]
-    return "\n\n".join(parts)
+class TestParseB2VerdictProductionFixtures:
+    """Each fixture is a verbatim `gh issue view --json body` archive and
+    covers one Step B action. The wrapper-chrome assertions lock in the
+    premise that production bodies are fenced + folded — if a future format
+    change un-wraps them, these tests will still pass (parser is anchored
+    on the header only) but the premise assertions document today's shape."""
 
+    def test_fixture_bodies_really_are_fence_wrapped(self):
+        # Regression premise: Step B JSON sits inside ``` fence + <details>.
+        for number in (259, 276, 280, 305):
+            body, _ = _load_fixture(number)
+            assert "</details>" in body, f"#{number} lost <details> wrapper?"
+            assert "```" in body, f"#{number} lost code fence?"
+            assert "=== SP-v4 B2 Step B (final verdict) ===" in body
 
-class TestParseB2Verdict:
-    def test_drop_add_action(self):
-        body = _body({"action": "drop_X_add_Y", "drop": "Nola",
-                      "add": "Pfaadt", "watch_target": None,
-                      "reason": "Sum +18"})
-        v = parse_b2_verdict(body, date(2026, 5, 27))
+    def test_issue_259_drop_add(self):
+        body, d = _load_fixture(259)
+        v = parse_b2_verdict(body, d)
         assert v is not None
         assert v.action == "drop_X_add_Y"
-        assert v.drop == "Nola"
-        assert v.add == "Pfaadt"
+        assert v.drop == "Coleman Crow"
+        assert v.add == "Trevor McDonald"
         assert v.watch_target is None
-        assert v.reason == "Sum +18"
-        assert v.issue_date == date(2026, 5, 27)
+        assert v.issue_date == date(2026, 5, 29)
+        assert "McDonald" in v.reason
 
-    def test_watch_action(self):
-        body = _body({"action": "watch", "drop": None, "add": None,
-                      "watch_target": "Lambert", "reason": "trending"})
-        v = parse_b2_verdict(body, date(2026, 5, 27))
-        assert v is not None
-        assert v.action == "watch"
-        assert v.watch_target == "Lambert"
-        assert v.drop is None
-
-    def test_pass_action(self):
-        body = _body({"action": "pass", "drop": None, "add": None,
-                      "watch_target": None, "reason": "no upgrade"})
-        v = parse_b2_verdict(body, date(2026, 5, 27))
+    def test_issue_276_pass(self):
+        body, d = _load_fixture(276)
+        v = parse_b2_verdict(body, d)
         assert v is not None
         assert v.action == "pass"
+        assert v.drop is None
+        assert v.add is None
+        assert v.watch_target is None
+        assert v.issue_date == date(2026, 6, 2)
+
+    def test_issue_280_watch(self):
+        body, d = _load_fixture(280)
+        v = parse_b2_verdict(body, d)
+        assert v is not None
+        assert v.action == "watch"
+        assert v.watch_target == "Zebby Matthews"
+        assert v.drop is None
+        assert v.issue_date == date(2026, 6, 3)
+
+    def test_issue_305_watch(self):
+        # The exact body the 2026-06-10 shell-finding was reproduced against.
+        body, d = _load_fixture(305)
+        v = parse_b2_verdict(body, d)
+        assert v is not None
+        assert v.action == "watch"
+        assert v.watch_target == "Shane Drohan"
+        assert v.issue_date == date(2026, 6, 10)
+
+    def test_issue_254_no_step_b_block_returns_none(self):
+        # Real SP-v4 issue from B2-deploy morning (2026-05-28 04:34) that
+        # predates the Step B raw dump — must be silently skipped.
+        body, d = _load_fixture(254)
+        assert "Step B (final verdict)" not in body
+        assert parse_b2_verdict(body, d) is None
+
+
+# ── parse_b2_verdict — synthetic boundary cases (NOT production format) ──
+
+class TestParseB2VerdictSyntheticBoundaries:
+    """Hand-written bodies for malformed-input boundaries that cannot be
+    sourced from the archive. None of these represent production format —
+    production-format coverage lives in the fixture class above."""
 
     def test_empty_body_returns_none(self):
         assert parse_b2_verdict("", date(2026, 5, 27)) is None
@@ -107,8 +125,9 @@ class TestParseB2Verdict:
         assert parse_b2_verdict(body, date(2026, 5, 27)) is None
 
     def test_invalid_action_returns_none(self):
-        body = _body({"action": "weird_action", "drop": None, "add": None,
-                      "watch_target": None, "reason": ""})
+        body = ('=== SP-v4 B2 Step B (final verdict) ===\n\n'
+                '{"action": "weird_action", "drop": null, "add": null,'
+                ' "watch_target": null, "reason": ""}')
         assert parse_b2_verdict(body, date(2026, 5, 27)) is None
 
     def test_malformed_json_returns_none(self):
@@ -118,25 +137,42 @@ class TestParseB2Verdict:
 """
         assert parse_b2_verdict(body, date(2026, 5, 27)) is None
 
+    def test_truncated_json_returns_none(self):
+        # Object never closes — brace scanner must not hang or crash.
+        body = ('=== SP-v4 B2 Step B (final verdict) ===\n\n'
+                '{"action": "watch", "reason": "truncated')
+        assert parse_b2_verdict(body, date(2026, 5, 27)) is None
+
     def test_b1_pre_cutover_issue_returns_none(self):
-        # B1 issues used Phase 6 multi-agent format, not Step B
         b1_body = "[FA Scan SP-v4] drop Nola add Pfaadt — Phase 6 multi-agent"
         assert parse_b2_verdict(b1_body, date(2026, 5, 20)) is None
 
-    def test_matches_actual_emit_format_with_double_newline(self):
-        """Regression: _emit_b2_final joins parts with '\\n\\n'. Earlier
-        regex required single '\\n' after === header and silently dropped
-        every real production Issue body."""
-        body = _body_from_emit({
-            "action": "drop_X_add_Y", "drop": "Nola",
-            "add": "Pfaadt", "watch_target": None,
-            "reason": "Sum +18",
-        })
-        v = parse_b2_verdict(body, date(2026, 5, 27))
+    def test_bare_emit_format_still_supported(self):
+        """Backward compat: the raw '\\n\\n'.join() shape _emit_b2_final
+        produces BEFORE markdown wrapping (header + JSON, no fence)."""
+        step_b = {"action": "drop_X_add_Y", "drop": "Nola", "add": "Pfaadt",
+                  "watch_target": None, "reason": "Sum +18"}
+        parts = [
+            "=== SP-v4 B2 Step A ===",
+            json.dumps({"my_team_rank": [], "fa_classify": []}, indent=2),
+            "=== SP-v4 B2 Step B (final verdict) ===",
+            json.dumps(step_b, indent=2),
+        ]
+        v = parse_b2_verdict("\n\n".join(parts), date(2026, 5, 27))
         assert v is not None
         assert v.action == "drop_X_add_Y"
         assert v.drop == "Nola"
         assert v.add == "Pfaadt"
+
+    def test_braces_inside_reason_string_do_not_break_extraction(self):
+        step_b = {"action": "watch", "drop": None, "add": None,
+                  "watch_target": "X",
+                  "reason": 'tricky {braces} and "quote \\" escapes" inside'}
+        body = ("=== SP-v4 B2 Step B (final verdict) ===\n\n"
+                + json.dumps(step_b) + "\n```\n\n</details>\n")
+        v = parse_b2_verdict(body, date(2026, 5, 27))
+        assert v is not None
+        assert v.watch_target == "X"
 
 
 # ── parse_issue_date ──
@@ -229,6 +265,118 @@ class TestResolvePlayer:
         assert result.source == "unresolved"
 
 
+# ── Episode dedup ──
+
+def _verdict_on(d: date, action: str = "drop_X_add_Y",
+                drop: str | None = "Crow", add: str | None = "McDonald",
+                watch: str | None = None) -> B2Verdict:
+    if action != "drop_X_add_Y":
+        drop = add = None
+    return B2Verdict(issue_date=d, action=action, drop=drop, add=add,
+                     watch_target=watch, reason="r")
+
+
+class TestDedupeEpisodes:
+    KW = dict(key_fn=verdict_episode_key, date_fn=lambda v: v.issue_date)
+
+    def test_consecutive_days_merge_into_one_episode(self):
+        vs = [_verdict_on(date(2026, 5, 29)),
+              _verdict_on(date(2026, 5, 30)),
+              _verdict_on(date(2026, 5, 31))]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 1
+        assert eps[0].start_date == date(2026, 5, 29)
+        assert eps[0].end_date == date(2026, 5, 31)
+        assert len(eps[0].occurrences) == 3
+        assert eps[0].first is vs[0]
+
+    def test_gap_of_two_days_still_merges(self):
+        # Scan missed one day: 5/29 then 5/31 (gap 2) → same episode
+        vs = [_verdict_on(date(2026, 5, 29)), _verdict_on(date(2026, 5, 31))]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 1
+        assert eps[0].start_date == date(2026, 5, 29)
+
+    def test_gap_of_three_days_breaks_episode(self):
+        vs = [_verdict_on(date(2026, 5, 29)), _verdict_on(date(2026, 6, 1))]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 2
+        assert eps[0].start_date == date(2026, 5, 29)
+        assert eps[1].start_date == date(2026, 6, 1)
+
+    def test_different_combinations_never_merge(self):
+        vs = [_verdict_on(date(2026, 5, 29), add="McDonald"),
+              _verdict_on(date(2026, 5, 30), add="Pfaadt")]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 2
+
+    def test_same_day_duplicates_merge(self):
+        # Real case: two SP-v4 issues on 2026-05-28 (#254 + #255)
+        vs = [_verdict_on(date(2026, 5, 28)), _verdict_on(date(2026, 5, 28))]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 1
+        assert len(eps[0].occurrences) == 2
+
+    def test_unsorted_input_is_sorted_by_date(self):
+        vs = [_verdict_on(date(2026, 5, 31)), _verdict_on(date(2026, 5, 29)),
+              _verdict_on(date(2026, 5, 30))]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 1
+        assert eps[0].first.issue_date == date(2026, 5, 29)
+
+    def test_watch_and_drop_add_have_distinct_keys(self):
+        vs = [_verdict_on(date(2026, 5, 29)),
+              _verdict_on(date(2026, 5, 29), action="watch", watch="Drohan")]
+        eps = dedupe_episodes(vs, **self.KW)
+        assert len(eps) == 2
+
+    def test_generic_key_and_date_fns(self):
+        # Batter side (issue 029) will pass plain dicts — must work unchanged.
+        items = [
+            {"d": date(2026, 6, 1), "k": ("replace", "A", "B")},
+            {"d": date(2026, 6, 2), "k": ("replace", "A", "B")},
+        ]
+        eps = dedupe_episodes(items, key_fn=lambda i: i["k"],
+                              date_fn=lambda i: i["d"])
+        assert len(eps) == 1
+        assert eps[0].key == ("replace", "A", "B")
+
+
+class TestSelectDueEpisodes:
+    @staticmethod
+    def _ep(start: date) -> Episode:
+        v = _verdict_on(start)
+        return Episode(key=verdict_episode_key(v), start_date=start,
+                       end_date=start, occurrences=(v,))
+
+    def test_age_window_boundaries(self):
+        today = date(2026, 6, 28)
+        eps = [self._ep(date(2026, 6, 8)),   # age 20 → too young
+               self._ep(date(2026, 6, 7)),   # age 21 → due
+               self._ep(date(2026, 6, 1)),   # age 27 → due
+               self._ep(date(2026, 5, 31))]  # age 28 → already reconciled
+        due = select_due_episodes(eps, on_date=today)
+        # input order preserved (pipeline feeds pre-sorted episodes)
+        assert {e.start_date for e in due} == {date(2026, 6, 1), date(2026, 6, 7)}
+
+    def test_weekly_stride_covers_each_episode_exactly_once(self):
+        # Two Sunday runs 7 days apart: every episode start lands in
+        # exactly one [21, 28) window.
+        run1, run2 = date(2026, 6, 28), date(2026, 7, 5)
+        eps = [self._ep(date(2026, 6, 1) + timedelta(days=i))
+               for i in range(14)]
+        due1 = {e.start_date for e in select_due_episodes(eps, on_date=run1)}
+        due2 = {e.start_date for e in select_due_episodes(eps, on_date=run2)}
+        assert due1.isdisjoint(due2)
+        assert len(due1) == 7 and len(due2) == 7
+
+    def test_override_age_min_zero_for_demo(self):
+        today = date(2026, 6, 10)
+        eps = [self._ep(date(2026, 6, 10)), self._ep(date(2026, 5, 29))]
+        due = select_due_episodes(eps, on_date=today, age_min=0)
+        assert len(due) == 2
+
+
 # ── Hit-rate aggregation ──
 
 def _v(action: str, name: str = "X") -> B2Verdict:
@@ -289,105 +437,3 @@ class TestAggregateHitRate:
         assert stats["by_action"]["watch"]["hit_rate"] == 0.0
         assert stats["by_action"]["pass"]["hit_rate"] is None
         assert stats["by_action"]["pass"]["n_actionable"] == 0
-
-
-# ── Integration: collect_verdicts on crafted B2 fixture ──
-
-class TestCollectVerdictsIntegration:
-    """Exercises the end-to-end issue body → verdict list pipeline on hand-
-    crafted B2-format fixtures (no real B2 issues exist pre-cutover)."""
-
-    def test_collect_from_mixed_issue_list(self):
-        from backtest_track import collect_verdicts
-
-        issues = [
-            {
-                "createdAt": "2026-05-27T12:00:00Z",
-                "body": _body({
-                    "action": "drop_X_add_Y", "drop": "Nola",
-                    "add": "Pfaadt", "watch_target": None,
-                    "reason": "5-slot edge",
-                }),
-            },
-            {
-                "createdAt": "2026-05-28T12:00:00Z",
-                "body": _body({
-                    "action": "watch", "drop": None, "add": None,
-                    "watch_target": "Lambert", "reason": "trending",
-                }),
-            },
-            {
-                # B1-format — should be silently skipped
-                "createdAt": "2026-05-20T12:00:00Z",
-                "body": "[FA Scan SP-v4] B1 multi-agent verdict",
-            },
-            {
-                # Missing body — skipped without crash
-                "createdAt": "2026-05-29T12:00:00Z",
-                "body": "",
-            },
-        ]
-
-        verdicts = collect_verdicts(issues)
-        assert len(verdicts) == 2
-        assert verdicts[0].action == "drop_X_add_Y"
-        assert verdicts[0].drop == "Nola"
-        assert verdicts[1].action == "watch"
-        assert verdicts[1].watch_target == "Lambert"
-
-    def test_classify_outcome_drop_add_hit(self):
-        from backtest_track import classify_outcome
-
-        v = _v("drop_X_add_Y")
-        # post_drop xwOBACON .395 (worse), post_add .360 (better) → hit
-        outcome = classify_outcome(v, post_drop=0.395, post_add=0.360)
-        assert outcome.outcome_label == "hit"
-        assert outcome.marginal_benefit == pytest.approx(0.035)
-
-    def test_classify_outcome_drop_add_miss(self):
-        from backtest_track import classify_outcome
-
-        v = _v("drop_X_add_Y")
-        # post_drop .345 (better), post_add .400 (worse) → miss
-        outcome = classify_outcome(v, post_drop=0.345, post_add=0.400)
-        assert outcome.outcome_label == "miss"
-        assert outcome.marginal_benefit == pytest.approx(-0.055)
-
-    def test_classify_outcome_pass_neutral(self):
-        from backtest_track import classify_outcome
-
-        v = _v("pass")
-        outcome = classify_outcome(v, post_drop=None, post_add=None)
-        assert outcome.outcome_label == "neutral"
-
-    def test_classify_outcome_missing_data_neutral(self):
-        from backtest_track import classify_outcome
-
-        v = _v("drop_X_add_Y")
-        outcome = classify_outcome(v, post_drop=None, post_add=0.345)
-        assert outcome.outcome_label == "neutral"
-
-    def test_format_weekly_section_includes_essentials(self):
-        from backtest_track import format_weekly_section
-
-        stats = {
-            "window_days": 7,
-            "observation_window_days": 21,
-            "date_range": ["2026-05-27", "2026-05-29"],
-            "n_total": 2,
-            "n_actionable": 1,
-            "n_hits": 1,
-            "hit_rate": 1.0,
-            "avg_marginal_benefit": 0.035,
-            "by_action": {
-                "drop_X_add_Y": {"n": 1, "n_actionable": 1, "hit_rate": 1.0},
-                "watch": {"n": 1, "n_actionable": 0, "hit_rate": None},
-                "pass": {"n": 0, "n_actionable": 0, "hit_rate": None},
-            },
-            "verdicts": [],
-        }
-        md = format_weekly_section(stats)
-        assert "Weekly Backtest" in md
-        assert "Hit rate" in md
-        assert "drop_X_add_Y" in md
-        assert "marginal benefit" in md
