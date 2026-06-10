@@ -2903,6 +2903,27 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     return lines
 
 
+def _sort_fa_by_owned(fa_tagged: list[dict]) -> list[dict]:
+    """Order FA batter candidates by %owned descending (issue 036).
+
+    The presentation order is the LLM's attention prior, so it must not
+    encode the system's own verdict. The previous key (vs-P1 ``sum_diff``
+    desc)膨脹 the whole batch's spread whenever our P1 anchor happened to be
+    weak — biasing which candidates got read first by a number derived from
+    our own roster. %owned is an external market signal orthogonal to our
+    judgment, consistent with batter v4 thin「Sum 不暴露、hint 非 verdict」.
+
+    Tie-break: name ascending for deterministic output. Entries missing
+    ``pct`` sort last (can't position them on the market axis).
+    """
+    def key(entry):
+        pct = entry.get("pct")
+        has_pct = isinstance(pct, (int, float))
+        return (0 if has_pct else 1, -(pct if has_pct else 0), entry.get("name", ""))
+
+    return sorted(fa_tagged, key=key)
+
+
 def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                                  watch_tagged, changes, ref_1d, ref_3d, config,
                                  rostered_names=None):
@@ -2943,8 +2964,9 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     # ── FA 候選 ──
     if fa_tagged:
         lines.append(f"\n--- FA 打者候選 ({len(fa_tagged)} 人，Sum≥21 通過品質門檻) ---")
-        # Sort: prefer larger Sum diff (still useful as ordering hint, not a verdict)
-        fa_sorted = sorted(fa_tagged, key=lambda x: -x.get("sum_diff", 0))
+        # Order by %owned desc (external market signal), NOT vs-P1 sum_diff —
+        # debias attention order when our own P1 anchor is weak (issue 036).
+        fa_sorted = _sort_fa_by_owned(fa_tagged)
         for idx, f in enumerate(fa_sorted, start=1):
             owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
                 if today_str else None
