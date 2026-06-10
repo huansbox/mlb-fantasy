@@ -1,5 +1,7 @@
 # 027 — SP backtest 修復端到端
 
+> **狀態：✅ 完工 merge 2026-06-10（merge `4daefa7`）**。Demo 判準已達成 — `docs/sp-decisions-backtest.md` 2026-06-10 OVERRIDE DEMO 段（n_total 12、hit_rate 100%、Δ +0.0912）。曆法：首個非空 regular 週日段預期 2026-06-21。
+
 ## Parent PRD
 
 `issues/prd-fa-scan-batter-quality.md`（§Implementation Decisions「對帳引擎」）
@@ -12,13 +14,13 @@ Demo 判準：本機對真實 issue archive 跑一次，產出第一份 n_total 
 
 ## Acceptance criteria
 
-- [ ] verdict 解析對真實 production issue body（含 code fence + `</details>` 包裹）成功抽出 Step B verdict
-- [ ] 解析測試 fixture 一律取自 `gh issue view --json body` 的真實存檔（如 #305），**禁止手寫模板樣本**（PRD Testing Decisions 鐵律）
-- [ ] outcome 取數不再是 stub：drop / add / watch 對象的 post-verdict 21 天 xwOBACON 由 Savant rolling 實際取得
-- [ ] 取帳改為帳齡 21-28 天窗口：觀察窗未走完的 verdict 不對帳；跨週重跑同一筆 verdict 不重複對帳
-- [ ] episode 去重為共用純函式（落在共用對帳函式庫），batter 端可直接 import
-- [ ] 對真實 issue archive 跑出第一份 n_total > 0 的 SP 週報 section，append 到既有 SP 對帳 doc
-- [ ] 純函式層（解析 / 帳齡選擇 / 去重 / outcome 分類）有單元測試；外部邊界（gh / Savant fetch）注入式
+- [x] verdict 解析對真實 production issue body（含 code fence + `</details>` 包裹）成功抽出 Step B verdict（header 定位 + 平衡大括號掃描）
+- [x] 解析測試 fixture 一律取自 `gh issue view --json body` 的真實存檔（#254/259/276/280/305），**禁止手寫模板樣本**（PRD Testing Decisions 鐵律）
+- [x] outcome 取數不再是 stub：drop / add / watch 對象的 post-verdict 21 天 xwOBACON 由 Savant rolling 實際取得（+ MLB API id fallback）
+- [x] 取帳改為帳齡 21-28 天窗口：觀察窗未走完的 verdict 不對帳；跨週重跑同一筆 verdict 不重複對帳
+- [x] episode 去重為共用純函式（`_backtest_lib.dedupe_episodes`，key_fn/date_fn 注入），batter 端（029）已直接 import
+- [x] 對真實 issue archive 跑出第一份 n_total > 0 的 SP 週報 section，append 到既有 SP 對帳 doc（2026-06-10 OVERRIDE DEMO 段）
+- [x] 純函式層（解析 / 帳齡選擇 / 去重 / outcome 分類）有單元測試；外部邊界（gh / Savant fetch）注入式
 
 ## Blocked by
 

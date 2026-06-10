@@ -19,7 +19,7 @@ HITL 點：屬「往 prompt 加判斷規則」類變更 — lever 2 backfire 的
 
 ## Blocked by
 
-- Blocked by `issues/028-waiver-log-grammar-extension.md`（同一份 prompt，分批上線）
+- Blocked by `issues/028-waiver-log-grammar-extension.md`（✅ 2026-06-10 已部署 — 技術上已解鎖，但「分批上線」軟約束仍在：與 028 的 prompt 變更隔開觀察窗，A/B 歸因才乾淨）
 
 ## User stories addressed
 

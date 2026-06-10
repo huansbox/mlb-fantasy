@@ -17,7 +17,7 @@
 
 ## Blocked by
 
-- Blocked by `issues/029-batter-backtest-skeleton.md`（可與 `issues/030` 平行）
+- Blocked by `issues/029-batter-backtest-skeleton.md`（✅ 2026-06-10 完工 — 本片已解鎖，可與 `issues/030` 平行）
 
 ## User stories addressed
 
