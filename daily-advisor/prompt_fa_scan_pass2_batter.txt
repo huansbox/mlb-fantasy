@@ -11,6 +11,7 @@
 - **結構性訊號**：season xwOBA / BB% / Barrel% / HH% percentile = long-term skill 等級
 - **當週訊號**：14d OPS / K% spike / HR/RBI/R/SB 產量 = 一週決策的 first-order signal
 - **聯盟動態**：%owned shape（explosive ≥+10pp 3d / rising +3-10pp / plateau / dropping ≤-3pp）= 別隊在搶或在丟
+- **%owned 是 Yahoo 全平台持有率，非本聯盟 12 隊**：高 %owned（如 57%）的球員仍可能是本聯盟 FA，不要由此反推「不可能是 FA」；`?%` = 持有率未知（非 0%）
 - **雙年對照**：2026 + 2025 prior 同看，區分 breakout（單年高）vs 結構性確認（雙年低）vs slump 候選（當年低 / 前年高）
 - **樣本量**：BBE <40 = 低信心已排除，但 14d 50 PA 仍有噪音；K% 短期跳 +5pp 以上常是傷勢警訊
 - **守位不影響評價** — 只看打擊數據；陣容守位衝突由用戶手動處理
