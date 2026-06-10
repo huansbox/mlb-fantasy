@@ -15,13 +15,19 @@ window = episode first day → last day + grace), and appends a weekly
 section (with executed / not-executed split hit-rates) to
 `docs/batter-decisions-backtest.md`.
 
-SKELETON SEMANTICS (tracer bullet): every episode outcome is labelled
-`pending-judge` — hit/miss classification is the judge panel's job
-(issue 030: 2 judges, forced A/B choice + 明顯/勉強 annotation, consensus
-table). The mechanical scorecard recorded here is the judges' audit
-baseline, NOT a verdict (PRD C1 #5: category wins are binary and
-magnitude-blind). Early runs legitimately output "0 筆可對帳" — the first
-age-eligible account is expected 2026-07-01 (028 deployed 2026-06-10 + 21d).
+JUDGE PANEL (issue 030): due accounts are packed into ONE payload and sent
+to two LLM judges (same instruction, independent claude -p calls from a
+neutral cwd — 2 calls/week, never per-account). Each judge makes a forced
+A/B choice + 明顯/勉強 margin per account; the consensus table (same pick +
+≥1 明顯 → adopted, otherwise 難分) plus the mechanical mirror mapping
+(watch accounts: adopted A → miss / else hit) upgrades outcomes to
+hit / miss / 難分. The mechanical scorecard stays recorded as the judges'
+audit baseline, NOT a verdict (PRD C1 #5: category wins are binary and
+magnitude-blind). Accounts whose scorecard is missing become `no-data`;
+panel failure (contract violation after retry) fails open — outcomes stay
+`pending-judge` and the weekly section carries a warning. Early runs
+legitimately output "0 筆可對帳" — the first age-eligible account is
+expected 2026-07-01 (028 deployed 2026-06-10 + 21d).
 
 Pure-function primitives live in `_backtest_lib.py` (shared with the SP
 backtest). Hit definitions intentionally differ from SP's — hence the
@@ -30,6 +36,7 @@ separate output doc.
 Usage:
     python3 backtest_batter.py                          # weekly summary to stdout
     python3 backtest_batter.py --update-doc             # append to batter doc
+    python3 backtest_batter.py --no-judge               # skip the 2 claude calls
     python3 backtest_batter.py --age-min 0 --update-doc # demo/backfill override
 """
 
@@ -50,17 +57,22 @@ from _backtest_lib import (
     Episode,
     RosterSnapshot,
     batter_episode_key,
+    build_judge_payload,
     build_roster_name_index,
     compare_batter_categories,
     dedupe_episodes,
+    judge_consensus,
     judge_executed,
+    map_judge_outcome,
     parse_batter_verdicts,
     parse_bydaterange_hitting,
     parse_issue_date,
+    parse_judge_response,
     parse_roster_snapshot,
     resolve_id_with_fallback,
     select_due_episodes,
 )
+from _multi_agent import run_single_agent
 from backtest_track import fetch_recent_issues, search_mlb_id
 
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -74,6 +86,12 @@ _OBSERVATION_DAYS = 21
 _DEFAULT_AGE_MIN = _OBSERVATION_DAYS
 _DEFAULT_AGE_MAX = _OBSERVATION_DAYS + 7
 _FETCH_LOOKBACK_SLACK = 14
+
+# Judge panel (issue 030). Both judges share ONE instruction file — the
+# "split picks = real 難分" inference only holds when the judges differ in
+# nothing but sampling. 1 retry per judge mirrors the SP Step A precedent.
+_JUDGE_PROMPT_PATH = _MODULE_DIR / "prompt_batter_judge.txt"
+_JUDGE_RETRIES = 1
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +173,92 @@ def fetch_roster_timeline(since: date, repo_root: Path | None = None,
         logger.warning("roster timeline fetch failed (%s) — "
                        "executed annotation degrades to unknown", e)
         return []
+
+
+# ── Judge panel (issue 030 boundary) ──
+
+def _claude_judge_runner(prompt: str, agent_id: str) -> dict | None:
+    """One judge call: `claude -p` from a neutral cwd (lever 1a pattern,
+    via _multi_agent.run_single_agent) → parsed JSON or None."""
+    result = run_single_agent(prompt, agent_id)
+    if result.error:
+        logger.warning("judge call %s error: %s", agent_id, result.error)
+    return result.parsed
+
+
+def run_judge_panel(rows: list[dict], *, _run_judge=None,
+                    window_days: int = _OBSERVATION_DAYS) -> dict:
+    """Upgrade pending-judge rows to consensus verdicts, in place.
+
+    The whole week's judgeable accounts go into ONE payload; each of the
+    two judges gets it in one call (2 calls/week regardless of account
+    count, +1 retry each on contract violation). Rows without a scorecard
+    are marked `no-data` (never judgeable). On persistent judge failure
+    the panel fails open: rows keep `pending-judge`, the section renders a
+    warning, and — because the [21, 28) age window moves on — those
+    accounts need a manual --age-min/--age-max re-run to get judged.
+    """
+    run_judge = _run_judge or _claude_judge_runner
+    payload, indices = build_judge_payload(rows, window_days=window_days)
+    judgeable = set(indices)
+    for i, row in enumerate(rows):
+        if i not in judgeable and row.get("outcome") == "pending-judge":
+            row["outcome"] = "no-data"
+    if not indices:
+        return {"status": "no-accounts", "n_calls": 0, "n_accounts": 0}
+
+    prompt = (_JUDGE_PROMPT_PATH.read_text(encoding="utf-8")
+              + "\n\n---\n\n" + payload)
+    expected = list(range(1, len(indices) + 1))
+    judge_maps: list[dict] = []
+    n_calls = 0
+    for judge_id in ("judge_1", "judge_2"):
+        judge_map = None
+        for attempt in range(1 + _JUDGE_RETRIES):
+            n_calls += 1
+            parsed = run_judge(prompt, f"{judge_id}_try{attempt + 1}")
+            judge_map = parse_judge_response(parsed, expected_ids=expected)
+            if judge_map is not None:
+                break
+            logger.warning("judge panel: %s attempt %d violated the output "
+                           "contract", judge_id, attempt + 1)
+        if judge_map is None:
+            logger.warning("judge panel: %s failed after retry — outcomes "
+                           "stay pending-judge", judge_id)
+            return {"status": "failed", "failed_judge": judge_id,
+                    "n_calls": n_calls}
+        judge_maps.append(judge_map)
+
+    j1, j2 = judge_maps
+    for account_id, row_i in zip(expected, indices):
+        row = rows[row_i]
+        consensus = judge_consensus(j1[account_id], j2[account_id])
+        row["judge"] = {"j1": j1[account_id], "j2": j2[account_id],
+                        **consensus}
+        row["outcome"] = map_judge_outcome(row["kind"], consensus)
+    return {"status": "ok", "n_calls": n_calls, "n_accounts": len(indices)}
+
+
+def aggregate_outcome_by_kind(rows: list[dict]) -> dict:
+    """Hit-rate per account kind — the PRD's paired diagnosis (C1 #8):
+    replace rate measures 太衝動, watch rate (mirror) measures 太保守.
+
+    Denominator = hit + miss. For watch accounts 難分 maps to hit upstream
+    (the verdict confirms the claim), so n_nanfen > 0 only on replace.
+    """
+    out: dict[str, dict] = {}
+    for kind in ("replace", "watch"):
+        bucket = [r for r in rows if r.get("kind") == kind]
+        judged = [r for r in bucket if r.get("outcome") in ("hit", "miss")]
+        hits = [r for r in judged if r["outcome"] == "hit"]
+        out[kind] = {
+            "n": len(bucket),
+            "n_judged": len(judged),
+            "n_hits": len(hits),
+            "n_nanfen": sum(1 for r in bucket if r.get("outcome") == "難分"),
+            "hit_rate": (len(hits) / len(judged)) if judged else None,
+        }
+    return out
 
 
 # ── Aggregate pipeline ──
@@ -256,15 +360,19 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
                        _fetch_stats=None,
                        _search_mlb_id=None,
                        _roster_index=None,
-                       _roster_timeline=None) -> dict:
+                       _roster_timeline=None,
+                       _judge_runner=None) -> dict:
     """Full pipeline: fetch issues → parse batter verdicts → dedupe episodes
     → select due episodes (age in [age_min, age_max)) → six-category
-    scorecards → stats dict.
+    scorecards → judge panel → stats dict.
 
     `days` overrides the issue-fetch lookback only (default age_max + slack);
     it does NOT select which episodes get reconciled. Underscore-prefixed
     params are injectable system boundaries for tests (_roster_index included
     — the real roster_config contains the very players test verdicts name).
+    `_judge_runner=None` skips the panel entirely (outcomes stay
+    pending-judge) — the CLI opts in with the real claude -p runner, so
+    library callers and tests never subprocess claude by default.
     """
     today = today or date.today()
     fetch_issues = _fetch_issues or fetch_recent_issues
@@ -300,6 +408,12 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
         due, roster_index, roster_timeline,
         fetch_stats=fetch_stats, search_fn=search_fn)
 
+    if _judge_runner is not None:
+        judge_panel = run_judge_panel(rows, _run_judge=_judge_runner,
+                                      window_days=_OBSERVATION_DAYS)
+    else:
+        judge_panel = {"status": "skipped", "n_calls": 0}
+
     return {
         "run_date": today.isoformat(),
         "age_window": [age_min, age_max],
@@ -313,6 +427,8 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
         "n_episodes_in_lookback": len(episodes),
         "execution_grace_days": EXECUTION_GRACE_DAYS,
         "executed_split": aggregate_executed_split(rows),
+        "judge_panel": judge_panel,
+        "outcome_by_kind": aggregate_outcome_by_kind(rows),
         "date_range": _date_range(due),
         "episodes": rows,
     }
@@ -330,8 +446,9 @@ def _date_range(episodes: list[Episode]) -> list[str] | None:
 def format_batter_weekly_section(stats: dict) -> str:
     """Render the weekly batter summary as appendable markdown.
 
-    Mirrors the SP weekly section style; outcomes stay pending-judge until
-    issue 030 wires the judge panel.
+    Mirrors the SP weekly section style. Outcomes are consensus verdicts
+    (issue 030); pending-judge appears only when the panel was skipped
+    (--no-judge) or failed its output contract.
     """
     range_str = (" ~ ".join(stats["date_range"]) if stats["date_range"]
                  else "no due episodes")
@@ -355,8 +472,7 @@ def format_batter_weekly_section(stats: dict) -> str:
         f"- Episodes due this run: {stats['n_total']} "
         f"(replace {stats['n_replace']} / watch {stats['n_watch']}; "
         f"episodes in lookback: {stats['n_episodes_in_lookback']}){zero_marker}",
-        "- Outcome: all **pending-judge** — 裁判合議（issue 030）上線後升級為 "
-        "hit/miss；機械類別比數僅為稽核底稿，不參與判定",
+        *_fmt_judge_lines(stats),
         _fmt_executed_split_line(stats),
     ]
     rows = stats.get("episodes") or []
@@ -376,11 +492,60 @@ def format_batter_weekly_section(stats: dict) -> str:
             missing = f"（{'; '.join(ep['missing'])}）" if ep["missing"] else ""
             lines.append(
                 f"- {ep['start_date']} ({ep['n_occurrences']}d) {target} "
-                f"→ 機械比數 {card_str} → **{ep['outcome']}** "
+                f"→ 機械比數 {card_str} → {_fmt_judge_marker(ep.get('judge'))}"
+                f"**{ep['outcome']}** "
                 f"{_fmt_execution_marker(ep.get('execution'))}{missing}"
             )
     lines.append("")
     return "\n".join(lines) + "\n"
+
+
+def _fmt_judge_lines(stats: dict) -> list[str]:
+    panel = stats.get("judge_panel") or {"status": "skipped", "n_calls": 0}
+    status = panel.get("status")
+    if status == "ok":
+        agg = stats.get("outcome_by_kind") or aggregate_outcome_by_kind(
+            stats.get("episodes") or [])
+
+        def rate(group: dict) -> str:
+            if group["hit_rate"] is None:
+                return "—"
+            return (f"{group['hit_rate']:.0%}"
+                    f"（{group['n_hits']}/{group['n_judged']}）")
+
+        r, w = agg["replace"], agg["watch"]
+        return [
+            f"- Judge panel（issue 030）: 2 位裁判同指示合議，"
+            f"{panel['n_calls']} calls（強制二選一＋明顯/勉強；"
+            f"同人+至少一明顯=採用，餘=難分）；機械類別比數僅為稽核底稿，不參與判定",
+            f"- 命中率 — replace（量太衝動）: {rate(r)}，難分 {r['n_nanfen']} "
+            f"/ watch（鏡像，量太保守；難分=看對計 hit）: {rate(w)}",
+        ]
+    if status == "failed":
+        return [
+            f"- ⚠️ Judge panel FAILED（{panel['n_calls']} calls，"
+            f"輸出契約連續違反，failed_judge={panel.get('failed_judge')}）— "
+            f"outcomes 留 **pending-judge**；本批帳下週會老化出 [21, 28) 窗，"
+            f"需手動 `--age-min/--age-max` 重跑補判",
+        ]
+    if status == "no-accounts":
+        return [
+            "- Judge panel（issue 030）: 0 筆可判（無完整 scorecard 的帳）— 0 calls",
+        ]
+    return [
+        "- Outcome: all **pending-judge** — judge panel skipped"
+        "（--no-judge / library 呼叫未注入 runner）；機械類別比數僅為稽核底稿",
+    ]
+
+
+def _fmt_judge_marker(judge: dict | None) -> str:
+    if not judge:
+        return ""
+    j1, j2 = judge["j1"], judge["j2"]
+    consensus = (f"adopted {judge['winner']}"
+                 if judge["consensus"] == "adopted" else "難分")
+    return (f"裁判 J1 {j1['better']}·{j1['margin']} / "
+            f"J2 {j2['better']}·{j2['margin']} ⇒ {consensus} → ")
 
 
 def _fmt_executed_split_line(stats: dict) -> str:
@@ -451,12 +616,17 @@ def main(argv: list[str] | None = None) -> int:
                         help="Append summary to docs/batter-decisions-backtest.md")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print summary to stdout (default behaviour)")
+    parser.add_argument("--no-judge", action="store_true",
+                        help="Skip the judge panel (no claude -p calls); "
+                             "outcomes stay pending-judge")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     stats = run_weekly_summary(age_min=args.age_min, age_max=args.age_max,
-                               days=args.days, repo=args.repo, label=args.label)
+                               days=args.days, repo=args.repo, label=args.label,
+                               _judge_runner=(None if args.no_judge
+                                              else _claude_judge_runner))
     section_md = format_batter_weekly_section(stats)
 
     if args.update_doc and not args.dry_run:
