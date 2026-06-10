@@ -118,6 +118,10 @@ def _aggregate_pitches(rows, player_type="batter"):
     sum_xwoba_on_bbe = 0.0
     hh_count = 0
     barrel_count = 0
+    # Actual wOBA from Savant's per-event woba_value / woba_denom columns —
+    # gives the rolling wOBA−xwOBA luck gap (issue 035).
+    woba_num = 0.0
+    woba_den = 0
     # Pitcher-only: track IP from game_date + outs
     outs = 0
 
@@ -130,6 +134,11 @@ def _aggregate_pitches(rows, player_type="batter"):
         event = (row.get("events") or "").strip()
         if not event:
             continue  # Mid-PA pitch, skip
+
+        wd = _safe_float(row.get("woba_denom"))
+        if wd:
+            woba_den += int(wd)
+            woba_num += _safe_float(row.get("woba_value")) or 0.0
 
         if event in BB_EVENTS:
             bb_count += 1
@@ -160,6 +169,8 @@ def _aggregate_pitches(rows, player_type="batter"):
 
     result = {
         "xwoba": round(xwoba, 3),
+        # None when the CSV lacks woba_value/woba_denom columns (old data)
+        "woba": round(woba_num / woba_den, 3) if woba_den else None,
         "xwobacon": round(sum_xwoba_on_bbe / bbe_count, 3),
         "barrel_pct": round(barrel_count / bbe_count * 100, 1),
         "hh_pct": round(hh_count / bbe_count * 100, 1),

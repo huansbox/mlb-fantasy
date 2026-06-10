@@ -8,6 +8,7 @@ from fa_compute import (
     compute_sum_score,
     compute_sum_score_v4_sp,
     compute_urgency,
+    compute_woba_gap,
     format_sp_breakdown_human,
     metric_to_score,
     pa_tg_gap_warn,
@@ -369,6 +370,50 @@ class TestFaTagsBatter:
         assert "⚠️ 樣本小" not in result["warn_tags"]
         assert "⚠️ Breakout 待驗" not in result["warn_tags"]
         assert "⚠️ 近況下滑" not in result["warn_tags"]
+
+
+class TestComputeWobaGap:
+    """Issue 035 — batter luck field (wOBA−xwOBA gap).
+
+    Counterpart of the SP xERA−ERA luck tag. Significance threshold 0.023 =
+    2025 |gap| P70 (bip ≥ 50, n=486, calc_woba_gap_pctiles.py). BBE floor
+    suppresses luck judgment mid-collapse on tiny samples (SP BBE≥40 gate
+    precedent).
+    """
+
+    def test_positive_significant_gap(self):
+        # actual outperforms expected → lucky / sell-high side
+        res = compute_woba_gap(0.350, 0.320, bbe=60)
+        assert res == {"gap": 0.030, "significant": True}
+
+    def test_negative_significant_gap(self):
+        # actual underperforms expected → buy-low side
+        res = compute_woba_gap(0.290, 0.330, bbe=60)
+        assert res == {"gap": -0.040, "significant": True}
+
+    def test_small_gap_not_significant(self):
+        res = compute_woba_gap(0.330, 0.320, bbe=60)
+        assert res == {"gap": 0.010, "significant": False}
+
+    def test_exact_threshold_is_significant(self):
+        res = compute_woba_gap(0.343, 0.320, bbe=60)
+        assert res["gap"] == 0.023
+        assert res["significant"] is True
+
+    def test_bbe_below_floor_returns_none(self):
+        assert compute_woba_gap(0.350, 0.320, bbe=39) is None
+
+    def test_bbe_at_floor_computes(self):
+        assert compute_woba_gap(0.350, 0.320, bbe=40) is not None
+
+    def test_missing_either_side_returns_none(self):
+        assert compute_woba_gap(None, 0.320, bbe=60) is None
+        assert compute_woba_gap(0.350, None, bbe=60) is None
+
+    def test_custom_floor(self):
+        # 14d caller uses the rolling line floor (15)
+        assert compute_woba_gap(0.350, 0.320, bbe=16, bbe_floor=15) is not None
+        assert compute_woba_gap(0.350, 0.320, bbe=14, bbe_floor=15) is None
 
 
 class TestPaTgGapWarn:

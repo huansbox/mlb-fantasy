@@ -2804,6 +2804,9 @@ def _fmt_14d_savant_line(rolling_savant: dict, season_xwoba,
 
     Returns None when there is no rolling xwOBA at all (line omitted).
     BBE < _SAVANT_14D_BBE_FLOOR → 樣本不足 marker, no xwOBA/Δ printed.
+    When the rolling data carries actual woba (issue 035), the line also
+    shows the 14d 運氣 gap — value only, no 顯著 marker (the season-derived
+    threshold is not comparable on 14d noise).
     """
     rolling = rolling_savant or {}
     rolling_xwoba = rolling.get("xwoba")
@@ -2814,7 +2817,26 @@ def _fmt_14d_savant_line(rolling_savant: dict, season_xwoba,
         return (f"{indent}14d Savant: 樣本不足 (BBE {bbe} "
                 f"<{_SAVANT_14D_BBE_FLOOR}，xwOBA/Δ 不顯示)")
     delta_str = _fmt_xwoba_delta_batter(rolling_xwoba, season_xwoba)
-    return f"{indent}14d Savant: xwOBA {rolling_xwoba:.3f}{delta_str} / BBE {bbe}"
+    luck = fa_compute.compute_woba_gap(
+        rolling.get("woba"), rolling_xwoba, bbe,
+        bbe_floor=_SAVANT_14D_BBE_FLOOR)
+    luck_part = f" / 運氣 {luck['gap']:+.3f}" if luck else ""
+    return (f"{indent}14d Savant: xwOBA {rolling_xwoba:.3f}{delta_str}"
+            f"{luck_part} / BBE {bbe}")
+
+
+def _fmt_season_luck_part(sv: dict) -> str | None:
+    """Season 運氣 part for the Season 2026 line (issue 035).
+
+    wOBA−xwOBA gap with 顯著 marker at |gap| ≥ 0.023 (2025 |gap| P70);
+    suppressed when woba missing or BBE <40 (fa_compute.compute_woba_gap).
+    """
+    res = fa_compute.compute_woba_gap(
+        sv.get("woba"), sv.get("xwoba"), int(sv.get("bbe", 0) or 0))
+    if res is None:
+        return None
+    sig = "(顯著)" if res["significant"] else ""
+    return f"運氣 {res['gap']:+.3f}{sig}"
 
 
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
@@ -2846,6 +2868,9 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
     ]
     if sv.get("k_pct") is not None:
         season_parts.append(f"K% {sv.get('k_pct')}")
+    luck_part = _fmt_season_luck_part(sv)
+    if luck_part:
+        season_parts.append(luck_part)
     lines.append(f"  Season 2026: {' / '.join(season_parts)}")
 
     # 14d block — combine Savant rolling + trad gameLog
@@ -2934,6 +2959,9 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     ]
     if sv.get("k_pct") is not None:
         season_parts.append(f"K% {sv.get('k_pct')}")
+    luck_part = _fmt_season_luck_part(sv)
+    if luck_part:
+        season_parts.append(luck_part)
     lines.append(f"   Season 2026: {' / '.join(season_parts)}")
 
     trad = (trad_14d or {}).get(str(entry.get("mlb_id", "")))
@@ -2987,6 +3015,12 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     lines.append(
         "> 視窗註記：「14d」trad = 最近 14 場（場次窗，約 15-17 日曆天）；"
         "「14d Savant」= 最近 14 個日曆天（日曆窗）。兩者樣本基底不同。"
+    )
+    # Issue 035: luck field data dictionary — direction + significance basis.
+    lines.append(
+        "> 運氣欄：wOBA−xwOBA（正 = 實際優於預期 = 運氣偏多/賣高側；"
+        "負 = 實際劣於預期 = buy-low 側）。「顯著」= |gap| ≥ 0.023"
+        "（2025 |gap| P70）；season 需 BBE ≥40，14d 只列值不標顯著。"
     )
 
     weakest_pool = urgency_result.get("weakest_ranked", [])
