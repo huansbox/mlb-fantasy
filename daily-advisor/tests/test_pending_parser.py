@@ -175,10 +175,11 @@ class TestMultipleDates:
 
 class TestFixtureRegression:
     def test_real_pending_file_parses_5_26_evaluations(self):
-        # 讀真實 stream-sp-pending.md，驗 ET 2026-05-26 4 位 SP 被正確抽出
-        fixture = Path(__file__).resolve().parents[1] / "stream-sp-pending.md"
-        if not fixture.exists():
-            return  # fixture 缺檔不算 fail（純 sanity check）
+        # 真實 production 檔凍結版（git f1de52f 的 stream-sp-pending.md）。
+        # 原本直接讀活檔，但 /stream-sp 過期清理會刪掉舊 ET section →
+        # 測試隨時間漂移 fail（2026-06-10 修正：凍結進 fixtures/）。
+        fixture = (Path(__file__).resolve().parent / "fixtures"
+                   / "stream_sp_pending_2026-05-26.md")
         out = parse_pending(fixture.read_text(encoding="utf-8"))
         # ET 5/26 應該有 Canning / Alexander / Burke / Freeland 4 位
         d = out.get("2026-05-26", {})
