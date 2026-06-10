@@ -71,12 +71,29 @@
 
 ## C. 品質測量回路（最高槓桿）
 
-### C1. batter 決策沒有 backtest — 所有優化都在盲調
+### C1. 決策 backtest 回路 — SP 是不會動的空殼，batter 連殼都沒有
 
-- SP 有 `cron_backtest.sh` 週級 hit-rate + marginal benefit（`docs/sp-decisions-backtest.md`）；batter 的「立即取代/取代/觀察」**沒有任何事後驗證**。
+- **前提修正（2026-06-10 grill-me 驗證）**：原以為「SP 有 backtest、batter 沒有」。實測發現 SP 那套有兩層斷裂，**production 一筆帳都沒對過**：
+  1. **Parse 層從未成功**：`_STEP_B_BLOCK_RE`（_backtest_lib.py:57-60）要求 Step B JSON 後接 `===` 或字串結尾，但實際 issue 把 JSON 包在 ` ``` ` code fence + `</details>` 內 → 拿 #305 真實 body 實測 `regex match: False`。5/31、6/7 兩班 cron 都輸出「no verdicts」（當週每天都有 verdict）。教訓：**解析測試必須用真實 issue body 當 fixture，不能用手寫假樣本**（SP 的單元測試全綠，因為假樣本格式跟真的不一樣）。
+  2. **Outcome 層是 stub**：`fetch_post_verdict_xwobacon`（backtest_track.py:89-102）寫死 `return None`（TODO 未補），即使 parse 修好也全判 neutral。
 - 沒有 hit-rate 就無法回答「A2 補 PA 後 breakout 誤判率有沒有降」「B3 改排序有沒有差」「model 降級 Sonnet 品質掉多少」（Phase 2 的量尺也是它）。
-- 資料都在：fa-scan issue archive 每天存建議 + 完整 raw payload；`backtest_track.py` 模式可複用。
+- 資料都在：fa-scan issue archive 每天存建議 + 完整 raw payload（含 waiver-log 結構化區塊）。
 - **建議排在所有訊號優化之前 — 先有尺，再調刀。**
+
+### C1 設計定稿（2026-06-10 grill-me 對齊，10 題走完）
+
+| # | 決策點 | 定案 |
+|---|---|---|
+| 1 | 範圍 | **一次做完整套**：修 SP 兩破洞（parse regex + outcome join）+ batter 接同一套引擎。分開做 = 同樣兩塊零件寫兩遍 |
+| 2 | 對帳對象 | 只對「取代/立即取代」+「觀察」。不對 P1-P7 排序（噪音）、結案（價值低）、pass（無比較對象） |
+| 3 | Verdict 來源 | **沿用 waiver-log 結構化區塊**（issue raw 段已存兩個月、格式穩定），prompt 補一個「vs 對象」欄位（取代行 + 觀察行都記建議丟誰），搭 B1 CLOSE 同班車改。不寫自由文字解析器（SP 死法）。解析測試用真實 issue fixture |
+| 4 | 撿人 hit 定義 | **實際產出比較**（非 xwOBA 品質比較）：建議日後 21 天，六類別 R/HR/RBI/BB/AVG/OPS（**無 SB**，軟 punt）。**不給裁判 PA** — 上場量已自然反映在累積項，附 PA 反而誘導腦補折算 |
+| 5 | 六項合成判定 | 不用機械多數決（類別輸贏二元、幅度感知不到 — RBI 20 vs 5 跟 HR 3 vs 4 不該等值）。**2 agent 裁判合議** |
+| 6 | 裁判格式 | **強制二選一（A/B 誰較好）+「明顯/勉強」標註**。合議表：同人+至少一位明顯 → 採用；同人+雙勉強 → 難分；分歧 → 難分。設計理由：同模型同指示的兩位裁判高度相關，純靠「分歧」偵測難分幾乎不會觸發；直接給「難分」選項又會被當逃避出口。強制選擇逼比較做完、標註直接回報幅度、分歧仍是難分證據 |
+| 7 | 裁判運作 | 整週帳打包成 1 call/裁判 → **每週固定 2 calls**。兩位裁判**同一份指示**（分歧=真難分的推論前提）。機械類別比數照記不參與判定，當稽核底稿（裁判常與比數唱反調 → 回頭查裁判 prompt） |
+| 8 | 觀察 hit 定義 | **同一裁判機器、方向鏡像**：觀察 = 宣稱「Y 還沒明顯好過 X」。21 天後 Y 明顯較好 → 看走眼（太保守）；難分或 X 較好 → 看對。撿人命中率量「太衝動」、觀察命中率量「太保守」，雙向並看才能診斷判斷層偏激進或偏怯懦 |
+| 9 | 未執行的建議 | **全部對帳，不管是否執行**（量系統判斷力，非用戶服從度；兩人數據照抓）。**v1 納入「是否實際執行」標註**（從 roster 異動機械判斷）→ 累積後可比 executed vs not 命中率 = 量人工否決是加值還是誤殺 |
+| 10 | Cadence / 輸出 | 共用既有週日 cron 班次（擴充成 SP + batter 一次跑）。每週只對「帳齡 21-28 天」的建議 → 每筆恰對一次。batter 獨立 `docs/batter-decisions-backtest.md`（兩邊 hit 定義不同，混一份表格式打架）；週一 /weekly-review 兩份一起看 |
 
 ## D. 入口 recall（已有規劃覆蓋，不急）
 
@@ -107,9 +124,9 @@
 
 → 兩篇若各自落地會互相孤兒化，PRD 階段應合併為單一改善計畫。
 
-## 尚待決定（grill-me / PRD 前的開放決策）
+## 尚待決定（PRD 前的開放決策）
 
-1. **PRD 範圍**：與 payload doc 的 ②③④⑤ 合併成單一「fa_scan batter 改善計畫」，或品質項獨立成篇？（推薦：合併）
-2. **C1 hit 定義**：batter verdict 的對錯怎麼判 — 取代建議 → N 天後新人 vs 被 drop 者實際產出差？觀察 → 觸發達成率？時間窗多長？這是 PRD 中唯一需要真正設計的新東西。
-3. **A3 輕重版**：先 PA-TG 落差 tag（一行 code）還是直上 vs L/R splits（新資料源）？（推薦：先輕後重）
-4. **B5 是否直接 out of scope**：（推薦：out of scope，留待 C1 基線後另案）
+1. **PRD 範圍**：與 payload doc 的 ②③④⑤ 合併成單一「fa_scan batter 改善計畫」，或品質項獨立成篇？（推薦：合併 — PRD 按此寫，除非用戶反對）
+2. ~~**C1 hit 定義**~~ ✅ 2026-06-10 grill-me 對齊定稿，見上方「C1 設計定稿」10 題總表。
+3. **A3 輕重版**：先 PA-TG 落差 tag（一行 code）還是直上 vs L/R splits（新資料源）？（推薦：先輕後重 — PRD 按此寫）
+4. **B5 是否直接 out of scope**：（推薦：out of scope，留待 C1 基線後另案 — PRD 按此寫）
