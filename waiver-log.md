@@ -89,30 +89,6 @@
 - 06-09：IL10 + DTD；Swanson 離隊後錨點 vs Arraez — 若 Pederson 先取代 Arraez 則需重新錨定；P95/P95 底穩（fa_scan）
 - 06-10：IL10 + DTD；Swanson 離隊後錨點 vs Arraez — 若 Pederson 先取代 Arraez 則需重新錨定；P95/P95 底穩；觸發改為：IL 回歸 + 先發確認 → 立即取代（錨點待定）（fa_scan）
 
-### Matt McLain (CIN, 2B) [mlb_id:680574] — 觀察中
-觸發：立即行動
-- 05-19：xwOBA P70 / BB% P95 / 14d OPS .928 / PA-TG 4.06 全職；全方位碾壓 Albies，50% owned 搶人窗口（fa_scan）
-- 05-20：14d OPS .839 / 3HR / 11RBI / 2SB / Savant Δ+0.052 全面升；50% rising +3；vs Albies 全指標碾壓 — 立即取代 Albies（fa_scan）
-- 05-21：⚠️ 已推薦 3 天未執行；14d OPS .824 / 3HR / 11RBI / 2SB / Savant Δ+0.020 品質上升 + 51% rising +3 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-22：⚠️ 已推薦 4 天未執行；14d OPS .824 / 3HR / 11RBI / 2SB / Savant Δ+0.009 品質上升；50% owned 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-23：⚠️ 已推薦 5 天未執行；14d OPS .824 / 3HR / 11RBI / 2SB / Savant Δ+0.019 品質上升；49% owned 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-24：⚠️ 已推薦 6 天未執行；14d OPS .665 / 2HR / 10RBI / 2SB / Savant Δ+0.024 品質上升；48% dropping 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-25：⚠️ 已推薦 7 天未執行；14d OPS .665 trad 冷卻但 Savant Δ+0.004 持平 = BABIP 噪音；48% 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-26：⚠️ 已推薦 8 天未執行；14d OPS .617 trad 冷卻但 Savant Δ+0.004 持平 = BABIP 噪音；48% owned 窗口關閉中 — 立即取代 Albies（fa_scan）
-- 05-27：⚠️ 已推薦 9 天未執行；14d OPS .606 trad 冷卻但 Savant Δ+0.009 持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 05-28：14d OPS .603 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 05-29：14d OPS .603 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 05-30：⚠️ 已推薦 12 天未執行；14d OPS .603 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 05-31：⚠️ 已推薦 13 天未執行；14d OPS .589 trad 冷卻但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 06-01：⚠️ 已推薦 14 天未執行；14d OPS .597 trad 冷但 Savant Δ持平 = BABIP 噪音；0% 零壓力 — 立即取代 Albies（fa_scan）
-- 06-02：⚠️ 已推薦 15 天未執行；14d Savant xwOBA 0.162（Δ-0.147）品質崩盤（非純 BABIP 噪音）；0% 零壓力；Horwitz 更強即時替代 — 降為 B-plan vs Albies（fa_scan）
-- 06-03：14d OPS .449 / Savant xwOBA 0.196（Δ-0.112）品質真崩；降為 B-plan vs Albies（fa_scan）
-- 06-04：14d OPS .322 / Savant xwOBA 0.186（Δ-0.121）品質真崩；降為 B-plan vs Albies（fa_scan）
-- 06-05：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
-- 06-06：14d OPS .322 / Savant xwOBA 0.182（Δ-0.123）品質真崩持續；降為 B-plan vs Albies（fa_scan）
-- 06-07：14d OPS .458 / Savant xwOBA 0.169（Δ-0.136）品質崩盤持續；降為 B-plan vs Albies（fa_scan）
-- 06-09：14d Savant xwOBA 0.182（Δ-0.123）品質崩盤持續 4 週；Clemens 取代 Albies 更優 — 降為 C-plan（fa_scan）
-
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
 - 05-19：xwOBA P70 / Barrel% P95 / 14d OPS .958 / Savant Δ+0.128；雙年 P70 穩定確認，McLain B plan（fa_scan）
@@ -262,6 +238,9 @@
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Matt McLain (CIN, 2B) — 被搶（自動偵測）
+- 2026-06-10：Yahoo ownership_type=team，從觀察中移除。
 
 ### Edouard Julien (COL, 1B,2B) — 觸發失效（手動結案）
 - 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。platoon 確認 + PA-TG 從未達 3.0 + 14d 崩盤 10+ 天。
