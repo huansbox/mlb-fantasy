@@ -1838,12 +1838,167 @@ def _build_position_lookup(group_type, fa_candidates, watch_candidates, config):
     return lookup
 
 
+# ── waiver-log block grammar (issue 028) ──
+#
+# Line types emitted by the batter pass-2 LLM (output contract in
+# prompt_fa_scan_pass2_batter.txt). Field separator is `|`; the summary is
+# always the LAST field so it may itself contain `|` (parsers join the tail):
+#
+#   NEW|name|team||trigger|vs|summary      (7 fields — issue 028 grammar)
+#   NEW|name|team||trigger|summary         (6 fields — pre-028 archives)
+#   UPDATE|name|summary
+#   ACTION|name|取代 or 立即取代|vs          (explicit daily replace verdict)
+#   CLOSE|name|reason                      (move entry to 已結案)
+#
+# ACTION lines never create entries; they annotate the player's same-day
+# history line with a `[取代→vs]` prefix so the replace-streak counter
+# (`compute_replace_streak`) counts mechanically — the LLM quoting an
+# injected number replaces it counting 30 history lines itself (實證誤數,
+# see docs/fa-scan-batter-judgment-quality.md B2).
+
+_ACTION_TYPES = ("立即取代", "取代")
+
+
+def apply_waiver_log_block(content, block, short_date,
+                           position_lookup=None, mlb_id_lookup=None):
+    """Apply one ```waiver-log``` block to waiver-log.md content. Pure.
+
+    Returns (new_content, modified, log_messages). External effects (file
+    IO, git, MLB id search) stay with the caller; `mlb_id_lookup` is the
+    injected name→mlb_id resolver (production passes search_mlb_id).
+
+    Processing order: ACTION annotations are collected first (they prefix
+    the same-block NEW/UPDATE day line), CLOSE moves run last so a same-day
+    UPDATE still lands in the entry before it is archived.
+    """
+    logs = []
+    modified = False
+    lookup_id = mlb_id_lookup or (lambda name: None)
+    lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
+
+    # Pass 0: ACTION annotations (name → "[type→vs]").
+    annotations = {}
+    consumed = set()
+    for line in lines:
+        parts = line.split("|")
+        if parts[0] != "ACTION":
+            continue
+        if len(parts) < 4 or parts[2].strip() not in _ACTION_TYPES:
+            logs.append(f"SKIP malformed ACTION: {line[:60]}")
+            continue
+        annotations[parts[1].strip()] = f"[{parts[2].strip()}→{parts[3].strip()}]"
+
+    def _annotated(name, summary):
+        if name in annotations:
+            consumed.add(name)
+            return f"{annotations[name]} {summary}"
+        return summary
+
+    # Pass 1: NEW / UPDATE.
+    for line in lines:
+        parts = line.split("|")
+
+        if parts[0] == "NEW" and len(parts) >= 6:
+            name, team, position, trigger = (
+                parts[1], parts[2], parts[3], parts[4])
+            if len(parts) >= 7:
+                vs, summary = parts[5].strip(), "|".join(parts[6:])
+            else:
+                # Pre-028 6-field row — no vs column.
+                vs, summary = "", "|".join(parts[5:])
+            # Batter v4 thin: position may be empty (LLM doesn't write it).
+            # Look up from authoritative sources; skip row if lookup fails to
+            # avoid corrupting _filter_waiver_log_by_group structure.
+            if not position.strip():
+                if position_lookup:
+                    position = position_lookup.get(name, "")
+                if not position.strip():
+                    logs.append(f"SKIP NEW {name} — position lookup failed")
+                    continue
+            # Check if player already exists in 觀察中
+            if name in content:
+                # Treat as UPDATE instead — but skip 條件 Pass players
+                if _is_condition_pass(content, name):
+                    logs.append(f"SKIP UPDATE {name} (條件 Pass)")
+                    continue
+                content = _insert_update_line(
+                    content, name, short_date, _annotated(name, summary))
+                modified = True
+                continue
+            # Resolve mlb_id via injected lookup (don't trust Claude's ID)
+            mlb_id = lookup_id(name)
+            mlb_id_tag = f" [mlb_id:{mlb_id}]" if mlb_id else ""
+            vs_line = f"vs：{vs}\n" if vs else ""
+            # Append new player block to end of 觀察中 section
+            new_entry = (
+                f"\n### {name} ({team}, {position}){mlb_id_tag} — 觀察中\n"
+                f"觸發：{trigger}\n"
+                f"{vs_line}"
+                f"- {short_date}：{_annotated(name, summary)}（fa_scan）\n"
+            )
+            # Insert new FA at the END of 觀察中 section, which means BEFORE
+            # the next section header. Try ## 隊上觀察 first (FA goes in 觀察中,
+            # not in 隊上觀察); fall back to ## 已結案; finally append.
+            if "## 隊上觀察" in content:
+                pos = content.index("## 隊上觀察")
+                content = content[:pos] + new_entry + "\n" + content[pos:]
+            elif "## 已結案" in content:
+                pos = content.index("## 已結案")
+                content = content[:pos] + new_entry + "\n" + content[pos:]
+            else:
+                content += new_entry
+            modified = True
+            logs.append(f"NEW {name}")
+
+        elif parts[0] == "UPDATE" and len(parts) >= 3:
+            name, summary = parts[1], "|".join(parts[2:])
+            # Skip 條件 Pass players
+            if _is_condition_pass(content, name):
+                logs.append(f"SKIP UPDATE {name} (條件 Pass)")
+                continue
+            content = _insert_update_line(
+                content, name, short_date, _annotated(name, summary))
+            modified = True
+            logs.append(f"UPDATE {name}")
+
+    # Pass 2: standalone ACTION (no same-block NEW/UPDATE carried it).
+    for name, annot in annotations.items():
+        if name in consumed:
+            continue
+        before = content
+        content = _insert_update_line(
+            content, name, short_date, f"{annot} 取代判斷")
+        if content != before:
+            modified = True
+            logs.append(f"ACTION {name} (standalone)")
+        else:
+            logs.append(f"SKIP ACTION {name} — entry not found")
+
+    # Pass 3: CLOSE moves (last — same-day UPDATE lands before archiving).
+    for line in lines:
+        parts = line.split("|")
+        if parts[0] != "CLOSE":
+            continue
+        if len(parts) < 3 or not parts[1].strip():
+            logs.append(f"SKIP malformed CLOSE: {line[:60]}")
+            continue
+        name, reason = parts[1].strip(), "|".join(parts[2:]).strip()
+        content, moved = _close_waiver_entry(content, name, short_date, reason)
+        if moved:
+            modified = True
+            logs.append(f"CLOSE {name}")
+        else:
+            logs.append(f"SKIP CLOSE {name} — not in 觀察中 / 條件 Pass")
+
+    return content, modified, logs
+
+
 def _update_waiver_log(advice, today_str, env=None, position_lookup=None):
     """Parse waiver-log update block from Claude output, write to waiver-log.md.
 
-    Expects ```waiver-log ... ``` block in advice with lines:
-      NEW|name|team|position|trigger|summary
-      UPDATE|name|summary
+    Expects ```waiver-log ... ``` block in advice; line grammar (issue 028)
+    documented above apply_waiver_log_block. Pre-028 6-field NEW rows remain
+    parseable.
 
     The `position` field in NEW rows may be empty (batter v4 thin LLM is
     instructed to leave it blank). When empty, looked up from
@@ -1886,66 +2041,11 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None)
     # Short date format (MM-DD) for consistency with existing entries
     short_date = today_str[5:]  # "2026-04-07" → "04-07"
 
-    modified = False
-    for line in block.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split("|")
-
-        if parts[0] == "NEW" and len(parts) >= 6:
-            _, name, team, position, trigger, summary = parts[0], parts[1], parts[2], parts[3], parts[4], "|".join(parts[5:])
-            # Batter v4 thin: position may be empty (LLM doesn't write it).
-            # Look up from authoritative sources; skip row if lookup fails to
-            # avoid corrupting _filter_waiver_log_by_group structure.
-            if not position.strip():
-                if position_lookup:
-                    position = position_lookup.get(name, "")
-                if not position.strip():
-                    print(f"  waiver-log: SKIP NEW {name} — position lookup failed",
-                          file=sys.stderr)
-                    continue
-            # Check if player already exists in 觀察中
-            if name in content:
-                # Treat as UPDATE instead — but skip 條件 Pass players
-                if _is_condition_pass(content, name):
-                    print(f"  waiver-log: SKIP UPDATE {name} (條件 Pass)", file=sys.stderr)
-                    continue
-                content = _insert_update_line(content, name, short_date, summary)
-                modified = True
-                continue
-            # Resolve mlb_id via API (don't trust Claude's ID)
-            mlb_id = search_mlb_id(name)
-            mlb_id_tag = f" [mlb_id:{mlb_id}]" if mlb_id else ""
-            # Append new player block to end of 觀察中 section
-            new_entry = (
-                f"\n### {name} ({team}, {position}){mlb_id_tag} — 觀察中\n"
-                f"觸發：{trigger}\n"
-                f"- {short_date}：{summary}（fa_scan）\n"
-            )
-            # Insert new FA at the END of 觀察中 section, which means BEFORE
-            # the next section header. Try ## 隊上觀察 first (FA goes in 觀察中,
-            # not in 隊上觀察); fall back to ## 已結案; finally append.
-            if "## 隊上觀察" in content:
-                pos = content.index("## 隊上觀察")
-                content = content[:pos] + new_entry + "\n" + content[pos:]
-            elif "## 已結案" in content:
-                pos = content.index("## 已結案")
-                content = content[:pos] + new_entry + "\n" + content[pos:]
-            else:
-                content += new_entry
-            modified = True
-            print(f"  waiver-log: NEW {name}", file=sys.stderr)
-
-        elif parts[0] == "UPDATE" and len(parts) >= 3:
-            _, name, summary = parts[0], parts[1], "|".join(parts[2:])
-            # Skip 條件 Pass players
-            if _is_condition_pass(content, name):
-                print(f"  waiver-log: SKIP UPDATE {name} (條件 Pass)", file=sys.stderr)
-                continue
-            content = _insert_update_line(content, name, short_date, summary)
-            modified = True
-            print(f"  waiver-log: UPDATE {name}", file=sys.stderr)
+    content, modified, logs = apply_waiver_log_block(
+        content, block, short_date,
+        position_lookup=position_lookup, mlb_id_lookup=search_mlb_id)
+    for msg in logs:
+        print(f"  waiver-log: {msg}", file=sys.stderr)
 
     if not modified:
         return
@@ -2053,6 +2153,105 @@ def _insert_update_line(content, player_name, short_date, summary):
         after = content[section_end:]
         content = before + new_line + "\n" + after
     return content
+
+
+def _close_waiver_entry(content, name, short_date, reason):
+    """Move one 觀察中 entry (with full history) to the 已結案 section.
+
+    Issue 028 decision: the whole ### block is preserved — 已結案 is excluded
+    from payload assembly, so keeping history costs zero tokens but retains
+    the audit trail for the batter backtest (issue 029) and weekly review.
+
+    Returns (content, moved). No-ops (moved=False) when the player is not in
+    the 觀察中 section (the same name may legitimately live under 隊上觀察),
+    is marked 條件 Pass, or the ## 已結案 marker is missing.
+    """
+    sec_start = content.find("## 觀察中")
+    if sec_start == -1:
+        return content, False
+    nxt = content.find("\n## ", sec_start + len("## 觀察中"))
+    sec_end = nxt + 1 if nxt != -1 else len(content)
+
+    section = content[sec_start:sec_end]
+    pattern = re.compile(
+        rf"### {re.escape(name)} \([^)]+\)[^\n]*\n(?:(?!### |## ).*\n)*",
+        re.MULTILINE,
+    )
+    m = pattern.search(section)
+    if m is None:
+        return content, False
+    entry = m.group(0)
+    if "條件 Pass" in entry.split("\n", 1)[0]:
+        return content, False
+
+    closed_marker = "## 已結案\n"
+    if closed_marker not in content:
+        return content, False
+
+    header, _, body = entry.partition("\n")
+    if "觀察中" in header:
+        header = header.replace("觀察中", "已結案（fa_scan CLOSE）", 1)
+    closed_entry = (
+        f"{header}\n{body.rstrip()}\n"
+        f"- {short_date}：[結案] {reason}（fa_scan）\n"
+    )
+
+    # Remove from 觀察中, then insert at the top of 已結案 (newest first —
+    # same convention as cleanup_rostered_watchlist auto-close).
+    content = content[:sec_start + m.start()] + content[sec_start + m.end():]
+    pos = content.index(closed_marker) + len(closed_marker)
+    content = content[:pos] + "\n" + closed_entry + content[pos:]
+    return content, True
+
+
+# Day line carrying an ACTION annotation, e.g.
+# "- 06-10：[立即取代→Arraez] Season P95 …（fa_scan）"
+_REPLACE_ANNOT_RE = re.compile(r"^- (\d{2}-\d{2})：\[(?:立即)?取代→([^\]]*)\]")
+_DATE_LINE_RE = re.compile(r"^- \d{2}-\d{2}：")
+
+
+def compute_replace_streak(entry_text):
+    """Trailing run of day lines carrying a `[取代→X]`/`[立即取代→X]` annotation.
+
+    Counts SCAN DAYS (history lines), not calendar days — the daily scan
+    occasionally skips a day, and the LLM is told to quote exactly this
+    number (issue 028: counting moved out of the LLM after observed
+    miscounts). Returns (streak, start_date, vs); (0, None, None) when the
+    most recent day line is unannotated.
+    """
+    day_lines = [ln for ln in entry_text.split("\n") if _DATE_LINE_RE.match(ln)]
+    streak, start_date, vs = 0, None, None
+    for ln in reversed(day_lines):
+        m = _REPLACE_ANNOT_RE.match(ln)
+        if m is None:
+            break
+        streak += 1
+        start_date = m.group(1)
+        if vs is None:
+            vs = m.group(2)  # most recent annotation wins
+    return streak, start_date, vs
+
+
+def inject_replace_streaks(filtered_section):
+    """Inject a derived `[機械計數]` line into watch entries with an active
+    replace-recommendation streak (payload-only — waiver-log.md untouched).
+
+    The prompt instructs the LLM to quote this number in the ⚠️ 已推薦 N 天
+    warning instead of counting history lines itself.
+    """
+    entries = re.split(r"(?=^### )", filtered_section, flags=re.MULTILINE)
+    out = []
+    for entry in entries:
+        if entry.startswith("### "):
+            streak, start, vs = compute_replace_streak(entry)
+            if streak >= 1:
+                vs_str = f"，vs {vs}" if vs else ""
+                derived = (f"[機械計數] 已連續推薦取代 {streak} 個掃描日"
+                           f"（自 {start} 起{vs_str}）\n")
+                header, _, body = entry.partition("\n")
+                entry = f"{header}\n{derived}{body}"
+        out.append(entry)
+    return "".join(out)
 
 
 # ── Phase 5: Python compute layer (Layer 4) integration ──
@@ -2783,6 +2982,9 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             if "## 已結案" in section:
                 section = section.split("## 已結案")[0]
             filtered = _filter_waiver_log_by_group(section, "batter", rostered_names)
+            # Issue 028: derived [機械計數] replace-streak lines — LLM quotes
+            # the injected number instead of counting history lines itself.
+            filtered = inject_replace_streaks(filtered)
             if filtered.strip():
                 lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅打者）---\n## 觀察中{filtered}")
 
