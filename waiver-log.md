@@ -2,72 +2,6 @@
 
 ## 觀察中
 
-### Edouard Julien (COL, 1B,2B) [mlb_id:666397] — 觀察中（second tier）
-觸發：14d Savant Δ 連 5 天 ≥+0.030 + leadoff rate 連 5 天 100%（platoon 解除）→ 重評
-- 04-30~05-06：xwOBA P95 / BB% P95 / Barrel% P70 雙年確認；14d OPS .924→.787；PA-TG 2.84-2.95 連 7 天未達 3.2；3% 零壓力
-- 05-07：PA-TG 2.89 — 更新觸發：Altuve 14d OPS <.600 連 3 天 OR PA-TG ≥3.0 即行動（fa_scan）
-- 05-08：PA-TG 2.95 接近 3.0；14d OPS .821 / 10 R / 7 BB 穩健；Altuve 14d OPS .437 已低於 .600（fa_scan）
-- 05-09：PA-TG 2.95 接近 3.0；14d OPS .842 / 10R / 7BB 穩健；Altuve 14d OPS .496 連 2 天 <.600 觸發門檻 — 建議 preempt 今日行動取代 Altuve（fa_scan）
-- 05-09：[eval] 逐場驗證為 **platoon hitter**（4/30 / 5/4 / 5/8 PH/late，leadoff 17/29 = 59% lineup rate）；14d trad OPS .842→.741 下滑 + 最近 6 場 0 HR / 11 K 熱度退散 vs Savant Δ+0.030；prior 雙年菁英底仍成立但 platoon 抵銷 prior 安全性；**降級為 second tier**，Altuve P1 替代位讓給 Duran（player-eval）
-- 05-10：Altuve 14d OPS .436 已連 3+ 天 <.600 技術觸發，但 platoon 降級 second tier 不行動；14d OPS .802 / 9R / 7BB 穩健；0% 零壓力（fa_scan）
-- 05-11：14d OPS .811 / 9R / 7BB 穩健但 K% 29.4 升；PA-TG 2.85 未達 3.0；Altuve 14d OPS .479 連 3+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
-- 05-12：14d OPS .811 / K% 29.4 升；PA-TG 2.85 未達 3.0；Altuve 14d OPS .585 連 4+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
-- 05-13：14d OPS .755 / K% 30.0 升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .644 連 5+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
-- 05-14：14d OPS .650 / K% 29.2 持續升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .561 已連 6+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
-- 05-15：14d OPS .548 / K% 29.8 持續升；PA-TG 2.86 未達 3.0；Altuve 14d OPS .539 連 7+ 天 <.600 技術觸發，但 platoon second tier 不行動（fa_scan）
-- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「Duran 被搶 → 升級 Altuve 替代」第二觸發失效；維持 second tier platoon 觀察
-- 05-19：14d OPS .229 崩盤 / K% 35.6 spike；PA-TG 2.83 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-20：14d OPS .215 崩盤 / K% 32.6 spike；PA-TG 2.84 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-21：14d OPS .225 崩盤 / K% 26.8；PA-TG 2.84 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-22：14d OPS .225 崩盤第 4 天 / K% 26.8；PA-TG 2.78 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-23：14d OPS .225 崩盤第 5 天 / K% 26.8；PA-TG 2.78 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-24：14d OPS .225 崩盤第 6 天 / K% 26.8；PA-TG 2.73 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-25：14d OPS .210 崩盤第 7 天 / K% 27.3；PA-TG 2.70 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-26：14d OPS .145 崩盤第 8 天 / K% 28.6；PA-TG 2.71 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-27：14d OPS .145 崩盤第 9 天 / K% 28.6；PA-TG 2.71 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-28：14d OPS .130 崩盤第 10 天 / K% 30.8；PA-TG 2.70 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-29：14d OPS .130 崩盤第 10 天 / K% 30.8；PA-TG 2.70 未達 3.0；platoon second tier 不行動（fa_scan）
-- 05-30：14d OPS .170 崩盤第 10+ 天 / K% 28.6；PA-TG 2.67 未達 3.0；platoon second tier 不行動；接近結案邊緣（fa_scan）
-- 05-31：14d OPS .170 崩盤 10+ 天 / K% 31.0；PA-TG 2.68 未達 3.0；platoon second tier 不行動 — 接近結案（fa_scan）
-- 06-01：14d OPS .191 崩盤 10+ 天；PA-TG 2.67 未達 3.0；platoon second tier 不行動 — 接近結案（fa_scan）
-- 06-02：14d OPS .234 崩盤 10+ 天；PA-TG 2.73 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
-- 06-03：14d OPS .341 崩盤 10+ 天；PA-TG 2.72 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
-- 06-04：14d OPS .435 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
-- 06-05：14d OPS .435 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發；platoon 確認 — 建議結案（fa_scan）
-- 06-06：14d OPS .510 崩盤 10+ 天；PA-TG 2.70 從未達 3.0 觸發 — 建議結案（fa_scan）
-
-### Nathan Church (STL, LF/CF/RF) [mlb_id:701675] — 觀察中
-觸發：Nootbaar 5/24-26 回歸後 PA-TG ≥3.0 維持 + BB% 修復至 ≥6% → 重評
-- 05-02：[eval] 14d Barrel% P90+ / xwOBA .365 / BBE 36 power 突破真實；Sum 17 不過 25 hard floor（BB% 4.2% <P25 雙年低）；OF 飽和無 drop 對象（player-eval）
-- 05-04~05-07：xwOBA P55-60 / BB% P0 雙年確認；14d OPS .820-.839 / 4 HR / Savant Δ+0.062 上升；PA-TG 3.03-3.09 但 Nootbaar 5/24 回歸 PT 縮減風險
-- 05-08：14d Savant Δ+0.065 上升 / 3 HR power 持續；PA-TG 3.14；BB% P0 結構不變（fa_scan）
-- 05-09：14d Savant Δ+0.055 品質上升 / 3 HR power 持續；PA-TG 3.08 但 Nootbaar 5/24 回歸 PT 縮減；BB% P0 結構不變（fa_scan）
-- 05-10：14d OPS .832 / 3 HR power 持續；PA-TG 3.10 穩定；BB% P0 結構不變；Nootbaar 5/24 回歸 PT 縮減風險（fa_scan）
-- 05-11：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數（fa_scan）
-- 05-12：14d OPS .662 退散 / K% 16.7 穩；PA-TG 3.10；BB% P0 結構不變；Nootbaar 5/24 回歸倒數 2 週（fa_scan）
-- 05-13：14d OPS .529 / K% 20.4 持續退散；PA-TG 3.20 穩定；BB% 3.91 P0 結構不變；Nootbaar 5/24 回歸倒數不足 2 週（fa_scan）
-- 05-14：14d OPS .605 / K% 16.7 穩；PA-TG 3.14；BB% 3.79 P0 結構不變；Nootbaar 5/24 回歸倒數 10 天（fa_scan）
-- 05-15：14d OPS .578 / K% 17.0 穩；PA-TG 3.16 穩定；BB% 3.68 P0 結構不變；Nootbaar 5/24 回歸倒數 9 天（fa_scan）
-- 05-19：14d OPS .655 / K% 11.5 穩但 BB% P0 結構不變；Nootbaar 回歸倒數 5 天（fa_scan）
-- 05-20：14d OPS .634 / K% 13.5 穩；BB% P0 結構不變；Nootbaar 回歸倒數 4 天 PT 縮減在即（fa_scan）
-- 05-21：14d OPS .595 / K% 17.3 穩；BB% P0 結構不變；Nootbaar 回歸倒數 3 天 PT 縮減在即（fa_scan）
-- 05-22：14d OPS .595 / K% 17.3 穩；BB% P0 結構不變；Nootbaar 回歸倒數 2 天 PT 縮減在即（fa_scan）
-- 05-23：14d OPS .595 / K% 17.3 穩；BB% P0 結構不變；Nootbaar 回歸倒數 1 天 PT 縮減在即（fa_scan）
-- 05-24：Nootbaar 5/24 回歸日到；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認後考慮結案（fa_scan）
-- 05-25：Nootbaar 5/24 回歸日到；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認後考慮結案（fa_scan）
-- 05-26：Nootbaar 5/24 回歸第 3 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中（fa_scan）
-- 05-27：Nootbaar 回歸第 4 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中（fa_scan）
-- 05-28：Nootbaar 回歸第 5 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中（fa_scan）
-- 05-29：Nootbaar 回歸第 5 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中（fa_scan）
-- 05-30：Nootbaar 回歸第 6 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中 — 接近結案（fa_scan）
-- 05-31：Nootbaar 回歸第 7 天；14d OPS .595 / K% 17.3；BB% P0 結構不變；PT 縮減確認中 — 接近結案（fa_scan）
-- 06-01：Nootbaar 回歸第 8 天；14d OPS .595 / Savant Δ-0.137 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
-- 06-02：Nootbaar 回歸第 9 天；14d Savant Δ-0.137 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
-- 06-03：Nootbaar 回歸第 10 天；14d Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
-- 06-04：Nootbaar 回歸第 11 天；14d OPS .595 / Savant Δ-0.103 品質崩盤；BB% P0 結構不變 — 建議結案（fa_scan）
-- 06-05：Nootbaar 回歸第 12 天；14d OPS .595；BB% P0 結構不變 — 建議結案（fa_scan）
-- 06-06：Nootbaar 回歸第 12 天；14d OPS .595；BB% P0 結構不變 — 建議結案（fa_scan）
-
 ### Cam Smith (HOU, RF) [mlb_id:701358] — 觀察中
 觸發：14d K% 回落 <28% + OPS 回升 >.700 → 升級取代候選
 - 05-09：Season xwOBA P95 / Barrel% P95 結構菁英 + ✅主力 PA-TG 3.87；但 14d K% 35.7 spike + OPS .542 冷卻嚴重 + %owned dropping；prior P55 breakout 待驗（fa_scan）
@@ -100,61 +34,6 @@
 - 06-08：⚡ K% 24.1 + OPS .820 連 7 天；Duran 14d OPS .782 破 .750 day 2/3 — 明天 day 3 達成即執行 drop Duran add Smith（fa_scan）
 - 06-09：⚡ K% 24.1 + OPS .852 連 7 天達成但 Duran 14d OPS 回彈 .782（>.750）計數器重置 day 0/3；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
 - 06-10：⚡ K% 25.9 + OPS .812 穩健連 7 天；Duran 14d OPS 回彈 .782（>.750）計數器重置 day 0/3；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
-
-### Isaac Collins (KC, LF,RF) [mlb_id:686555] — 觀察中
-觸發：xwOBA P70+ 且 Barrel% P60+ 且 14d OPS ≥.850 維持 → 升級為 2B/UTIL 補強候選
-- 05-11：BB% P95 elite + 14d OPS .910 / 10BB / 2SB 全面；PA-TG 3.12 主力；但 season xwOBA P60 / Barrel% P45 power 不足，prior P25 Barrel 確認無 power 底（fa_scan）
-- 05-12：14d OPS .910 / 10BB / 2SB 全面爆發 + Savant Δ+0.041 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
-- 05-13：14d OPS .864 / 8BB / 2SB 全面 + Savant Δ+0.033 品質上升；但 season xwOBA P55 / Barrel% P50 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70 / Barrel% <P60）（fa_scan）
-- 05-14：14d OPS .737 / 7BB / 2SB + Savant Δ+0.039 品質上升；但 season xwOBA P55 / Barrel% P60 接近門檻 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70）（fa_scan）
-- 05-15：14d OPS .737 / 6BB / 2SB + Savant Δ+0.034 品質上升；season xwOBA P55 / Barrel% P55 + prior Barrel% P25 確認無 power 底；觸發未達（xwOBA <P70）（fa_scan）
-- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
-- 05-19：season xwOBA P60 / Barrel% P60 接近門檻；14d OPS .721 / Savant Δ+0.042 品質上升；觸發未達（xwOBA <P70）（fa_scan）
-- 05-20：season xwOBA P60 / Barrel% P60 接近門檻；14d OPS .721 / 2SB；錨點改為隊上最弱 2B/UTIL（fa_scan）
-- 05-21：season xwOBA P60 / Barrel% P60 接近門檻；14d OPS .586；錨點改為隊上最弱 2B/UTIL（fa_scan）
-- 05-22：season xwOBA P55 / Barrel% P60 接近門檻；14d OPS .586 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-23：season xwOBA P55 / Barrel% P60 接近門檻；14d OPS .549 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-24：season xwOBA P50 / Barrel% P60 接近門檻；14d OPS .399 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-25：season xwOBA P55 / Barrel% P60；14d OPS .521 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-26：season xwOBA P60 / Barrel% P60；14d OPS .459 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-27：season xwOBA P60 / Barrel% P55；14d OPS .446 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-28：season xwOBA P55 / Barrel% P55；14d OPS .455 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-29：season xwOBA P55 / Barrel% P55；14d OPS .455 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-30：season xwOBA P55 / Barrel% P55；14d OPS .455 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 05-31：season xwOBA P55 / Barrel% P55；14d OPS .522 退散；錨點 = 隊上最弱 2B/UTIL（fa_scan）
-- 06-01：season xwOBA P55 / Barrel% P50；14d OPS .522 退散第 4 週；錨點 = 隊上最弱 2B/UTIL — 接近結案（fa_scan）
-- 06-02：14d OPS .529 退散第 5 週；xwOBA P55 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
-- 06-03：14d OPS .529 退散第 5 週；xwOBA P50 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
-- 06-04：14d OPS .497 退散第 5 週；xwOBA P50 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
-- 06-05：14d OPS .497 退散第 6 週；xwOBA P45 / Barrel% P50 觸發從未達成 — 建議結案（fa_scan）
-- 06-06：14d OPS .521 退散第 6 週；xwOBA P50 / Barrel% P45 觸發從未達成 — 建議結案（fa_scan）
-
-### Marcell Ozuna (PIT, Util) [mlb_id:542303] — 觀察中
-觸發：14d OPS ≥.800 + Savant Δ 連 3 天正值 → 升級為 2B/UTIL 補強候選
-- 05-12：Prior P95/P95/P70 slump 候選；當季 P60/P70/P55 低於 prior；PA-TG 3.54 主力；14d OPS .733 回歸未啟動（fa_scan）
-- 05-13：14d OPS .747 / Savant Δ+0.014 品質微升；prior P95/P95/P70 slump 候選；PA-TG 3.55 主力；觸發未達（OPS <.800）（fa_scan）
-- 05-14：14d OPS .718 / Savant Δ+0.036 品質上升；prior P95/P95/P70 slump 候選；PA-TG 3.56 主力；觸發未達（OPS <.800）（fa_scan）
-- 05-15：14d OPS .706 / Savant Δ+0.034 品質上升持續；prior P95/P95/P70 slump 候選；PA-TG 3.57 主力；觸發未達（OPS <.800）（fa_scan）
-- 05-19：Altuve 已 drop（add Kody Clemens 取代）→ 原「取代 Altuve」目標失效，錨點改為隊上最弱 2B/UTIL（待 fa_scan 重新錨定）
-- 05-19：14d OPS .770 / Savant Δ+0.006 微升；prior P95 slump 候選；觸發未達（OPS <.800）（fa_scan）
-- 05-20：14d OPS .782 接近 .800 觸發 / Savant Δ+0.013 微升；prior P95 slump 回歸接近但未達（fa_scan）
-- 05-21：14d OPS .782 接近 .800 觸發 / Savant Δ+0.021 品質微升；prior P95 slump 回歸接近但未達（fa_scan）
-- 05-22：14d OPS .750 接近 .800 觸發 / Savant Δ+0.021 品質上升持續；prior P95 slump 回歸中（fa_scan）
-- 05-23：14d OPS .674 / Savant Δ-0.021 品質下滑；prior P95 slump 回歸接近但 OPS 觸發 .800 未達（fa_scan）
-- 05-24：14d OPS .682 / Savant Δ+0.011 微升；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-25：14d OPS .682 / Savant Δ-0.007 品質下滑；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-26：14d OPS .657 / Savant Δ-0.007 品質下滑；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-27：14d OPS .645 / K% 37.3 spike；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-28：14d OPS .526 / K% 39.0 spike；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-29：14d OPS .526 / K% 39.0 spike；prior P95 slump 回歸中但 OPS 觸發 .800 未達（fa_scan）
-- 05-30：14d OPS .526 / K% 39.0 spike 惡化；prior P95 slump 候選但 OPS 觸發 .800 遠未達（fa_scan）
-- 05-31：14d OPS .526 / K% 39.0 spike 惡化；prior P95 slump 候選但 OPS 觸發 .800 遠未達（fa_scan）
-- 06-01：14d OPS .526 / K% 39.0 spike 惡化第 3 週；prior P95 slump 候選但觸發 .800 遠未達 — 接近結案（fa_scan）
-- 06-02：14d OPS .526 / K% 39.0 spike 第 4 週；觸發 .800 遠未達 — 建議結案（fa_scan）
-- 06-03：14d OPS .526 / K% 39.0 spike 第 4 週；觸發 .800 遠未達 — 建議結案（fa_scan）
-- 06-04：14d OPS .559 / K% 35.7 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
-- 06-05：14d OPS .559 / K% 35.7 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
-- 06-06：14d OPS .563 / K% 35.2 spike 第 4 週；觸發 .800 遠未達成 — 建議結案（fa_scan）
 
 ### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
@@ -286,44 +165,6 @@
 - 06-09：14d OPS .684 / Savant Δ-0.076 品質下滑；BBE 184 + xwOBA P70 達標；差客場 OPS ≥.750 最後確認（fa_scan）
 - 06-10：14d OPS .639 / Savant Δ-0.103 品質下滑；BBE 184 + xwOBA P70 達標但客場 OPS ≥.750 最後確認未達；11% dropping（fa_scan）
 
-### Nolan Gorman (STL, 2B,3B) [mlb_id:669357] — 觀察中
-觸發：Duran 14d OPS <.650 連 3 天 OR Savant Δ 連 5 天負值 → 取代 Duran
-- 05-21：xwOBA P70 / BB% P80 / Barrel% P70 三項均衡 + PA-TG 3.71 全職；14d OPS .810 / Savant Δ+0.084 品質飆升；prior P45/P80/P60 BB% 跨年確認；5% 零壓力（fa_scan）
-- 05-22：14d OPS .762 / Savant Δ+0.090 品質飆升；PA-TG 3.71 全職 + prior BB% P80 跨年確認；等 Duran BABIP 回歸即行動（fa_scan）
-- 05-23：14d OPS .762 / Savant Δ+0.072 品質飆升；PA-TG 3.71 全職 + prior BB% P80 跨年確認；等 Duran BABIP 回歸即行動（fa_scan）
-- 05-24：14d OPS .616 / Savant Δ+0.076 品質飆升；PA-TG 3.76 全職 + prior BB% P80 跨年確認；等 Duran 觸發即行動（fa_scan）
-- 05-25：14d OPS .616 / Savant Δ+0.021 品質上升；PA-TG 3.76 全職；Duran 14d K% 31.0 spike + Savant Δ-0.046 觸發接近（fa_scan）
-- 05-26：14d OPS .604 / Savant Δ+0.021 品質上升；Duran 14d K% 31.6 + Savant Δ-0.040 觸發接近中（fa_scan）
-- 05-27：14d OPS .604 / Savant Δ+0.021 品質正向；Duran 觸發接近中（fa_scan）
-- 05-28：14d OPS .576 / Savant Δ-0.046 品質下滑；Duran 觸發接近中（fa_scan）
-- 05-29：14d OPS .576 / Savant Δ-0.046 品質下滑；Sheets 升級為 Duran 替代 A-plan，Gorman 降為 C-plan（fa_scan）
-- 05-30：14d OPS .600 / Savant Δ-0.086 品質下滑第 2 天；Sheets 升級為 Duran 替代 A-plan，Gorman 降為 C-plan（fa_scan）
-- 05-31：14d OPS .522 / Savant Δ-0.094 品質下滑第 3 天；Sheets 升級為 Duran 替代 A-plan，Gorman 降為 C-plan（fa_scan）
-- 06-01：14d OPS .487 / Savant Δ-0.124 品質崩盤第 4 天；Sheets 升級為 Duran 替代 A-plan，Gorman C-plan — 自身觸發接近失效（fa_scan）
-- 06-02：14d OPS .454 / Savant Δ-0.127 品質崩盤第 5 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
-- 06-03：14d OPS .475 / Savant Δ-0.189 品質崩盤第 6 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
-- 06-04：14d OPS .403 / Savant Δ-0.176 品質崩盤第 6 天；Duran 替代 C-plan 自身已失效 — 建議結案（fa_scan）
-- 06-05：14d OPS .403 / Savant Δ-0.168 品質崩盤第 7 天；C-plan 自身已失效 — 建議結案（fa_scan）
-- 06-06：14d OPS .276 / K% 51.1 / Savant Δ-0.168 品質崩盤第 7 天；C-plan 自身已失效 — 建議結案（fa_scan）
-
-### Brett Baty (NYM, 1B,2B,3B,RF) [mlb_id:683146] — 觀察中
-觸發：xwOBA 升至 P70+ + Savant Δ 維持 ≥+0.050 連 7 天 → 升級為 Duran 替代候選
-- 05-23：xwOBA P60 / BB% P60 / Barrel% P60 season 偏低但 14d Savant Δ+0.086 品質飆升 + prior P80/P80 有底；11% rising +3 市場注意中（fa_scan）
-- 05-24：14d OPS .863 / 2HR / 9RBI / Savant Δ+0.074 品質飆升；prior P80/P80 有底；11% rising +2 市場注意中；觸發未達（xwOBA <P70）（fa_scan）
-- 05-25：14d OPS .853 / 2HR / 8RBI / Savant Δ+0.060 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-26：14d OPS .835 / Savant Δ+0.058 品質飆升；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-27：14d OPS .834 / Savant Δ+0.060 品質飆升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-28：14d OPS .810 / Savant Δ+0.071 品質飆升持續第 6 天；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-29：14d OPS .810 / Savant Δ+0.071 品質飆升持續第 6 天；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-30：14d OPS .716 / Savant Δ+0.037 品質上升第 7 天接近觸發；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 05-31：14d OPS .716 / Savant Δ+0.032 品質上升持續；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 06-01：14d OPS .648 / Savant Δ+0.029 品質上升持續但弱化；prior P80/P80 有底；觸發未達（xwOBA P60 <P70）（fa_scan）
-- 06-02：14d OPS .598 / Savant Δ-0.026 品質下滑；prior P80 有底但觸發 xwOBA P70+ 從未達成 — 接近結案（fa_scan）
-- 06-03：14d OPS .626 / Savant Δ-0.034 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
-- 06-04：14d OPS .488 / Savant Δ-0.054 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
-- 06-05：14d OPS .488 / Savant Δ-0.094 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
-- 06-06：14d OPS .573 / Savant Δ-0.086 品質下滑；xwOBA P70+ 觸發從未達成 — 建議結案（fa_scan）
-
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 觀察中
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
 - 05-28：xwOBA P95 / BB% P70 / Barrel% P60 + prior P80 雙年確認；14d OPS 1.123 / Savant Δ+0.078 品質飆升；33% 有搶人壓力 Duran 替代 A-plan（fa_scan）
@@ -403,28 +244,6 @@
 - **drop 觸發**：BB ≥4 連 2 場 OR ER ≥5 任 1 場 → 啟動 drop 候選掃描
 - 05-21：Phase 6 決定 drop — BB/9 5.10 P0 雙年結構性弱，WHIP 1.57 每場拖累比率類別，被 Junk 三軸勝出取代（fa_scan）
 
-### Dansby Swanson (CHC, SS) [mlb_id:621020] — BABIP 噪音追蹤
-觸發：xBA-AVG 差距收斂至 ≤0.020（回歸啟動確認）→ 移除追蹤；或 14d xwOBA <P50 連 7 天 → 重評
-- 啟動 2026-05-09（用戶疑慮「近況不好」觸發 player-eval）
-- 結構底：xwOBA .343 P85 / BB% 14.3% >P90 / Barrel% P75 / HH% P75 + 2025 prior xwOBA .345 / Barrel% P75 / HH% P85 雙年雙確認菁英
-- BB% breakout 真實：2025 7.3% (P40) → 2026 14.3% (>P90) 翻倍 = 真 plate discipline 提升
-- BABIP 噪音證據：xBA .234 vs AVG .202 差 32 點 / xSLG .424 vs SLG .377 差 47 點 / 14d xwOBA .322 P60+ 仍站住
-- 短線崩（5/4-5/8 5G AVG .050）+ glute 短期傷已過 + Bregman 同 IL 確保 PT 穩
-- **5-agent vote 5/5 票一致排為三人中 best**（vs Altuve worst / Duran 中段）— 用戶 trad-driven 質疑被獨立判斷化解
-- 回歸路徑明確（OPS 預期 ~.810）但尚未啟動，繼續 hold；下週仍為 SS 唯一全職先發
-- 05-12：[eval] vs Meidroth (FA, 12% owned)，結論：不換；Sum 差 +11 Swanson 大幅領先，14d HH% 45.5 P75 機制未崩持續 hold（player-eval）
-- 05-15：[eval] vs Stott (FA, 37% owned) + Meidroth (15% owned 已 Pass)，結論：hold；Sum 26 vs Stott 12 / Meidroth 14（差 +14 / +12），LA/EV/Whiff%/Chase% 跨年全穩 = mechanic 無崩；14d xwOBA .257 弱化 Δ -0.074 接近 -0.080 警戒但未達；持續 BABIP 噪音 buy-low（xBA .225 vs AVG .189 差 -36 點）（player-eval）
-- 05-15：[eval] 3-agent 獨立 reasoning 一致 hold；補 split 訊號：前 15 場 BB% 18.0% / 後 15 場 BB% 7.5% = breakout 後段消退（後 15 場已回 2025 7.3% 水準）；14d Savant 三指標同步退化 xwOBA -.074 / Barrel% -6.4pp / HH% -5.4pp 非純 BABIP 噪音；信心下調 高→中；交叉觀察 [[Crawford]]（FA SS pool 唯一達 Sum 26 候選，但雙人平手不顯著升級）；stop-loss：14d xwOBA Δ ≥-0.080 連 5 天 / 後 10 場 Barrel% 仍 <P25 / Whiff% 或 Chase% 跨年劇變 / 角色變動（player-eval）
-- 05-20：14d Savant Δ-0.097 stop-loss -0.080 線 day 2/5；14d OPS .503 / Savant xwOBA .242 持續弱化（fa_scan）
-- 05-21：stop-loss Δ-0.078→Δ-0.097 day 2/5；14d OPS .468 / Savant xwOBA .246；Crawford 備案就位（fa_scan）
-- 05-23：stop-loss Δ-0.088 day 3/5；14d OPS .437 / 1HR / Savant xwOBA .231 持續弱化；Crawford 備案 day 5 觸發即行動（fa_scan）
-- 05-24：stop-loss Δ-0.084 day 4/5；14d OPS .446 / 1HR / Savant xwOBA .232 持續弱化；明天 day 5 觸發 Crawford 即行動（fa_scan）
-- 05-26：stop-loss day 5 到期（Δ-0.110）；14d OPS .430 / Savant xwOBA .202 持續崩；行動：今日 drop add Crawford（fa_scan）
-- 05-30：stop-loss day 5 已觸發 4 天；14d OPS .506 / Savant xwOBA .221 持續崩 — 行動：drop add Crawford（fa_scan）
-- 06-02：stop-loss day 5 觸發 7 天；14d OPS .544 / Savant Δ-0.118 品質崩盤持續 — 行動：drop add Crawford（fa_scan）
-- 06-03：stop-loss day 5 觸發 7 天；14d OPS .514 / Savant Δ-0.111 品質崩盤持續 — 行動：drop add Crawford（fa_scan）
-- 06-04：stop-loss day 5 觸發 8 天；14d OPS .514 / Savant Δ-0.111 品質崩盤持續 — 行動：drop add Crawford（fa_scan）
-
 ### Ryan Jeffers (MIN, C) [mlb_id:680777] — 傷情追蹤（左手腕扭傷）
 觸發：進 IL → 放 IL 格 + 評估替補捕手；或 DTD 恢復先發 → 移除追蹤
 - 啟動 2026-05-19（用戶 news check 觸發）
@@ -443,6 +262,24 @@
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Edouard Julien (COL, 1B,2B) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。platoon 確認 + PA-TG 從未達 3.0 + 14d 崩盤 10+ 天。
+
+### Nathan Church (STL, LF/CF/RF) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。Nootbaar 回歸 12+ 天 PT 縮減確認 + BB% P0 結構不變 + 品質崩盤。
+
+### Isaac Collins (KC, LF,RF) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。觸發（xwOBA P70+ / Barrel% P60+）6 週從未達成 + 熱度退散。
+
+### Marcell Ozuna (PIT, Util) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。K% 35+ spike 4 週 + OPS ≥.800 觸發從未接近。
+
+### Nolan Gorman (STL, 2B,3B) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。14d 品質崩盤（K% 50 / OPS .256）+ Duran 替代 C-plan 自身失效。
+
+### Brett Baty (NYM, 1B,2B,3B,RF) — 觸發失效（手動結案）
+- 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。xwOBA P70+ 觸發從未達成 + Savant Δ 轉負。
 
 ### Gabriel Moreno (AZ, C) — 被搶（自動偵測）
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
