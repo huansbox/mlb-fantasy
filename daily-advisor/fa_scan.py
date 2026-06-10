@@ -2270,6 +2270,104 @@ def inject_replace_streaks(filtered_section):
     return "".join(out)
 
 
+# Issue 032: read-side history truncation. Day lines come in two real forms —
+# "- 06-10：…" (daily scan) and "- 2026-05-15：[eval] …" (milestones).
+# _DATE_LINE_RE above only matches the short form (the replace-streak counter
+# never needs [eval] lines); truncation must see both.
+_HISTORY_DAY_RE = re.compile(r"^- ((?:\d{4}-)?\d{2}-\d{2})：")
+_COUNTER_TOKEN_RE = re.compile(r"\bday (\d+)/(\d+)")
+TRUNCATE_KEEP_RECENT = 5  # A/B-validated window (payload doc 2026-06-10)
+
+
+def compute_history_counters(entry_text, recent_window=TRUNCATE_KEEP_RECENT):
+    """Derive fixed-format counter facts from one watch entry's history.
+
+    Returns a list of strings (possibly empty):
+      - ``counter day X/N（引自 MM-DD）`` — latest trigger-counter token,
+        looked up only within the most recent ``recent_window`` day lines so a
+        stale token from an abandoned trigger (e.g. anchor since dropped) is
+        never quoted as current state.
+      - ``已連續建議結案 N 個掃描日`` — trailing day lines containing 建議結案.
+        CLOSE automation (issue 028) should keep this at zero; a non-zero
+        value surfaces "LLM keeps suggesting but never emits CLOSE".
+
+    Must run on the FULL entry (before truncation) — the close-suggestion
+    streak can be longer than the kept window.
+    """
+    day_lines = [ln for ln in entry_text.split("\n")
+                 if _HISTORY_DAY_RE.match(ln)]
+    facts = []
+    for ln in reversed(day_lines[-recent_window:] if recent_window else []):
+        m = _COUNTER_TOKEN_RE.search(ln)
+        if m:
+            date = _HISTORY_DAY_RE.match(ln).group(1)
+            facts.append(f"counter day {m.group(1)}/{m.group(2)}（引自 {date}）")
+            break
+    close_streak = 0
+    for ln in reversed(day_lines):
+        if "建議結案" not in ln:
+            break
+        close_streak += 1
+    if close_streak:
+        facts.append(f"已連續建議結案 {close_streak} 個掃描日")
+    return facts
+
+
+def truncate_entry_history(entry_text, keep_recent=TRUNCATE_KEEP_RECENT):
+    """Truncate one watch entry's day-line history (payload-only).
+
+    Keeps: header, trigger/vs/derived lines (anything that is not a day
+    line), every ``[eval]`` milestone day line, and the ``keep_recent`` most
+    recent day lines. Each contiguous run of omitted day lines collapses to
+    one ``（中略 N 行）`` marker. Entries with ≤ keep_recent day lines pass
+    through unchanged.
+    """
+    lines = entry_text.split("\n")
+    day_idx = [i for i, ln in enumerate(lines) if _HISTORY_DAY_RE.match(ln)]
+    if len(day_idx) <= keep_recent:
+        return entry_text
+    keep = set(day_idx[-keep_recent:])
+    keep.update(i for i in day_idx if "[eval]" in lines[i])
+    omitted = set(day_idx) - keep
+    if not omitted:
+        return entry_text
+    out, run = [], 0
+    for i, ln in enumerate(lines):
+        if i in omitted:
+            run += 1
+            continue
+        if run:
+            out.append(f"（中略 {run} 行）")
+            run = 0
+        out.append(ln)
+    if run:
+        out.append(f"（中略 {run} 行）")
+    return "\n".join(out)
+
+
+def truncate_watch_history(filtered_section, keep_recent=TRUNCATE_KEEP_RECENT):
+    """Per-entry history truncation + derived counter lines (issue 032).
+
+    waiver-log.md keeps the full history; only the assembled payload is cut.
+    Counter facts are computed from the full history BEFORE truncating (the
+    close-suggestion streak may extend past the kept window), then injected
+    right after the header so the LLM quotes them instead of re-deriving
+    trigger discipline from the omitted middle (A/B 邊際代價緩解).
+    """
+    entries = re.split(r"(?=^### )", filtered_section, flags=re.MULTILINE)
+    out = []
+    for entry in entries:
+        if entry.startswith("### "):
+            facts = compute_history_counters(entry, recent_window=keep_recent)
+            entry = truncate_entry_history(entry, keep_recent=keep_recent)
+            if facts:
+                header, _, body = entry.partition("\n")
+                derived = "".join(f"[機械計數] {f}\n" for f in facts)
+                entry = f"{header}\n{derived}{body}"
+        out.append(entry)
+    return "".join(out)
+
+
 # ── Phase 5: Python compute layer (Layer 4) integration ──
 
 
@@ -3115,6 +3213,10 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             # Issue 028: derived [機械計數] replace-streak lines — LLM quotes
             # the injected number instead of counting history lines itself.
             filtered = inject_replace_streaks(filtered)
+            # Issue 032: read-side truncation — payload carries trigger +
+            # [eval] milestones + last 5 day lines per entry, plus derived
+            # counter lines. waiver-log.md itself keeps full history.
+            filtered = truncate_watch_history(filtered)
             if filtered.strip():
                 lines.append(f"\n--- waiver-log 觀察中（含觸發條件，僅打者）---\n## 觀察中{filtered}")
 
