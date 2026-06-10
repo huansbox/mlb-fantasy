@@ -41,7 +41,7 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "Util",
+      "selected_pos": "1B",
       "status": ""
     },
     {
@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "Util",
+      "selected_pos": "3B",
       "status": ""
     },
     {
@@ -86,7 +86,7 @@
         "pa": 678,
         "g": 159
       },
-      "selected_pos": "3B",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -109,7 +109,7 @@
         "g": 126
       },
       "selected_pos": "CF",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Ozzie Albies",
@@ -216,7 +216,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "1B",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -238,7 +238,7 @@
       "positions": [
         "2B"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -453,29 +453,6 @@
       }
     },
     {
-      "name": "Joey Cantillo",
-      "mlb_id": 676282,
-      "yahoo_player_key": "469.p.11823",
-      "team": "CLE",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "P",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 3.71,
-        "xwoba_allowed": 0.3,
-        "hh_pct_allowed": 41.8,
-        "barrel_pct_allowed": 7.2,
-        "bbe": 251,
-        "era": 3.21,
-        "ip": 95.3,
-        "ip_per_gs": 5.2
-      }
-    },
-    {
       "name": "Andre Pallante",
       "mlb_id": 669467,
       "yahoo_player_key": "469.p.12591",
@@ -483,7 +460,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -505,8 +482,8 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "NA",
-      "status": "NA",
+      "selected_pos": "BN",
+      "status": "",
       "prior_stats": {
         "season": 2025,
         "xera": 4.3,
@@ -573,7 +550,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
