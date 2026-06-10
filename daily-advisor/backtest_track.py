@@ -109,6 +109,7 @@ def fetch_recent_issues(days: int, repo: str = "huansbox/mlb-fantasy",
             "--json", "body,createdAt,number,title",
         ],
         capture_output=True, text=True, check=True,
+        encoding="utf-8",  # issue titles contain CJK; never trust locale codec
     )
     issues = json.loads(result.stdout)
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
