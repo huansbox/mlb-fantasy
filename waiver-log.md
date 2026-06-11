@@ -188,6 +188,14 @@ vs：待定
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
 
+### Luis Arraez (SF, 1B,2B) [mlb_id:650333] — 框架偏見標註（contact-only 型 P1 永駐）
+觸發：若考慮 drop Arraez → 必走 /player-eval 手動評，比較時把 AVG 類別貢獻加回（機械層 3 核心指標不含 AVG）
+- 啟動 2026-06-11（用戶否決 fa_scan「Caglianone 立即取代 Arraez」建議後的結構性歸因）
+- 偏見機制：batter 機械層 Sum 只看 xwOBA/BB%/Barrel% — Arraez 生涯 BB% P0 / Barrel% P0 是型態事實不會變 → **他每天都會是 P1 drop 候選**，這是框架噪音不是訊號
+- 實際價值：season AVG .327（7×7 AVG 類別錨點）+ R 35；低 K 高 PA 的 AVG/R 穩定供給
+- 運氣欄位警告：wOBA−xwOBA 正 gap（06-11 +0.040 顯著）對 spray-contact 型是**常態非泡沫**（xwOBA 模型長期低估此型態），不可引為賣高/drop 依據
+- 真正的 drop 條件：AVG 跌破 .300 持續 + 我方 AVG 類別已穩贏或穩輸（類別邊際歸零）才重評
+
 ### Luis Severino (ATH, SP) [mlb_id:622663] — borderline anchor 觀察（控球失守降回 hold）
 觸發：v4 機械層季線 Sum 25 被前 5 場污染（ERA 6.20 / BB/9 7.30），4/29 起 transformation 候選
 - 啟動 2026-05-02（roster_sync 自動 add）
