@@ -16,11 +16,11 @@
 | [`029-batter-backtest-skeleton`](029-batter-backtest-skeleton.md) | AFK | 027, 028 | ✅ 2026-06-10（merge `0e94cf7`） |
 | [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ✅ 2026-06-10（merge `b9a8e4d`；殘留觀察：07-05 首個非空段再抽查一次） |
 | [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ✅ 2026-06-10（雲端 session 完工，merge `ae8cb46`） |
-| [`032-payload-history-truncation`](032-payload-history-truncation.md) | AFK | 無（軟排序在 028 後） | ✅ 2026-06-10（merge `d18207e`；隔日 cron 後驗證 payload 觀察中段出現（中略 N 行）+ [機械計數] 行） |
-| [`033-payload-hygiene-pack`](033-payload-hygiene-pack.md) | AFK | 無 | ✅ 2026-06-10（merge `fc55fae`；隔日 6/11 12:30 cron 後驗證 payload 逐項可見 + cost spot-check） |
-| [`034-pa-tg-gap-warn-tag`](034-pa-tg-gap-warn-tag.md) | AFK | 無 | ✅ 2026-06-10（merge `57abeec`；隔日 cron 後驗證符合條件 FA 可見 tag） |
-| [`035-woba-xwoba-luck-field`](035-woba-xwoba-luck-field.md) | AFK | 無 | ✅ 2026-06-10（merge `8a651ae`；隔日 cron 後驗證 payload 可見） |
-| [`036-fa-sort-key-debias`](036-fa-sort-key-debias.md) | AFK | 無 | ✅ 2026-06-10（雲端 session 完工，PR #308 merge `7e8bc91`；隔日 cron 後驗證 FA 順序 = %owned 降序） |
+| [`032-payload-history-truncation`](032-payload-history-truncation.md) | AFK | 無（軟排序在 028 後） | ✅ 2026-06-10（merge `d18207e`）；**隔日驗證 ✅ 2026-06-11**（issue #311：（中略 N 行）+ [機械計數] 行皆現） |
+| [`033-payload-hygiene-pack`](033-payload-hygiene-pack.md) | AFK | 無 | ✅ 2026-06-10（merge `fc55fae`）；**隔日驗證 ✅ 2026-06-11**（payload 五項逐項可見 + cost 下降） |
+| [`034-pa-tg-gap-warn-tag`](034-pa-tg-gap-warn-tag.md) | AFK | 無 | ✅ 2026-06-10（merge `57abeec`）；**隔日驗證 ✅ 2026-06-11**（FA/watch 多人帶 ⚠️ 上場量落差 tag） |
+| [`035-woba-xwoba-luck-field`](035-woba-xwoba-luck-field.md) | AFK | 無 | ✅ 2026-06-10（merge `8a651ae`）；**隔日驗證 ✅ 2026-06-11**（season 顯著標記 + 14d 列值 + legend 行皆現，LLM 已引用入判斷） |
+| [`036-fa-sort-key-debias`](036-fa-sort-key-debias.md) | AFK | 無 | ✅ 2026-06-10（雲端 session 完工，PR #308 merge `7e8bc91`）；**隔日驗證 ✅ 2026-06-11**（FA 順序 87→1% 嚴格降序） |
 | [`037-trigger-schema-constraint`](037-trigger-schema-constraint.md) | HITL | 028（同 prompt 分批上線） | ⏳ 未開工 |
 
 ### 開工順序（曆法長竿驅動）
@@ -31,7 +31,9 @@
 4. **029 在 027+028 合併後開工**（fixture 先行開發，cron 上線後等資料熟，「0 筆可對帳」= 合格 demo）→ **030 / 031 接續**。
 5. **032 在 028 上線後重測省幅**（結案自動化會先縮小歷史段）、**037 殿後**（與 028 分批，A/B 歸因隔離）。
 
-### Handoff（最後更新：2026-06-10）
+### Handoff（最後更新：2026-06-11）
+
+- **032-036 隔日 production 驗證全過（2026-06-11，對象 issue #311 + VPS transcript）**：① 032 — 觀察中段全部長歷史條目折疊為「（中略 N 行）」、Cam Smith 帶 `[機械計數] counter day 0/3（引自 06-10）`；② 033 — 視窗註記 + 運氣 legend 兩行、watch 球員真 %owned（Cam Smith 12% 等）、prior 行 PA+年齡、Heriberto 14d Savant「樣本不足 (BBE 13 <15)」；③ 034 — Teoscar/Basallo/Jeffers/Mead/Pederson/Meckler + watch 多人帶 ⚠️ 上場量落差 tag，且 LLM 確實用它擋了立即取代（Mead/Basallo 留觀察）；④ 035 — season「運氣 +0.040(顯著)」格式正確、14d 只列值，LLM 判斷大量引用（Arraez/Albies 泡沫、Steer buy-low）；⑤ 036 — FA 10 人 87/53/52/50/48/33/26/7/3/1% 嚴格降序。**Cost spot-check**：batter call cache 寫入 41.3K→21.4K（−48%）、output 13.1K→7.1K（−46%），無 thinking 誘發反噬。⑥ 028 CLOSE 鏈端到端首次在 production 走通：LLM 發 `CLOSE|Gavin Sheets` → 寫入端即時搬已結案（VPS log + waiver-log.md 皆證實）。**唯一未開工：037**。
 
 - **033 / 034 / 035 / 036 同日完工（2026-06-10）— payload 誠實度 + 去偏四片全上**。共同剩餘驗證：**6/11 12:30 cron 後看 production batter issue** ① payload 逐項可見（視窗註記 + 運氣 legend 兩行、watch 真 %owned 或 `?%`、prior 行 PA+年齡、BBE<15 樣本不足、符合條件 FA 的 ⚠️ 上場量落差、Season/14d 運氣欄、FA 順序 = %owned 降序）② cost spot-check（input/output tokens 與前日同量級 — 新增行均為靜態資料字典類，非判斷規則，lever 2 風險低但仍要看）。035 注意：我方 roster 的 14d 運氣欄要等 VPS savant_rolling cron（TW 12:00）以新 code 跑過一輪；FA 端即時計算當天即有。剩餘未開工：**037**（觸發 schema 約束，HITL，需與 028 分批 A/B — 至此 11 片唯一未完）。
 - **032 完工（2026-06-10，merge `d18207e`）— payload 觀察歷史讀取端截斷 + 機械 counter 摘要行**：`truncate_watch_history`（觸發 + [eval] + 最近 5 日行保留，連續省略 run 折疊為（中略 N 行））+ `compute_history_counters`（`counter day X/N（引自 MM-DD）` 僅引最近 5 日行內 token、過窗 stale 不引用；`已連續建議結案 N 個掃描日` 從完整歷史算）。注入順序 filter → inject_replace_streaks（028）→ truncate（counter 先推導後截斷）。僅 batter 路徑、零 prompt 變動。凍結 fixture 實測觀察中段 −59.7%（18,295 → 7,366 chars）。18 tests，全套 770 綠。**剩餘驗證：6/11 12:30 cron 後看 payload 觀察中段（中略 N 行）+ [機械計數] 行 + cost 較前日下降**（issue 存檔 raw 段可直接看）。注意：032 上線後 payload doc 建議 ②（建議結案自動化）的省幅前提已部分被 028 CLOSE + 032 截斷吃掉，若再評估以新基線量。
