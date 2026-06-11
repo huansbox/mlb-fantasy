@@ -36,32 +36,6 @@
 - 06-10：⚡ K% 25.9 + OPS .812 穩健連 7 天；Duran 14d OPS 回彈 .782（>.750）計數器重置 day 0/3；觸發：Duran <.750 連 3 天 → 執行（fa_scan）
 - 06-11：K% 29.6 回升破 28% 觸發線 + OPS .784；Duran 14d OPS .833 回彈計數器重置 day 0/3；觸發未達（fa_scan）
 
-### Paul Goldschmidt (NYY, 1B) [mlb_id:502671] — 觀察中
-觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
-- 05-14：xwOBA P95 / BB% P80 / Barrel% P95 / HH% P95 全面菁英結構；14d OPS .918 / 3 HR 驗證；prior P70/P25/P50 breakout 跳升；但 PA-TG 1.59 上場有限 + BBE 46 剛過門檻（fa_scan）（fa_scan）
-- 05-15：xwOBA P95 / Barrel% P95 / HH% P95 結構菁英持續；14d OPS .918 / 3 HR 驗證；但 PA-TG 1.59 上場有限 + BBE 46 信心仍低；prior P70/P25/P50 breakout 跳升（fa_scan）
-- 05-19：14d OPS 1.217 / 4 HR 菁英驗證但 PA-TG 1.69 上場有限觸發未達（fa_scan）
-- 05-20：14d OPS 1.174 / 4HR 菁英驗證持續但 PA-TG 1.69 上場有限觸發遠未達（fa_scan）
-- 05-21：14d OPS 1.207 / 4HR 菁英驗證持續但 PA-TG 1.74 上場有限觸發遠未達（fa_scan）
-- 05-22：14d OPS 1.138 / 4HR 菁英驗證持續但 PA-TG 1.78 上場有限觸發遠未達（fa_scan）
-- 05-23：14d OPS 1.094 / 4HR 菁英驗證持續但 PA-TG 1.83 上場有限觸發遠未達（fa_scan）
-- 05-24：14d OPS 1.094 / 4HR 菁英驗證持續但 PA-TG 1.83 上場有限觸發遠未達（fa_scan）
-- 05-25：14d OPS .994 / 3HR 菁英驗證持續但 PA-TG 1.85 上場有限觸發遠未達（fa_scan）
-- 05-26：14d OPS 1.015 / 3HR 菁英驗證持續但 PA-TG 1.89 上場有限觸發遠未達（fa_scan）
-- 05-27：14d OPS .948 / 3HR 菁英驗證持續但 PA-TG 1.96 上場有限觸發遠未達 2.5（fa_scan）
-- 05-28：14d OPS .981 / 3HR 菁英驗證持續但 PA-TG 2.02 上場有限觸發遠未達 2.5（fa_scan）
-- 05-29：14d OPS .981 / 3HR 菁英驗證持續但 PA-TG 2.02 上場有限觸發遠未達 2.5（fa_scan）
-- 05-30：14d OPS .903 / 3HR 菁英驗證持續；PA-TG 2.11 上場有限觸發遠未達 2.5（fa_scan）
-- 05-31：14d OPS .914 / 3HR 菁英驗證持續；PA-TG 2.12 上場有限觸發遠未達 2.5（fa_scan）
-- 06-01：14d OPS .771 / 2HR 菁英驗證持續；PA-TG 2.15 上場有限觸發遠未達 2.5（fa_scan）
-- 06-02：14d OPS .771 / 2HR；PA-TG 2.15 上場有限觸發遠未達 2.5（fa_scan）
-- 06-03：14d OPS .861 / 3HR；PA-TG 2.20 上場有限觸發遠未達 2.5（fa_scan）
-- 06-05：14d OPS .736 / 2HR；PA-TG 2.24 上場有限觸發遠未達 2.5（fa_scan）
-- 06-06：14d OPS .687 / 2HR；PA-TG 2.27 上場有限觸發遠未達 2.5（fa_scan）
-- 06-07：14d OPS .687 / 2HR；PA-TG 2.27 上場有限觸發遠未達 2.5；3d +3 rising（fa_scan）
-- 06-08：14d OPS .721 / 2HR；PA-TG 2.30 上場有限觸發遠未達 2.5；3d +1（fa_scan）
-- 06-10：14d OPS .887 / 3HR；PA-TG 2.36 上場有限觸發 2.5 遠未達；12% rising +2；持續觀察（fa_scan）
-
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
      或 Crawford 後 15 場 BB% 退至 <10% + AVG <.200 連 5 天 → 降級結案（breakout 消退確認）
@@ -245,6 +219,9 @@ vs：待定
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Paul Goldschmidt (NYY, 1B) — 被搶（自動偵測）
+- 2026-06-11：Yahoo ownership_type=team，從觀察中移除。
 
 ### Gavin Sheets (SD, 1B,LF,RF) [mlb_id:657757] — 已結案（fa_scan CLOSE）
 觸發：Duran 14d OPS <.650 連 3 天 → 立即取代 Duran
