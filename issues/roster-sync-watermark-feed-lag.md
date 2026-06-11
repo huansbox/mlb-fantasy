@@ -1,6 +1,11 @@
 # roster_sync watermark 推進漏交易（Yahoo transaction feed 晚浮出面）
 
-**狀態**：🔴 open（2026-06-11 發現，config 已手動 `--init` 修復 `73e7528`，根因未修）
+**狀態**：🟡 fix deployed（2026-06-12 merge `53332fb` + VPS cron 已加），待首班 reconcile cron 驗證
+- 已實作：修法 1（`compute_watermark` = max(seen tx ts)，monotonic，不再寫牆鐘）+ 修法 3 後半（`--reconcile` 每日全量 roster 對帳模式，cron `50 3 * * *` UTC = TW 11:50，fa_scan 前；發現 diff → 自動修復 + commit 標 `(reconcile recovery)` + Telegram 大聲警報）。8 新測試，全套 778 綠。
+- 已知接受的邊角：reconcile 若搶在 gate 前套用了新交易，gate 之後會走 classify_empty_diff retry → ~30h 後一次 spurious advance_alert（罕見、有界、config 已正確）。
+- 未實作：修法 2（overlap window）— reconcile 網已覆蓋同類風險，不疊加複雜度；修法 3 前半（fa_scan FA 池 ∩ roster alert）— reconcile 讓 config 滯後 ≤24h，FA 池污染窗口大幅縮小，暫不另做。
+- **剩餘驗證**：① 首班 reconcile cron（06-12 TW 11:50 後查 `/var/log/roster-sync.log` 應見「Reconcile: config matches Yahoo roster」）② 部署當下 Yahoo API 整體 500/502/503 故障中，e2e dry-run 未能跑 — cron 恢復後自然驗證。
+- 原始狀態（2026-06-11 發現，config 已手動 `--init` 修復 `73e7528`）：
 
 ## 事件
 
