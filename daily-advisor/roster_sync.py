@@ -183,6 +183,23 @@ def has_new_transactions(transactions, last_sync_ts):
     return any(tx["timestamp"] > last_sync_ts for tx in transactions)
 
 
+def compute_watermark(new_txns, last_sync):
+    """Next .last_sync value after processing new_txns.
+
+    Anchors to the newest *seen* transaction timestamp, never wall-clock
+    time. Writing time.time() here permanently skips any transaction that
+    surfaces late in Yahoo's feed with an earlier timestamp — third
+    missed-tx incident 6/10 (Dubón/Steer surfaced after a same-batch
+    Cantillo tx had advanced the watermark to poll time; see
+    issues/roster-sync-watermark-feed-lag.md). Anchoring to max(seen ts)
+    shrinks the skip window to same-batch partial visibility, which the
+    daily --reconcile pass then covers.
+
+    Monotonic: never moves backwards even if Yahoo returns a bogus ts.
+    """
+    return max([last_sync] + [tx["timestamp"] for tx in new_txns])
+
+
 # Max time to keep retrying when an add/drop transaction is visible in the
 # Yahoo transaction log but not yet reflected in the roster snapshot. Beyond
 # this, give up + alert rather than loop forever.
@@ -649,14 +666,14 @@ def sync_repo_before_edit(env=None):
     return False
 
 
-def git_commit_and_push(added_names, dropped_names, env=None):
+def git_commit_and_push(added_names, dropped_names, env=None, suffix=""):
     """Git add, commit, and push roster_config.json.
 
     No rebase here — sync_repo_before_edit() runs at main() start so
     the working copy is already on top of origin/master.
     """
     parts = [f"+{n}" for n in added_names] + [f"-{n}" for n in dropped_names]
-    msg = f"roster: {', '.join(parts)}"
+    msg = f"roster: {', '.join(parts)}{suffix}"
 
     try:
         subprocess.run(
@@ -852,12 +869,12 @@ def run_daily(league_key, my_key, token, config, env, dry_run):
                    "watermark to avoid an infinite retry loop. Manual check needed.")
             print(msg, file=sys.stderr)
             send_telegram(msg, env)
-            write_last_sync(int(time.time()))
+            write_last_sync(compute_watermark(new_txns, last_sync))
             return
         # decision == "advance": no add/drop roster impact (e.g. vetoed trade,
         # commish note) — safe to advance so we don't re-check it.
         print("Transactions detected but no roster impact. Done.", file=sys.stderr)
-        write_last_sync(int(time.time()))
+        write_last_sync(compute_watermark(new_txns, last_sync))
         return
 
     added_names = [p["name"] for p in added]
@@ -874,16 +891,66 @@ def run_daily(league_key, my_key, token, config, env, dry_run):
 
     config = update_config(config, roster, diff)
     save_config(config)
-    write_last_sync(int(time.time()))
+    write_last_sync(compute_watermark(new_txns, last_sync))
     print("Config updated.", file=sys.stderr)
 
     git_commit_and_push(added_names, dropped_names, env=env)
     send_notification(added_names, dropped_names, env)
 
 
+def run_reconcile(my_key, token, config, env, dry_run):
+    """Daily full-roster reconciliation — bypasses the transactions gate.
+
+    The gate (run_daily) can permanently miss a transaction when Yahoo's
+    feed surfaces it late (three incidents: 5/8, 5/16-19, 6/10). This mode
+    diffs the full Yahoo roster against config directly, so any missed
+    transaction self-heals within a day instead of lurking until a human
+    notices fa_scan recommending our own just-dropped player.
+
+    Does NOT touch .last_sync — watermark semantics stay with the gate.
+    Side effect accepted: if this front-runs a transaction the gate has not
+    yet processed, the gate later sees the tx with an empty diff and walks
+    the classify_empty_diff retry path until advance_alert (~30h, one
+    spurious Telegram). Rare and bounded; config is already correct.
+    """
+    roster = fetch_full_roster(my_key, token)
+    diff = diff_roster(roster, config)
+    added, dropped = diff["added"], diff["dropped"]
+
+    if not added and not dropped:
+        print("Reconcile: config matches Yahoo roster. Done.", file=sys.stderr)
+        return
+
+    added_names = [p["name"] for p in added]
+    dropped_names = [p["name"] for p in dropped]
+    print(f"Reconcile diff (gate missed): +{added_names} -{dropped_names}",
+          file=sys.stderr)
+
+    if dry_run:
+        print("[DRY RUN] No changes written.", file=sys.stderr)
+        return
+
+    config = update_config(config, roster, diff)
+    save_config(config)
+    git_commit_and_push(added_names, dropped_names, env=env,
+                        suffix=" (reconcile recovery)")
+
+    # Louder than the normal sync notification: a reconcile diff means the
+    # transactions gate missed something — worth a human glance at the log.
+    parts = [f"+{n}" for n in added_names] + [f"-{n}" for n in dropped_names]
+    send_telegram(
+        "[roster_sync] reconcile recovered roster changes the transactions "
+        f"gate missed: {', '.join(parts)} — check /var/log/roster-sync.log",
+        env,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description="Sync Yahoo roster to roster_config.json")
     parser.add_argument("--init", action="store_true", help="Full bootstrap: pull entire roster and build config")
+    parser.add_argument("--reconcile", action="store_true",
+                        help="Full-roster diff vs config, bypassing the transactions gate "
+                             "(daily safety net for gate-missed transactions)")
     parser.add_argument("--dry-run", action="store_true", help="Print diff without writing config or pushing")
     args = parser.parse_args()
 
@@ -903,6 +970,8 @@ def main():
 
     if args.init:
         run_init(my_key, token, config, args.dry_run)
+    elif args.reconcile:
+        run_reconcile(my_key, token, config, env, args.dry_run)
     else:
         run_daily(league_key, my_key, token, config, env, args.dry_run)
 

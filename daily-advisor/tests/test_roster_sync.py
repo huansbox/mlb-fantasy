@@ -5,6 +5,8 @@ from roster_sync import (
     MAX_ROSTER_LAG_SECONDS,
     _count_missing_fields,
     classify_empty_diff,
+    compute_watermark,
+    run_reconcile,
     search_mlb_id,
 )
 
@@ -89,6 +91,115 @@ def test_classify_missing_action_key_treated_as_no_impact():
     txns = [{"timestamp": NOW - 60, "type": "add/drop",
              "players": [{"name": "X"}]}]
     assert classify_empty_diff(txns, NOW, LAG) == "advance"
+
+
+# ── compute_watermark: feed-lag watermark fix ──
+#
+# Regression for the third missed-tx incident (6/10 Dubón/Steer): the
+# watermark was written as wall-clock poll time, so a transaction surfacing
+# late in Yahoo's feed with an earlier timestamp fell permanently outside
+# the `timestamp > last_sync` window. The watermark must anchor to the
+# newest SEEN transaction, never to time.time().
+
+
+def test_watermark_anchors_to_newest_seen_tx():
+    """Watermark = max processed tx timestamp, not poll wall-clock."""
+    txns = [_tx(NOW - 840, "add"), _tx(NOW - 60, "drop")]
+    assert compute_watermark(txns, last_sync=NOW - 900) == NOW - 60
+
+
+def test_watermark_leaves_room_for_late_surfacing_tx():
+    """A tx that surfaces next poll with ts between max(seen) and poll time
+    must still be detectable — i.e. the watermark must sit BELOW poll time."""
+    poll_time = NOW
+    seen = [_tx(NOW - 840, "add")]  # processed at 13:22, tx ts 13:08
+    wm = compute_watermark(seen, last_sync=NOW - 900)
+    late_tx_ts = NOW - 700  # surfaces one poll later, ts after the seen tx
+    assert late_tx_ts > wm  # detectable next run
+    assert wm < poll_time  # the old time.time() write would have hidden it
+
+
+def test_watermark_monotonic_never_regresses():
+    """Bogus/zero Yahoo timestamps must not move the watermark backwards."""
+    txns = [_tx(0, "add")]
+    assert compute_watermark(txns, last_sync=NOW) == NOW
+
+
+def test_watermark_no_txns_keeps_last_sync():
+    assert compute_watermark([], last_sync=NOW) == NOW
+
+
+# ── run_reconcile: daily full-roster safety net ──
+#
+# Bypasses the transactions gate entirely: full Yahoo roster vs config diff.
+# Catches any gate-missed transaction within a day. Must never touch
+# .last_sync (watermark semantics belong to the gate).
+
+_ROSTER_PLAYER = {
+    "name": "New Guy", "yahoo_player_key": "469.p.1", "team": "ATL",
+    "positions": ["2B"], "selected_pos": "BN", "status": "",
+}
+
+
+def _reconcile_env(diff):
+    """Patch run_reconcile's collaborators; return the mock bundle."""
+    return {
+        "fetch_full_roster": patch("roster_sync.fetch_full_roster", return_value=[_ROSTER_PLAYER]),
+        "diff_roster": patch("roster_sync.diff_roster", return_value=diff),
+        "update_config": patch("roster_sync.update_config", side_effect=lambda c, r, d: c),
+        "save_config": patch("roster_sync.save_config"),
+        "git": patch("roster_sync.git_commit_and_push"),
+        "telegram": patch("roster_sync.send_telegram"),
+        "write_last_sync": patch("roster_sync.write_last_sync"),
+    }
+
+
+def _run_reconcile_with(diff, dry_run=False):
+    patches = _reconcile_env(diff)
+    mocks = {}
+    try:
+        for key, p in patches.items():
+            mocks[key] = p.start()
+        run_reconcile("469.l.1.t.8", "token", {"batters": [], "pitchers": []},
+                      env={}, dry_run=dry_run)
+    finally:
+        patch.stopall()
+    return mocks
+
+
+def test_reconcile_no_diff_writes_nothing():
+    mocks = _run_reconcile_with({"added": [], "dropped": []})
+    mocks["save_config"].assert_not_called()
+    mocks["git"].assert_not_called()
+    mocks["telegram"].assert_not_called()
+
+
+def test_reconcile_diff_applies_and_alerts():
+    diff = {"added": [_ROSTER_PLAYER], "dropped": [{"name": "Old Guy"}]}
+    mocks = _run_reconcile_with(diff)
+    mocks["save_config"].assert_called_once()
+    mocks["git"].assert_called_once()
+    # commit message must mark this as a reconcile recovery
+    assert mocks["git"].call_args.kwargs.get("suffix") == " (reconcile recovery)"
+    # alert names both sides of the missed swap
+    alert_msg = mocks["telegram"].call_args.args[0]
+    assert "+New Guy" in alert_msg and "-Old Guy" in alert_msg
+
+
+def test_reconcile_never_touches_watermark():
+    """Watermark belongs to the gate; reconcile advancing it would skip
+    next-day-effective claims (Daily-Tomorrow league)."""
+    diff = {"added": [_ROSTER_PLAYER], "dropped": []}
+    mocks = _run_reconcile_with(diff)
+    mocks["write_last_sync"].assert_not_called()
+
+
+def test_reconcile_dry_run_writes_nothing():
+    diff = {"added": [_ROSTER_PLAYER], "dropped": []}
+    mocks = _run_reconcile_with(diff, dry_run=True)
+    mocks["save_config"].assert_not_called()
+    mocks["git"].assert_not_called()
+    mocks["telegram"].assert_not_called()
 
 
 def test_count_missing_fields_all_complete():
