@@ -265,6 +265,7 @@
 
 ### Peter Lambert (HOU, SP) — 被搶（自動偵測）
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
+- 06-11：Lambert wins 3 of 5 slots over Buehler by wide margins: IP/GS 5.7 vs 4.79, Whiff% 26.2 vs 17.3, xwOBACON .338 vs .389. Buehler holds only BB/9 (3.18 vs 3.95) and GB% (47.3 vs 42.8), but his 0th-percen（fa_scan）
 
 ### Colton Cowser (BAL, LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
