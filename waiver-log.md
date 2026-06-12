@@ -139,21 +139,11 @@
 - 06-11：14d OPS .960 / 4HR / 2SB；PA-TG 1.94 觸發 2.5 遠未達；1% 零壓力（fa_scan）
 - 06-12：14d OPS .960 / 4HR / 2SB；PA-TG 1.94 觸發 2.5 遠未達；1% 零壓力（fa_scan）
 
-### Shane Drohan (MIL, SP,RP) [mlb_id:675660] — 觀察中
-觸發：B2 2-step watch
-- 06-09：Cantillo's 21d xwOBACON 0.436 (+0.067 Δ, 51 BBE) confirms real deterioration, making him a valid drop candidate. However, no FA clears the bar for an add: Chad Patrick wins xwOBACON (0.339 vs 0.369) a（fa_scan）
-- 06-10：Drohan shows a 3-slot edge over Buehler (Whiff% 27.1 vs 17.3, BB/9 2.63 vs 3.18, xwOBACON .328 vs .389) with 106 BBE, but his 3 GS/13 G swingman role severely caps SP-slot volume (IP/W/QS), and his 21（fa_scan）
-
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
 - 06-10：Season P70/P95/P95/P80 power 結構強但 14d K% 35.8 massive spike 警訊；prior P40/P60/P40 非雙年確認；5% 零壓力（fa_scan）
 - 06-11：14d K% 35.8 massive spike 持續；觸發 <28% 連 5 天極遠；prior P40 非雙年確認；5% 零壓力（fa_scan）
 - 06-12：14d K% 35.8 massive spike 持續；觸發 <28% 極遠；prior P40 非雙年確認（fa_scan）
-
-### Jac Caglianone (KC, 1B,RF) [mlb_id:695506] — 觀察中
-觸發：立即行動
-vs：Arraez
-- 06-11：[立即取代→Arraez] xwOBA P95/Barrel% P95/HH% P95 結構碾壓；14d OPS 1.090 + Savant xwOBA 0.497 品質飆升；48% plateau（fa_scan）
 
 ### Isaac Paredes (HOU, 3B) [mlb_id:670623] — 觀察中
 觸發：立即行動
@@ -210,6 +200,12 @@ vs：待定
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Shane Drohan (MIL, SP,RP) — 被搶（自動偵測）
+- 2026-06-12：Yahoo ownership_type=team，從觀察中移除。
+
+### Jac Caglianone (KC, 1B,RF) — 被搶（自動偵測）
+- 2026-06-12：Yahoo ownership_type=team，從觀察中移除。
 
 ### TJ Rumfield (COL, 1B) [mlb_id:681198] — 已結案（fa_scan CLOSE）
 觸發：BBE ≥100 + xwOBA 維持 P80+ + 客場 OPS ≥.750 → 升級取代
