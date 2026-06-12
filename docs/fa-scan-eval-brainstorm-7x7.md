@@ -3,6 +3,7 @@
 > **任務性質**：純研究探索，不動任何程式碼。產出方式 = multi-agent workflow（3 個 ground agent 盤點現況 / 6 個 lens brainstorm agent 各自上網查證 2024-2026 sabermetrics 進展 / 3 個 domain critic 去重 + 可行性審查），45 個提案合併為 36 項評估。
 > **本文件是裁決素材**：所有 verdict（adopt_now / pilot / research_more / reject）為 AI 建議，未經用戶裁決前不進 PRD、不動 code。
 > ⚠️ 文中「已實測」指本次 workflow agent 當下驗證（endpoint 回 200 / CSV 可下載等）。實作 session 仍須重新驗證（`feedback_no_hardcode_facts` 鐵律：不憑記憶 hardcode 事實）。
+> **後續修正（2026-06-12）**：用戶質疑「只用 Walker 一案太武斷」→ 全季決策回溯完成，見 [`fa-scan-decision-retrospective-2026h1.md`](fa-scan-decision-retrospective-2026h1.md)。結論：Walker 非孤例（add 端 ~8/10 命中），但實證代價重排了本文件的優先序 — **churn/drop 紀律與執行洞比「更早找到人」更貴**；heat-led 推薦（Sheets/Pederson 型）幾乎全敗需降權；新增零成本提案 discovery-channel tag。閱讀本文件 §6 roadmap 前先讀該回溯 §6。
 
 ## 1. 問題定義
 
