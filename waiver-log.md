@@ -284,6 +284,7 @@ vs：待定
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
 - 06-11：Lambert wins 3 of 5 slots over Buehler by wide margins: IP/GS 5.7 vs 4.79, Whiff% 26.2 vs 17.3, xwOBACON .338 vs .389. Buehler holds only BB/9 (3.18 vs 3.95) and GB% (47.3 vs 42.8), but his 0th-percen（fa_scan）
 - 06-12：Lambert beats Buehler in 3 of 5 slots (IP/GS 5.70 vs 4.79, Whiff% 25.3 vs 17.3, xwOBACON .337 vs .389) but his BB/9 3.95 (0th pctl) is worse than Buehler's 3.18 (25th), he carries a DTD tag, and a com（fa_scan）
+- 06-13：Lambert holds a clear 3-slot edge over Buehler: IP/GS 5.7 vs 4.79 (60th vs 0th), Whiff% 25.3 vs 17.3 (60th vs 0th), xwOBACON .337 vs .389 (95th vs 0th). Buehler's two 'wins' are marginal (BB/9 25th vs（fa_scan）
 
 ### Colton Cowser (BAL, LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
