@@ -16,10 +16,9 @@
 
 ## Acceptance criteria
 
-- [ ] 擴充 `savant_rolling` 聚合保留 `description` + `release_speed`（pitch-level），不破壞既有 BBE 級輸出
-- [ ] CSW% 21d / velo 三窗 delta / K-BB% ladder 各為純函式 + payload 行（CSW 永遠 context 行不進 Sum — 21d<穩定點）
-- [ ] 單元測試：CSW 分子聚合 / velo delta 三窗 / K-BB stabilization 框架文字
-- [ ] 三 tag 注入 SP payload，受 039 payload_budget 守門
+- [x] **擴充 `savant_rolling` 聚合保留 pitch-level（merge `ea4b9e3`）**：`_pitch_level_metrics` 逐球遍歷算 CSW%（called+swinging strikes / 總球）+ velo by pitch_type + primary fastball velo，merge 進 pitcher result（batter 不變）。真實 CSV 欄名已對 2025 Savant 驗證（`description`/`release_speed`/`pitch_type` 皆在）。+6 tests。**環境註記**：本機抓 2026 窗回 0 rows（模擬季無真實 Savant 資料），2025 窗正常 — VPS 端視其資料源。
+- [ ] CSW% 21d delta vs season / velo 三窗 delta / K-BB% ladder 各為純函式 + payload 行（CSW 永遠 context 行不進 Sum）— **計算用聚合已備的 csw_pct/velo_fb**
+- [ ] 三 tag 注入 SP payload，受 039 payload_budget 守門 — **併 318b 批**
 
 ## Blocked by
 
