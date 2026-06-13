@@ -21,7 +21,7 @@
 | [`034-pa-tg-gap-warn-tag`](034-pa-tg-gap-warn-tag.md) | AFK | 無 | ✅ 2026-06-10（merge `57abeec`）；**隔日驗證 ✅ 2026-06-11**（FA/watch 多人帶 ⚠️ 上場量落差 tag） |
 | [`035-woba-xwoba-luck-field`](035-woba-xwoba-luck-field.md) | AFK | 無 | ✅ 2026-06-10（merge `8a651ae`）；**隔日驗證 ✅ 2026-06-11**（season 顯著標記 + 14d 列值 + legend 行皆現，LLM 已引用入判斷） |
 | [`036-fa-sort-key-debias`](036-fa-sort-key-debias.md) | AFK | 無 | ✅ 2026-06-10（雲端 session 完工，PR #308 merge `7e8bc91`）；**隔日驗證 ✅ 2026-06-11**（FA 順序 87→1% 嚴格降序） |
-| [`037-trigger-schema-constraint`](037-trigger-schema-constraint.md) | HITL | 028（同 prompt 分批上線） | ⏳ 未開工 |
+| [`037-trigger-schema-constraint`](037-trigger-schema-constraint.md) | HITL | 028（同 prompt 分批上線） | ✅ 2026-06-13（merge `585a736`，VPS A/B 通過：output −12% + 觸發機械可判定，核心決策不變）；剩一週 spot-check 被動觀察 |
 
 ### 開工順序（曆法長竿驅動）
 
