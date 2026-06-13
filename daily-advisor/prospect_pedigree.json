@@ -1,0 +1,808 @@
+{
+  "meta": {
+    "updated": "2026-06-13",
+    "source": "Bleacher Report annual Top 100 MLB Prospects (seed)",
+    "source_years": [
+      2023,
+      2024,
+      2025
+    ],
+    "stale_after_month": 3,
+    "resolved": 158,
+    "needs_review": 83,
+    "aged_out": 1,
+    "note": "Join key is mlb_id (API-verified). name is descriptive only. Only MLB-debuted prospects are kept — undebuted ones go to needs_review and are excluded until they reach MLB. Refresh each March: paste the new Top 100 into prospect_rankings_raw.tsv, rerun."
+  },
+  "prospects": {
+    "666310": {
+      "best_rank": 57,
+      "best_rank_year": 2023,
+      "name": "Bo Naylor"
+    },
+    "666397": {
+      "best_rank": 100,
+      "best_rank_year": 2023,
+      "name": "Edouard Julien"
+    },
+    "668904": {
+      "best_rank": 68,
+      "best_rank_year": 2023,
+      "name": "Royce Lewis"
+    },
+    "668909": {
+      "best_rank": 32,
+      "best_rank_year": 2023,
+      "name": "Gavin Williams"
+    },
+    "669003": {
+      "best_rank": 92,
+      "best_rank_year": 2023,
+      "name": "Garrett Mitchell"
+    },
+    "669084": {
+      "best_rank": 42,
+      "best_rank_year": 2023,
+      "name": "DL Hall"
+    },
+    "669224": {
+      "best_rank": 86,
+      "best_rank_year": 2023,
+      "name": "Austin Wells"
+    },
+    "671213": {
+      "best_rank": 25,
+      "best_rank_year": 2023,
+      "name": "Triston Casas"
+    },
+    "671655": {
+      "best_rank": 43,
+      "best_rank_year": 2023,
+      "name": "George Valera"
+    },
+    "671737": {
+      "best_rank": 14,
+      "best_rank_year": 2023,
+      "name": "Taj Bradley"
+    },
+    "672012": {
+      "best_rank": 73,
+      "best_rank_year": 2024,
+      "name": "Tyler Black"
+    },
+    "672724": {
+      "best_rank": 36,
+      "best_rank_year": 2023,
+      "name": "Oswald Peraza"
+    },
+    "673237": {
+      "best_rank": 82,
+      "best_rank_year": 2023,
+      "name": "Yainer Díaz"
+    },
+    "673962": {
+      "best_rank": 45,
+      "best_rank_year": 2023,
+      "name": "Josh Jung"
+    },
+    "676059": {
+      "best_rank": 72,
+      "best_rank_year": 2023,
+      "name": "Jordan Westburg"
+    },
+    "676272": {
+      "best_rank": 21,
+      "best_rank_year": 2023,
+      "name": "Bobby Miller"
+    },
+    "676475": {
+      "best_rank": 63,
+      "best_rank_year": 2023,
+      "name": "Alec Burleson"
+    },
+    "676917": {
+      "best_rank": 53,
+      "best_rank_year": 2023,
+      "name": "Cade Cavalli"
+    },
+    "676962": {
+      "best_rank": 58,
+      "best_rank_year": 2024,
+      "name": "Ben Brown"
+    },
+    "676974": {
+      "best_rank": 39,
+      "best_rank_year": 2023,
+      "name": "Max Meyer"
+    },
+    "677008": {
+      "best_rank": 35,
+      "best_rank_year": 2024,
+      "name": "Heston Kjerstad"
+    },
+    "677587": {
+      "best_rank": 50,
+      "best_rank_year": 2024,
+      "name": "Brayan Rocchio"
+    },
+    "677595": {
+      "best_rank": 75,
+      "best_rank_year": 2024,
+      "name": "Ronny Mauricio"
+    },
+    "677958": {
+      "best_rank": 23,
+      "best_rank_year": 2025,
+      "name": "Kumar Rocker"
+    },
+    "678246": {
+      "best_rank": 28,
+      "best_rank_year": 2023,
+      "name": "Miguel Vargas"
+    },
+    "678554": {
+      "best_rank": 29,
+      "best_rank_year": 2023,
+      "name": "Curtis Mead"
+    },
+    "678662": {
+      "best_rank": 16,
+      "best_rank_year": 2023,
+      "name": "Ezequiel Tovar"
+    },
+    "678882": {
+      "best_rank": 65,
+      "best_rank_year": 2024,
+      "name": "Ceddanne Rafaela"
+    },
+    "680570": {
+      "best_rank": 6,
+      "best_rank_year": 2023,
+      "name": "Grayson Rodriguez"
+    },
+    "680744": {
+      "best_rank": 96,
+      "best_rank_year": 2023,
+      "name": "Ty Madden"
+    },
+    "680779": {
+      "best_rank": 59,
+      "best_rank_year": 2023,
+      "name": "Henry Davis"
+    },
+    "681297": {
+      "best_rank": 18,
+      "best_rank_year": 2024,
+      "name": "Colton Cowser"
+    },
+    "681351": {
+      "best_rank": 54,
+      "best_rank_year": 2023,
+      "name": "Logan O'Hoppe"
+    },
+    "681624": {
+      "best_rank": 79,
+      "best_rank_year": 2023,
+      "name": "Andy Pages"
+    },
+    "682254": {
+      "best_rank": 97,
+      "best_rank_year": 2023,
+      "name": "Mason Montgomery"
+    },
+    "682617": {
+      "best_rank": 11,
+      "best_rank_year": 2023,
+      "name": "Marco Luciano"
+    },
+    "682619": {
+      "best_rank": 66,
+      "best_rank_year": 2024,
+      "name": "Orelvis Martinez"
+    },
+    "682622": {
+      "best_rank": 24,
+      "best_rank_year": 2024,
+      "name": "Noelvi Marté"
+    },
+    "682626": {
+      "best_rank": 1,
+      "best_rank_year": 2023,
+      "name": "Francisco Álvarez"
+    },
+    "682634": {
+      "best_rank": 98,
+      "best_rank_year": 2023,
+      "name": "Kevin Alcántara"
+    },
+    "682663": {
+      "best_rank": 92,
+      "best_rank_year": 2025,
+      "name": "Agustin Ramírez"
+    },
+    "682668": {
+      "best_rank": 46,
+      "best_rank_year": 2024,
+      "name": "Luisangel Acuña"
+    },
+    "682829": {
+      "best_rank": 7,
+      "best_rank_year": 2023,
+      "name": "Elly De La Cruz"
+    },
+    "682848": {
+      "best_rank": 46,
+      "best_rank_year": 2023,
+      "name": "Endy Rodriguez"
+    },
+    "682982": {
+      "best_rank": 19,
+      "best_rank_year": 2023,
+      "name": "Daniel Espino"
+    },
+    "682990": {
+      "best_rank": 64,
+      "best_rank_year": 2023,
+      "name": "Quinn Priester"
+    },
+    "682998": {
+      "best_rank": 8,
+      "best_rank_year": 2023,
+      "name": "Corbin Carroll"
+    },
+    "683002": {
+      "best_rank": 2,
+      "best_rank_year": 2023,
+      "name": "Gunnar Henderson"
+    },
+    "683003": {
+      "best_rank": 77,
+      "best_rank_year": 2024,
+      "name": "Jared Jones"
+    },
+    "683004": {
+      "best_rank": 60,
+      "best_rank_year": 2023,
+      "name": "Jack Leiter"
+    },
+    "683011": {
+      "best_rank": 9,
+      "best_rank_year": 2023,
+      "name": "Anthony Volpe"
+    },
+    "683146": {
+      "best_rank": 26,
+      "best_rank_year": 2023,
+      "name": "Brett Baty"
+    },
+    "683357": {
+      "best_rank": 58,
+      "best_rank_year": 2025,
+      "name": "Owen Caissie"
+    },
+    "683568": {
+      "best_rank": 93,
+      "best_rank_year": 2024,
+      "name": "Jairo Iriarte"
+    },
+    "683737": {
+      "best_rank": 44,
+      "best_rank_year": 2023,
+      "name": "Michael Busch"
+    },
+    "683953": {
+      "best_rank": 8,
+      "best_rank_year": 2025,
+      "name": "Travis Bazzana"
+    },
+    "686217": {
+      "best_rank": 55,
+      "best_rank_year": 2023,
+      "name": "Sal Frelick"
+    },
+    "686610": {
+      "best_rank": 74,
+      "best_rank_year": 2023,
+      "name": "Ken Waldichuk"
+    },
+    "686611": {
+      "best_rank": 5,
+      "best_rank_year": 2024,
+      "name": "Dylan Crews"
+    },
+    "686613": {
+      "best_rank": 30,
+      "best_rank_year": 2023,
+      "name": "Hunter Brown"
+    },
+    "686752": {
+      "best_rank": 83,
+      "best_rank_year": 2023,
+      "name": "Ryan Pepiot"
+    },
+    "686797": {
+      "best_rank": 21,
+      "best_rank_year": 2024,
+      "name": "Brooks Lee"
+    },
+    "686894": {
+      "best_rank": 81,
+      "best_rank_year": 2023,
+      "name": "Joey Wiemer"
+    },
+    "686948": {
+      "best_rank": 44,
+      "best_rank_year": 2025,
+      "name": "Drake Baldwin"
+    },
+    "687075": {
+      "best_rank": 35,
+      "best_rank_year": 2025,
+      "name": "Brandon Sproat"
+    },
+    "687221": {
+      "best_rank": 33,
+      "best_rank_year": 2025,
+      "name": "Dalton Rushing"
+    },
+    "687263": {
+      "best_rank": 91,
+      "best_rank_year": 2023,
+      "name": "Zach Neto"
+    },
+    "687363": {
+      "best_rank": 84,
+      "best_rank_year": 2024,
+      "name": "Victor Scott II"
+    },
+    "687401": {
+      "best_rank": 90,
+      "best_rank_year": 2024,
+      "name": "Joey Ortiz"
+    },
+    "687515": {
+      "best_rank": 79,
+      "best_rank_year": 2025,
+      "name": "Colby Thomas"
+    },
+    "687551": {
+      "best_rank": 63,
+      "best_rank_year": 2024,
+      "name": "Drew Gilbert"
+    },
+    "687931": {
+      "best_rank": 83,
+      "best_rank_year": 2024,
+      "name": "Carson Whisenhunt"
+    },
+    "688107": {
+      "best_rank": 89,
+      "best_rank_year": 2024,
+      "name": "Robert Gasser"
+    },
+    "689200": {
+      "best_rank": 98,
+      "best_rank_year": 2025,
+      "name": "Jacob Melton"
+    },
+    "689672": {
+      "best_rank": 82,
+      "best_rank_year": 2024,
+      "name": "Drew Thorpe"
+    },
+    "690291": {
+      "best_rank": 85,
+      "best_rank_year": 2023,
+      "name": "Jace Jung"
+    },
+    "690953": {
+      "best_rank": 37,
+      "best_rank_year": 2024,
+      "name": "Mick Abel"
+    },
+    "690976": {
+      "best_rank": 65,
+      "best_rank_year": 2025,
+      "name": "Alex Freeland"
+    },
+    "690986": {
+      "best_rank": 15,
+      "best_rank_year": 2023,
+      "name": "Kyle Harrison"
+    },
+    "690987": {
+      "best_rank": 22,
+      "best_rank_year": 2023,
+      "name": "Robert Hassell III"
+    },
+    "690990": {
+      "best_rank": 15,
+      "best_rank_year": 2024,
+      "name": "Cade Horton"
+    },
+    "690993": {
+      "best_rank": 13,
+      "best_rank_year": 2024,
+      "name": "Colt Keith"
+    },
+    "691011": {
+      "best_rank": 61,
+      "best_rank_year": 2023,
+      "name": "Drew Romo"
+    },
+    "691016": {
+      "best_rank": 34,
+      "best_rank_year": 2023,
+      "name": "Tyler Soderstrom"
+    },
+    "691019": {
+      "best_rank": 36,
+      "best_rank_year": 2025,
+      "name": "Kyle Teel"
+    },
+    "691023": {
+      "best_rank": 4,
+      "best_rank_year": 2023,
+      "name": "Jordan Walker"
+    },
+    "691026": {
+      "best_rank": 36,
+      "best_rank_year": 2024,
+      "name": "Masyn Winn"
+    },
+    "691176": {
+      "best_rank": 16,
+      "best_rank_year": 2024,
+      "name": "Jasson Dominguez"
+    },
+    "691182": {
+      "best_rank": 28,
+      "best_rank_year": 2024,
+      "name": "Adael Amador"
+    },
+    "691406": {
+      "best_rank": 4,
+      "best_rank_year": 2024,
+      "name": "Junior Caminero"
+    },
+    "691587": {
+      "best_rank": 10,
+      "best_rank_year": 2023,
+      "name": "Eury Pérez"
+    },
+    "691620": {
+      "best_rank": 34,
+      "best_rank_year": 2024,
+      "name": "Jeferson Quero"
+    },
+    "691718": {
+      "best_rank": 12,
+      "best_rank_year": 2024,
+      "name": "Pete Crow-Armstrong"
+    },
+    "691723": {
+      "best_rank": 22,
+      "best_rank_year": 2025,
+      "name": "Coby Mayo"
+    },
+    "691725": {
+      "best_rank": 16,
+      "best_rank_year": 2025,
+      "name": "Andrew Painter"
+    },
+    "691728": {
+      "best_rank": 20,
+      "best_rank_year": 2023,
+      "name": "Zac Veen"
+    },
+    "691781": {
+      "best_rank": 54,
+      "best_rank_year": 2024,
+      "name": "Brady House"
+    },
+    "691783": {
+      "best_rank": 3,
+      "best_rank_year": 2023,
+      "name": "Jordan Lawlar"
+    },
+    "691785": {
+      "best_rank": 7,
+      "best_rank_year": 2025,
+      "name": "Marcelo Mayer"
+    },
+    "692225": {
+      "best_rank": 4,
+      "best_rank_year": 2025,
+      "name": "Kristian Campbell"
+    },
+    "692585": {
+      "best_rank": 56,
+      "best_rank_year": 2024,
+      "name": "Yanquiel Fernandez"
+    },
+    "693049": {
+      "best_rank": 65,
+      "best_rank_year": 2023,
+      "name": "Oscar Colás"
+    },
+    "694192": {
+      "best_rank": 2,
+      "best_rank_year": 2024,
+      "name": "Jackson Chourio"
+    },
+    "694208": {
+      "best_rank": 55,
+      "best_rank_year": 2025,
+      "name": "Moises Ballesteros"
+    },
+    "694212": {
+      "best_rank": 13,
+      "best_rank_year": 2025,
+      "name": "Samuel Basallo"
+    },
+    "694224": {
+      "best_rank": 62,
+      "best_rank_year": 2024,
+      "name": "Gabriel Gonzalez"
+    },
+    "694249": {
+      "best_rank": 86,
+      "best_rank_year": 2025,
+      "name": "Cole Carrigg"
+    },
+    "694297": {
+      "best_rank": 88,
+      "best_rank_year": 2023,
+      "name": "Brandon Pfaadt"
+    },
+    "694371": {
+      "best_rank": 95,
+      "best_rank_year": 2024,
+      "name": "Tommy Troy"
+    },
+    "694377": {
+      "best_rank": 98,
+      "best_rank_year": 2024,
+      "name": "Nick Yorke"
+    },
+    "694384": {
+      "best_rank": 42,
+      "best_rank_year": 2024,
+      "name": "Nolan Schanuel"
+    },
+    "694462": {
+      "best_rank": 67,
+      "best_rank_year": 2024,
+      "name": "Hurston Waldrep"
+    },
+    "694497": {
+      "best_rank": 3,
+      "best_rank_year": 2024,
+      "name": "Evan Carter"
+    },
+    "694671": {
+      "best_rank": 14,
+      "best_rank_year": 2024,
+      "name": "Wyatt Langford"
+    },
+    "694728": {
+      "best_rank": 88,
+      "best_rank_year": 2025,
+      "name": "Brice Matthews"
+    },
+    "694813": {
+      "best_rank": 69,
+      "best_rank_year": 2023,
+      "name": "Gavin Stone"
+    },
+    "694819": {
+      "best_rank": 38,
+      "best_rank_year": 2024,
+      "name": "Jacob Misiorowski"
+    },
+    "694973": {
+      "best_rank": 6,
+      "best_rank_year": 2024,
+      "name": "Paul Skenes"
+    },
+    "695076": {
+      "best_rank": 24,
+      "best_rank_year": 2025,
+      "name": "Rhett Lowder"
+    },
+    "695243": {
+      "best_rank": 72,
+      "best_rank_year": 2024,
+      "name": "Mason Miller"
+    },
+    "695490": {
+      "best_rank": 41,
+      "best_rank_year": 2023,
+      "name": "Edwin Arroyo"
+    },
+    "695505": {
+      "best_rank": 27,
+      "best_rank_year": 2025,
+      "name": "Chase Burns"
+    },
+    "695506": {
+      "best_rank": 26,
+      "best_rank_year": 2025,
+      "name": "Jac Caglianone"
+    },
+    "695549": {
+      "best_rank": 2,
+      "best_rank_year": 2025,
+      "name": "Jackson Jobe"
+    },
+    "695578": {
+      "best_rank": 7,
+      "best_rank_year": 2024,
+      "name": "James Wood"
+    },
+    "695657": {
+      "best_rank": 17,
+      "best_rank_year": 2024,
+      "name": "Colson Montgomery"
+    },
+    "695670": {
+      "best_rank": 30,
+      "best_rank_year": 2024,
+      "name": "Harry Ford"
+    },
+    "695681": {
+      "best_rank": 62,
+      "best_rank_year": 2025,
+      "name": "Christian Moore"
+    },
+    "695731": {
+      "best_rank": 67,
+      "best_rank_year": 2025,
+      "name": "Braden Montgomery"
+    },
+    "696136": {
+      "best_rank": 68,
+      "best_rank_year": 2024,
+      "name": "Jordan Wicks"
+    },
+    "696149": {
+      "best_rank": 9,
+      "best_rank_year": 2025,
+      "name": "Bubba Chandler"
+    },
+    "700246": {
+      "best_rank": 3,
+      "best_rank_year": 2025,
+      "name": "Carson Williams"
+    },
+    "700337": {
+      "best_rank": 78,
+      "best_rank_year": 2025,
+      "name": "Edgar Quero"
+    },
+    "700363": {
+      "best_rank": 41,
+      "best_rank_year": 2024,
+      "name": "AJ Smith-Shawver"
+    },
+    "700669": {
+      "best_rank": 84,
+      "best_rank_year": 2023,
+      "name": "Gordon Graceffo"
+    },
+    "700932": {
+      "best_rank": 90,
+      "best_rank_year": 2023,
+      "name": "Kyle Manzardo"
+    },
+    "701350": {
+      "best_rank": 1,
+      "best_rank_year": 2025,
+      "name": "Roman Anthony"
+    },
+    "701358": {
+      "best_rank": 25,
+      "best_rank_year": 2025,
+      "name": "Cam Smith"
+    },
+    "701538": {
+      "best_rank": 11,
+      "best_rank_year": 2024,
+      "name": "Jackson Merrill"
+    },
+    "701762": {
+      "best_rank": 42,
+      "best_rank_year": 2025,
+      "name": "Nick Kurtz"
+    },
+    "702222": {
+      "best_rank": 47,
+      "best_rank_year": 2024,
+      "name": "Justin Crawford"
+    },
+    "702273": {
+      "best_rank": 10,
+      "best_rank_year": 2025,
+      "name": "Noah Schultz"
+    },
+    "702281": {
+      "best_rank": 29,
+      "best_rank_year": 2024,
+      "name": "Robby Snelling"
+    },
+    "702284": {
+      "best_rank": 43,
+      "best_rank_year": 2024,
+      "name": "Cole Young"
+    },
+    "702616": {
+      "best_rank": 1,
+      "best_rank_year": 2024,
+      "name": "Jackson Holliday"
+    },
+    "702674": {
+      "best_rank": 53,
+      "best_rank_year": 2025,
+      "name": "Caden Dana"
+    },
+    "800050": {
+      "best_rank": 56,
+      "best_rank_year": 2025,
+      "name": "Chase DeLauter"
+    },
+    "801403": {
+      "best_rank": 6,
+      "best_rank_year": 2025,
+      "name": "Chase Dollander"
+    },
+    "802139": {
+      "best_rank": 28,
+      "best_rank_year": 2025,
+      "name": "JJ Wetherholt"
+    },
+    "802415": {
+      "best_rank": 75,
+      "best_rank_year": 2025,
+      "name": "Chandler Simpson"
+    },
+    "802419": {
+      "best_rank": 60,
+      "best_rank_year": 2025,
+      "name": "Thomas Harrington"
+    },
+    "804606": {
+      "best_rank": 72,
+      "best_rank_year": 2025,
+      "name": "Konnor Griffin"
+    },
+    "805779": {
+      "best_rank": 37,
+      "best_rank_year": 2025,
+      "name": "Jacob Wilson"
+    },
+    "805808": {
+      "best_rank": 20,
+      "best_rank_year": 2025,
+      "name": "Kevin McGonigle"
+    },
+    "805811": {
+      "best_rank": 12,
+      "best_rank_year": 2025,
+      "name": "Bryce Eldridge"
+    },
+    "806068": {
+      "best_rank": 19,
+      "best_rank_year": 2025,
+      "name": "Colt Emerson"
+    },
+    "807712": {
+      "best_rank": 61,
+      "best_rank_year": 2025,
+      "name": "Luke Keaschall"
+    },
+    "807713": {
+      "best_rank": 17,
+      "best_rank_year": 2025,
+      "name": "Matt Shaw"
+    }
+  }
+}
