@@ -74,11 +74,28 @@ from _backtest_lib import (
 )
 from _multi_agent import run_single_agent
 from backtest_track import fetch_recent_issues, search_mlb_id
+from backtest_kpi import (
+    aggregate_execution_delay,
+    aggregate_hit_rate_by_stars,
+    attach_ledger_stars,
+    count_regret_events,
+    format_kpi_lines,
+)
 
 _MODULE_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _MODULE_DIR.parent
 _BATTER_DOC = _REPO_ROOT / "docs" / "batter-decisions-backtest.md"
 _ROSTER_CONFIG = _MODULE_DIR / "roster_config.json"
+_DECISION_LEDGER = _REPO_ROOT / "decision-ledger.json"
+
+
+def _load_ledger_histories():
+    """{player: [LedgerEntry]} from decision-ledger.json, or {} if absent
+    (issue 051 — stars/regret source; injected in tests)."""
+    if not _DECISION_LEDGER.exists():
+        return {}
+    from decision_ledger import DecisionLedger
+    return DecisionLedger(_DECISION_LEDGER).all_histories()
 
 # Post-verdict observation window (days). Same length as the SP side —
 # both feed the Sunday cron's [21, 28) reconciliation-age window.
@@ -361,7 +378,8 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
                        _search_mlb_id=None,
                        _roster_index=None,
                        _roster_timeline=None,
-                       _judge_runner=None) -> dict:
+                       _judge_runner=None,
+                       _ledger_histories=None) -> dict:
     """Full pipeline: fetch issues → parse batter verdicts → dedupe episodes
     → select due episodes (age in [age_min, age_max)) → six-category
     scorecards → judge panel → stats dict.
@@ -414,6 +432,12 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
     else:
         judge_panel = {"status": "skipped", "n_calls": 0}
 
+    # Issue 051 KPIs: join ledger stars onto the rows, then derive the
+    # star-bucket hit-rate, trigger→execution delay, and regret events.
+    ledger_histories = (_ledger_histories if _ledger_histories is not None
+                        else _load_ledger_histories())
+    attach_ledger_stars(rows, ledger_histories)
+
     return {
         "run_date": today.isoformat(),
         "age_window": [age_min, age_max],
@@ -429,6 +453,9 @@ def run_weekly_summary(age_min: int = _DEFAULT_AGE_MIN,
         "executed_split": aggregate_executed_split(rows),
         "judge_panel": judge_panel,
         "outcome_by_kind": aggregate_outcome_by_kind(rows),
+        "hit_rate_by_stars": aggregate_hit_rate_by_stars(rows),
+        "execution_delay": aggregate_execution_delay(rows),
+        "regret_events": count_regret_events(rows, ledger_histories),
         "date_range": _date_range(due),
         "episodes": rows,
     }
@@ -474,6 +501,7 @@ def format_batter_weekly_section(stats: dict) -> str:
         f"episodes in lookback: {stats['n_episodes_in_lookback']}){zero_marker}",
         *_fmt_judge_lines(stats),
         _fmt_executed_split_line(stats),
+        *format_kpi_lines(stats),
     ]
     rows = stats.get("episodes") or []
     if rows:

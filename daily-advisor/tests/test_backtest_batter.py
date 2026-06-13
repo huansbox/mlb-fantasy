@@ -387,6 +387,29 @@ class TestPipeline:
         assert ep["scorecard"] is None
         assert "Joc Pederson" in " ".join(ep["missing"])
 
+    def test_kpi_keys_and_section_with_injected_ledger(self):
+        from decision_ledger import LedgerEntry
+        today = date(2026, 7, 5)
+        issues = [_issue(_block_body(REPLACE_LINES), "2026-06-12T04:30:00Z")]
+        led = {"Joc Pederson": [
+            LedgerEntry("Joc Pederson", "立即取代", "2026-06-12", stars=4)]}
+        stats = run_weekly_summary(
+            today=today,
+            _fetch_issues=lambda days, repo, label: issues,
+            _fetch_stats=lambda mlb_id, start: {
+                1001: STATS_FA, 2001: STATS_MY}.get(mlb_id),
+            _search_mlb_id=lambda name: {
+                "Joc Pederson": 1001, "Luis Arraez": 2001}.get(name),
+            _roster_index={}, _roster_timeline=[],
+            _ledger_histories=led,
+        )
+        assert {"hit_rate_by_stars", "execution_delay",
+                "regret_events"} <= set(stats)
+        assert stats["hit_rate_by_stars"]["4★"]["n"] == 1
+        assert stats["episodes"][0]["stars"] == 4
+        section = format_batter_weekly_section(stats)
+        assert "star-bucket 命中率" in section and "觸發→執行延遲" in section
+
     def test_zero_due_episodes_is_valid_output(self):
         stats = self._run([], date(2026, 7, 5))
         assert stats["n_total"] == 0
