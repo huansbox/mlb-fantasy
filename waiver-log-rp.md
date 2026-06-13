@@ -6,21 +6,14 @@
 
 ## 隊上 RP（SV+H 持有）
 
-### Gregory Soto（PIT, RP）— added 2026-06-01（drop Kevin Kelly）
+> 2026-06-13：drop Soto 後，隊上僅剩 Ferrer 1 位純 RP（隊形考量讓出 1 格）。1 RP 與 punt SV+H 一致；若 SV+H 轉 contested 再用 `/rp-svh` 從 FA 串 save-getter。
 
-- **取得**：FA $0 即時生效（VPS roster_sync 自動偵測，commit `71168c7` `+Gregory Soto, -Kevin Kelly`）。
-- **2026-06-01 eval（vs King/Ferrer，只看 SV+H）**：三者最強 — SV+H 13（最高）、ERA 1.95 / WHIP **0.76** / K 32。46% owned（市場已認證）。
-- **選他理由**：三者唯一往 closer 走（save 上限 > setup hold）；近 9 場 8 場無失分、11:2 K:BB；教練 Don Kelly 偏好 closer 選項（雖 noncommittal）。
-- **監看點**：① **trade risk** — PIT 賣家 + 左投 closer = 7 月 deadline 熱門標的，換隊後 SV+H 角色或波動。② closer 角色未完全坐穩 + PIT 弱隊（本週客場打 HOU/ATL 強旅）→ 短期 save 產量可能僅 0-2，價值看中期接管九局後兌現。
-- **incumbent benchmark**：與 Ferrer 並列為 FA RP 掃描比較基準 — 新 FA 候選需**明顯優於** Soto/Ferrer 才換。
+### José A. Ferrer（SEA, RP）— 隊上唯一 RP（2026-06-13 留人）
 
-### José A. Ferrer（SEA, RP）— hold（2026-06-01 eval）
-
-- **2026-06-01 [eval] vs Soto/King（只看 SV+H，drop 一人）**：結論 = **hold（留）**。
-- 本季 SV+H 10、ERA **1.75** / WHIP 1.25 / K 22。季中由 WSH 交易至 SEA（換 Harry Ford + Issac Lyon）。
-- role 上升：Dipoto 稱 Mariners「No.1 bullpen target」、定位 7-8 局 setup（左投版 Matt Brash）、fastball 觸 100 mph、近況好（剛 close out vs ATL）。closer = Andrés Muñoz → hold 為主、SV 偶有。
-- 本週賽程 3 home NYM + 3 away DET（中等）。role 軌跡向上，留著。
-- **incumbent benchmark**：與 Soto 並列為 FA RP 掃描比較基準。
+- **2026-06-13 [eval] vs Soto（drop 1 RP，二選一）**：結論 = **留 Ferrer**。rp-svh 三軸 1-1-平（BB/9 **2.10** 勝 Soto 3.71 / K9 7.80 輸 / 30d SV+H 5 平）→ 決於角色安全層：Soto 三重威脅（球隊找 closer 取代 + deadline 交易籌碼 + 30d ERA 7.88 崩盤），Ferrer 控球菁英 + 角色上升 + ERA/WHIP 正資產 → 留 Ferrer。
+- 2026 數據：SV+H 11、ERA **2.10** / WHIP 1.33 / K 26 / BB/9 2.10。Savant（v2）xERA 2.84 / xwOBA-a .267（>P90）/ Barrel%-a 4.2%（>P90）。
+- role：SEA「牛棚最有價值手臂」、領銜全 MLB 中繼出賽、隊上多名後援傷兵 → leverage 升高；後段 setup（closer = Andrés Muñoz）→ hold 為主、SV 偶有。本週 3 home NYM + 3 away DET（中等）。
+- **incumbent benchmark**：Soto 已 drop（6/13），Ferrer 現為唯一隊上 RP / FA RP 掃描比較基準 — 新候選需**明顯優於** Ferrer 才換。
 
 ## FA 觀察中
 
@@ -39,6 +32,12 @@
 - 若 incumbent 監看點觸發，Morejon 是 holds 路徑替代候選 — 但近況 ERA 風險未解，優先序低於角色穩定的選項。
 
 ## 已結案
+
+### Gregory Soto（PIT, RP）— dropped 2026-06-13（隊形考量，drop 1 RP，留 Ferrer）
+
+- **drop 理由（2026-06-13 /player-eval，vs Ferrer 二選一）**：rp-svh 三軸 1-1-平（BB/9 3.71 輸 Ferrer 2.10 / K9 10.43 贏 / 30d SV+H 5 平），決於角色安全層 — Soto 三重威脅同時觸發：① PIT 積極找 closer 取代他（Rosenthal 報導）② deadline 熱門交易籌碼（左投 + $7.75M 一年約，換隊恐丟 closer 變 setup）③ 30d 崩盤 ERA 7.88 / 2 BS + 季 ERA 靠 .194 BABIP + 3.6% HR/FB 撐（回歸已啟動）。SV+H 是 punt 類別不追上限，且其 SV+H 附帶 7.88 ERA 毒害 ERA/WHIP 兩格。6/01 撿入時標的 trade/role watch point 已成真。
+- 持有期間：6/01 撿入（drop Kevin Kelly），約 12 天。closer 角色（9SV/12SVO）是唯一偏他的點，但角色三方受侵蝕 + 比率回吐 → 讓位給穩定的 Ferrer。
+- ⚠️ 2026 live Savant 抓到同名打者（homonym），投手 contact quality 以 2025 prior（xERA 3.85 / xwOBA-a .305）為準。
 
 ### Bryan King（HOU, RP）— dropped 2026-06-01（撿 Trevor McDonald）
 
