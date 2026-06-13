@@ -26,7 +26,9 @@
 
 ## 狀態
 
-✅ 模組完成（`daily-advisor/star_rating.py`，TDD 22 tests，825 全綠零回歸）。`score()` + bucketers + `format_stars()` 凍結介面。報告注入留待 039（payload_budget）。
+✅ 模組完成（merge `f0d789d`）+ **三審硬化（`49e9741`）**。`daily-advisor/star_rating.py`，`score()` + bucketers + `format_stars()` 凍結介面。報告注入留待 039（payload_budget）。
+
+三審（#317/#319）修正 — **校準失真（C1/C2/D1）**：原校準把 Sheets 硬編 `dual_year=partial`（但文件說「prior P80」=強）、Pederson 編 `mid`（但他是 platoon -28%PA 反例=`low`），是自我實現的假校準。修法 = **heat-led 硬上限 3★**（忠於文件「channel 才是鑑別器、雙年/上場量不分勝負」），讓校準改用忠實等級仍 ≤3★。新增 channel-only-differs 鑑別測試 + day-0 上限邊界 + P70 邊界 + 清死碼。27 star tests，834 全綠。
 
 ## Blocked by
 

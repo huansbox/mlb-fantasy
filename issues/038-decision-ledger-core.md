@@ -26,7 +26,14 @@
 
 ## 狀態
 
-✅ 完成（branch `feat/038-decision-ledger`，TDD 25 tests，803 全綠零回歸）。模組 `daily-advisor/decision_ledger.py`；wiring 進 `_update_waiver_log_locked` 寫 `decision-ledger.json`（best-effort + git add）。
+✅ 完成（merge `ec832fd`）+ **三審硬化（`49e9741`）**。模組 `daily-advisor/decision_ledger.py`，production 已運作（cron 已記 13 球員，git tracked）。
+
+三審（#317/#319）修正：
+- **Bug 1（單一真相源）**：改由 `apply_waiver_log_block` 的 state-aware `ledger_sink` emit verdict（只在真正改 markdown 時），消除「skip 球員仍記幽靈 verdict」。取代原純文法 deriver。
+- **dedup 反向掃描**：找匹配 (ts, verdict) 列而非只看最後一列 → 039 同日 enrich 不被中間的 distinct verdict 打斷。
+- **凍結介面補強**：加 `executed_ts` 欄（051 用）+ `first_channel()` helper（039 永不重判用）。
+- **corrupt ledger**：改 Telegram 警報，不再無聲永久跳過。
+- 29 ledger tests（含 sink state-aware 邊界 + 真實 fixture 共存），834 全綠。
 
 ## Blocked by
 
