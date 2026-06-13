@@ -2631,26 +2631,36 @@ def _roster_names(config):
     return names
 
 
+def _gate_notifications(enrich_map, roster, ledger, today_str):
+    """Pure: ACT-NOW notify lines for today's actionable 4★+ verdicts.
+
+    Reads each candidate's history from the injected ledger, runs the gate,
+    collects a line per player whose gate says notify. owned_trend is None for
+    now (fast-lane = 5★ only); the %owned-rising fast-lane is plumbed in 318b.
+    Only today's entry counts (the freshness guard skips stale players from a
+    no-op scan)."""
+    msgs = []
+    for name, (_channel, stars) in (enrich_map or {}).items():
+        hist = ledger.get_history(name)
+        if not hist or hist[-1].ts != today_str:
+            continue
+        latest = hist[-1]
+        if latest.verdict not in ACTIONABLE:
+            continue
+        result = gate(hist, latest.verdict, stars or 0,
+                      owned_trend=None, executed=(name in roster))
+        if result.notify:
+            msgs.append(f"⚡ {name} — {result.reason}")
+    return msgs
+
+
 def _notify_gate_actions(enrich_map, config, env, today_str):
-    """Run the decision gate (issue 041) over today's actionable verdicts and
-    push a targeted ACT-NOW Telegram for the 4★+ ones. Best-effort — a notify
-    failure never blocks the scan. owned_trend is left None for now (fast-lane
-    = 5★ only); the %owned-rising fast-lane is plumbed in 318b."""
+    """Run the decision gate (issue 041) over today's verdicts and push a
+    targeted ACT-NOW Telegram for the 4★+ ones. Best-effort — never blocks."""
     try:
-        roster = _roster_names(config)
         ledger = DecisionLedger(DECISION_LEDGER_PATH)
-        msgs = []
-        for name, (_channel, stars) in (enrich_map or {}).items():
-            hist = ledger.get_history(name)
-            if not hist or hist[-1].ts != today_str:
-                continue
-            latest = hist[-1]
-            if latest.verdict not in ACTIONABLE:
-                continue
-            result = gate(hist, latest.verdict, stars or 0,
-                          owned_trend=None, executed=(name in roster))
-            if result.notify:
-                msgs.append(f"⚡ {name} — {result.reason}")
+        msgs = _gate_notifications(
+            enrich_map, _roster_names(config), ledger, today_str)
         if msgs and env:
             send_telegram("[決策 gate] ACT NOW\n" + "\n".join(msgs), env)
     except Exception as e:  # noqa: BLE001 — notify never blocks the scan

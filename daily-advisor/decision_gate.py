@@ -6,14 +6,27 @@ the retrospective's two opposite lessons:
 
   - Drops/replaces cost when too fast (Hicks/Clemens/Steer churned a
     correctly-picked player on a single-day signal) → SLOW lane: a replace
-    needs 2 consecutive recommend-days before it escalates.
+    needs 2 consecutive recommend-days before it escalates. Since a drop here
+    only happens as part of a replace (drop X to add Y), slowing the replace
+    cadence dampens the churn. NOTE: the other half of the churn fix — "a drop
+    must confront the original add reason" — is the prompt contract in issue
+    042, not this gate; the gate does not read add_reason.
   - Adds cost when too slow (Vargas, a 5★ miss) → FAST lane exceptions: a 5★
     rating or a fast-rising %owned shape skips the wait.
 
-Notify policy (anti-cry-wolf): only 4★+ pushes Telegram; a 5★ unexecuted
-recommendation re-escalates daily ("第 N 天未執行"), a 4★ notifies once on the
-escalation day. "Executed" (the candidate is now on the roster, or the ledger
-carries an execution timestamp) short-circuits to DONE.
+Notify policy (anti-cry-wolf): only 4★+ pushes Telegram. An URGENT
+recommendation (5★, or a fast-rising %owned shape) re-escalates DAILY while
+unexecuted ("第 N 天未執行"); a slow-lane 4★ (2-day-confirmed, not urgent)
+notifies ONCE on the escalation day and then stays silent. "Executed" (the
+candidate is now on the roster, or the ledger carries an execution timestamp)
+short-circuits to DONE.
+
+Caveat (318a): with trigger-completeness deferred, 5★ is currently unreachable
+(established players cap at 4★, day-0 caps at 4★), so the daily-escalation path
+is built but INERT until 318b builds trigger evaluation. Today the live path is
+the 4★ slow-lane notify-once and the 4★ %owned-rising daily (once shape is
+plumbed in 318b). A Vargas-type gets the 4★ notify-once today, not a 5★ daily
+ping — the full execution-hole remedy lands with 318b.
 
 The gate is fed `stars` (040, persisted by 318a) and the player's ledger
 history (038). It does NOT read channel/playing_time directly: with 318a's
@@ -101,13 +114,13 @@ def gate(history, verdict, stars, owned_trend=None, executed=False) -> GateResul
     #   5★      → re-notify daily while unexecuted
     #   4★      → notify once on the escalation day
     if stars < NOTIFY_MIN_STARS:
-        notify = False
-    elif stars >= FAST_STARS:
-        notify = True
+        notify = False           # below the notify floor (anti-cry-wolf)
+    elif fast:
+        notify = True            # urgent (5★ or %owned rising) → re-notify daily
     else:
-        escalation_day = (consecutive == 1 and fast) or \
-            (consecutive == SLOW_LANE_DAYS and not fast)
-        notify = bool(escalation_day)
+        # Slow-lane 4★: notify ONCE, on the escalation day (day 2). Days 3+ stay
+        # silent — a deliberately 2-day-confirmed add isn't worth daily nagging.
+        notify = (consecutive == SLOW_LANE_DAYS)
 
     lane = "快軌" if fast else "慢軌"
     reason = f"ACT NOW（{lane}，{stars}★，已推薦 {consecutive} 天未執行）"

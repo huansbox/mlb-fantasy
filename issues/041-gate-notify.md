@@ -24,7 +24,17 @@
 
 ## 狀態
 
-✅ 完成（`daily-advisor/decision_gate.py`，TDD 22 tests，873 全綠零回歸）。每日通知 wiring 進 `_process_group`（best-effort，`_notify_gate_actions`）；weekly-review consumer 注入 output JSON。**D2 死區 carve-out 未做**（刻意）：318a 評分下 everyday structure 球員已達 4★（trigger=none + structure+full+high=3.0→4★），3★ 殘餘為 mid-PA/部分資格的低優先案，靜默合理；若 backtest 顯示真實 3★ 漏接再降 `NOTIFY_MIN_STARS` 或加 channel carve-out。**剩餘**：owned-rising 快軌的 shape 串接（gate 已支援，wiring 待 318b）+ 一週推播噪音被動觀察。
+✅ 完成（`daily-advisor/decision_gate.py`，TDD 27 tests，879 全綠零回歸）+ **三審硬化（#320 review）**。每日通知 wiring 進 `_process_group`（`_notify_gate_actions`，純函式 `_gate_notifications` 可注入測試）；weekly-review consumer 注入 output JSON。
+
+**三審修正**：
+- **`escalation_day` bug 修復**：原邏輯讓「4★ 第 1 天 pending、第 2 天 owned 轉 rising」永不通知（兩分支都不中）。改為「fast（5★ 或 owned-rising）= 每日；slow-lane 4★ = day 2 一次」，語意明確化。
+- **誠實降調（claims honesty）**，三點寫進 docstring：
+  1. **churn 範圍**：gate 慢軌降 churn（drop 經 replace、慢軌需 2 天）；但「drop 須面對原 add 理由」是 **042 prompt 契約**、不是 gate（gate 不讀 add_reason）。
+  2. **5★ 在 318a 下 unreachable**（established cap 4★ / day-0 cap 4★）→ 5★ 快軌 + 逐日升級是 **built-but-inert，待 318b 觸發評估**。今天 Vargas 型拿 4★ notify-once，非 5★ 逐日；完整執行洞補救隨 318b 落地。
+  3. **executed_ts 無 production writer**（見下 051 註）→ 目前唯一有效「已執行」訊號是 roster 名單比對。
+- **D2 死區 carve-out 未做**（刻意，三審確認誠實）：everyday（PA/TG≥3.5）structure 球員 full **與 partial** dual-year 都達 4★（2.5 half-up→4★）；3★ 殘餘僅 mid-PA / dual 全崩的窄角，靜默合理。邊界靠 half-up rounding（已有測試 pin）。
+
+**剩餘**：owned-rising 快軌 shape 串接（gate 已支援，wiring 待 318b）+ 一週推播噪音被動觀察。**318b 噪音懸崖警示**：5★ 變 reachable 後多個滯留 5★ 會每日多行推播，無 cap/decay；若實測吵則加 backoff（記入 039 318b）。
 
 ## 審查補充（來自 #317/#319 三審，開工必讀）
 

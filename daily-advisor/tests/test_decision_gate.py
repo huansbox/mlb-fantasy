@@ -77,6 +77,32 @@ def test_4star_notifies_once_not_daily():
     assert r.consecutive_days == 3
 
 
+def test_4star_slow_lane_silent_days_4_and_5():
+    days = ["2026-06-1" + d for d in "012345"]  # 06-10..06-15
+    for n in (4, 5):
+        h = _hist(*[(days[i], VERDICT_REPLACE) for i in range(n)])
+        r = gate(h, VERDICT_REPLACE, stars=4, owned_trend=None)
+        assert r.action == ACT_NOW and r.notify is False, f"day {n}"
+
+
+def test_4star_owned_rising_re_notifies_daily():
+    # fast-lane (owned rising) is urgent → notify every day, not once
+    h = _hist(("2026-06-12", VERDICT_REPLACE), ("2026-06-13", VERDICT_REPLACE))
+    r = gate(h, VERDICT_REPLACE, stars=4, owned_trend="rising")
+    assert r.action == ACT_NOW and r.notify is True   # day 2, still pinging
+
+
+def test_4star_mid_streak_flip_to_fast_notifies():
+    # regression: pending day 1 (no shape), %owned flips to rising day 2 →
+    # fast-lane escalation on day 2 must NOT be silently swallowed
+    h = _hist(("2026-06-12", VERDICT_REPLACE), ("2026-06-13", VERDICT_REPLACE))
+    day1 = gate(_hist(("2026-06-12", VERDICT_REPLACE)),
+                VERDICT_REPLACE, stars=4, owned_trend=None)
+    assert day1.action == PENDING and day1.notify is False
+    day2 = gate(h, VERDICT_REPLACE, stars=4, owned_trend="rising")
+    assert day2.action == ACT_NOW and day2.notify is True
+
+
 # ── fast lane: 5★ or %owned rising ──
 
 def test_5star_fast_lane_day1():
@@ -209,3 +235,49 @@ def test_collect_unexecuted_recommendations_missing_file():
     from weekly_review import collect_unexecuted_recommendations
     assert collect_unexecuted_recommendations(
         {"batters": []}, ledger_path="/no/such/ledger.json") == []
+
+
+def test_collect_unexecuted_stars_none_still_listed():
+    # legacy ledger rows (pre-318a) have stars=None → 0★; they never NOTIFY
+    # but a 2-day actionable run still belongs in the unexecuted list
+    histories = {"A": [_ent("A", "2026-06-12", VERDICT_REPLACE, stars=None),
+                       _ent("A", "2026-06-13", VERDICT_REPLACE, stars=None)]}
+    out = collect_unexecuted(histories, roster_names=set())
+    assert [p for p, _ in out] == ["A"] and out[0][1].consecutive_days == 2
+
+
+# ── _gate_notifications wiring (injection-based) ──
+
+class _FakeLedger:
+    def __init__(self, histories):
+        self._h = histories
+
+    def get_history(self, name):
+        return self._h.get(name, [])
+
+
+def test_gate_notifications_pushes_4star_actionable_today():
+    from fa_scan import _gate_notifications
+    histories = {
+        "Hot": [_ent("Hot", "2026-06-12", VERDICT_REPLACE),
+                _ent("Hot", "2026-06-13", VERDICT_REPLACE)],   # day2 4★ → notify
+        "New": [_ent("New", "2026-06-13", VERDICT_REPLACE)],   # day1 pending → no
+        "Watched": [_ent("Watched", "2026-06-13", VERDICT_WATCH)],  # not actionable
+    }
+    enrich_map = {"Hot": ("structure", 4), "New": ("structure", 4),
+                  "Watched": ("structure", 4)}
+    msgs = _gate_notifications(enrich_map, set(), _FakeLedger(histories), "2026-06-13")
+    assert len(msgs) == 1 and msgs[0].startswith("⚡ Hot")
+
+
+def test_gate_notifications_skips_rostered_and_stale():
+    from fa_scan import _gate_notifications
+    histories = {
+        "Rostered": [_ent("Rostered", "2026-06-12", VERDICT_REPLACE),
+                     _ent("Rostered", "2026-06-13", VERDICT_REPLACE)],
+        "Stale": [_ent("Stale", "2026-06-10", VERDICT_REPLACE)],  # not today
+    }
+    enrich_map = {"Rostered": ("structure", 5), "Stale": ("structure", 5)}
+    msgs = _gate_notifications(
+        enrich_map, {"Rostered"}, _FakeLedger(histories), "2026-06-13")
+    assert msgs == []  # rostered=executed (DONE); stale=not today

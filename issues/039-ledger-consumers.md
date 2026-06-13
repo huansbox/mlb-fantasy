@@ -31,6 +31,8 @@ decision_ledger 的薄消費端三件 + 全域行數預算守門：
 - [ ] payload 注入 prev-verdict + add-reason + star 三行，格式機械可解析
 - [ ] legacy backfill 覆蓋率：跑後無「缺 add 理由」roster 球員、無「缺 channel」watchlist 條目
 - [ ] 配對 A/B（VPS，比照 037）量 payload input/output token delta；trigger-completeness 評估（5★ 精度）一併補
+- [ ] **owned-rising 快軌 shape 串接**：把候選 %owned shape 傳進 `_gate_notifications` 的 `owned_trend`（現 hardcode None，gate 已支援）
+- [ ] **5★ 噪音 backoff（#320 三審警示）**：觸發評估上線後 5★ 變 reachable，多個滯留 5★ 會每日多行推播且無 cap/decay。若實測吵 → 在 `decision_gate.gate` 加 5★ re-escalation backoff（如 day 1/2/3 後改每 3 天）。先觀察再決定。
 
 ## 審查補充（來自 #317/#319 三審，開工必讀）
 
