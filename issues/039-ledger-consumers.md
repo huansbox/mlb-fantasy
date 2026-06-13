@@ -13,14 +13,24 @@ decision_ledger 的薄消費端三件 + 全域行數預算守門：
 
 詳見 PRD Implementation Decisions「ledger 消費端」。
 
+## 拆分（2026-06-13，因 Explore 揭露 channel 在組裝時已遺失 + payload 注入成本敏感需 A/B）
+
+- **318a（機械持久化半，✅ 完成 merge `e48b956`）**：不動 LLM payload、零成本風險。
+- **318b（LLM 注入半，⏳ 待辦，與 042 同批上 VPS A/B）**：payload_budget 模組 + 注入 prev-verdict/add-reason/star 三行 + legacy backfill + 配對 A/B。
+
 ## Acceptance criteria
 
-- [ ] 發現路徑於首次接觸持久化、不重判（heat-led 球員不會因季線成熟洗白為 structure-led）
-- [ ] payload 注入 prev-verdict + add-reason 兩行，格式機械可解析
-- [ ] legacy backfill 覆蓋率：跑後無「缺 add 理由」的 roster 球員、無「缺 channel」的 watchlist 條目（機器可判）
-- [ ] payload_budget `register`/`assert_within` 純函式 + 超限 assert（≤3 行/候選），獨立於 ledger
-- [ ] 單元測試：channel 分類四來源 + 注入格式 + backfill 推導 + budget 超限/通過；真實 waiver-log fixture
-- [ ] 上線前後量 payload input/output token delta
+### 318a（已完成）
+- [x] 發現路徑於首次接觸持久化、不重判（`first_channel` honored；heat-led 不洗白）— `ledger_enrich.classify_channel` + `compute_candidate_stars`，channel 寫進 ledger
+- [x] source 標記（scan-query / owned-riser）池層注入 + 經 normalize 保留 + thread 到寫入點（做法 A）
+- [x] star 因子萃取 + day0 判定（empty history → day0 cap 4★；established → 4-factor trigger 暫 none）+ stars 回寫 ledger
+- [x] 單元測試：channel 四分類 + first_channel 不重判 + day0/established + 薄樣本 + wiring entry 萃取（17 cases，851 全綠）
+
+### 318b（待辦，與 042 同批）
+- [ ] payload_budget `register`/`assert_within` 純函式 + 超限 assert（≤3 行/候選）
+- [ ] payload 注入 prev-verdict + add-reason + star 三行，格式機械可解析
+- [ ] legacy backfill 覆蓋率：跑後無「缺 add 理由」roster 球員、無「缺 channel」watchlist 條目
+- [ ] 配對 A/B（VPS，比照 037）量 payload input/output token delta；trigger-completeness 評估（5★ 精度）一併補
 
 ## 審查補充（來自 #317/#319 三審，開工必讀）
 
