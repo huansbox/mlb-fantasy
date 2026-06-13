@@ -26,9 +26,12 @@ decision_ledger 的薄消費端三件 + 全域行數預算守門：
 - [x] star 因子萃取 + day0 判定（empty history → day0 cap 4★；established → 4-factor trigger 暫 none）+ stars 回寫 ledger
 - [x] 單元測試：channel 四分類 + first_channel 不重判 + day0/established + 薄樣本 + wiring entry 萃取（17 cases，851 全綠）
 
-### 318b（待辦，與 042 同批）
+### 318b（待辦，與 042 同批）— 注意：318b 現在是「全 payload 注入批」
+> 量修復鏈（#322-#327）模組已全部建好+測過（merge `9a9eeb4`），它們的 LLM payload 注入也併入此批一起上 VPS A/B：platoon tag（#323）、PA 投影行（#324）、swap-batter 行（#326）、swap-SP 行（#327）、SP 場次行（#325）。connect 點：candidate entry → 各模組計算 → payload 行，受 payload_budget 守門。
 - [ ] payload_budget `register`/`assert_within` 純函式 + 超限 assert（≤3 行/候選）
 - [ ] payload 注入 prev-verdict + add-reason + star 三行，格式機械可解析
+- [ ] 量修復鏈注入：platoon tag / PA 投影 / swap-batter / swap-SP / SP 場次（模組已備，串 candidate entry → payload 行）
+- [ ] sp_start_projector ≥85% retro 準確率 gate（VPS 歷史資料跑）
 - [ ] legacy backfill 覆蓋率：跑後無「缺 add 理由」roster 球員、無「缺 channel」watchlist 條目
 - [ ] 配對 A/B（VPS，比照 037）量 payload input/output token delta；trigger-completeness 評估（5★ 精度）一併補
 - [ ] **owned-rising 快軌 shape 串接**：把候選 %owned shape 傳進 `_gate_notifications` 的 `owned_trend`（現 hardcode None，gate 已支援）
