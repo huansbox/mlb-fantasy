@@ -18,11 +18,15 @@
 
 ## Acceptance criteria
 
-- [ ] `score(factors: dict)` 純函式 + 資料化權重表（加因子不改簽章）
-- [ ] day-0 三因子變體（無觸發完成度時上限 4★）
-- [ ] **回溯校準集 fixture**（機器可判驗收）：Vargas/Horwitz/O'Hearn ≥4★、Sheets/Pederson ≤3★
-- [ ] 星等 + 因子明細注入報告，受 039 payload_budget 守門
-- [ ] 單元測試：四因子各檔位 + day-0 變體 + 校準集回歸
+- [x] `score(factors: dict)` 純函式 + 資料化權重表 `WEIGHTS[factor][level]`（加因子=加一列資料，簽章不變）
+- [x] day-0 三因子變體（去 trigger、×4/3 放大、上限 4★ — 5★ 須經觸發驗證）
+- [x] **回溯校準集 fixture**（機器可判驗收）：Vargas/Horwitz/O'Hearn ≥4★、Sheets/Pederson ≤3★ + winners 嚴格 > losers（structure/heat 發現路徑為主鑑別器）
+- [~] 星等 + 因子明細注入報告 — `format_stars()` 已備（★bar + 因子明細）；**實際報告注入受 039 payload_budget 守門，wiring 待 039**
+- [x] 單元測試：四因子各檔位 + day-0 變體 + bucketers（PA-TG/雙年/觸發）+ 校準集回歸（22 cases）
+
+## 狀態
+
+✅ 模組完成（`daily-advisor/star_rating.py`，TDD 22 tests，825 全綠零回歸）。`score()` + bucketers + `format_stars()` 凍結介面。報告注入留待 039（payload_budget）。
 
 ## Blocked by
 
