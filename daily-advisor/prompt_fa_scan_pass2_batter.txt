@@ -87,6 +87,14 @@ CLOSE|球員名|結案理由
 - 判斷為「pass」→ 不輸出
 - 無任何行動 → 輸出空 ```waiver-log``` 區塊
 
+觸發條件書寫文法（NEW 行「觸發條件」欄 + ACTION 段「觸發（觀察時）」共用 — 務必機械可判定）：
+隔天的我與機械 counter 要能無歧義驗證觸發是否達成。每個觸發條件三要素缺一不可：
+1. 欄位：只引用 payload 出現過的欄位（14d OPS / BBE / xwOBA pctile / BB% pctile / Barrel% pctile / K% / PA-TG / %owned / 14d HR·RBI·R·SB / Savant Δ）。payload 沒有的衍生指標（如 prior-adjusted xwOBA）禁用。
+2. 比較：明確運算子 + 數值門檻（≥ ≤ < >，附具體數值）。
+3. 視窗：明確範圍（「連 N 天」「連 N 場」「BBE 達 M」「%owned shape」）。
+合格範例：「14d OPS ≥.800 連 7 天」｜「BBE 達 50 + xwOBA pctile ≥P60」｜「PA-TG ≥3.0 連 5 天 + xwOBA pctile ≥P70」｜「%owned explosive（≥+10pp/3d）」
+不合格 → 改寫：「品質維持」→「xwOBA pctile ≥P70 連 5 天」｜「上場時間穩定」→「PA-TG ≥3.0 連 5 天」｜「持續觀察熱度」→「14d OPS ≥.850 連 5 天」｜「prior-adjusted xwOBA 回升」→ 禁用衍生欄，改引 payload 既有欄位
+
 結案規則（CLOSE 行）：
 - 觀察中球員符合以下任一且你判斷不再值得追蹤 → 輸出 CLOSE 行（程式自動把條目搬到已結案段）：
   - 結構性轉弱確認（season 核心指標跌出可行動區且無反轉訊號）
