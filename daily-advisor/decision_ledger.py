@@ -133,6 +133,11 @@ class DecisionLedger:
         return [LedgerEntry(**{k: v for k, v in row.items() if k in _ENTRY_FIELDS})
                 for row in self._data.get(player, [])]
 
+    def all_histories(self) -> dict:
+        """{player: [LedgerEntry]} for every player — used by the weekly-review
+        unexecuted-recommendations consumer (issue 041)."""
+        return {player: self.get_history(player) for player in self._data}
+
     def first_channel(self, player) -> str | None:
         """The discovery channel from the player's earliest entry that has one
         — the "set at first contact, never re-judged" value 039 must honor."""

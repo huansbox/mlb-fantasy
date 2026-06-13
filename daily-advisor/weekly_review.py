@@ -873,6 +873,35 @@ def fetch_scan_summary(week_start):
 # ── Main ──
 
 
+def collect_unexecuted_recommendations(config, ledger_path=None):
+    """Issue 041 weekly-review consumer: actionable replace verdicts that are
+    still unexecuted (not on the roster, no execution timestamp), most-overdue
+    first. Pure given config + ledger path; returns a list of plain dicts for
+    the review JSON. Empty list if the ledger file is absent."""
+    from decision_ledger import DecisionLedger
+    from decision_gate import collect_unexecuted
+
+    path = ledger_path or os.path.join(REPO_ROOT, "decision-ledger.json")
+    if not os.path.exists(path):
+        return []
+    roster = {
+        p.get("name")
+        for grp in ("batters", "pitchers")
+        for p in (config.get(grp) or [])
+        if p.get("name")
+    }
+    ledger = DecisionLedger(path)
+    out = []
+    for player, result in collect_unexecuted(ledger.all_histories(), roster):
+        out.append({
+            "player": player,
+            "action": result.action,
+            "recommend_days": result.consecutive_days,
+            "reason": result.reason,
+        })
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(description="Weekly Review Data Preparation")
     parser.add_argument("--prepare", action="store_true", help="Prepare weekly data JSON")
@@ -989,6 +1018,8 @@ def main():
         "generated": datetime.now(ET).isoformat(),
         "review": review_data,
         "preview": preview_data,
+        # Issue 041: actionable verdicts still unexecuted (decision gate).
+        "unexecuted_recommendations": collect_unexecuted_recommendations(config),
     }
 
     json_str = json.dumps(output, indent=2, ensure_ascii=False, default=str)

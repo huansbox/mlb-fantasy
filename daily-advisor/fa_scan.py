@@ -48,6 +48,7 @@ from ledger_enrich import (
     CandidateSignals, compute_candidate_stars,
     SOURCE_SCAN, SOURCE_OWNED_RISER,
 )
+from decision_gate import gate, ACTIONABLE
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -2619,6 +2620,44 @@ def _candidate_signals_from_entry(entry):
     )
 
 
+def _roster_names(config):
+    """Set of my-team player names (a candidate on the roster = executed)."""
+    names = set()
+    for grp in ("batters", "pitchers"):
+        for p in config.get(grp, []) or []:
+            n = p.get("name")
+            if n:
+                names.add(n)
+    return names
+
+
+def _notify_gate_actions(enrich_map, config, env, today_str):
+    """Run the decision gate (issue 041) over today's actionable verdicts and
+    push a targeted ACT-NOW Telegram for the 4★+ ones. Best-effort — a notify
+    failure never blocks the scan. owned_trend is left None for now (fast-lane
+    = 5★ only); the %owned-rising fast-lane is plumbed in 318b."""
+    try:
+        roster = _roster_names(config)
+        ledger = DecisionLedger(DECISION_LEDGER_PATH)
+        msgs = []
+        for name, (_channel, stars) in (enrich_map or {}).items():
+            hist = ledger.get_history(name)
+            if not hist or hist[-1].ts != today_str:
+                continue
+            latest = hist[-1]
+            if latest.verdict not in ACTIONABLE:
+                continue
+            result = gate(hist, latest.verdict, stars or 0,
+                          owned_trend=None, executed=(name in roster))
+            if result.notify:
+                msgs.append(f"⚡ {name} — {result.reason}")
+        if msgs and env:
+            send_telegram("[決策 gate] ACT NOW\n" + "\n".join(msgs), env)
+    except Exception as e:  # noqa: BLE001 — notify never blocks the scan
+        print(f"  gate-notify: skipped ({type(e).__name__}: {e})",
+              file=sys.stderr)
+
+
 def build_ledger_enrich_map(entries, ledger):
     """Map name → (channel, stars) for batter candidates (issue 039 / 318a).
 
@@ -3483,6 +3522,9 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                 print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
                       file=sys.stderr)
             _update_waiver_log(advice, today_str, env, position_lookup, enrich_map)
+            # Decision gate (issue 041): targeted ACT-NOW push for 4★+ verdicts
+            # after the ledger reflects today's records.
+            _notify_gate_actions(enrich_map, config, env, today_str)
 
     except Exception as e:
         _handle_error(f"{label} scan", e, env, args)

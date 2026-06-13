@@ -180,6 +180,15 @@ def test_distinct_players_isolated(ledger_path):
     assert led.get_history("B")[0].verdict == "取代"
 
 
+def test_all_histories(ledger_path):
+    led = DecisionLedger(ledger_path)
+    led.record("A", "watch", ts="2026-05-01")
+    led.record("B", "取代", ts="2026-05-01")
+    hs = led.all_histories()
+    assert set(hs) == {"A", "B"}
+    assert hs["A"][0].verdict == "watch"
+
+
 # ── apply_waiver_log_block ledger_sink: STATE-AWARE emission ──
 
 def test_sink_new_player_is_watch():

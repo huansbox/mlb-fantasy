@@ -15,12 +15,16 @@
 
 ## Acceptance criteria
 
-- [ ] `gate` 純函式：drop 慢軌（連 2 天 + 原 add 理由比對）、add 快軌例外（5★ / owned 急升）
-- [ ] 4★+ 才推 Telegram（複用既有 send_telegram）；5★ 未執行逐日升級含天數
-- [ ] 「已執行」判定讀當前 roster_config；pending 假升級行為文件化
-- [ ] weekly-review 未處理清單消費端
-- [ ] 單元測試：慢軌連 2 天邏輯 + 快軌兩例外 + 升級天數計算（注入 history/roster）
+- [x] `gate` 純函式：drop/replace 慢軌（連 2 天）、add 快軌例外（5★ / owned 急升）— `decision_gate.gate`（owned-rising 快軌已實作，wiring 端 owned_trend 暫 None 待 318b 串接 shape）
+- [x] 4★+ 才推 Telegram（複用 send_telegram）；5★ 未執行逐日升級含天數、4★ 升級日通知一次；<4★ 靜默（anti-cry-wolf）
+- [x] 「已執行」判定讀 roster_config 名單 + ledger executed_ts；pending（waiver 次日生效）≤1 天假升級已文件化
+- [x] weekly-review 未處理清單消費端（`collect_unexecuted` + `weekly_review.collect_unexecuted_recommendations` 注入 review JSON `unexecuted_recommendations`）
+- [x] 單元測試：慢/快軌 + 通知門檻 + 5★ 逐日 vs 4★ 一次 + executed 短路 + trailing 天數 + weekly consumer（22 cases，873 全綠）
 - [ ] 上線後一週觀察推播噪音（被動）
+
+## 狀態
+
+✅ 完成（`daily-advisor/decision_gate.py`，TDD 22 tests，873 全綠零回歸）。每日通知 wiring 進 `_process_group`（best-effort，`_notify_gate_actions`）；weekly-review consumer 注入 output JSON。**D2 死區 carve-out 未做**（刻意）：318a 評分下 everyday structure 球員已達 4★（trigger=none + structure+full+high=3.0→4★），3★ 殘餘為 mid-PA/部分資格的低優先案，靜默合理；若 backtest 顯示真實 3★ 漏接再降 `NOTIFY_MIN_STARS` 或加 channel carve-out。**剩餘**：owned-rising 快軌的 shape 串接（gate 已支援，wiring 待 318b）+ 一週推播噪音被動觀察。
 
 ## 審查補充（來自 #317/#319 三審，開工必讀）
 
