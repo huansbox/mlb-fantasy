@@ -300,7 +300,7 @@
         "gb_pct": 46.4,
         "xwobacon": 0.356
       },
-      "selected_pos": "IL",
+      "selected_pos": "SP",
       "status": "IL15"
     },
     {
@@ -439,7 +439,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "SP",
+      "selected_pos": "RP",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -518,29 +518,6 @@
         "k_per_9": 8.37,
         "ip_per_team_g": 0.47,
         "ip": 76.3
-      }
-    },
-    {
-      "name": "Gregory Soto",
-      "mlb_id": 642397,
-      "yahoo_player_key": "469.p.10882",
-      "team": "PIT",
-      "positions": [
-        "RP"
-      ],
-      "selected_pos": "RP",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 3.85,
-        "xwoba_allowed": 0.305,
-        "hh_pct_allowed": 37.9,
-        "barrel_pct_allowed": 4.0,
-        "bbe": 174,
-        "era": 4.18,
-        "k_per_9": 10.44,
-        "ip_per_team_g": 0.37,
-        "ip": 60.3
       }
     },
     {
