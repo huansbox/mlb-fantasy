@@ -39,6 +39,11 @@ from roster_sync import (
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
 )
 import fa_compute
+from decision_ledger import DecisionLedger, derive_ledger_records
+
+# Decision ledger (issue 038) — per-player verdict history, derived from the
+# same waiver-log block apply_waiver_log_block writes (single source of truth).
+DECISION_LEDGER_PATH = os.path.join(SCRIPT_DIR, "..", "decision-ledger.json")
 from _savant_v4_fetch import (
     fetch_pitchers_custom_bulk,
     fetch_pitchers_batted_ball_bulk,
@@ -2072,9 +2077,26 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None)
     with open(waiver_log_path, "w", encoding="utf-8") as f:
         f.write(content)
 
-    # Git commit + push (pre-edit sync already done above)
+    # Decision ledger (issue 038): derive per-player verdicts from the SAME
+    # block and persist to decision-ledger.json. Best-effort — a ledger
+    # failure must never abort the waiver-log write/commit. 039 will enrich
+    # rows with channel/add_reason via the same-day merge rule.
+    ledger_written = False
     try:
-        subprocess.run(["git", "add", "waiver-log.md"],
+        ledger = DecisionLedger(DECISION_LEDGER_PATH)
+        for player, verdict in derive_ledger_records(block, today_str):
+            ledger.record(player, verdict, ts=today_str)
+        ledger_written = True
+    except Exception as e:  # noqa: BLE001 — never break the waiver-log path
+        print(f"  decision-ledger: skipped ({type(e).__name__}: {e})",
+              file=sys.stderr)
+
+    # Git commit + push (pre-edit sync already done above)
+    git_paths = ["waiver-log.md"]
+    if ledger_written:
+        git_paths.append("decision-ledger.json")
+    try:
+        subprocess.run(["git", "add", *git_paths],
                        cwd=repo_root, check=True, timeout=10)
         subprocess.run(
             ["git", "commit", "-m",

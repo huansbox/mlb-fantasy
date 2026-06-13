@@ -18,11 +18,15 @@
 
 ## Acceptance criteria
 
-- [ ] `record` / `get_history` 純介面 + JSON 持久化，與 waiver-log 寫入點同步 derive（不另開第二寫入路徑）
-- [ ] 同日同 verdict dedup，時序正確
-- [ ] 單元測試：注入 clock/fs，覆蓋寫入、讀取、dedup、空歷史（house style：rp_svh_scan 注入式）
-- [ ] 與既有 032 `compute_history_counters` 並存無衝突（同寫入點，不重複計數）— 真實 waiver-log fixture 回歸
-- [ ] 介面凍結文件化（039/040 依賴它，不得在後續片變更簽章）
+- [x] `record` / `get_history` 純介面 + JSON 持久化，與 waiver-log 寫入點同步 derive（`derive_ledger_records` 讀同一 block，wiring 在 `_update_waiver_log_locked` best-effort，不另開第二寫入路徑）
+- [x] 同日同 verdict dedup-merge（idempotent + 非 None 欄位合併供 039 enrich），不同 verdict 同日 append，跨日時序正確
+- [x] 單元測試：注入 path/clock，25 cases 覆蓋寫入/讀取/dedup/merge/空檔/持久化/derive 文法+precedence
+- [x] 與既有 032 `compute_history_counters` 並存無衝突（ledger 走獨立 JSON、不碰 markdown）— 真實 waiver-log fixture 共存測試
+- [x] 介面凍結（`record(player, verdict, ts, add_reason, channel, stars)` / `get_history(player)`，docstring 標注 039/040 不得改簽章）
+
+## 狀態
+
+✅ 完成（branch `feat/038-decision-ledger`，TDD 25 tests，803 全綠零回歸）。模組 `daily-advisor/decision_ledger.py`；wiring 進 `_update_waiver_log_locked` 寫 `decision-ledger.json`（best-effort + git add）。
 
 ## Blocked by
 
