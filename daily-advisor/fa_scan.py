@@ -44,6 +44,10 @@ from decision_ledger import (
     VERDICT_CLOSED, VERDICT_REPLACE, VERDICT_REPLACE_NOW, VERDICT_WATCH,
     VERDICT_PRECEDENCE,
 )
+from ledger_enrich import (
+    CandidateSignals, compute_candidate_stars,
+    SOURCE_SCAN, SOURCE_OWNED_RISER,
+)
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -2049,7 +2053,8 @@ def apply_waiver_log_block(content, block, short_date,
     return content, modified, logs
 
 
-def _update_waiver_log(advice, today_str, env=None, position_lookup=None):
+def _update_waiver_log(advice, today_str, env=None, position_lookup=None,
+                       enrich_map=None):
     """Parse waiver-log update block from Claude output, write to waiver-log.md.
 
     Expects ```waiver-log ... ``` block in advice; line grammar (issue 028)
@@ -2068,10 +2073,12 @@ def _update_waiver_log(advice, today_str, env=None, position_lookup=None):
     if "```waiver-log" not in advice:
         return
     with _WAIVER_LOG_LOCK:
-        _update_waiver_log_locked(advice, today_str, env, position_lookup)
+        _update_waiver_log_locked(advice, today_str, env, position_lookup,
+                                  enrich_map)
 
 
-def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None):
+def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None,
+                              enrich_map=None):
     """Actual waiver-log update logic (called inside _WAIVER_LOG_LOCK)."""
     if "```waiver-log" not in advice:
         return
@@ -2123,8 +2130,11 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None)
     ledger_written = False
     try:
         ledger = DecisionLedger(DECISION_LEDGER_PATH)
+        emap = enrich_map or {}
         for player, verdict in ledger_records:
-            ledger.record(player, verdict, ts=today_str)
+            channel, stars = emap.get(player, (None, None))
+            ledger.record(player, verdict, ts=today_str,
+                          channel=channel, stars=stars)
         ledger_written = True
     except Exception as e:  # noqa: BLE001 — never break the waiver-log path
         msg = f"[fa_scan] decision-ledger skipped ({type(e).__name__}: {e})"
@@ -2569,6 +2579,8 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
         "savant_2026": savant,
         "prior_stats": prior_stats,
         "derived": p.get("derived_2026") or {},
+        # Discovery source (issue 039) — preserved for channel classification.
+        "source": p.get("source", SOURCE_SCAN),
     }
     if group_type == "sp":
         entry["rolling_21d"] = rolling_data
@@ -2585,6 +2597,45 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
         entry["score"] = 0
         entry["breakdown"] = {}
     return entry
+
+
+def _candidate_signals_from_entry(entry):
+    """Extract CandidateSignals (issue 039) from a normalized batter entry."""
+    sav = entry.get("savant_2026") or {}
+    der = entry.get("derived") or {}
+    prior = entry.get("prior_stats") or {}
+    roll = entry.get("rolling_14d") or {}
+    return CandidateSignals(
+        source=entry.get("source", SOURCE_SCAN),
+        xwoba=sav.get("xwoba"),
+        bb_pct=sav.get("bb_pct") if sav.get("bb_pct") is not None else der.get("bb_pct"),
+        barrel_pct=sav.get("barrel_pct"),
+        xwoba_14d=(roll or {}).get("xwoba"),
+        prior_xwoba=prior.get("xwoba"),
+        prior_bb_pct=prior.get("bb_pct"),
+        prior_barrel_pct=prior.get("barrel_pct"),
+        prior_pa=prior.get("pa"),
+        pa_tg=der.get("pa_per_tg"),
+    )
+
+
+def build_ledger_enrich_map(entries, ledger):
+    """Map name → (channel, stars) for batter candidates (issue 039 / 318a).
+
+    Channel honours first-contact (via ledger history); stars are today's
+    mechanical rating. The map is threaded to the waiver-log write point,
+    which persists channel/stars onto the recorded verdict. Pure given an
+    injected ledger — unit-tested in test_ledger_enrich_wiring.
+    """
+    enrich_map = {}
+    for entry in entries:
+        name = entry.get("name")
+        if not name:
+            continue
+        sig = _candidate_signals_from_entry(entry)
+        stars, channel, _ = compute_candidate_stars(sig, ledger.get_history(name))
+        enrich_map[name] = (channel, stars)
+    return enrich_map
 
 
 def _rolling_tag(rolling, season_savant, group_type):
@@ -3422,7 +3473,16 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             position_lookup = _build_position_lookup(
                 group_type, fa_candidates, watch_candidates, config,
             )
-            _update_waiver_log(advice, today_str, env, position_lookup)
+            # Discovery channel + mechanical stars per candidate (issue 039 /
+            # 318a) — persisted onto the ledger at the write point. Best-effort.
+            enrich_map = {}
+            try:
+                enrich_map = build_ledger_enrich_map(
+                    fa_tagged + watch_tagged, DecisionLedger(DECISION_LEDGER_PATH))
+            except Exception as e:  # noqa: BLE001 — enrichment never blocks the scan
+                print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
+                      file=sys.stderr)
+            _update_waiver_log(advice, today_str, env, position_lookup, enrich_map)
 
     except Exception as e:
         _handle_error(f"{label} scan", e, env, args)
@@ -3549,6 +3609,9 @@ def _run_daily_scan(access_token, config, today_str, env, args):
 
     # ── Layer 2: filter ──
     filtered = filter_by_savant(snapshot_no_watch, savant_2026)
+    # Discovery source (issue 039): a structural scan-query hit by default.
+    for p in filtered:
+        p["source"] = SOURCE_SCAN
 
     # Add %owned risers (3d) that aren't already in filtered or watch
     existing_names = {p["name"] for p in filtered} | watch_names
@@ -3561,6 +3624,8 @@ def _run_daily_scan(access_token, config, today_str, env, args):
                     "position": r["position"], "stats": {},
                 }
                 extra = filter_by_savant({r["name"]: snapshot_no_watch[r["name"]]}, savant_2026)
+                for p in extra:
+                    p["source"] = SOURCE_OWNED_RISER  # surfaced by ownership movement
                 filtered.extend(extra)
                 existing_names.add(r["name"])
 
