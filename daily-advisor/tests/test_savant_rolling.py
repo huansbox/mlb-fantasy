@@ -140,3 +140,87 @@ def test_aggregate_xwobacon_present_for_pitcher_view():
     result = _aggregate_pitches(rows, player_type="pitcher")
     assert "xwobacon" in result
     assert result["xwobacon"] == 0.3
+
+
+# ── issue #329: per-pitch CSW% + velocity aggregation ──
+
+from savant_rolling import _pitch_level_metrics  # noqa: E402
+
+
+def _pitch(description="", pitch_type="", release_speed=None,
+           game_date="2026-04-01", at_bat_number=1, events=""):
+    return {
+        "description": description,
+        "pitch_type": pitch_type,
+        "release_speed": "" if release_speed is None else str(release_speed),
+        "game_date": game_date,
+        "at_bat_number": str(at_bat_number),
+        "events": events,
+        "estimated_woba_using_speedangle": "",
+        "launch_speed": "", "launch_speed_angle": "",
+        "woba_value": "", "woba_denom": "",
+    }
+
+
+def test_pitch_level_csw_counts_called_and_swinging():
+    rows = [
+        _pitch(description="called_strike"),
+        _pitch(description="swinging_strike"),
+        _pitch(description="swinging_strike_blocked"),
+        _pitch(description="foul_tip"),
+        _pitch(description="ball"),
+        _pitch(description="foul"),       # foul (not foul_tip) is NOT CSW
+    ]
+    m = _pitch_level_metrics(rows)
+    assert m["pitches"] == 6
+    assert m["csw_pct"] == round(4 / 6 * 100, 1)   # 4 CSW of 6
+
+
+def test_pitch_level_velocity_by_type_and_primary_fastball():
+    rows = [
+        _pitch(pitch_type="FF", release_speed=97.0, description="ball"),
+        _pitch(pitch_type="FF", release_speed=99.0, description="called_strike"),
+        _pitch(pitch_type="SI", release_speed=96.0, description="ball"),
+        _pitch(pitch_type="SL", release_speed=88.0, description="swinging_strike"),
+    ]
+    m = _pitch_level_metrics(rows)
+    assert m["velo_by_type"]["FF"] == 98.0
+    assert m["velo_by_type"]["SL"] == 88.0
+    assert m["velo_fb_type"] == "FF"   # most-thrown fastball type
+    assert m["velo_fb"] == 98.0
+
+
+def test_pitch_level_empty():
+    assert _pitch_level_metrics([]) == {}
+
+
+def test_pitch_level_missing_velo_skipped():
+    rows = [_pitch(pitch_type="FF", release_speed=None, description="ball"),
+            _pitch(pitch_type="FF", release_speed=98.0, description="ball")]
+    m = _pitch_level_metrics(rows)
+    assert m["velo_by_type"]["FF"] == 98.0   # the None one skipped from avg
+    assert m["pitches"] == 2                  # but still counted as a pitch
+
+
+def test_pitcher_aggregate_merges_csw_and_velo():
+    # rows that pass the BBE gate AND carry pitch-level fields
+    rows = [
+        _pitch(description="called_strike", pitch_type="FF", release_speed=97.0,
+               at_bat_number=1),
+        _pitch(description="swinging_strike", pitch_type="FF", release_speed=98.0,
+               at_bat_number=1),
+        _pitch(description="hit_into_play", pitch_type="SI", release_speed=96.0,
+               at_bat_number=1, events="field_out"),
+    ]
+    result = _aggregate_pitches(rows, player_type="pitcher")
+    assert result.get("csw_pct") == round(2 / 3 * 100, 1)
+    assert result.get("velo_fb") == 97.5
+    assert result.get("pitches") == 3
+
+
+def test_batter_aggregate_has_no_csw():
+    rows = [_pitch(description="called_strike", at_bat_number=1),
+            _pitch(events="single", at_bat_number=1,
+                   description="hit_into_play")]
+    result = _aggregate_pitches(rows, player_type="batter")
+    assert "csw_pct" not in result   # pitch-level metrics are pitcher-only

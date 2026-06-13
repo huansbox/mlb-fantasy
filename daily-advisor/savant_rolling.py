@@ -94,6 +94,49 @@ def _safe_float(val):
         return None
 
 
+# Pitch-level (per-pitch, not per-event) classification for the SP rolling
+# CSW% + velocity metrics (issue 049/050 #329 prerequisite). CSW = called +
+# swinging strikes / total pitches — the per-pitch loop must NOT skip mid-PA
+# pitches the way the event-gated aggregation does.
+_CSW_DESCRIPTIONS = frozenset({
+    "called_strike", "swinging_strike", "swinging_strike_blocked", "foul_tip",
+})
+# Fastball pitch types, preference order for the "primary fastball" velo.
+_FASTBALL_TYPES = ("FF", "SI", "FC")
+
+
+def _pitch_level_metrics(rows):
+    """Per-pitch CSW% + velocity from ALL pitches (issue #329 aggregation
+    extension — needs `description` + `release_speed`, which the event-gated
+    aggregation drops). Returns {} when there are no pitches."""
+    total = 0
+    csw = 0
+    velo_sum: dict[str, float] = {}
+    velo_n: dict[str, int] = {}
+    for row in rows:
+        total += 1
+        if (row.get("description") or "").strip() in _CSW_DESCRIPTIONS:
+            csw += 1
+        pt = (row.get("pitch_type") or "").strip()
+        rs = _safe_float(row.get("release_speed"))
+        if pt and rs is not None:
+            velo_sum[pt] = velo_sum.get(pt, 0.0) + rs
+            velo_n[pt] = velo_n.get(pt, 0) + 1
+    if total == 0:
+        return {}
+    velo_by_type = {pt: round(velo_sum[pt] / velo_n[pt], 1) for pt in velo_sum}
+    fb_type = next((pt for pt in sorted(
+        _FASTBALL_TYPES, key=lambda t: velo_n.get(t, 0), reverse=True)
+        if velo_n.get(pt, 0) > 0), None)
+    return {
+        "csw_pct": round(csw / total * 100, 1),
+        "pitches": total,
+        "velo_fb": velo_by_type.get(fb_type) if fb_type else None,
+        "velo_fb_type": fb_type,
+        "velo_by_type": velo_by_type,
+    }
+
+
 def _aggregate_pitches(rows, player_type="batter"):
     """Aggregate pitch-level rows into player metrics.
 
@@ -184,6 +227,10 @@ def _aggregate_pitches(rows, player_type="batter"):
     # xwOBA-allowed (the core quality signal) and rely on season xERA from
     # full-season CSV for long-horizon comparison. Pass 2 21d-vs-season Δ
     # should use xwOBA Δ instead of xERA Δ until we wire a proper proxy.
+    if player_type == "pitcher":
+        # Issue #329: per-pitch CSW% + velocity retained for the SP rolling
+        # micro-fields (the K precursor + velo-delta / injury proxy).
+        result.update(_pitch_level_metrics(rows))
     return result
 
 
