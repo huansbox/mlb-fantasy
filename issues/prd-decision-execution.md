@@ -54,29 +54,33 @@
 
 ## Implementation Decisions
 
-**模組切割**（經 agent 依 prd-to-issues tracer-bullet 原則審查修正）：
+**模組切割**（經兩輪 agent 依 prd-to-issues tracer-bullet + write-a-prd deep-module 原則審查修正，14 片 038-051）：
 
-- **decision_ledger 拆三片**：
-  - L-a（AFK）：ledger JSON 寫入路徑（與 waiver-log 同一寫入點 derive，單一真相源；032 的歷史計數行未來改讀 ledger 或明文分工）+ payload 注入（prev verdict 行 + 原 add 理由行）+ 發現路徑判定（pool assembly 時依候選來源持久化）+ 行數預算 enforcement + legacy backfill 一次性腳本。
-  - L-b（AFK）：`gate(history, verdict, stars, owned_trend) → action_level` 純函式（慢快軌）+ 報告渲染 + 4★ Telegram / 5★ 逐日升級（notify_policy 併入此片）+ weekly-review 未處理清單消費端。
-  - L-c（HITL）：prompt 契約（「翻供必須指認變因」「drop 須回應原 add 理由」）— lever 2 風險正主，配對 A/B + 人工審，與 037 分批上線隔離歸因。
-- **star_rating（AFK）**：pre-LLM 決定論公式。四因子 = 發現路徑（structure +1 / market·news·unknown +0.5 / heat +0）、雙年確認（prior 核心 ≥2 項 P70+ 且樣本足 +1 / 部分 +0.5 / 無 +0）、上場量（PA/TG ≥3.5 +1 / 2.5-3.5 +0.5 / <2.5 +0；SP 以 IP/GS + Rotation Gate 對應）、觸發完成度（全達成 +1 / 部分 +0.5）；stars = 1 + round(Σ)。day-0 變體：三因子按比例放大、上限 4★（5★ 必須經觸發驗證）。確切門檻在實作片內以回溯案例集校準定案 — 公式本身凍結在本 PRD，避免變 HITL。
-- **platoon 拆兩片**：P-a（AFK）classifier + tag（boxscore lineup × 對方先發慣用手；按「球隊×日」cache，fetch 次數上限寫進驗收）；P-b（AFK）下週 PA 投影（賽程 × 對手 SP 慣用手份額推估）。
-- **sp_start_projector（AFK）**：下週先發場次 {0,1,2} + payload 行；per-start 產出向量移至 swap-SP 片；retro 場次預測準確率 ≥85% 為機器可判驗收 gate。
-- **swap_vector 拆兩片 + 共用算術**：週投影算術（per-PA rate × 投影量）獨立成共用純模組，swap-batter（先行，吃 P-b）與 swap-SP（吃 projector）共用；只對 4★+ 候選 emit。
-- **micro-fields 按管線拆兩片**：M-bat（chase delta + post-hype JSON join）、M-sp（CSW 21d + velo delta + K-BB ladder）。M-sp 是對前一輪 PRD「SP payload 不動」的**有意 scope 變更**，在此明示。
-- **星等/gate 相對 LLM 的位置**：star pre-LLM（payload 預篩依據）、gate post-LLM（建議產出後的行動分級），兩者皆純 Python、零 prompt 變更（prompt 變更獨立在 L-c）。
+- **decision_ledger 深核心（038, AFK）**：穩定介面 `record(player, verdict, add_reason, channel, ts)` / `get_history(player) → [LedgerEntry]`；封裝 JSON IO + 與 waiver-log 同一寫入點 derive 的單一真相源 + dedup。**032 分工裁定**：ledger 為 gate 計數的權威來源；既有 `compute_history_counters` 的 `[機械計數]` 行短期照舊（同寫入點 derive，避免雙套打架），長期改讀 ledger。深模組介面凍結後即解鎖 039/040。
+- **ledger 消費端（039, AFK）**：發現路徑分類（pool assembly 時依候選來源 SCAN_QUERIES / owned risers / watchlist 持久化一次，star 只讀不重判）+ payload 注入（prev verdict 行 + 原 add 理由行）+ legacy backfill 一次性腳本 + **payload_budget 守門模組**（`register(slice_id, lines)` / `assert_within(candidate)`，獨立深模組 — 行數預算是橫跨 7 片的全域不變量，不埋在 ledger 內）。皆薄消費，依賴 038 凍結介面。
+- **star_rating（040, AFK）**：pre-LLM 決定論公式，介面 `score(factors: dict) → StarResult`（**具名因子字典 + 資料化權重表，非定位參數 — 之後加因子是資料變更不是介面變更**）。四因子 = 發現路徑（structure +1 / market·news·unknown +0.5 / heat +0）、雙年確認（prior 核心 ≥2 項 P70+ 且樣本足 +1 / 部分 +0.5 / 無 +0）、上場量（PA/TG ≥3.5 +1 / 2.5-3.5 +0.5 / <2.5 +0；SP 以 IP/GS + Rotation Gate 對應）、觸發完成度（全達成 +1 / 部分 +0.5）；stars = 1 + round(Σ)。day-0 變體：三因子按比例放大、上限 4★（5★ 必須經觸發驗證）。門檻在實作片內以回溯案例集校準定案 — 公式凍結在本 PRD，避免變 HITL。
+- **gate + 通知（041, AFK）**：`gate(history, verdict, stars, owned_trend) → action_level` 純函式（慢快軌；簽章已含 owned_trend，無 churn）+ 報告渲染 + 4★ Telegram / 5★ 逐日升級 + weekly-review 未處理清單消費端。
+- **ledger prompt 契約（042, HITL）**：「翻供必須指認變因」「drop 須回應原 add 理由」進 prompt — lever 2 風險正主，配對 A/B + 人工審，與 037 分批上線隔離歸因。
+- **weekly_projection 共用算術深模組（043, AFK）**：`rate × projected_volume → 逐類別向量` 純函式；**獨立深模組、前置於 P-b/swap，三片（045/047/048）共用**（修正原稿把它埋在 swap-batter 內、導致 P-b 需要一個尚未建出模組的潛在順序 bug）。
+- **platoon 拆兩片**：P-a（044, AFK）classifier + tag（boxscore battingOrder × 對方先發 pitchHand；按「球隊×日」cache，fetch 次數上限為機器可判驗收 — assert cache-hit count）；P-b（045, AFK）下週 PA 投影（賽程 × 對手 SP 慣用手份額，吃 043）。fetcher 部分已存在（`mlb_query` 已 resolve pitchHand / `stream_sp_scan` 已 hydrate probables）。
+- **sp_start_projector（046, AFK）**：下週先發場次 {0,1,2} + payload 行；核心為注入式純函式（schedule/probable 注入）；retro 場次預測準確率 ≥85% 機器可判 gate。per-start 產出向量移至 048。
+- **swap-batter（047, AFK）**：逐類別週差額 vs 指名 incumbent（吃 043 + 045），只對 4★+ emit。
+- **swap-SP（048, AFK）**：SP 逐類別週差額 + per-start 產出向量（吃 043 + 046）。
+- **micro-fields 按管線拆兩片**：M-bat（049, AFK）chase/zone-contact delta + post-hype JSON join；M-sp（050, AFK）CSW 21d + velo delta + K-BB ladder。**M-sp 資料前提修正**：`savant_rolling.py` 每日抓 pitch-level CSV 但聚合後 JSON 只留 BBE 級欄位，**丟掉了 CSW 需要的 `description` 與 velo 需要的 `release_speed`** → 本片需擴充聚合保留此 2 欄，非「讀現有 rows」。此片亦為對前一輪 PRD「SP payload 不動」的**有意 scope 變更**。
+- **KPI 對帳接線（051, AFK）**：星等寫進 backtest 資料列、ledger 記執行時間戳，由既有週日 backtest cron 計算 KPI（star-bucket 命中率、執行延遲中位數）；regret rate 由 ledger 直接可算。獨立成片確保 user story 21 有 owner，避免重蹈「SP backtest 空殼」。
+- **星等/gate 相對 LLM 的位置**：star pre-LLM（payload 預篩依據）、gate post-LLM（建議產出後的行動分級），兩者皆純 Python、零 prompt 變更（prompt 變更獨立在 042）。
 - **「已執行」語意**：以當前 roster_config 為準（roster_sync 15 分 cron 保鮮）；waiver claim pending 期造成 ≤1 天假升級，接受並文件化，不當 bug 修。
-- **KPI owner**：星等寫進 backtest 資料列、ledger 記執行時間戳，由既有週日 backtest cron 計算 KPI（star-bucket 命中率、執行延遲中位數）；regret rate 由 ledger 直接可算。此整合邊明寫，避免重蹈「SP backtest 空殼」。
-- **排程**：既有 037 先收掉（結構化觸發文法是本計畫地基），本 PRD 接續；關鍵路徑 037 → L-a → star → L-b，P-a / projector / M-bat / M-sp 可在 037 觀察窗平行動工。
-- 資料來源全部為既有 stack（MLB Stats API / Savant 已抓 rows / Yahoo 已抓欄位 / 自產 issue 存檔）；workflow agent 的端點實測在實作時依 no-hardcode-facts 鐵律重驗。
+- **排程**：既有 037 已收掉（2026-06-13 部署），本 PRD 接續；關鍵路徑 038 → 040 → 041 →（051），可立即平行開工 038/043/044/046/049/050。
+- 資料來源全部為既有 stack（MLB Stats API / Savant CSV / Yahoo 已抓欄位 / 自產 issue 存檔）；端點與「資料是否已落地」聲稱在實作時依 no-hardcode-facts 鐵律重驗（M-sp 已是一例）。
 
 ## Testing Decisions
 
 - 好測試 = 只測外部行為不綁實作：純函式核心（gate / star / classifier / projector / swap 算術 / 各 micro field）全部單元測試，照 repo 既有 TDD 慣例（rp_svh_scan 43 cases / stream_sp_scan 72 cases 的 style）；fetcher 一律注入 mock。
 - **真實 fixture 鐵律**：解析/注入測試的 fixture 必須取自真實 production 產物（gh issue body / 真 waiver-log 段），禁止手寫樣本 — SP backtest「測試全綠、production 全敗」的教訓。
 - **回溯重放驗收**：可機器判定的歷史案例集作為驗收條件 — star 校準集（Vargas/Horwitz/O'Hearn ≥4★、Sheets/Pederson ≤3★）、platoon 重放 Pederson 案、swap-batter 對 2026 全部已執行 swap 回算（Arraez→Pederson 必須被標出）、projector 對季初至今逐週回測 ≥85%。
-- prompt 變更（僅 L-c）必配對 A/B 量 output tokens；所有片上線前後量 payload delta。
+- **legacy backfill 覆蓋率驗收**（039）：上線日存量 watchlist + roster 球員必須全數獲得 backfill 紀錄（發現路徑推得出則填、推不出標 unknown；roster 球員以當日季線快照充 add 理由），驗收條件 = backfill 後無「缺 add 理由」的 roster 球員、無「缺 channel」的 watchlist 條目。
+- **跨模組整合片**（051 KPI）不強制單測，走 dry-run 驗收（比照 029「0 筆可對帳 = 合格 demo」）。
+- prompt 變更（僅 042）必配對 A/B 量 output tokens（比照 037）；所有片上線前後量 payload delta，受 039 payload_budget 守門。
 
 ## Out of Scope
 
@@ -88,7 +92,7 @@
 
 ## Further Notes
 
-- **切片草案（12 片，最終以 /prd-to-issues 為準）**：037（既有，先行）→ L-a → star → L-b 為關鍵路徑；P-a、P-b、sp_start_projector、swap-batter、swap-SP、M-bat、M-sp、L-c。AFK 11 / HITL 1（L-c；037 另計）。
+- **切片（14 片，issue 038-051；037 已先行部署）**：關鍵路徑 038 ledger → 040 star → 041 gate →（051 KPI）。GitHub 子 issue 掛於主 issue #316。AFK 13 / HITL 1（042 prompt 契約）。可立即平行：038、043、044、046、049、050。深模組三抽取（vs 原 12 片草案）：038 純核心 ＋ 039 消費端含 payload_budget 守門 ＋ 043 weekly_projection 共用算術前置。
 - **星等頻率預期**：依回溯，4★+ 事件 ~2-4 次/月 — 若上線後顯著高於此，先懷疑公式而非調通知門檻。
 - **驗收 KPI**（上線一個月對帳）：①30 天內反悔事件（add→drop→系統再推薦回）= 0；②行動級建議「首次達標→執行或否決」中位 ≤2 天；③4★/5★ 事後命中率顯著 > 3★；④payload 餵入量增幅 ≤10%。
 - 灰色地帶先例：post-hype 年度 JSON 是本系統第一個「需定期人工維護的資料資產」— 若 3 月忘記更新，標記自動降級為 stale 並在報告中註明，不靜默用舊資料。
