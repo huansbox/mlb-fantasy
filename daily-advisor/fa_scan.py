@@ -39,10 +39,15 @@ from roster_sync import (
     search_mlb_id, fetch_mlb_season_stats, mlb_api_get, _parse_ip,
 )
 import fa_compute
-from decision_ledger import DecisionLedger, derive_ledger_records
+from decision_ledger import (
+    DecisionLedger,
+    VERDICT_CLOSED, VERDICT_REPLACE, VERDICT_REPLACE_NOW, VERDICT_WATCH,
+    VERDICT_PRECEDENCE,
+)
 
-# Decision ledger (issue 038) — per-player verdict history, derived from the
-# same waiver-log block apply_waiver_log_block writes (single source of truth).
+# Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
+# emits (player, verdict) into a sink only at real mutation points, so the
+# ledger and the markdown stay a single source of truth.
 DECISION_LEDGER_PATH = os.path.join(SCRIPT_DIR, "..", "decision-ledger.json")
 from _savant_v4_fetch import (
     fetch_pitchers_custom_bulk,
@@ -1881,12 +1886,20 @@ _ACTION_TYPES = ("立即取代", "取代")
 
 
 def apply_waiver_log_block(content, block, short_date,
-                           position_lookup=None, mlb_id_lookup=None):
+                           position_lookup=None, mlb_id_lookup=None,
+                           ledger_sink=None):
     """Apply one ```waiver-log``` block to waiver-log.md content. Pure.
 
     Returns (new_content, modified, log_messages). External effects (file
     IO, git, MLB id search) stay with the caller; `mlb_id_lookup` is the
     injected name→mlb_id resolver (production passes search_mlb_id).
+
+    `ledger_sink` (issue 038): if a list is passed, it is extended with
+    ``(player, verdict)`` tuples — one per player — emitted ONLY at points
+    where this function actually mutates the markdown. This makes the
+    decision ledger and the markdown a single source of truth (no phantom
+    verdict for a player whose line was skipped). Verdict precedence within
+    a block: closed > 立即取代 > 取代 > watch.
 
     Processing order: ACTION annotations are collected first (they prefix
     the same-block NEW/UPDATE day line), CLOSE moves run last so a same-day
@@ -1897,8 +1910,19 @@ def apply_waiver_log_block(content, block, short_date,
     lookup_id = mlb_id_lookup or (lambda name: None)
     lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
 
-    # Pass 0: ACTION annotations (name → "[type→vs]").
+    # Ledger verdicts accumulate here with precedence, populated only at
+    # real mutation points; flushed to ledger_sink at the end.
+    ledger_verdicts = {}
+
+    def _emit(name, verdict):
+        prev = ledger_verdicts.get(name)
+        if prev is None or VERDICT_PRECEDENCE[verdict] > VERDICT_PRECEDENCE[prev]:
+            ledger_verdicts[name] = verdict
+
+    # Pass 0: ACTION annotations (name → "[type→vs]"); keep the raw verdict
+    # so a NEW/UPDATE the action rides on emits 取代/立即取代, not watch.
     annotations = {}
+    action_verdict = {}
     consumed = set()
     for line in lines:
         parts = line.split("|")
@@ -1908,12 +1932,16 @@ def apply_waiver_log_block(content, block, short_date,
             logs.append(f"SKIP malformed ACTION: {line[:60]}")
             continue
         annotations[parts[1].strip()] = f"[{parts[2].strip()}→{parts[3].strip()}]"
+        action_verdict[parts[1].strip()] = parts[2].strip()
 
     def _annotated(name, summary):
         if name in annotations:
             consumed.add(name)
             return f"{annotations[name]} {summary}"
         return summary
+
+    def _watch_or_action(name):
+        return action_verdict.get(name, VERDICT_WATCH)
 
     # Pass 1: NEW / UPDATE.
     for line in lines:
@@ -1945,6 +1973,7 @@ def apply_waiver_log_block(content, block, short_date,
                 content = _insert_update_line(
                     content, name, short_date, _annotated(name, summary))
                 modified = True
+                _emit(name.strip(), _watch_or_action(name.strip()))
                 continue
             # Resolve mlb_id via injected lookup (don't trust Claude's ID)
             mlb_id = lookup_id(name)
@@ -1969,6 +1998,7 @@ def apply_waiver_log_block(content, block, short_date,
             else:
                 content += new_entry
             modified = True
+            _emit(name.strip(), _watch_or_action(name.strip()))
             logs.append(f"NEW {name}")
 
         elif parts[0] == "UPDATE" and len(parts) >= 3:
@@ -1980,6 +2010,7 @@ def apply_waiver_log_block(content, block, short_date,
             content = _insert_update_line(
                 content, name, short_date, _annotated(name, summary))
             modified = True
+            _emit(name.strip(), _watch_or_action(name.strip()))
             logs.append(f"UPDATE {name}")
 
     # Pass 2: standalone ACTION (no same-block NEW/UPDATE carried it).
@@ -1991,6 +2022,7 @@ def apply_waiver_log_block(content, block, short_date,
             content, name, short_date, f"{annot} 取代判斷")
         if content != before:
             modified = True
+            _emit(name, action_verdict.get(name, VERDICT_REPLACE))
             logs.append(f"ACTION {name} (standalone)")
         else:
             logs.append(f"SKIP ACTION {name} — entry not found")
@@ -2007,10 +2039,13 @@ def apply_waiver_log_block(content, block, short_date,
         content, moved = _close_waiver_entry(content, name, short_date, reason)
         if moved:
             modified = True
+            _emit(name, VERDICT_CLOSED)
             logs.append(f"CLOSE {name}")
         else:
             logs.append(f"SKIP CLOSE {name} — not in 觀察中 / 條件 Pass")
 
+    if ledger_sink is not None:
+        ledger_sink.extend(ledger_verdicts.items())
     return content, modified, logs
 
 
@@ -2062,9 +2097,11 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None)
     # Short date format (MM-DD) for consistency with existing entries
     short_date = today_str[5:]  # "2026-04-07" → "04-07"
 
+    ledger_records = []
     content, modified, logs = apply_waiver_log_block(
         content, block, short_date,
-        position_lookup=position_lookup, mlb_id_lookup=search_mlb_id)
+        position_lookup=position_lookup, mlb_id_lookup=search_mlb_id,
+        ledger_sink=ledger_records)
     for msg in logs:
         print(f"  waiver-log: {msg}", file=sys.stderr)
 
@@ -2077,19 +2114,23 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None)
     with open(waiver_log_path, "w", encoding="utf-8") as f:
         f.write(content)
 
-    # Decision ledger (issue 038): derive per-player verdicts from the SAME
-    # block and persist to decision-ledger.json. Best-effort — a ledger
-    # failure must never abort the waiver-log write/commit. 039 will enrich
-    # rows with channel/add_reason via the same-day merge rule.
+    # Decision ledger (issue 038): persist the verdicts apply_waiver_log_block
+    # actually committed (ledger_sink) to decision-ledger.json. Best-effort —
+    # a ledger failure must never abort the waiver-log write/commit; a corrupt
+    # ledger file raises in DecisionLedger() and is alerted, not silently
+    # swallowed forever. 039 enriches rows with channel/add_reason via the
+    # same-day merge rule.
     ledger_written = False
     try:
         ledger = DecisionLedger(DECISION_LEDGER_PATH)
-        for player, verdict in derive_ledger_records(block, today_str):
+        for player, verdict in ledger_records:
             ledger.record(player, verdict, ts=today_str)
         ledger_written = True
     except Exception as e:  # noqa: BLE001 — never break the waiver-log path
-        print(f"  decision-ledger: skipped ({type(e).__name__}: {e})",
-              file=sys.stderr)
+        msg = f"[fa_scan] decision-ledger skipped ({type(e).__name__}: {e})"
+        print(f"  {msg}", file=sys.stderr)
+        if env:
+            send_telegram(msg, env)
 
     # Git commit + push (pre-edit sync already done above)
     git_paths = ["waiver-log.md"]

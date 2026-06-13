@@ -39,6 +39,14 @@ WEIGHTS: dict[str, dict[str, float]] = {
 DAY0_FACTORS = ("channel", "dual_year", "playing_time")
 DAY0_MAX_STARS = 4
 
+# Discovery channel is THE discriminator, not merely one of four equal factors
+# (docs/fa-scan-decision-retrospective-2026h1.md §4/§7: dual-year and playing
+# time do NOT separate winners from losers — heat-led nearly all failed). A
+# heat-led candidate is therefore hard-capped below the 4★ notify threshold no
+# matter how strong its other credentials: a 14d spike never cries wolf.
+HEAT_CHANNEL = "heat"
+HEAT_MAX_STARS = 3
+
 _STAR_FULL = "★"
 _STAR_EMPTY = "☆"
 _BREAKDOWN_LABELS = {
@@ -73,15 +81,21 @@ def score(factors: dict, day0: bool = False) -> StarResult:
             continue
         breakdown[factor] = table.get(level, 0.0)
 
+    is_heat = factors.get("channel") == HEAT_CHANNEL
+
     if day0:
         raw = sum(breakdown.get(f, 0.0) for f in DAY0_FACTORS)
         scaled = raw * (4.0 / len(DAY0_FACTORS))
         stars = min(DAY0_MAX_STARS, 1 + _round_half_up(scaled))
+        if is_heat:
+            stars = min(stars, HEAT_MAX_STARS)
         return StarResult(stars=stars, total=round(scaled, 3),
                           breakdown=breakdown)
 
     total = sum(breakdown.values())
     stars = max(1, min(5, 1 + _round_half_up(total)))
+    if is_heat:
+        stars = min(stars, HEAT_MAX_STARS)
     return StarResult(stars=stars, total=total, breakdown=breakdown)
 
 
@@ -108,7 +122,7 @@ def bucket_dual_year(prior_percentiles, sample_ok: bool) -> str:
     strong = sum(1 for p in (prior_percentiles or []) if p is not None and p >= 70)
     if strong >= 2 and sample_ok:
         return "full"
-    if strong >= 1 or (strong >= 2 and not sample_ok):
+    if strong >= 1:  # incl. dual-elite on a thin sample (strong≥2, not sample_ok)
         return "partial"
     return "none"
 

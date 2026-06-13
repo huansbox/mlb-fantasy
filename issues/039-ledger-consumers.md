@@ -22,6 +22,12 @@ decision_ledger 的薄消費端三件 + 全域行數預算守門：
 - [ ] 單元測試：channel 分類四來源 + 注入格式 + backfill 推導 + budget 超限/通過；真實 waiver-log fixture
 - [ ] 上線前後量 payload input/output token delta
 
+## 審查補充（來自 #317/#319 三審，開工必讀）
+
+- **發現路徑「永不重判」用 `DecisionLedger.first_channel(player)`**：038 已提供此 helper（回傳最早一筆有 channel 的值）。039 寫 channel 前先查 first_channel，非 None 就沿用，不可重判 — 這是 user story 9 的不變量，務必在這層強制。同日多次 enrich 也不可用不同 channel 覆蓋。
+- **day0 路徑選擇是 039 的責任（PRD 未指派，本片補上）**：star `score(factors, day0=?)` 的 day0 由 039 決定，規則 = `day0 = (get_history(player) == [] )` 或「該球員從無觸發驗證過的 entry」。day0=True 走三因子上限 4★（5★ 須經觸發驗證）。把此規則寫進本片 AC + 測試。
+- **stars 要回寫 ledger**：039 算完 star 後 `record(..., stars=)` 持久化，供 041/051 直接讀，不重算。
+
 ## Blocked by
 
 - Blocked by `issues/038-decision-ledger-core.md`

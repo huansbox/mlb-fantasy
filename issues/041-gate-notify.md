@@ -22,6 +22,11 @@
 - [ ] 單元測試：慢軌連 2 天邏輯 + 快軌兩例外 + 升級天數計算（注入 history/roster）
 - [ ] 上線後一週觀察推播噪音（被動）
 
+## 審查補充（來自 #317/#319 三審，開工必讀）
+
+- **結構型 everyday + 觸發未達的「死區」風險（D2）**：星等標準路徑下，structure + 部分雙年 + 中等上場 + 觸發未達 = 2.0 → 3★ → 不會通知，但這正是 Vargas/Manzardo「看到了卻沒執行」最貴的洞。041 gate 設計要考慮：是否給「structure-led + everyday + 觸發逼近」一個 carve-out（例如降一級門檻或單獨追蹤），不要讓觸發因子單獨把有資格的結構型 everyday 打者壓在通知線下。決策寫進本片。
+- **executed 時間戳已備**：038 `LedgerEntry.executed_ts` 欄位已加，5★ 逐日升級 + 051 KPI 直接用，不需再改 frozen 介面。
+
 ## Blocked by
 
 - Blocked by `issues/040-star-rating.md`

@@ -59,6 +59,20 @@ def test_partial_credits_round_half_up():
     assert r.stars == 4  # half-up rounding
 
 
+def test_heat_capped_at_three_despite_strong_credentials():
+    # heat(0)+full(1)+high(1)+partial(0.5)=2.5 → would be 4★, capped to 3★.
+    r = score({"channel": "heat", "dual_year": "full",
+               "playing_time": "high", "trigger": "partial"})
+    assert r.total == 2.5
+    assert r.stars == 3  # heat hard-cap: a 14d spike never reaches notify
+
+
+def test_heat_cap_does_not_inflate_weak():
+    r = score({"channel": "heat", "dual_year": "none",
+               "playing_time": "low", "trigger": "none"})
+    assert r.stars == 1  # cap is a ceiling, not a floor
+
+
 def test_unknown_level_scores_zero():
     r = score({"channel": "bogus", "dual_year": "full",
                "playing_time": "high", "trigger": "full"})
@@ -110,6 +124,24 @@ def test_day0_weak_is_low():
     assert r.stars == 1
 
 
+def test_day0_cap_at_threshold_not_just_max():
+    # structure(1)+full(1)+mid(0.5)=2.5 → scaled ×4/3 = 3.333 → 1+3 = 4★;
+    # uncapped this would still be 4 (cap is a no-op here) — but the next step
+    # up (raw 3.0 → scaled 4.0 → would be 5) is where the cap bites:
+    assert score({"channel": "structure", "dual_year": "full",
+                  "playing_time": "mid"}, day0=True).stars == 4
+    # raw 3.0 → 5 pre-cap → capped to 4 (the boundary that matters)
+    assert score({"channel": "structure", "dual_year": "full",
+                  "playing_time": "high"}, day0=True).stars == 4
+
+
+def test_day0_heat_capped_at_three():
+    # day-0 heat with otherwise-max credentials: 4★ day-0 cap, then 3★ heat cap
+    r = score({"channel": "heat", "dual_year": "full",
+               "playing_time": "high"}, day0=True)
+    assert r.stars == 3
+
+
 # ── bucketers: raw → level ──
 
 def test_bucket_playing_time():
@@ -129,6 +161,9 @@ def test_bucket_dual_year():
     # dual-elite percentiles but thin prior sample → not full
     assert bucket_dual_year([90, 90, 90], sample_ok=False) == "partial"
     assert bucket_dual_year([], sample_ok=True) == "none"
+    # exactly P70 counts as strong (>= boundary)
+    assert bucket_dual_year([70, 70], sample_ok=True) == "full"
+    assert bucket_dual_year([70, 69], sample_ok=True) == "partial"
 
 
 def test_bucket_trigger():
@@ -143,6 +178,11 @@ def test_bucket_trigger():
 # (docs/fa-scan-decision-retrospective-2026h1.md). The structure/heat channel
 # split is what separates the winners from the losers.
 
+# Factor levels are read off the retrospective data, NOT reverse-engineered to
+# pass: Sheets is dual_year "full" (doc §3/§4: "prior P80" — a real prior
+# credential); Pederson is playing_time "low" (doc §3: platoon weak-side,
+# measured -28% weekly PA). They still land ≤3★ because the heat-channel cap —
+# the doc's actual discriminator — carries the split, not hand-tuned gaps.
 CALIBRATION = {
     # ≥4★ — structure-led with real dual-year + playing time + trigger
     "Vargas": (
@@ -154,13 +194,13 @@ CALIBRATION = {
     "O'Hearn": (
         {"channel": "structure", "dual_year": "full",
          "playing_time": "high", "trigger": "partial"}, 4, 5),
-    # ≤3★ — heat-led surfaced (14d spike), with a real credential gap
+    # ≤3★ — heat-led surfaced (14d spike); faithful credentials, capped anyway
     "Sheets": (
-        {"channel": "heat", "dual_year": "partial",
+        {"channel": "heat", "dual_year": "full",
          "playing_time": "high", "trigger": "partial"}, 1, 3),
     "Pederson": (
         {"channel": "heat", "dual_year": "partial",
-         "playing_time": "mid", "trigger": "full"}, 1, 3),
+         "playing_time": "low", "trigger": "full"}, 1, 3),
 }
 
 
@@ -177,6 +217,15 @@ def test_calibration_winners_strictly_above_losers():
     winners = min(s("Vargas"), s("Horwitz"), s("O'Hearn"))
     losers = max(s("Sheets"), s("Pederson"))
     assert winners >= 4 and losers <= 3 and winners > losers
+
+
+def test_channel_alone_flips_the_verdict():
+    # Identical credentials, ONLY channel differs → isolates the discriminator
+    # (would catch a flipped/removed heat weight or cap).
+    creds = {"dual_year": "full", "playing_time": "high", "trigger": "partial"}
+    structured = score({**creds, "channel": "structure"}).stars
+    heated = score({**creds, "channel": "heat"}).stars
+    assert structured >= 4 and heated <= 3
 
 
 # ── format_stars: payload display ──
