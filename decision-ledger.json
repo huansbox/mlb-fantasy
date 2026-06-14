@@ -26,6 +26,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -36,6 +45,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Isaac Paredes",
+   "verdict": "取代",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "J.P. Crawford": [
@@ -46,6 +64,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Kyle Manzardo": [
@@ -56,6 +83,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Kyle Manzardo",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Dominic Canzone": [
@@ -66,6 +102,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Dominic Canzone",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Andrew Benintendi": [
@@ -76,6 +121,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Andrew Benintendi",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Vaughn Grissom": [
@@ -86,6 +140,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Vaughn Grissom",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
   }
  ],
  "Heriberto Hernández": [
@@ -96,6 +159,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Heriberto Hernández",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Garrett Mitchell": [
@@ -106,6 +178,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Garrett Mitchell",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kyle Karros": [
@@ -116,6 +197,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Kyle Karros",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kody Clemens": [
@@ -126,6 +216,15 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  },
+  {
+   "player": "Kody Clemens",
+   "verdict": "取代",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Joc Pederson": [
@@ -136,6 +235,17 @@
    "add_reason": null,
    "channel": null,
    "stars": null
+  }
+ ],
+ "Spencer Torkelson": [
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-06-14",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ]
 }
