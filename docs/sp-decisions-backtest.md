@@ -284,3 +284,15 @@ Episodes:
 - 2026-06-07 (2d) `watch` watch Peter Lambert → **neutral**
 - 2026-06-09 (2d) `watch` watch Shane Drohan → **neutral**
 
+
+## Weekly Backtest 2026-06-14 (no due episodes)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 0 (actionable: 0; episodes in lookback: 14)
+- Hit rate: —
+
+By action:
+- `drop_X_add_Y` n=0 (actionable 0) hit_rate=—
+- `watch` n=0 (actionable 0) hit_rate=—
+- `pass` n=0 (actionable 0) hit_rate=—
+

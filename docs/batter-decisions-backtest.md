@@ -29,3 +29,16 @@
 - **2026-06-10 執行標註上線**（issue 031）：每筆帳補 executed 欄位（roster git 歷史機械判定）+ 週報 executed / not-executed 分組 hit-rate 行。真實歷史 spot-check 三例皆正確（Rafaela 06-07 add → executed / Pederson 被搶 → not-executed / Arraez 長期在籍 → already-rostered）。
 - **2026-06-10 裁判合議上線**（issue 030）：pending-judge → 2 位裁判合議 verdict（hit / miss / 難分）+ 週報命中率行（replace 量太衝動 / watch 鏡像量太保守）。第一批真 claude 抽查（真實 05-15→06-04 產出，Pederson vs Arraez + Clemens vs Arraez）：2 calls 零 retry 契約全合規、判定與機械比數方向一致無唱反調。**待辦：首個非空 production 週日段（預期 2026-07-05）出來後再做一次人工抽查**（demo 兩帳都偏明顯案例，勉強/難分路徑尚未被真裁判走過）。
 - 後續：xwOBACON 門檻校準（Use Case B）等對帳資料累積 4-6 週後另案。
+
+## Weekly Batter Backtest 2026-06-14 (no due episodes)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 0 (replace 0 / watch 0; episodes in lookback: 17) — 0 筆可對帳
+- Judge panel（issue 030）: 0 筆可判（無完整 scorecard 的帳）— 0 calls
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 0（hit-rate —）/ not-executed 0（hit-rate —）
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 0/0 (—) / ≤3★ 0/0 (—)
+- ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 0
+
