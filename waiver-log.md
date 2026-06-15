@@ -311,6 +311,7 @@ vs：Mauricio Dubón
 - 06-12：Lambert beats Buehler in 3 of 5 slots (IP/GS 5.70 vs 4.79, Whiff% 25.3 vs 17.3, xwOBACON .337 vs .389) but his BB/9 3.95 (0th pctl) is worse than Buehler's 3.18 (25th), he carries a DTD tag, and a com（fa_scan）
 - 06-13：Lambert holds a clear 3-slot edge over Buehler: IP/GS 5.7 vs 4.79 (60th vs 0th), Whiff% 25.3 vs 17.3 (60th vs 0th), xwOBACON .337 vs .389 (95th vs 0th). Buehler's two 'wins' are marginal (BB/9 25th vs（fa_scan）
 - 06-14：Lambert beats Buehler in 3 of 5 slots by wide margins: IP/GS 5.7 (60th) vs 4.79 (0th), Whiff% 25.3 (60th) vs 17.3 (0th), xwOBACON .337 (95th) vs .389 (0th). Buehler's only edges are BB/9 (25th vs 0th)（fa_scan）
+- 06-15：Buehler sits 0th percentile in 3 of 5 slots (IP/GS 4.81, Whiff% 17.3, xwOBACON .389) with 21d xwOBACON trending worse at .396. Lambert delivers a decisive 3-slot edge: IP/GS 5.70 (60th vs 0th), Whiff%（fa_scan）
 
 ### Colton Cowser (BAL, LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-09：Yahoo ownership_type=team，從觀察中移除。
