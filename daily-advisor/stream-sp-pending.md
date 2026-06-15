@@ -4,83 +4,46 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-06-07
-- recorded_at: 2026-06-06T10:32:16+08:00
+## ET 2026-06-15
+- recorded_at: 2026-06-15T12:26:12+08:00
 - last_recheck_at: —
 
 ### TBD 場次（待補查）
-- NYM @ SD (NYM away TBD)
+- SD @ STL (SD away TBD)
+- MIN @ TEX (MIN away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Trevor McDonald | SF @ CHC | CHC (.723 🟡) | 11% | 40/46 | P60-70·P60-70·P60-70·**>P90**·**P80-90** | ✅ 推 | 全 5 軸 P60+ 雙菁英（GB% 61.6 >P90 + xwOBACON .349 P80-90）+ IP/GS 5.67 深投；對手 CHC 14d .723 🟡 中等 + vs RHP .728；ERA 4.50 xERA 3.83 小幅 buy-low；風險僅樣本 6 GS + 客場 Wrigley。6/2 自家 drop（換 Buehler）後結構回升 |
-| Connor Prielipp | MIN vs KC | KC (.698 🟢) | 8% | 19/— | <P25·P40-50·<P25·P40-50·P60-70 | ⚠️ 條件推 | buy-low：ERA 5.26 vs xERA 3.80（✅ 撿便宜運氣）+ 對手 KC 14d .698 🟢 冷 + K9 9.6 + vs LHB .677；風險 Sum 19 偏低 + BB/9 3.89 <P25 控球偏差 + 2025 無 prior（rookie 待驗）|
-| Bubba Chandler | PIT @ ATL | ATL (.747 🟡) | 61% | 16/27 | <P25·P50-60·<P25·<P25·P60-70 | ❌ 不推 | BB/9 6.0 <P25 嚴重失控 + GB% <P25 + Sum 16 偏弱；對手 ATL .747 🟡 中強；ERA 5.05 xERA 4.45。61% owned 高但結構不支持串流 |
+| Ryan Gusto | MIA @ PHI | PHI (.726 🟡 / vs RHP .685) | — | 21/21 | <P25·<P25·**P80-90**·**P80-90**·<P25 | ⚠️ 條件推 | floor 型：BB/9 2.0 + GB% 51.7 雙菁英控球壓 HR + 對手 PHI vs RHP .685 偏弱；但 Whiff <P25 K 少 + xwOBACON .397 <P25 on-contact 被打慘 + WebSearch 確認 true_starter 但仍 ramp-up（6/11 季高 66 球/4IP）預期 IP ~5 邊緣，QS 難、缺 K 無用。樣本 low (BBE 29/GS 2) |
 
 ### 備註
-- 2026-06-06 首次評估（recorded 10:32）：McDonald + Prielipp + Chandler 通過 Rotation gate + Sum ≥15 + true_starter。已過濾 Sum<15 hard floor 3 位：David Sandlin (CWS@PHI, Sum 13, opener_verdict small_sample 但 Sum 先排除跳過 WebSearch) + Rhett Lowder (CIN@STL, Sum 12) + Kyle Freeland (COL vs MIL, Sum 12 + Coors + ERA 8.06)。別隊 22 位（含 deGrom / Aaron Nola / Sandy Alcantara / Spencer Strider 等）+ 本隊 1 位（Joey Cantillo @ TEX）。
-- TBD 1 場（NYM @ SD，NYM away SP 未公布；SD = Randy Vásquez 別隊），建議 TW 6/7 早上補查。
-- 排序：**McDonald >> Prielipp > Chandler**。McDonald 唯一 ✅ 推（Sum 40 雙菁英 + 對手中等），命中率最高；Prielipp buy-low 賭注（Sum 低但運氣 + K + 對手冷）；Chandler 控球崩 ❌。
-- 用戶決策建議：① 缺 QS/IP/ERA 想穩 → McDonald（深投 + GB 壓 HR + 對手中等）② 缺 K + 願賭 buy-low → Prielipp（K9 9.6 + ERA 回歸 + 對手冷，但控球風險）③ 不缺或對手嫌硬 → pass / 等 TBD 補查。
+- 2026-06-15 首次評估（recorded 12:26）：Gusto 唯一過 Rotation gate + Sum ≥15 + true_starter（WebSearch 確認）。Rotation gate 🚫 排除 3 位（Mitch Spence KC g1/gs0、Andrew Alvarez WSH g7/gs2、Tobias Myers NYM g20/gs2 — 全 pure-RP/long-relief）。owned_by_others 13 位（含 Zack Wheeler / Dustin May / Shota Imanaga / MacKenzie Gore）+ 本隊 1 位（J.T. Ginn ATH vs PIT）。無 Sum<15 hard floor 排除項。
+- Gusto opener_suspect flag = stale：歷史 IP/GS 3.0 來自 ramp-up（3A 拉上來）+ 一場 2 天短休的 opener 式出賽，Marlins 本輪明確「分離」配對投手把他當正規 SP。預期 IP ~5（low-end true starter，仍 building）。
+- TBD 2 場（SD @ STL、MIN @ TEX，皆客場 SP 未公布），建議 TW 6/15 晚上/6/16 早上呼叫 `/stream-sp 2026-06-15 --tbd-only` 補查。
+- 用戶決策建議：Gusto 是 floor/控球型賭注，**缺 K 或要 QS 都不適合**；只有「想要一個不爆 BB、GB 壓 HR、對手對 RHP 偏弱的低變異 5 IP」才考慮，且要接受 ramp-up 可能 <5 IP。整體本日無強推候選。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
 
-## ET 2026-06-08
-- recorded_at: 2026-06-07T21:02:00+08:00
-- last_recheck_at: 2026-06-07T21:20:00+08:00
+## ET 2026-06-16
+- recorded_at: 2026-06-15T12:26:12+08:00
+- last_recheck_at: —
 
 ### TBD 場次（待補查）
-- SEA @ BAL (both TBD)
-- BOS @ TB (both TBD)
-- PHI @ TOR (both TBD)
-- HOU @ LAA (both TBD)
-- WSH @ SF (both TBD)
+- TOR @ BOS (TOR away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Jeffrey Springs | ATH vs MIL | MIL (.782 🔴 / vs LHP .648) | 22% | 23/22 | P40-50·P25-40·P60-70·<P25·P60-70 | ❌ 不推 (deep) | 近 6 場 ERA 4.88 + QS 1/6 + floor 高（近 6 場 3 崩）；flyball（GB <P25）近 8 場 11 HR 對 MIL 7d .911 熱化長打線 = HR mismatch；vs LHP .648 是全季均值，熱化期回歸只到 14d .782 救不了。對位利多蓋不過自身近況崩 + HR 暴露 |
+| Zebby Matthews | MIN @ TEX | TEX (.730 🟡 / vs RHP .699) | 16% | 30/18 | **P80-90**·P25-40·P70-80·<P25·**P80-90** | ✅ 推 | Sum 30 最高 + IP/GS 6.06 P80-90 深投 + BB/9 2.23 P70-80 控球 + xwOBACON .348 P80-90 被打輕 + ✅ 撿便宜運氣（ERA 5.20 vs xERA 3.76）；對手 TEX 🟡 中等。風險：GB% <P25 飛球型 + Whiff P25-40 K 不多 + 6 GS 樣本 |
+| Robert Gasser | MIL vs CLE | CLE (.671 🟢 / vs LHP .710) | 1% | 21/18 | <P25·**P70-80**·<P25·<P25·**>P90** | ⚠️ 條件推 | buy-low：ERA 6.38 vs xERA 3.69（✅ 撿便宜運氣，差 +2.69）+ Whiff 26.5 P70-80 + xwOBACON .317 >P90 被打極輕 + K9 9.33 + 對手 CLE 🟢 冷；風險 BB/9 4.42 <P25 控球差 + GB% 21.4 <P25 飛球 + IP/GS 4.58 短 + 4 GS 樣本。缺 K 願賭可，要 QS 不適合 |
+| Slade Cecconi | CLE @ MIL | MIL (.886 🔴 / vs RHP .755) | 5% | 20/27 | <P25·P25-40·P50-60·P60-70·P25-40 | ❌ 不推 | 結構平庸（無 elite 軸）+ 對手 MIL 14d .886 🔴 全聯盟最熱長打線 + vs RHP .755 也硬；ERA 4.83 xERA 4.48 無 buy-low。對位最差 |
+| Kumar Rocker | TEX vs MIN | MIN (.794 🔴 / vs RHP .727) | 10% | 19/19 | <P25·P25-40·<P25·P70-80·P50-60 | ❌ 不推 | ⚠️ 賣高運氣（ERA 3.56 vs xERA 4.69，ERA 預期回升）+ 對手 MIN .794 🔴；GB% P70-80 是唯一亮點但 Sum 19 偏弱。雙扣分 |
+| Ryan Feltner | COL @ CHC | CHC (.720 🟡 / vs RHP .721) | 1% | 16/24 | <P25·P50-60·P25-40·P40-50·<P25 | ❌ 不推 | xwOBACON .413 <P25 on-contact 被打慘 + ERA 5.20 xERA 5.75（無 buy-low）+ Sum 16 偏弱；對手 CHC 🟡 中等但客場 Wrigley 不利飛球。結構弱 |
+| Brady Singer | CIN vs NYM | NYM (.751 🟡 / vs RHP .670) | 11% | 15/21 | <P25·P25-40·P40-50·P40-50·<P25 | ❌ 不推 | xwOBACON <P25 + WHIP 1.64 + xERA 5.79（運氣未來更糟）+ Sum 15 剛過 floor；對手 NYM vs RHP .670 偏弱是唯一利多但救不了自身結構崩 |
 
 ### 備註
-- 2026-06-07 首次評估（recorded 21:02）：Springs 唯一過 Rotation gate + Sum ≥15 + true_starter。owned_by_others 別隊 4 位（Will Warren NYY@CLE / Gavin Williams CLE vs NYY / Andrew Abbott CIN@SD / Kyle Harrison MIL@ATH）+ 本隊 1 位（Walker Buehler SD vs CIN）。無 Sum<15 / rotation gate / opener 過濾項。
-- TBD 5 場（SEA@BAL / BOS@TB / PHI@TOR / HOU@LAA / WSH@SF，全 both TBD），建議 TW 6/8 早上呼叫 `/stream-sp 補查` 補查。
-- 排序：**Springs 單獨**（⚠️ 條件推）。關鍵 = 機械 tier 🔴 是 MIL 整體 14d，但對左投 .648 弱（Springs 左投對位實際偏 🟢）；穩定深投 + 控球給 QS floor，但缺 K。
-- 2026-06-07 21:20 deep eval（與 6/9 Gasser/Giolito 同輪 3 位）：
-  - **Jeffrey Springs**：⚠️ 條件推 → **❌ 不推**。差異訊號 = 近 6 場 ERA 4.88 + QS 1/6 + floor 高（5/12 STL · 5/22 SD 3HR · 6/3 CHC 2HR 三崩）；flyball 近 8 場 11 HR 對 MIL 7d .911 熱化長打線 HR mismatch。vs LHP .648 對位利多真實但救不了近況崩 + HR 結構（7d .911 vs 14d .782 落差 .129 觸發 hard rule 強制 14d 錨，熱化期對左投也可能高於季均 .648）。game log 顯示 Springs QS 不隨對手強弱、隨自身 HR 運氣（早季對 HOU/NYY 反 QS、對 CWS 弱打 7ER 崩）。
-- 跨兩日整體排序見 ET 6/9 備註。
-- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
-
-## ET 2026-06-09
-- recorded_at: 2026-06-07T21:02:00+08:00
-- last_recheck_at: 2026-06-07T21:20:00+08:00
-
-### TBD 場次（待補查）
-- SEA @ BAL (both TBD)
-- LAD @ PIT (both TBD)
-- BOS @ TB (both TBD)
-- MIN @ DET (both TBD)
-- AZ @ MIA (AZ away TBD)
-- NYY @ CLE (both TBD)
-- PHI @ TOR (both TBD)
-- STL @ NYM (both TBD)
-- TEX @ KC (both TBD)
-- ATL @ CWS (both TBD)
-- CHC @ COL (both TBD)
-- HOU @ LAA (both TBD)
-- WSH @ SF (both TBD)
-
-### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Robert Gasser | MIL @ ATH | ATH (.683 🟢) | 1% | 19/17 | <P25·P60-70·<P25·—·>P90 | ⚠️ 條件推 (deep) | 對手 ATH 三窗口一致冷（30d .692→14d .683→7d .630）+ vs LHP .701 中性 + K% 高利收割；近 3 場 4.73 ERA 全被 5/23 LAD 4ER 單崩汙染（去 LAD = 2.89），最近 6/3 vSF 5IP/1ER/5K 回穩。風險 = IP/GS 4.44 短局 + BB/9 4.73 + 3 場樣本。缺 K 願賭可，要 QS 不適合 |
-| Lucas Giolito | SD vs CIN | CIN (.719 🟢) | 8% | 19/11 | <P25·P60-70·<P25·—·>P90 | ❌ 不推 (deep) | BB/9 7.02 + WHIP 1.74 控球災難（4 場 13BB）+ 0/4 QS + IP/GS 4.17 短局；5/29 對 WSH 弱打崩盤 2.2IP/4ER/4BB/2HR → floor 高；對手 CIN 冷（vs RHP .694）救不了自身控球崩，全面風險無加分側 |
-
-### 備註
-- 2026-06-07 首次評估（recorded 21:02）：Gasser + Giolito 過 Rotation gate + Sum ≥15 + true_starter。owned_by_others 別隊 2 位（Max Meyer MIA vs AZ / Chase Burns CIN@SD）+ 本隊 1 位（J.T. Ginn ATH vs MIL）。無 Sum<15 / opener 過濾項。
-- TBD 13 場（其中 AZ@MIA 僅 away TBD，其餘 both TBD），建議 TW 6/9 早上補查（13 場大宗未公布，補查價值高）。
-- 排序：**Gasser > Giolito**。兩位皆 Sum 19 短局型，Gasser 控球較不崩（BB/9 4.73 vs Giolito 7.02）+ xERA<ERA buy-low 味道 + 對手最冷；Giolito BB/9 7.02 + WHIP 1.74 控球災難 ❌。兩位 IP/GS 皆 <P25，QS floor 都低。
-- 2026-06-07 21:20 deep eval（與 6/8 Springs 同輪 3 位）：
-  - **Robert Gasser**：⚠️ 條件推 → ⚠️ 維持 (deep)。差異訊號 = ATH 三窗口一致冷（.692→.683→.630，無 hard rule 觸發）+ K% 24-25% 高利 K 收割；近 3 場 4.73 ERA 全被 5/23 LAD 單崩汙染（去 LAD = 2.89），6/3 vSF 5IP/1ER/5K 回穩。3 場樣本 buy-low 賭注，短局 + BB/9 4.73 限 QS。
-  - **Lucas Giolito**：❌ 不推 → ❌ 維持 (deep)。差異訊號 = 4 場 13BB（BB/9 7.02）+ WHIP 1.74 控球災難 + 0/4 QS + 5/29 對 WSH 弱打崩盤（floor 高）；對手 CIN 冷救不了自身控球。
-- 跨兩日整體排序（3 位深評）：**Gasser > Springs >> Giolito**。Gasser 唯一 ⚠️（對手最冷 + K + 回穩，短局/控球賭注）；Springs season 最穩但 deep 降 ❌（flyball vs MIL 熱化 HR mismatch + 近 6 場 4.88）；Giolito 控球災難最差。缺 K 願賭 → Gasser；缺 QS/IP 想穩 → 三位皆不適合，等 6/9 13 場 TBD 補查。
+- 2026-06-16 首次評估（recorded 12:26）：6 位過 Rotation gate + Sum ≥15 + true_starter（全 true_starter，免 WebSearch）。Rotation gate 🚫 排除 2 位（Tyler Phillips MIA g19/gs3 Sum 29、Jack Perkins ATH g19/gs2 Sum 23 Whiff P80-90 — 結構不差但 pure-RP/long-relief 排除）。Sum<15 hard floor 排除 2 位（Christian Scott NYM Sum 7、Adrian Houser SF Sum 12）。owned_by_others 17 位（含 Jesús Luzardo / Gerrit Cole / Framber Valdez / Hunter Brown / Logan Gilbert / Michael King）+ 本隊 2 位（Andre Pallante STL vs SD、Reid Detmers LAA @ AZ）。
+- TBD 1 場（TOR @ BOS，TOR away SP 未公布；BOS = Payton Tolle 別隊），建議補查。
+- 排序：**Matthews >> Gasser > 其餘 4 位 ❌**。Matthews 唯一 ✅ 推（Sum 30 三條件全滿：深投 + 控球 + xwOBACON 菁英 + buy-low + 對手中等），命中率最高；Gasser buy-low 賭注（xERA 差 +2.69 + K + 對手最冷，但控球/飛球/短局風險）；Cecconi/Rocker 對手 🔴 + Feltner/Singer 結構弱全 ❌。
+- 用戶決策建議：① 缺 QS/IP/ERA 想穩 → **Matthews**（IP/GS P80-90 深投 + 控球 + xwOBACON 菁英 + ERA 回歸，本兩日最佳）② 缺 K + 願賭 buy-low → Gasser（K9 9.33 + xERA 大幅低於 ERA + 對手冷，但控球差短局）③ 不缺或對手嫌硬 → pass。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
