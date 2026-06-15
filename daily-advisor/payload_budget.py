@@ -26,17 +26,20 @@ from __future__ import annotations
 
 class PayloadBudgetExceeded(Exception):
     """Raised by ``assert_within`` when a candidate's registered lines exceed
-    the ceiling. Carries the per-slice breakdown so the offending slice is
-    diagnosable from logs / alerts."""
+    the ceiling. Carries the per-slice counts (``slice_counts``) so the
+    offending slice is diagnosable from logs / alerts. Named ``slice_counts``
+    rather than ``breakdown`` on purpose: it is a plain dict attribute, not the
+    ``PayloadBudget.breakdown()`` method — so ``except`` handlers don't reflex
+    into ``e.breakdown()`` and hit a ``'dict' object is not callable``."""
 
-    def __init__(self, candidate, total, limit, breakdown):
+    def __init__(self, candidate, total, limit, slice_counts):
         self.candidate = candidate
         self.total = total
         self.limit = limit
-        self.breakdown = dict(breakdown)
+        self.slice_counts = dict(slice_counts)
         super().__init__(
             f"payload budget exceeded for {candidate!r}: "
-            f"{total} > {limit} lines (breakdown: {self.breakdown})"
+            f"{total} > {limit} lines (breakdown: {self.slice_counts})"
         )
 
 

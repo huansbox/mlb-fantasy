@@ -120,7 +120,7 @@ def test_exceeded_exception_carries_diagnostic_context():
     assert exc.candidate == "Vargas"
     assert exc.total == 9
     assert exc.limit == 3
-    assert exc.breakdown == {"ledger": 3, "swap": 6}
+    assert exc.slice_counts == {"ledger": 3, "swap": 6}
     # the offending slices should be inspectable from the message too
     assert "Vargas" in str(exc)
     assert "swap" in str(exc)
