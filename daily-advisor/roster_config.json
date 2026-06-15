@@ -41,7 +41,7 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "1B",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -157,32 +157,6 @@
       "status": ""
     },
     {
-      "name": "Ezequiel Duran",
-      "mlb_id": 677649,
-      "yahoo_player_key": "469.p.11886",
-      "team": "TEX",
-      "positions": [
-        "1B",
-        "2B",
-        "3B",
-        "SS",
-        "LF"
-      ],
-      "selected_pos": "SS",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.247,
-        "barrel_pct": 2.6,
-        "hh_pct": 30.9,
-        "bb_pct": 3.7,
-        "ops": 0.559,
-        "pa_per_team_g": 1.35,
-        "pa": 219,
-        "g": 90
-      }
-    },
-    {
       "name": "Luis Arraez",
       "mlb_id": 650333,
       "yahoo_player_key": "469.p.11221",
@@ -191,7 +165,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "1B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -236,7 +210,7 @@
         "2B",
         "CF"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -262,7 +236,7 @@
         "LF",
         "CF"
       ],
-      "selected_pos": "LF",
+      "selected_pos": "SS",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -274,6 +248,32 @@
         "pa_per_team_g": 2.46,
         "pa": 398,
         "g": 133
+      }
+    },
+    {
+      "name": "Kody Clemens",
+      "mlb_id": 665019,
+      "yahoo_player_key": "469.p.11309",
+      "team": "MIN",
+      "positions": [
+        "1B",
+        "2B",
+        "LF",
+        "CF",
+        "RF"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.331,
+        "barrel_pct": 12.0,
+        "hh_pct": 48.3,
+        "bb_pct": 7.5,
+        "ops": 0.715,
+        "pa_per_team_g": 2.38,
+        "pa": 386,
+        "g": 119
       }
     }
   ],
@@ -301,7 +301,7 @@
         "xwobacon": 0.356
       },
       "selected_pos": "SP",
-      "status": "IL15"
+      "status": ""
     },
     {
       "name": "Chris Sale",
