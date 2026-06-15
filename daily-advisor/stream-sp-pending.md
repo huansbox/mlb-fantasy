@@ -26,7 +26,7 @@
 
 ## ET 2026-06-16
 - recorded_at: 2026-06-15T12:26:12+08:00
-- last_recheck_at: —
+- last_recheck_at: 2026-06-15T12:36:00+08:00
 
 ### TBD 場次（待補查）
 - TOR @ BOS (TOR away TBD)
@@ -34,8 +34,8 @@
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Zebby Matthews | MIN @ TEX | TEX (.730 🟡 / vs RHP .699) | 16% | 30/18 | **P80-90**·P25-40·P70-80·<P25·**P80-90** | ✅ 推 | Sum 30 最高 + IP/GS 6.06 P80-90 深投 + BB/9 2.23 P70-80 控球 + xwOBACON .348 P80-90 被打輕 + ✅ 撿便宜運氣（ERA 5.20 vs xERA 3.76）；對手 TEX 🟡 中等。風險：GB% <P25 飛球型 + Whiff P25-40 K 不多 + 6 GS 樣本 |
-| Robert Gasser | MIL vs CLE | CLE (.671 🟢 / vs LHP .710) | 1% | 21/18 | <P25·**P70-80**·<P25·<P25·**>P90** | ⚠️ 條件推 | buy-low：ERA 6.38 vs xERA 3.69（✅ 撿便宜運氣，差 +2.69）+ Whiff 26.5 P70-80 + xwOBACON .317 >P90 被打極輕 + K9 9.33 + 對手 CLE 🟢 冷；風險 BB/9 4.42 <P25 控球差 + GB% 21.4 <P25 飛球 + IP/GS 4.58 短 + 4 GS 樣本。缺 K 願賭可，要 QS 不適合 |
+| Zebby Matthews | MIN @ TEX | TEX (.730 🟡 / vs RHP .699) | 16% | 30/18 | **P80-90**·P25-40·P70-80·<P25·**P80-90** | ⚠️ 條件推 (deep) | 近 6 場 ERA 5.20 + 深投 QS 4/6；floor risk 高（5/31 PIT 7ER/2HR + 6/11 DET 7ER/3HR 兩崩，飛球型 6 場 8 HR）；對手 TEX 三窗口穩 .730 + vs RHP .699 偏弱。深投給 IP/QS 量但飛球爆 HR variance 真實 — 缺 IP/QS 可賭、缺 ERA/WHIP 危險。high variance（好 7IP0ER / 壞 7ER）|
+| Robert Gasser | MIL vs CLE | CLE (.671 🟢 / vs LHP .710) | 1% | 21/18 | <P25·**P70-80**·<P25·<P25·**>P90** | ❌ 不推 (deep) | 0/4 QS + 短局（4 場全 ≤5 IP）+ 6/9 對弱打 ATH 剛 5IP/6ER/4HR + 近 4 場 6.38 + 近 2 場各 4BB 控球崩。buy-low(xERA 3.69)是整季訊號，game log 即時命中率完全不支撐，單週串爆拉爛 ratio — pass |
 | Slade Cecconi | CLE @ MIL | MIL (.886 🔴 / vs RHP .755) | 5% | 20/27 | <P25·P25-40·P50-60·P60-70·P25-40 | ❌ 不推 | 結構平庸（無 elite 軸）+ 對手 MIL 14d .886 🔴 全聯盟最熱長打線 + vs RHP .755 也硬；ERA 4.83 xERA 4.48 無 buy-low。對位最差 |
 | Kumar Rocker | TEX vs MIN | MIN (.794 🔴 / vs RHP .727) | 10% | 19/19 | <P25·P25-40·<P25·P70-80·P50-60 | ❌ 不推 | ⚠️ 賣高運氣（ERA 3.56 vs xERA 4.69，ERA 預期回升）+ 對手 MIN .794 🔴；GB% P70-80 是唯一亮點但 Sum 19 偏弱。雙扣分 |
 | Ryan Feltner | COL @ CHC | CHC (.720 🟡 / vs RHP .721) | 1% | 16/24 | <P25·P50-60·P25-40·P40-50·<P25 | ❌ 不推 | xwOBACON .413 <P25 on-contact 被打慘 + ERA 5.20 xERA 5.75（無 buy-low）+ Sum 16 偏弱；對手 CHC 🟡 中等但客場 Wrigley 不利飛球。結構弱 |
@@ -46,4 +46,8 @@
 - TBD 1 場（TOR @ BOS，TOR away SP 未公布；BOS = Payton Tolle 別隊），建議補查。
 - 排序：**Matthews >> Gasser > 其餘 4 位 ❌**。Matthews 唯一 ✅ 推（Sum 30 三條件全滿：深投 + 控球 + xwOBACON 菁英 + buy-low + 對手中等），命中率最高；Gasser buy-low 賭注（xERA 差 +2.69 + K + 對手最冷，但控球/飛球/短局風險）；Cecconi/Rocker 對手 🔴 + Feltner/Singer 結構弱全 ❌。
 - 用戶決策建議：① 缺 QS/IP/ERA 想穩 → **Matthews**（IP/GS P80-90 深投 + 控球 + xwOBACON 菁英 + ERA 回歸，本兩日最佳）② 缺 K + 願賭 buy-low → Gasser（K9 9.33 + xERA 大幅低於 ERA + 對手冷，但控球差短局）③ 不缺或對手嫌硬 → pass。
+- 2026-06-15 12:36 deep eval（2 位候選）：
+  - **Zebby Matthews**：✅ 推 → **⚠️ 條件推 (deep)**。差異訊號 = 近 6 場 ERA 5.20 + floor risk 高（5/31 PIT 7ER/2HR + 6/11 DET 7ER/3HR 兩崩，飛球型 6 場 8 HR）；深投 QS 4/6 + xERA 3.76 buy-low + 對手 vs RHP .699 偏弱仍給 floor，故降一級不全 ❌。high variance（好 7IP0ER / 壞 7ER）。
+  - **Robert Gasser**：⚠️ 條件推 → **❌ 不推 (deep)**。差異訊號 = 0/4 QS + 短局型（4 場全 ≤5 IP）+ 6/9 對弱打 ATH 5IP/6ER/4HR 剛崩 + 近 4 場 6.38 + 近 2 場各 4BB。對手 CLE 冷 + K9 9.33 + xERA 3.69 buy-low 救不了即時命中率，短局/低三振天花板 + ratio 賭注報酬風險不對等。
+- 深評排序：**Matthews > Gasser**。Matthews 深投（QS 4/6 vs 0/4）+ Sum 30 + 近況 ERA 較低 + 對手對 RHP 更弱；Gasser 僅對手 14d 更冷但 0/4 QS + 6.38 + 剛崩 4HR 硬傷。缺 IP/QS 可賭 Matthews（吃 ER variance）；缺 ERA/WHIP 兩位皆不適合；Gasser 這輪 pass。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
