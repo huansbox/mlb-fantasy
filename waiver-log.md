@@ -107,21 +107,6 @@
 - 06-15：14d OPS .932/K% 26.5持續回落（30.8→26.5）接近25%目標；Savant運氣+0.143嚴重膨脹需注意；PA-TG 2.97接近3.0；C-plan維持（fa_scan）
 - 06-16：14d OPS .932/K% 26.5持續回落接近25%目標；Savant運氣+0.143嚴重膨脹；PA-TG 2.97接近3.0；C-plan維持（fa_scan）
 
-### Dominic Canzone (SEA, LF,RF) [mlb_id:686527] — 觀察中
-觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級取代候選
-- 06-04：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限（fa_scan）
-- 06-05：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.014 / 3HR；PA-TG 2.35 上場有限觸發未達（fa_scan）
-- 06-06：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS .998 / 3HR；PA-TG 2.36 上場有限觸發未達（fa_scan）
-- 06-07：xwOBA P95 / Barrel% P95 + prior P95 雙年菁英確認；14d OPS 1.131 / 4HR；PA-TG 2.38 上場有限觸發未達（fa_scan）
-- 06-08：14d OPS 1.131 / 4HR 爆發；PA-TG 2.38 上場有限觸發未達（fa_scan）
-- 06-09：14d OPS 1.151 / 4HR + Savant Δ+0.105 爆發；PA-TG 2.40 上場有限觸發未達；7% rising +3（fa_scan）
-- 06-10：14d OPS 1.151 / 4HR + Savant Δ+0.098 品質飆升；PA-TG 2.38 上場有限觸發 3.0 未達；7% plateau（fa_scan）
-- 06-11：14d OPS 1.171 / 4HR + Savant Δ+0.087 品質飆升；PA-TG 2.41 觸發 3.0 連續未達；7% plateau（fa_scan）
-- 06-12：14d OPS 1.219 / 5HR 爆發持續；PA-TG 2.43 觸發 3.0 連續未達（fa_scan）
-- 06-13：14d OPS 1.313/5HR 爆發持續；Savant Δ+0.089 品質飆升；PA-TG 2.45 觸發 3.0 連續未達；8% +4/7d（fa_scan）
-- 06-14：14d OPS 1.416/5HR/Savant Δ+0.098爆發延續；PA-TG 2.47觸發3.0連續未達；14% +7/3d rising市場反應中（fa_scan）
-- 06-15：14d OPS 1.416/5HR/Savant Δ+0.098爆發延續；PA-TG 2.47觸發3.0連續未達；17% +9/3d rising市場加速搶人（fa_scan）
-
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
 - 06-05：xwOBA P70 / Barrel% P70 / HH% P80 + prior P60/P55/P70 雙年確認；14d OPS .861 / Savant Δ+0.042 品質上升；PA-TG 3.21 全職；1% 零壓力（fa_scan）
@@ -246,6 +231,9 @@ vs：Mauricio Dubón
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Dominic Canzone (SEA, LF,RF) — 被搶（自動偵測）
+- 2026-06-16：Yahoo ownership_type=team，從觀察中移除。
 
 ### Shane Drohan (MIL, SP,RP) — 被搶（自動偵測）
 - 2026-06-12：Yahoo ownership_type=team，從觀察中移除。
