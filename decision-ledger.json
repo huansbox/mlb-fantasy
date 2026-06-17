@@ -71,6 +71,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -145,6 +154,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Kyle Manzardo": [
@@ -178,6 +196,15 @@
    "player": "Kyle Manzardo",
    "verdict": "watch",
    "ts": "2026-06-16",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "Kyle Manzardo",
+   "verdict": "watch",
+   "ts": "2026-06-17",
    "add_reason": null,
    "channel": "structure",
    "stars": 4,
@@ -247,6 +274,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Andrew Benintendi",
+   "verdict": "立即取代",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Vaughn Grissom": [
@@ -280,6 +316,15 @@
    "player": "Vaughn Grissom",
    "verdict": "watch",
    "ts": "2026-06-16",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
+  },
+  {
+   "player": "Vaughn Grissom",
+   "verdict": "watch",
+   "ts": "2026-06-17",
    "add_reason": null,
    "channel": "structure",
    "stars": 2,
@@ -321,6 +366,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Heriberto Hernández",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Garrett Mitchell": [
@@ -358,6 +412,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Garrett Mitchell",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kyle Karros": [
@@ -391,6 +454,15 @@
    "player": "Kyle Karros",
    "verdict": "watch",
    "ts": "2026-06-16",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Kyle Karros",
+   "verdict": "watch",
+   "ts": "2026-06-17",
    "add_reason": null,
    "channel": "structure",
    "stars": 3,
@@ -462,6 +534,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Gabriel Moreno": [
@@ -483,6 +564,17 @@
    "add_reason": null,
    "channel": null,
    "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Matt McLain": [
+  {
+   "player": "Matt McLain",
+   "verdict": "取代",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": "structure",
+   "stars": 4,
    "executed_ts": null
   }
  ]

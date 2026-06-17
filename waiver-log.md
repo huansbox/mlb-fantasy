@@ -40,6 +40,7 @@
 - 06-14：K% 29.1反彈>28%觸發線；Savant Δ-0.038品質下滑；OPS .731；觸發未達（06-13達成→06-14回落）；若Duran被Clemens取代需重新錨定（fa_scan）
 - 06-15：K% 28.3回落至觸發線邊緣但OPS .611極弱+Savant Δ-0.055品質下滑；觸發兩項均未達（fa_scan）
 - 06-16：K% 28.3觸發線邊緣但OPS .631極弱+Savant Δ-0.046品質下滑；觸發兩項均未達（fa_scan）
+- 06-17：K% 29.6>28%觸發線+OPS .658極弱+Savant Δ-0.062品質下滑；觸發兩項均未達（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -74,6 +75,7 @@
 - 06-14：IL10持續；14d OPS .874/4HR傷前數據；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-15：IL10持續；14d OPS .874/4HR傷前數據；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-16：IL10持續；14d OPS .874/4HR傷前數據；P95/P95底穩；等IL回歸+先發確認（fa_scan）
+- 06-17：IL10持續；14d OPS .916/4HR；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -106,6 +108,7 @@
 - 06-14：14d OPS .932/K% 26.5持續回落（42.6→36.0→30.8→26.5）；season P60/P70/P70；7%零壓力（fa_scan）
 - 06-15：14d OPS .932/K% 26.5持續回落（30.8→26.5）接近25%目標；Savant運氣+0.143嚴重膨脹需注意；PA-TG 2.97接近3.0；C-plan維持（fa_scan）
 - 06-16：14d OPS .932/K% 26.5持續回落接近25%目標；Savant運氣+0.143嚴重膨脹；PA-TG 2.97接近3.0；C-plan維持（fa_scan）
+- 06-17：14d OPS .888/K% 28.6持續回落（26.5→28.6微反彈）；Savant運氣+0.087膨脹；PA-TG 2.99接近3.0；C-plan維持（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -121,6 +124,7 @@
 - 06-14：14d OPS .898首次破.800 day 1/7；Savant Δ+0.079正值連5天+；season P70/P50/P70/P80；2%零壓力（fa_scan）
 - 06-15：[取代→Mauricio Dubón] 錨點從Albies重定至Dubón（因Paredes取代Albies）；14d OPS .943 day 2/7；Savant Δ+0.079品質上升；P70/P50/P70/P80 vs Dubón P60/P25/P25/P0全面碾壓（fa_scan）
 - 06-16：[取代→Mauricio Dubón] [取代→Mauricio Dubón] 14d OPS .943 day 3/7；Savant Δ+0.019品質上升；4HR/11R爆發；P70/P50/P70/P80 vs Dubón P60/P25/P25/P0全面碾壓；2%零壓力（fa_scan）
+- 06-17：[立即取代→Mauricio Dubón] ⚠️已推薦3天未執行；14d OPS 1.032/5HR/11R爆發；Savant Δ+0.061品質上升；P70/P55/P70/P80 vs Dubón P60/P25/P25/P0全面碾壓；2%零壓力（fa_scan）
 
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -136,6 +140,7 @@
 - 06-14：IL10；PA-TG 2.21持續下滑（2.35→2.21）；觸發3.0遠未達（fa_scan）
 - 06-15：IL10持續；PA-TG 2.15持續下滑；觸發3.0遠未達（fa_scan）
 - 06-16：IL10持續；PA-TG 2.12持續下滑；觸發3.0遠未達（fa_scan）
+- 06-17：IL10持續；PA-TG 2.09持續下滑；觸發3.0遠未達（fa_scan）
 
 ### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -150,6 +155,7 @@
 - 06-14：14d OPS 1.074/4HR/1SB爆發；PA-TG 2.00觸發2.5遠未達；1%零壓力（fa_scan）
 - 06-15：14d OPS 1.094/5HR/1SB爆發；PA-TG 2.03觸發2.5遠未達；1%零壓力（fa_scan）
 - 06-16：14d OPS .943/4HR/1SB；PA-TG 2.05觸發2.5遠未達；2%零壓力（fa_scan）
+- 06-17：14d OPS .901/4HR/1SB；K% 32.7高；PA-TG 2.08觸發2.5遠未達；2%零壓力（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
@@ -160,6 +166,7 @@
 - 06-14：14d K% 32.7從35.8回落但仍遠超28%觸發線；OPS .944；5%零壓力（fa_scan）
 - 06-15：14d K% 30.9從32.7微降但仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
 - 06-16：14d K% 30.9從32.7微降仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
+- 06-17：14d K% 27.3首次跌破28%觸發線 day 1/5 + OPS .962≥.800 ✓；P80/P95/P95/P80；需連5天維持（fa_scan）
 
 ### Isaac Paredes (HOU, 3B) [mlb_id:670623] — 觀察中
 觸發：立即行動
@@ -180,6 +187,7 @@ vs：待定
 - 06-14：14d OPS .998/Savant Δ+0.040品質上升；BBE 147觸發180遠未達；prior P0未確認+Coors；1%（fa_scan）
 - 06-15：14d OPS 1.080/Savant Δ+0.022品質上升；BBE 149觸發180遠未達；prior P0未確認+Coors；1%（fa_scan）
 - 06-16：14d OPS .975/Savant Δ+0.023品質上升；BBE 155觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
+- 06-17：14d OPS .938/Savant Δ+0.010品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -187,6 +195,7 @@ vs：Mauricio Dubón
 - 06-14：雙年P80/P80/P80確認；14d K% 36.4極端spike需冷卻；PA-TG 3.80全職；42% owned（fa_scan）
 - 06-15：14d K% 36.4極端spike持續；OPS .740；Savant Δ-0.047品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
 - 06-16：14d K% 39.3極端spike惡化（36.4→39.3）；OPS .824；Savant Δ-0.034品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
+- 06-17：14d K% 39.3極端spike持續惡化（36.4→39.3）；OPS .776；Savant Δ-0.058品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
 
 ## 隊上觀察
 
@@ -292,6 +301,7 @@ vs：Mauricio Dubón
 
 ### Matt McLain (CIN, 2B) — 被搶（自動偵測）
 - 2026-06-10：Yahoo ownership_type=team，從觀察中移除。
+- 06-17：[取代→Christian Walker] P80/P80/P60+14d Savant .483 Δ+0.149爆發+4SB+buy-low gap -0.027；49% owned有搶人風險；26歲BB% P60→P80 breakout（fa_scan）
 
 ### Edouard Julien (COL, 1B,2B) — 觸發失效（手動結案）
 - 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。platoon 確認 + PA-TG 從未達 3.0 + 14d 崩盤 10+ 天。
