@@ -474,5 +474,16 @@
    "stars": 4,
    "executed_ts": null
   }
+ ],
+ "Martín Pérez": [
+  {
+   "player": "Martín Pérez",
+   "verdict": "watch",
+   "ts": "2026-06-17",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }

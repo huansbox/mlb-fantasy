@@ -469,6 +469,7 @@ vs：Mauricio Dubón
 
 ### Martín Pérez (ATL, SP) [mlb_id:527048] — Pass
 - 2026-05-06：[stream-eval] 4/26 已被 ATL DFA 改 MiLB 合約，schedule 過時資料；即使先發 xERA-ERA −2.24 賣高運氣極端會拉爛 ERA
+- 06-17：Pérez shows a 3-slot edge over Buehler (IP/GS 5.27 vs 4.81, Whiff% 20.8 vs 17.7, xwOBACON .355 p70 vs .384 p25), and his 21d xwOBACON .318 is trending well. However, ERA 2.90 vs xERA 4.02 flags heavy（fa_scan）
 
 ### Patrick Corbin (TOR, SP) [mlb_id:571578] — Pass
 - 2026-05-06：[stream-eval] v4 Sum 13 / xwOBACON .426 全方位結構崩 / xERA-ERA −2.04 賣高運氣極端；我隊 ERA 1.96 + IP 路徑安全無 contested 觸發
