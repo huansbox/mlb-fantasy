@@ -168,16 +168,6 @@
 - 06-16：14d K% 30.9從32.7微降仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
 - 06-17：14d K% 27.3首次跌破28%觸發線 day 1/5 + OPS .962≥.800 ✓；P80/P95/P95/P80；需連5天維持（fa_scan）
 
-### Isaac Paredes (HOU, 3B) [mlb_id:670623] — 觀察中
-觸發：立即行動
-vs：Albies
-- 06-11：[取代→Albies] xwOBA P70/BB% P70 vs Albies P60/P40/P0/P0 三軸升級；14d 4HR/13RBI 爆發；50% plateau（fa_scan）
-- 06-12：[取代→Albies] 14d 4HR/13RBI 持續爆發；vs Albies P70/P70 vs P60/P40/P0/P0 升級；49% plateau（fa_scan）
-- 06-13：[取代→Ozzie Albies] 14d 4HR/13RBI/OPS .886 持續爆發；Savant Δ+0.063 品質上升；49% plateau（fa_scan）
-- 06-14：[取代→Ozzie Albies] ⚠️已推薦4天；14d 3HR/11RBI/OPS .772；Savant Δ+0.055品質上升；vs Albies P70/P70 vs P60/P40/P0/P0升級；49% plateau（fa_scan）
-- 06-15：[取代→Ozzie Albies] ⚠️已推薦5天；14d 3HR/11RBI/OPS .772；Savant Δ+0.042品質上升；vs Albies P70/P70 vs P60/P40/P0/P0升級；48% plateau（fa_scan）
-- 06-16：[取代→Ozzie Albies] [取代→Ozzie Albies] ⚠️已推薦6天；14d 4HR/13RBI/OPS .971爆發；Savant Δ+0.042品質上升；vs Albies P70/P70 vs P60/P40/P0/P0升級；47% plateau（fa_scan）
-
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
 vs：待定
@@ -240,6 +230,9 @@ vs：Mauricio Dubón
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
 ## 已結案
+
+### Isaac Paredes (HOU, 3B) — 被搶（自動偵測）
+- 2026-06-17：Yahoo ownership_type=team，從觀察中移除。
 
 ### Dominic Canzone (SEA, LF,RF) — 被搶（自動偵測）
 - 2026-06-16：Yahoo ownership_type=team，從觀察中移除。
