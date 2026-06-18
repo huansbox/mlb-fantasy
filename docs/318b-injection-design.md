@@ -122,11 +122,40 @@ for 球員 in (active roster + active watchlist):
 
 每段上線前後都記錄 payload input/output token（user story 19）。
 
+## 段① 實測結果（2026-06-18，VPS 配對 A/B）
+
+PR #351（318b-batter）merge（`9449fa2`）+ VPS deploy 後，VPS production code 跑出注入後 batter payload，反注入得**同 13 候選**的 clean 版（零候選池 noise，優於跨天 production issue 配對），VPS neutral cwd 各跑 `claude -p --output-format json` ×2（A=clean 無注入 / B=injected 有注入，同一個未動的 batter prompt）：
+
+| | input（cache_read+creation）| output_tokens | duration | cost（rep0 可比）|
+|---|---|---|---|---|
+| A_clean（無注入）| ~33.6–34.1K | 8,131 / 9,189（avg **8,660**）| ~184s | $0.351 |
+| B_injected（注入）| 34.8K | 7,231 / 7,105（avg **7,168**）| ~155s | $0.336 |
+
+**注入內容**（這批 13 FA + 我方 P1–P7）：ledger 22 行（791 chars）+ chase/zone tag 10 個（272 chars）= **1,063 chars（+5.2% payload）**。platoon / PA 投影 / swap 因無 actionable（取代）候選**未觸發**（設計意圖，稀有條件性注入，swap 走獨立 pool）；post-hype 無命中。
+
+**通過判定 — 段① 乾淨通過**：
+- ✅ **input 漲在預期內**：B−A ≈ **+1,029 tokens（+3.0%）**，精確對應注入 1,063 chars。
+- ✅✅ **output 無 thinking 誘發**：B（注入）7,168 vs A（無注入）8,660，**反低 17%**。對比 lever-2 backfire（output ~3× 暴增）完全相反；cost rep0 B $0.336 < A $0.351，注入裸上零成本甚至略省。
+
+**對照組效果（決定 042）**：
+- **chase/zone 事實型 tag：LLM 自發使用** — B output 直接引用「Joc Pederson zone-contact -4.4 接觸降」，waiver-log UPDATE 也寫入 chase/zone tag（Manzardo/Heriberto chase崩壞）。給資訊即用，**不需 042 強制**。
+- **ledger prev-verdict / add-reason：本批無有效驗證場景** — 有 ledger 的候選（Curtis Mead / Joc Pederson）judgment 未回溯「上次/原撿因」，但此批是弱樣本：① prev-verdict 全「0 天前 watch」無變化可指認；② add_reason 是季線快照（backfill B7 未跑 = 假理由，忽略反而合理）；③ 無翻供案例。042 兩規則本批皆無觸發場景。
+
+**fetcher VPS endpoint 確認**（B6 SP 注入參照）：
+- ✅ discipline bulk CSV + ledger fetcher：成功（payload_b 有對應注入，整次跑**無一條 best-effort skip 警告**）。注入鏈在 VPS production 環境跑通、never abort scan，B6 SP dict 注入可比照此 best-effort 模式。
+- ⏳ platoon games / future-games（PA 投影）fetcher：此批無 actionable 候選未觸發，endpoint shape 未驗 → 待後續有 actionable 候選的掃描日，或 B6 前單獨 smoke test 補驗。
+
+**042 決策 → 暫緩**（從「條件性」降為「backfill B7 + 真實翻供/drop 案例成熟後再評估」）：
+- 段① 證實「給資訊」對事實型 tag（chase/zone）已生效（Q5「步驟 1 是 042 對照組」假設在 tag 層面成立）；ledger 規則的增益未被本批證實，而 042 是 lever-2 風險正主（加判斷規則誘發 thinking）。價值未證實 + 風險已知 → 不值得現在做。
+- 042 的「drop 面對原 add 理由」邏輯上 **blocked by backfill B7**（現 add_reason 是季線快照假理由，強制面對會誤導）。
+- 結論：**注入裸上保留（已 production），042 不上**。重評觸發 = backfill B7 跑完 + 出現真實翻供（verdict 改變）或 drop 回溯案例。
+
 ## 拆 slice 清單與順序
 
-1. **318b-batter 注入 + backfill 前置**（先做，AFK）：backfill 腳本 → batter `_format_fa_batter` 注入 → 基礎 + swap 兩 pool register → 段① A/B。
-2. **042 prompt 契約**（#321，HITL，**條件性**）：段① 數據決定做不做；做則配對 A/B + 人工審。
-3. **318b-sp 注入**（延後，AFK）：`payload_slimmer.slim_entry` dict 注入 046/048/050 → 段③ A/B。
+1. **318b-batter 注入**（✅ merge PR #351 `9449fa2` + VPS deploy + 段① A/B 通過，2026-06-18）：batter pass2 注入 → 基礎 + swap 兩 pool register → 段① A/B。backfill（B7）改拆第二批，故段① 跑時 ledger add_reason 多為空/季線快照（見「段① 實測結果」）。
+2. **042 prompt 契約**（#321，HITL，**暫緩**）：段① 數據已出 — 注入裸上零誘發、事實型 tag LLM 自發使用，但 ledger 規則增益未證實 + drop 規則 blocked by backfill B7 → **042 不上**。重評觸發見「段① 實測結果」。
+3. **318b-sp 注入**（B6，延後，AFK）：`payload_slimmer.slim_entry` dict 注入 046/048/050 → 段③ A/B。fetcher best-effort 模式可比照 batter 段①（VPS 已驗）。
+4. **legacy backfill**（B7，前置一次性，AFK）：active roster + watchlist 的 ledger 回填（roster 用 tagged `add_reason`）。042 的 drop 規則依賴此。
 
 ## 尚待決定的實作細節（design doc 不卡、實作時定）
 
