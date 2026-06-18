@@ -83,6 +83,7 @@ class CandidateEnrichment:
     add_reason: str | None = None
     note_lines: list = field(default_factory=list)   # B1: ledger note (budgeted)
     inline_tags: list = field(default_factory=list)  # B2/B5: header tags (not budgeted)
+    owned_shape: str | None = None                   # B8: %owned shape → gate fast-lane
 
 
 def percentile_of(value, metric) -> int:

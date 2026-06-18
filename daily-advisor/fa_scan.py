@@ -2641,10 +2641,10 @@ def _gate_notifications(enrich_map, roster, ledger, today_str):
     """Pure: ACT-NOW notify lines for today's actionable 4★+ verdicts.
 
     Reads each candidate's history from the injected ledger, runs the gate,
-    collects a line per player whose gate says notify. owned_trend is None for
-    now (fast-lane = 5★ only); the %owned-rising fast-lane is plumbed in 318b.
-    Only today's entry counts (the freshness guard skips stale players from a
-    no-op scan)."""
+    collects a line per player whose gate says notify. owned_trend = the
+    candidate's %owned shape (B8, set on the enrichment during payload build)
+    so a fast-rising add fast-lanes past the slow lane. Only today's entry
+    counts (the freshness guard skips stale players from a no-op scan)."""
     msgs = []
     for name, enr in (enrich_map or {}).items():
         hist = ledger.get_history(name)
@@ -2654,8 +2654,9 @@ def _gate_notifications(enrich_map, roster, ledger, today_str):
         if latest.verdict not in ACTIONABLE:
             continue
         stars = enr.stars if enr else None
+        owned_shape = enr.owned_shape if enr else None
         result = gate(hist, latest.verdict, stars or 0,
-                      owned_trend=None, executed=(name in roster))
+                      owned_trend=owned_shape, executed=(name in roster))
         if result.notify:
             msgs.append(f"⚡ {name} — {result.reason}")
     return msgs
@@ -3447,6 +3448,7 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             f_age = ages.get(str(f.get("mlb_id", "")))
             enr = (enrich_map or {}).get(f.get("name"))
             if enr is not None:
+                enr.owned_shape = (owned or {}).get("shape")  # B8 gate fast-lane
                 fid = f.get("mlb_id")
                 enr.inline_tags.extend(_compute_inline_tags(
                     f, f_age, ped, today_date,
@@ -3466,6 +3468,7 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             w_age = ages.get(str(w.get("mlb_id", "")))
             enr = (enrich_map or {}).get(w.get("name"))
             if enr is not None:
+                enr.owned_shape = (owned or {}).get("shape")  # B8 gate fast-lane
                 wid = w.get("mlb_id")
                 enr.inline_tags.extend(_compute_inline_tags(
                     w, w_age, ped, today_date,
