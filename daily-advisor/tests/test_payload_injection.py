@@ -179,3 +179,43 @@ def test_fa_block_header_shows_inline_tags():
 def test_fa_block_header_no_inline_tags_when_absent():
     lines = _fmt_fa_block_batter_v4(_fa_entry(), 1, None, None, age=23)
     assert "post-hype" not in lines[0]
+
+
+# ── B5 / 318b: chase / zone-contact YoY discipline inline tag ──
+
+def test_inline_tags_chase_zone_improvement_fires():
+    # chase -6.0 (sig) + zone-contact +5.0 (sig) → discipline-improving tag
+    entry = _fa_entry(mlb_id=123456, score=26)  # strong Sum → no post-hype
+    cur = {"chase": 24.0, "zone_contact": 88.0, "pa": 300}
+    prior = {"chase": 30.0, "zone_contact": 83.0, "pa": 400}
+    tags = _compute_inline_tags(entry, age=28, ped=None,
+                                today=_dt.date(2026, 6, 18),
+                                disc_cur=cur, disc_prior=prior)
+    assert any("選球進化" in t and "chase -6.0" in t for t in tags)
+
+
+def test_inline_tags_discipline_absent_without_data():
+    entry = _fa_entry(mlb_id=123456, score=26)
+    tags = _compute_inline_tags(entry, 28, None, _dt.date(2026, 6, 18))
+    assert not any("選球" in t or "擊球接觸" in t for t in tags)
+
+
+def test_inline_tags_thin_current_sample_no_discipline():
+    # cur PA below CUR_PA_FLOOR (40) → compute_discipline returns None → no tag
+    entry = _fa_entry(mlb_id=123456, score=26)
+    cur = {"chase": 24.0, "zone_contact": 88.0, "pa": 20}
+    prior = {"chase": 30.0, "zone_contact": 83.0, "pa": 400}
+    tags = _compute_inline_tags(entry, 28, None, _dt.date(2026, 6, 18),
+                                disc_cur=cur, disc_prior=prior)
+    assert not any("選球" in t for t in tags)
+
+
+def test_inline_tags_combines_post_hype_and_discipline():
+    # a young weak post-hype prospect who is ALSO improving discipline → both
+    entry = _fa_entry(mlb_id=123456, score=12)
+    cur = {"chase": 24.0, "zone_contact": 88.0, "pa": 300}
+    prior = {"chase": 30.0, "zone_contact": 83.0, "pa": 400}
+    tags = _compute_inline_tags(entry, 23, _ped(), _dt.date(2026, 6, 18),
+                                disc_cur=cur, disc_prior=prior)
+    assert any("post-hype" in t for t in tags)
+    assert any("選球進化" in t for t in tags)

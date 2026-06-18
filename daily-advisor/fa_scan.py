@@ -51,6 +51,8 @@ from ledger_enrich import (
 from decision_gate import gate, ACTIONABLE
 from payload_budget import PayloadBudget, PayloadBudgetExceeded
 from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
+from batter_discipline import (
+    compute_discipline, discipline_tag, fetch_batter_discipline_bulk)
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -3140,12 +3142,15 @@ def _inject_318b_lines(name, enrichment, indent="   "):
     return [f"{indent}{line}" for line in out]
 
 
-def _compute_inline_tags(entry, age, ped, today):
-    """Issue-318b inline header tags for one batter candidate (B5 post-hype;
-    B2 platoon + B5 chase-zone land here too). Inline tags ride the header
+def _compute_inline_tags(entry, age, ped, today, disc_cur=None, disc_prior=None):
+    """Issue-318b inline header tags for one batter candidate (B5 post-hype +
+    chase/zone-contact; B2 platoon lands here too). Inline tags ride the header
     (like add_tags/warn_tags) and do NOT consume the per-candidate line budget.
     Best-effort — a tag that can't be computed is simply absent, never raises
-    into the scan."""
+    into the scan.
+
+    disc_cur/disc_prior: this batter's {chase, zone_contact, pa} for the
+    current / prior season (looked up from the bulk Savant join), or None."""
     tags = []
     if ped is not None and today is not None:
         try:
@@ -3154,6 +3159,13 @@ def _compute_inline_tags(entry, age, ped, today):
             if t:
                 tags.append(t)
         except Exception:  # noqa: BLE001 — a tag never blocks the scan
+            pass
+    if disc_cur is not None:
+        try:
+            t = discipline_tag(compute_discipline(disc_cur, disc_prior))
+            if t:
+                tags.append(t)
+        except Exception:  # noqa: BLE001
             pass
     return tags
 
@@ -3397,6 +3409,16 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                       if today_str else None)
     except ValueError:
         today_date = None
+    # B5 chase/zone-contact: two league-bulk Savant CSVs (current + prior year),
+    # joined per batter by mlb_id. Best-effort — a failed fetch just drops the
+    # discipline tag this run (does not block the scan).
+    disc_cur_bulk, disc_prior_bulk = {}, {}
+    try:
+        disc_cur_bulk = fetch_batter_discipline_bulk(2026)
+        disc_prior_bulk = fetch_batter_discipline_bulk(2025)
+    except Exception as e:  # noqa: BLE001
+        print(f"  discipline: bulk fetch failed ({type(e).__name__})",
+              file=sys.stderr)
 
     # ── 我方候選 drop ──
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
@@ -3425,8 +3447,11 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             f_age = ages.get(str(f.get("mlb_id", "")))
             enr = (enrich_map or {}).get(f.get("name"))
             if enr is not None:
-                enr.inline_tags.extend(
-                    _compute_inline_tags(f, f_age, ped, today_date))
+                fid = f.get("mlb_id")
+                enr.inline_tags.extend(_compute_inline_tags(
+                    f, f_age, ped, today_date,
+                    disc_cur=disc_cur_bulk.get(fid),
+                    disc_prior=disc_prior_bulk.get(fid)))
             lines.extend(_fmt_fa_block_batter_v4(
                 f, idx, trad_14d, owned, age=f_age, enrichment=enr))
     else:
@@ -3441,8 +3466,11 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             w_age = ages.get(str(w.get("mlb_id", "")))
             enr = (enrich_map or {}).get(w.get("name"))
             if enr is not None:
-                enr.inline_tags.extend(
-                    _compute_inline_tags(w, w_age, ped, today_date))
+                wid = w.get("mlb_id")
+                enr.inline_tags.extend(_compute_inline_tags(
+                    w, w_age, ped, today_date,
+                    disc_cur=disc_cur_bulk.get(wid),
+                    disc_prior=disc_prior_bulk.get(wid)))
             lines.extend(_fmt_fa_block_batter_v4(
                 w, None, trad_14d, owned, age=w_age, enrichment=enr))
 
