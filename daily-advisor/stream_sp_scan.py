@@ -29,6 +29,7 @@ class GameLog:
 class ProbablePitcher:
     mlb_id: int
     name: str
+    projected: bool = False  # True = user-supplied projected (not MLB-official) starter
 
 
 @dataclass(frozen=True)
@@ -46,6 +47,7 @@ class StarterRef:
     team: str
     opponent: str
     is_home: bool
+    projected: bool = False
 
 
 @dataclass(frozen=True)
@@ -72,6 +74,8 @@ class Fetchers:
     # Optional — old tests / callers not using vs_hand can omit. None ⇒ emit
     # vs_hand_2026=None for every candidate (LLM falls back to 14d/season anchor).
     vs_hand_fn: object = None  # (opp_abbr, sp_id) -> raw dict | None
+    # Optional — only needed when scan() is called with projected= injection.
+    id_resolver_fn: object = None  # (team_abbr, name) -> mlb_id
 
 
 def classify_opener(games):
@@ -104,6 +108,71 @@ def parse_schedule(schedule_json):
                 away_sp=away_sp,
                 home_sp=home_sp,
             ))
+    return games
+
+
+def parse_projected_arg(s):
+    """Parse --projected CLI string → {et_date: [(team_abbr, name), ...]}.
+
+    Format: ``ET_DATE:TEAM:Full Name`` entries joined by commas, e.g.
+    ``2026-06-20:WSH:MacKenzie Gore,2026-06-20:CHC:Jameson Taillon``.
+
+    The name segment may contain spaces or colons — only the first two colons
+    are split on, so ``WSH:Foo: Bar`` keeps name ``Foo: Bar``. Blank entries
+    (trailing/double commas) are skipped. Each segment is whitespace-trimmed.
+    Raises ValueError on an entry with fewer than 3 segments.
+    """
+    if not s:
+        return {}
+    out: dict = {}
+    for entry in s.split(","):
+        entry = entry.strip()
+        if not entry:
+            continue
+        parts = entry.split(":", 2)
+        if len(parts) < 3:
+            raise ValueError(
+                f"projected entry needs ET_DATE:TEAM:Name, got {entry!r}"
+            )
+        et_date, team, name = (p.strip() for p in parts)
+        out.setdefault(et_date, []).append((team, name))
+    return out
+
+
+def apply_projected(games, projected_for_date, id_resolver):
+    """Fill TBD sides of ``games`` with user-supplied projected starters.
+
+    ``projected_for_date``: list of ``(team_abbr, name)`` for one ET date.
+    ``id_resolver(team_abbr, name) -> mlb_id`` resolves the name to an MLB id
+    (team-scoped → avoids homonym collisions; called lazily, only when a slot
+    is actually filled).
+
+    Rules:
+    - Only an **empty** (``None``) side is filled — official probables are
+      never overwritten.
+    - The injected ProbablePitcher is flagged ``projected=True``.
+    - A team not on this date's schedule (or whose matching side is already
+      official) is silently skipped.
+
+    Returns a new games list (frozen GameRefs rebuilt via ``dataclasses.replace``).
+    """
+    import dataclasses
+
+    games = list(games)
+    for team_abbr, name in projected_for_date:
+        for i, g in enumerate(games):
+            if g.away_team == team_abbr and g.away_sp is None:
+                pp = ProbablePitcher(
+                    mlb_id=id_resolver(team_abbr, name), name=name, projected=True,
+                )
+                games[i] = dataclasses.replace(g, away_sp=pp)
+                break
+            if g.home_team == team_abbr and g.home_sp is None:
+                pp = ProbablePitcher(
+                    mlb_id=id_resolver(team_abbr, name), name=name, projected=True,
+                )
+                games[i] = dataclasses.replace(g, home_sp=pp)
+                break
     return games
 
 
@@ -140,11 +209,13 @@ def _flatten_to_starters(games):
             starters.append(StarterRef(
                 mlb_id=g.away_sp.mlb_id, name=g.away_sp.name,
                 team=g.away_team, opponent=g.home_team, is_home=False,
+                projected=g.away_sp.projected,
             ))
         if g.home_sp:
             starters.append(StarterRef(
                 mlb_id=g.home_sp.mlb_id, name=g.home_sp.name,
                 team=g.home_team, opponent=g.away_team, is_home=True,
+                projected=g.home_sp.projected,
             ))
     return starters
 
@@ -171,6 +242,7 @@ def _starter_to_summary(sp):
         "team": sp.team,
         "opponent": sp.opponent,
         "is_home": sp.is_home,
+        "projected": sp.projected,
     }
 
 
@@ -329,11 +401,22 @@ def compute_pending_diff(pending_evaluations, scan_result_for_date):
     }
 
 
-def scan(et_dates, *, fetchers, pending_data=None):
+def scan(et_dates, *, fetchers, pending_data=None, projected=None):
+    """Scan ET dates for streamable FA starters.
+
+    ``projected`` (optional): ``{et_date: [(team_abbr, name), ...]}`` — manual
+    projected starters injected into TBD slots before FA cross-check, so the
+    user can evaluate not-yet-official probables (e.g. read off the Yahoo app)
+    through the full v4 pipeline. Injected candidates carry ``projected=True``.
+    """
     result = {}
     for et_date in et_dates:
         sched_json = fetchers.schedule_fn(et_date)
         games = parse_schedule(sched_json)
+        if projected and projected.get(et_date):
+            games = apply_projected(
+                games, projected[et_date], fetchers.id_resolver_fn,
+            )
         probable = _flatten_to_starters(games)
 
         # Pass starter names to fa_pool_fn so it can filter the pool early —
@@ -598,6 +681,43 @@ def fetch_vs_hand_split(opp_abbr, sp_id, season=2026):
     }
 
 
+def _norm_name(s):
+    """Accent-strip + casefold for roster name matching (no hardcoded ids)."""
+    import unicodedata
+    decomposed = unicodedata.normalize("NFKD", s or "")
+    return "".join(c for c in decomposed if not unicodedata.combining(c)).casefold().strip()
+
+
+def fetch_team_roster_id(team_abbr, name, season=2026):
+    """Resolve (team_abbr, player name) → mlb_id via statsapi team roster.
+
+    Team-scoped lookup avoids homonym collisions; never hardcodes ids
+    (see feedback_no_hardcode_facts). Tries active roster then 40-man.
+    Raises ValueError if not found — no silent wrong-id injection.
+    """
+    team_id = ABBR_TO_ID.get(team_abbr)
+    if team_id is None:
+        raise ValueError(f"unknown team abbr {team_abbr!r}")
+    target = _norm_name(name)
+    for roster_type in ("active", "40Man"):
+        url = (
+            f"https://statsapi.mlb.com/api/v1/teams/{team_id}/roster"
+            f"?rosterType={roster_type}&season={season}"
+        )
+        try:
+            data = _http_get_json(url)
+        except OSError:
+            continue
+        for entry in data.get("roster", []):
+            person = entry.get("person", {})
+            if _norm_name(person.get("fullName", "")) == target:
+                return person["id"]
+    raise ValueError(
+        f"projected SP {name!r} not found on {team_abbr} roster "
+        f"(check spelling / team abbr)"
+    )
+
+
 def build_real_fetchers():
     return Fetchers(
         schedule_fn=fetch_mlb_schedule,
@@ -607,6 +727,7 @@ def build_real_fetchers():
         team_14d_ops_fn=fetch_team_14d_ops,
         v4_data_fn=fetch_v4_data,
         vs_hand_fn=fetch_vs_hand_split,
+        id_resolver_fn=fetch_team_roster_id,
     )
 
 
@@ -627,10 +748,19 @@ def main():
         "--pending-file",
         help="path to stream-sp-pending.md — when given, emit top-level pending_diff key",
     )
+    parser.add_argument(
+        "--projected",
+        help=(
+            "manual projected starters injected into TBD slots: "
+            "'ET_DATE:TEAM:Full Name,ET_DATE:TEAM:Full Name'. "
+            "Each runs the full v4 pipeline and is flagged projected=true."
+        ),
+    )
     parser.add_argument("--pretty", action="store_true", help="pretty-print JSON")
     args = parser.parse_args()
 
     et_dates = [d.strip() for d in args.et_dates.split(",") if d.strip()]
+    projected = parse_projected_arg(args.projected) if args.projected else None
     fetchers = build_real_fetchers()
 
     pending_data = None
@@ -645,7 +775,9 @@ def main():
                 "skipping pending_diff", file=sys.stderr,
             )
 
-    result = scan(et_dates, fetchers=fetchers, pending_data=pending_data)
+    result = scan(
+        et_dates, fetchers=fetchers, pending_data=pending_data, projected=projected,
+    )
     indent = 2 if args.pretty else None
     print(_json.dumps(result, indent=indent, ensure_ascii=False, default=str))
 

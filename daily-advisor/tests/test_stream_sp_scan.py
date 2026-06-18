@@ -6,13 +6,19 @@ from stream_sp_scan import (
     FAEntry,
     Fetchers,
     GameLog,
+    GameRef,
+    ProbablePitcher,
     StarterRef,
     _apply_vs_hand_gate,
     _enrich_v4,
+    _flatten_to_starters,
+    _starter_to_summary,
+    apply_projected,
     classify_opener,
     compute_pending_diff,
     compute_sample_warning,
     cross_check_fa,
+    parse_projected_arg,
     parse_schedule,
     scan,
     tier_opponent,
@@ -350,6 +356,7 @@ def _build_fetchers(
     team_ops=None,
     v4_data=None,
     vs_hand=None,
+    id_resolver=None,
 ):
     fa_list = list(fa_entries or [])
     return Fetchers(
@@ -360,6 +367,7 @@ def _build_fetchers(
         team_14d_ops_fn=lambda team_abbr, end_date: (team_ops or {}).get(team_abbr, 0.720),
         v4_data_fn=lambda ids, season: v4_data or {},
         vs_hand_fn=lambda opp_abbr, sp_id: (vs_hand or {}).get(sp_id),
+        id_resolver_fn=lambda team_abbr, name: (id_resolver or {}).get((team_abbr, name)),
     )
 
 
@@ -1018,3 +1026,204 @@ class TestScanPendingDiffEmission:
         }
         result = scan(["2026-05-15"], fetchers=fetchers, pending_data=pending_data)
         assert result["pending_diff"] == {}
+
+
+# ── Projected injection (L1: manual projected starter feed) ──
+
+
+def _game(away="COL", home="PIT", away_sp=None, home_sp=None):
+    return GameRef(away_team=away, home_team=home, away_sp=away_sp, home_sp=home_sp)
+
+
+class TestParseProjectedArg:
+    def test_empty_or_none_returns_empty_dict(self):
+        assert parse_projected_arg("") == {}
+        assert parse_projected_arg(None) == {}
+
+    def test_single_entry(self):
+        out = parse_projected_arg("2026-06-20:WSH:MacKenzie Gore")
+        assert out == {"2026-06-20": [("WSH", "MacKenzie Gore")]}
+
+    def test_multiple_entries_grouped_by_date(self):
+        out = parse_projected_arg(
+            "2026-06-20:WSH:MacKenzie Gore,2026-06-20:CHC:Jameson Taillon,"
+            "2026-06-21:TB:Ryan Pepiot"
+        )
+        assert out == {
+            "2026-06-20": [("WSH", "MacKenzie Gore"), ("CHC", "Jameson Taillon")],
+            "2026-06-21": [("TB", "Ryan Pepiot")],
+        }
+
+    def test_name_with_accent_and_punctuation_preserved(self):
+        # parse 不 normalize（resolver 才做）— 原樣保留含重音 / 句點
+        out = parse_projected_arg("2026-06-20:STL:José Ramírez Jr.")
+        assert out == {"2026-06-20": [("STL", "José Ramírez Jr.")]}
+
+    def test_name_containing_colon_splits_only_first_two(self):
+        # 防呆：name 段內若含冒號只切前兩個分隔
+        out = parse_projected_arg("2026-06-20:WSH:Foo: Bar")
+        assert out == {"2026-06-20": [("WSH", "Foo: Bar")]}
+
+    def test_whitespace_trimmed_around_segments(self):
+        out = parse_projected_arg(" 2026-06-20 : WSH : MacKenzie Gore ")
+        assert out == {"2026-06-20": [("WSH", "MacKenzie Gore")]}
+
+    def test_blank_entries_between_commas_skipped(self):
+        out = parse_projected_arg("2026-06-20:WSH:MacKenzie Gore,,")
+        assert out == {"2026-06-20": [("WSH", "MacKenzie Gore")]}
+
+    def test_malformed_entry_too_few_segments_raises(self):
+        with pytest.raises(ValueError):
+            parse_projected_arg("2026-06-20:WSH")  # 缺 name 段
+
+
+class TestApplyProjected:
+    _IDS = {
+        "MacKenzie Gore": 681190,
+        "Jameson Taillon": 592791,
+        "Grant Holmes": 656550,
+        "Clay Holmes": 605280,
+    }
+
+    def _resolver(self, team_abbr, name):
+        return self._IDS[name]
+
+    def test_fills_empty_away_side_marks_projected(self):
+        games = [_game(away="WSH", home="TB", home_sp=ProbablePitcher(99, "Ryan Pepiot"))]
+        out = apply_projected(games, [("WSH", "MacKenzie Gore")], self._resolver)
+        assert out[0].away_sp == ProbablePitcher(681190, "MacKenzie Gore", projected=True)
+        # 官方 home side 不動（projected 預設 False）
+        assert out[0].home_sp == ProbablePitcher(99, "Ryan Pepiot")
+        assert out[0].home_sp.projected is False
+
+    def test_fills_empty_home_side(self):
+        games = [_game(away="CIN", home="NYY", away_sp=ProbablePitcher(5, "Rhett Lowder"))]
+        out = apply_projected(games, [("NYY", "Clay Holmes")], self._resolver)
+        assert out[0].home_sp.name == "Clay Holmes"
+        assert out[0].home_sp.mlb_id == 605280
+        assert out[0].home_sp.projected is True
+
+    def test_does_not_overwrite_official_probable(self):
+        games = [_game(away="WSH", home="TB", away_sp=ProbablePitcher(42, "Official Guy"))]
+        out = apply_projected(games, [("WSH", "MacKenzie Gore")], self._resolver)
+        assert out[0].away_sp == ProbablePitcher(42, "Official Guy")
+        assert out[0].away_sp.projected is False
+
+    def test_team_not_in_schedule_skipped(self):
+        games = [_game(away="WSH", home="TB")]
+        out = apply_projected(games, [("LAD", "Some Pitcher")], self._resolver)
+        assert out[0].away_sp is None and out[0].home_sp is None
+
+    def test_homonym_resolved_by_team(self):
+        # Grant Holmes (ATL) vs Clay Holmes (NYM) — team 定位場次 + resolver 拿 team+name
+        games = [
+            _game(away="ATL", home="BOS"),
+            _game(away="NYM", home="PHI"),
+        ]
+        out = apply_projected(
+            games,
+            [("ATL", "Grant Holmes"), ("NYM", "Clay Holmes")],
+            self._resolver,
+        )
+        assert out[0].away_sp.name == "Grant Holmes" and out[0].away_sp.mlb_id == 656550
+        assert out[1].away_sp.name == "Clay Holmes" and out[1].away_sp.mlb_id == 605280
+
+    def test_resolver_not_called_when_side_already_official(self):
+        # 已官方 side → 不解析 id（避免無謂 API call + 不覆蓋）
+        calls = []
+
+        def tracking_resolver(team_abbr, name):
+            calls.append((team_abbr, name))
+            return 999
+
+        games = [_game(away="WSH", home="TB", away_sp=ProbablePitcher(42, "Official"))]
+        apply_projected(games, [("WSH", "MacKenzie Gore")], tracking_resolver)
+        assert calls == []
+
+    def test_projected_flag_flows_to_flatten_and_summary(self):
+        games = [_game(away="WSH", home="TB", home_sp=ProbablePitcher(99, "Ryan Pepiot"))]
+        out = apply_projected(games, [("WSH", "MacKenzie Gore")], self._resolver)
+        starters = _flatten_to_starters(out)
+        gore = next(s for s in starters if s.name == "MacKenzie Gore")
+        assert gore.projected is True
+        assert _starter_to_summary(gore)["projected"] is True
+        pepiot = next(s for s in starters if s.name == "Ryan Pepiot")
+        assert pepiot.projected is False
+        assert _starter_to_summary(pepiot)["projected"] is False
+
+
+class TestScanProjected:
+    def _gore_v4(self):
+        return {
+            "ip_gs": 5.0, "whiff_pct": 25.0, "bb9": 3.0, "gb_pct": 44.0,
+            "xwobacon": 0.36, "g": 15, "gs": 15, "ip": 80.0, "bbe": 120,
+            "era": 4.0, "xera": 4.0,
+        }
+
+    def _schedule_wsh_tb_away_tbd(self):
+        # WSH @ TB — away (WSH) 無 probablePitcher → TBD；home (TB) 官方 Pepiot
+        return {"dates": [{"games": [{
+            "teams": {
+                "away": {"team": {"id": 120}},
+                "home": {"team": {"id": 139}, "probablePitcher": {"id": 99, "fullName": "Ryan Pepiot"}},
+            },
+        }]}]}
+
+    def test_projected_candidate_enriched_and_removed_from_tbd(self):
+        fetchers = _build_fetchers(
+            schedule=self._schedule_wsh_tb_away_tbd(),
+            fa_entries=[FAEntry(name="MacKenzie Gore", percent_owned="40%")],
+            game_logs={681190: [GameLog(f"2026-06-1{i}", 1, 5.0) for i in range(5)]},
+            team_ops={"TB": 0.652},
+            v4_data={681190: self._gore_v4()},
+            id_resolver={("WSH", "MacKenzie Gore"): 681190},
+        )
+        result = scan(
+            ["2026-06-20"], fetchers=fetchers,
+            projected={"2026-06-20": [("WSH", "MacKenzie Gore")]},
+        )
+        day = result["2026-06-20"]
+        cand = [c for c in day["candidates"] if c["name"] == "MacKenzie Gore"]
+        assert len(cand) == 1
+        assert cand[0]["projected"] is True
+        assert cand[0]["mlb_id"] == 681190
+        assert cand[0]["team"] == "WSH" and cand[0]["opponent"] == "TB"
+        # away 注入 + home 官方 → 整場 confirmed，tbd_games 清空
+        assert day["tbd_games"] == []
+
+    def test_official_starters_have_projected_false(self):
+        fetchers = _build_fetchers(
+            schedule=self._schedule_wsh_tb_away_tbd(),
+            fa_entries=[FAEntry(name="MacKenzie Gore", percent_owned="40%")],
+            game_logs={681190: [GameLog(f"2026-06-1{i}", 1, 5.0) for i in range(5)]},
+            team_ops={"TB": 0.652},
+            v4_data={681190: self._gore_v4()},
+            id_resolver={("WSH", "MacKenzie Gore"): 681190},
+        )
+        result = scan(
+            ["2026-06-20"], fetchers=fetchers,
+            projected={"2026-06-20": [("WSH", "MacKenzie Gore")]},
+        )
+        # Pepiot 非 FA / 非本隊 → owned_by_others，且 projected False
+        pepiot = next(s for s in result["2026-06-20"]["owned_by_others"] if s["name"] == "Ryan Pepiot")
+        assert pepiot["projected"] is False
+
+    def test_no_projected_arg_leaves_tbd_intact(self):
+        # projected=None → 行為與舊版一致（regression）：away 仍 TBD
+        fetchers = _build_fetchers(schedule=self._schedule_wsh_tb_away_tbd())
+        result = scan(["2026-06-20"], fetchers=fetchers)
+        day = result["2026-06-20"]
+        assert day["tbd_games"] == [{"away": "WSH", "home": "TB", "side": "away"}]
+        assert all(c["name"] != "MacKenzie Gore" for c in day["candidates"])
+
+    def test_projected_for_other_date_does_not_affect_this_date(self):
+        fetchers = _build_fetchers(
+            schedule=self._schedule_wsh_tb_away_tbd(),
+            id_resolver={("WSH", "MacKenzie Gore"): 681190},
+        )
+        result = scan(
+            ["2026-06-20"], fetchers=fetchers,
+            projected={"2026-06-21": [("WSH", "MacKenzie Gore")]},
+        )
+        # projected 綁在 06-21，06-20 的 away 仍 TBD
+        assert result["2026-06-20"]["tbd_games"] == [{"away": "WSH", "home": "TB", "side": "away"}]
