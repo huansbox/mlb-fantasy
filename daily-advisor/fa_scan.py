@@ -45,7 +45,7 @@ from decision_ledger import (
     VERDICT_PRECEDENCE,
 )
 from ledger_enrich import (
-    CandidateSignals, compute_candidate_stars,
+    CandidateSignals, enrich_candidate,
     SOURCE_SCAN, SOURCE_OWNED_RISER,
 )
 from decision_gate import gate, ACTIONABLE
@@ -2133,9 +2133,11 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None,
         ledger = DecisionLedger(DECISION_LEDGER_PATH)
         emap = enrich_map or {}
         for player, verdict in ledger_records:
-            channel, stars = emap.get(player, (None, None))
+            enr = emap.get(player)
             ledger.record(player, verdict, ts=today_str,
-                          channel=channel, stars=stars)
+                          channel=enr.channel if enr else None,
+                          stars=enr.stars if enr else None,
+                          add_reason=enr.add_reason if enr else None)
         ledger_written = True
     except Exception as e:  # noqa: BLE001 — never break the waiver-log path
         msg = f"[fa_scan] decision-ledger skipped ({type(e).__name__}: {e})"
@@ -2640,13 +2642,14 @@ def _gate_notifications(enrich_map, roster, ledger, today_str):
     Only today's entry counts (the freshness guard skips stale players from a
     no-op scan)."""
     msgs = []
-    for name, (_channel, stars) in (enrich_map or {}).items():
+    for name, enr in (enrich_map or {}).items():
         hist = ledger.get_history(name)
         if not hist or hist[-1].ts != today_str:
             continue
         latest = hist[-1]
         if latest.verdict not in ACTIONABLE:
             continue
+        stars = enr.stars if enr else None
         result = gate(hist, latest.verdict, stars or 0,
                       owned_trend=None, executed=(name in roster))
         if result.notify:
@@ -2668,13 +2671,15 @@ def _notify_gate_actions(enrich_map, config, env, today_str):
               file=sys.stderr)
 
 
-def build_ledger_enrich_map(entries, ledger):
-    """Map name → (channel, stars) for batter candidates (issue 039 / 318a).
+def build_ledger_enrich_map(entries, ledger, today_str):
+    """Map name → CandidateEnrichment for batter candidates (issue 039).
 
-    Channel honours first-contact (via ledger history); stars are today's
-    mechanical rating. The map is threaded to the waiver-log write point,
-    which persists channel/stars onto the recorded verdict. Pure given an
-    injected ledger — unit-tested in test_ledger_enrich_wiring.
+    Each bundle carries channel (first-contact honoured), today's mechanical
+    stars, the never-re-judged add_reason, and the rendered ledger note lines.
+    The map is threaded to (a) the waiver-log write point, which persists
+    channel/stars/add_reason onto the recorded verdict, and (b) the payload
+    builder, which injects note_lines (318b). Pure given an injected ledger —
+    unit-tested in test_ledger_enrich.
     """
     enrich_map = {}
     for entry in entries:
@@ -2682,8 +2687,7 @@ def build_ledger_enrich_map(entries, ledger):
         if not name:
             continue
         sig = _candidate_signals_from_entry(entry)
-        stars, channel, _ = compute_candidate_stars(sig, ledger.get_history(name))
-        enrich_map[name] = (channel, stars)
+        enrich_map[name] = enrich_candidate(sig, ledger.get_history(name), today_str)
     return enrich_map
 
 
@@ -3527,7 +3531,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             enrich_map = {}
             try:
                 enrich_map = build_ledger_enrich_map(
-                    fa_tagged + watch_tagged, DecisionLedger(DECISION_LEDGER_PATH))
+                    fa_tagged + watch_tagged,
+                    DecisionLedger(DECISION_LEDGER_PATH), today_str)
             except Exception as e:  # noqa: BLE001 — enrichment never blocks the scan
                 print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
                       file=sys.stderr)

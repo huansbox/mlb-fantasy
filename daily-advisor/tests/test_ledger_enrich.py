@@ -12,6 +12,7 @@ import pytest
 
 from decision_ledger import LedgerEntry
 from ledger_enrich import (
+    CandidateEnrichment,
     CandidateSignals,
     CHANNEL_HEAT,
     CHANNEL_MARKET,
@@ -21,10 +22,14 @@ from ledger_enrich import (
     SOURCE_SCAN,
     classify_channel,
     compute_candidate_stars,
+    enrich_candidate,
+    first_add_reason,
     first_channel,
+    format_ledger_note,
     is_hot_14d,
     is_season_strong,
     percentile_of,
+    snapshot_add_reason,
 )
 
 
@@ -172,9 +177,11 @@ def test_build_enrich_map_extracts_entry_and_scores():
                         "barrel_pct": 14.0, "pa": 600},
         "rolling_14d": {"xwoba": 0.355},
     }]
-    emap = build_ledger_enrich_map(entries, _FakeLedger())
-    channel, stars = emap["New Guy"]
-    assert channel == CHANNEL_STRUCTURE and stars == 4
+    emap = build_ledger_enrich_map(entries, _FakeLedger(), "2026-06-18")
+    enr = emap["New Guy"]
+    assert enr.channel == CHANNEL_STRUCTURE and enr.stars == 4
+    assert "xwOBA" in enr.add_reason          # first-contact snapshot persisted
+    assert enr.note_lines and enr.note_lines[0].startswith("[")
 
 
 def test_build_enrich_map_honours_existing_channel():
@@ -188,12 +195,147 @@ def test_build_enrich_map_honours_existing_channel():
                         "barrel_pct": 8.0, "pa": 600},
         "rolling_14d": {"xwoba": 0.360},  # looks hot now
     }]
-    channel, _ = build_ledger_enrich_map(entries, _FakeLedger(hist))["X"]
-    assert channel == "structure"  # never re-judged to heat
+    enr = build_ledger_enrich_map(entries, _FakeLedger(hist), "2026-06-18")["X"]
+    assert enr.channel == "structure"  # never re-judged to heat
 
 
 def test_build_enrich_map_skips_nameless_and_handles_missing_keys():
     from fa_scan import build_ledger_enrich_map
     entries = [{"source": SOURCE_SCAN}, {"name": "Sparse"}]
-    emap = build_ledger_enrich_map(entries, _FakeLedger())
+    emap = build_ledger_enrich_map(entries, _FakeLedger(), "2026-06-18")
     assert "Sparse" in emap and len(emap) == 1  # nameless skipped, sparse ok
+
+
+# ── B1 / 318b: add_reason persistence + ledger note injection ──
+
+def test_snapshot_add_reason_summarizes_season_core():
+    # The first-contact add reason = a compact snapshot of the three core
+    # metrics, so a later drop can be confronted with "why did we pick him".
+    sig = CandidateSignals(source=SOURCE_SCAN, xwoba=0.349,
+                           bb_pct=12.2, barrel_pct=14.0)
+    r = snapshot_add_reason(sig)
+    assert "xwOBA" in r and ".349" in r
+    assert "BB%" in r and "12.2" in r
+    assert "Barrel%" in r and "14.0" in r
+
+
+def test_snapshot_add_reason_includes_heat_when_hot():
+    # a heat-led pickup should record the 14d signal that surfaced it
+    sig = CandidateSignals(source=SOURCE_SCAN, xwoba=0.290, bb_pct=6.0,
+                           barrel_pct=5.0, xwoba_14d=0.360)
+    r = snapshot_add_reason(sig)
+    assert "14d" in r and ".360" in r
+
+
+def test_snapshot_add_reason_missing_metrics_no_crash():
+    # all-None signals must still yield a non-empty, parseable string
+    assert snapshot_add_reason(CandidateSignals(source=SOURCE_SCAN))
+
+
+def test_first_add_reason_returns_earliest_set():
+    hist = [
+        LedgerEntry("X", "watch", "2026-05-09", add_reason=None),
+        LedgerEntry("X", "watch", "2026-05-10", add_reason="xwOBA .349/BB% 12.2"),
+        LedgerEntry("X", "取代", "2026-05-12", add_reason="a newer reason"),
+    ]
+    assert first_add_reason(hist) == "xwOBA .349/BB% 12.2"
+
+
+def test_first_add_reason_none_when_unset():
+    assert first_add_reason([LedgerEntry("X", "watch", "2026-05-09")]) is None
+    assert first_add_reason([]) is None
+
+
+def test_format_ledger_note_day0_single_star_line():
+    # brand-new candidate: no prior verdict to confront, just the star line.
+    lines = format_ledger_note(history=[], today_str="2026-06-18",
+                               stars=4, add_reason_fallback="xwOBA .349")
+    assert len(lines) == 1
+    assert "★★★★" in lines[0]
+    assert "前判" not in lines[0]          # nothing to confront yet
+    assert lines[0].startswith("[")        # machine-parseable prefix
+
+
+def test_format_ledger_note_established_shows_prev_verdict_days_and_reason():
+    hist = [
+        LedgerEntry("X", "watch", "2026-05-13",
+                    add_reason="xwOBA .349/BB% 12.2", stars=3),
+        LedgerEntry("X", "取代", "2026-06-13", add_reason=None, stars=4),
+    ]
+    lines = format_ledger_note(hist, today_str="2026-06-18",
+                               stars=4, add_reason_fallback="now-snapshot")
+    joined = " ".join(lines)
+    assert "取代" in joined                 # latest prior verdict
+    assert "5" in joined                    # 06-13 → 06-18 = 5 days ago
+    assert "xwOBA .349/BB% 12.2" in joined  # ORIGINAL reason (first entry), not fallback
+    assert "now-snapshot" not in joined
+    assert "★★★★" in joined
+
+
+def test_format_ledger_note_falls_back_when_history_lacks_add_reason():
+    # legacy rows recorded before add_reason existed → use the live snapshot.
+    hist = [LedgerEntry("X", "watch", "2026-06-13", add_reason=None, stars=3)]
+    lines = format_ledger_note(hist, today_str="2026-06-18",
+                               stars=3, add_reason_fallback="xwOBA .310/BB% 9")
+    assert "xwOBA .310/BB% 9" in " ".join(lines)
+
+
+def test_format_ledger_note_all_lines_machine_parseable():
+    hist = [LedgerEntry("X", "watch", "2026-06-13",
+                        add_reason="r", stars=3)]
+    lines = format_ledger_note(hist, "2026-06-18", stars=3,
+                               add_reason_fallback="r")
+    assert lines and all(l.startswith("[") for l in lines)
+
+
+def test_format_ledger_note_unknown_stars_renders_safely():
+    # stars=None (enrichment failed) must not crash the note.
+    lines = format_ledger_note(history=[], today_str="2026-06-18",
+                               stars=None, add_reason_fallback="r")
+    assert lines  # still emits something parseable
+
+
+# ── B1a / 318b: enrich_candidate packs the full injection bundle ──
+
+def test_enrich_candidate_day0_packs_channel_stars_reason_note():
+    sig = CandidateSignals(
+        source=SOURCE_SCAN, xwoba=0.349, bb_pct=12.2, barrel_pct=14.0,
+        prior_xwoba=0.349, prior_bb_pct=12.2, prior_barrel_pct=14.0,
+        prior_pa=600, pa_tg=3.9)
+    enr = enrich_candidate(sig, history=[], today_str="2026-06-18")
+    assert isinstance(enr, CandidateEnrichment)
+    assert enr.channel == CHANNEL_STRUCTURE
+    assert enr.stars == 4
+    assert "xwOBA" in enr.add_reason         # snapshot computed at first contact
+    assert enr.note_lines and enr.note_lines[0].startswith("[")
+
+
+def test_enrich_candidate_reuses_persisted_add_reason():
+    # an existing add_reason is the never-re-judged anchor — not recomputed.
+    hist = [LedgerEntry("X", "watch", "2026-05-13", channel="structure",
+                        add_reason="原始 xwOBA .349/BB% 12", stars=3)]
+    sig = CandidateSignals(source=SOURCE_SCAN, xwoba=0.290, bb_pct=6.0,
+                           barrel_pct=5.0, prior_pa=600, pa_tg=3.0)
+    enr = enrich_candidate(sig, history=hist, today_str="2026-06-18")
+    assert enr.add_reason == "原始 xwOBA .349/BB% 12"
+    assert enr.channel == "structure"        # also never re-judged
+    assert "原始 xwOBA .349/BB% 12" in " ".join(enr.note_lines)
+
+
+def test_enrich_candidate_backfills_snapshot_for_legacy_rows():
+    # history exists but predates add_reason → compute a live snapshot so the
+    # note still has an original reason to confront.
+    hist = [LedgerEntry("X", "watch", "2026-06-13", channel="heat",
+                        add_reason=None, stars=2)]
+    sig = CandidateSignals(source=SOURCE_SCAN, xwoba=0.330,
+                           bb_pct=9.0, barrel_pct=10.0)
+    enr = enrich_candidate(sig, history=hist, today_str="2026-06-18")
+    assert enr.add_reason and "xwOBA" in enr.add_reason
+    assert enr.channel == "heat"
+
+
+def test_candidate_enrichment_defaults_are_safe():
+    # an all-default bundle (enrichment failed for a candidate) is inert.
+    enr = CandidateEnrichment()
+    assert enr.channel is None and enr.stars is None
+    assert enr.add_reason is None and enr.note_lines == []
