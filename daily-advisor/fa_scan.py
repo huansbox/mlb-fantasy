@@ -3115,7 +3115,8 @@ def _fmt_season_luck_part(sv: dict) -> str | None:
 
 # ── B1b / 318b: per-candidate payload injection point ──
 
-_PAYLOAD_MAX_LINES_PER_CAND = 3  # PRD User story 20: ≤3 new lines per candidate
+_PAYLOAD_MAX_LINES_PER_CAND = 3  # base pool: ledger note + PA line (doc Q2)
+_SWAP_POOL_MAX_LINES = 1         # swap pool: own ceiling, never evicted (doc Q3)
 
 
 def _inject_318b_lines(name, enrichment, indent="   "):
@@ -3129,23 +3130,28 @@ def _inject_318b_lines(name, enrichment, indent="   "):
     Returns indented payload lines (possibly empty)."""
     if enrichment is None:
         return []
-    budget = PayloadBudget(max_lines=_PAYLOAD_MAX_LINES_PER_CAND)
-    # (slice_id, lines) in DESCENDING priority — ledger is the churn-protection
-    # core and registers first, so when the budget is tight the lower-priority
-    # PA (B3) / swap (B4) pools are the ones that yield. Inline tags (B2/B5)
-    # ride the header and are NOT budgeted here.
-    pools = [("ledger", list(enrichment.note_lines or []))]
-    if enrichment.pa_line:
-        pools.append(("pa", [enrichment.pa_line]))
-    if enrichment.swap_line:
-        pools.append(("swap", [enrichment.swap_line]))
     out = []
-    for slice_id, slice_lines in pools:
-        if budget.remaining() < len(slice_lines):
-            budget.register(slice_id, 0)   # yields — would breach the budget
+    # Base pool (design doc Q2): ledger memory (highest priority) → PA line.
+    # When tight, the lower-priority PA yields; ledger is the churn-protection
+    # core. Inline tags (B2/B5) ride the header and are NOT budgeted here.
+    base = PayloadBudget(max_lines=_PAYLOAD_MAX_LINES_PER_CAND)
+    base_pools = [("ledger", list(enrichment.note_lines or []))]
+    if enrichment.pa_line:
+        base_pools.append(("pa", [enrichment.pa_line]))
+    for slice_id, slice_lines in base_pools:
+        if base.remaining() < len(slice_lines):
+            base.register(slice_id, 0)    # yields — would breach the base budget
             continue
-        budget.register(slice_id, len(slice_lines))
+        base.register(slice_id, len(slice_lines))
         out.extend(slice_lines)
+    # Swap pool (design doc Q3): a SEPARATE budget instance. 4★+ swap
+    # candidates are rare (~6 in 2.5 months), so the category-exchange line
+    # gets its own ceiling and is NEVER crowded out by the base pool.
+    if enrichment.swap_line:
+        swap = PayloadBudget(max_lines=_SWAP_POOL_MAX_LINES)
+        swap.register("swap", 1)
+        if swap.within():
+            out.append(enrichment.swap_line)
     return [f"{indent}{line}" for line in out]
 
 

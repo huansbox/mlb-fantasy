@@ -181,7 +181,7 @@ def test_build_enrich_map_extracts_entry_and_scores():
     enr = emap["New Guy"]
     assert enr.channel == CHANNEL_STRUCTURE and enr.stars == 4
     assert "xwOBA" in enr.add_reason          # first-contact snapshot persisted
-    assert enr.note_lines and enr.note_lines[0].startswith("[")
+    assert enr.note_lines == []               # day-0: no memory line (Q1)
 
 
 def test_build_enrich_map_honours_existing_channel():
@@ -246,14 +246,11 @@ def test_first_add_reason_none_when_unset():
     assert first_add_reason([]) is None
 
 
-def test_format_ledger_note_day0_single_star_line():
-    # brand-new candidate: no prior verdict to confront, just the star line.
+def test_format_ledger_note_day0_no_lines():
+    # design doc Q1: first contact has no memory yet → zero injected lines.
     lines = format_ledger_note(history=[], today_str="2026-06-18",
-                               stars=4, add_reason_fallback="xwOBA .349")
-    assert len(lines) == 1
-    assert "★★★★" in lines[0]
-    assert "前判" not in lines[0]          # nothing to confront yet
-    assert lines[0].startswith("[")        # machine-parseable prefix
+                               add_reason_fallback="xwOBA .349")
+    assert lines == []
 
 
 def test_format_ledger_note_established_shows_prev_verdict_days_and_reason():
@@ -263,41 +260,40 @@ def test_format_ledger_note_established_shows_prev_verdict_days_and_reason():
         LedgerEntry("X", "取代", "2026-06-13", add_reason=None, stars=4),
     ]
     lines = format_ledger_note(hist, today_str="2026-06-18",
-                               stars=4, add_reason_fallback="now-snapshot")
+                               add_reason_fallback="now-snapshot")
     joined = " ".join(lines)
     assert "取代" in joined                 # latest prior verdict
     assert "5" in joined                    # 06-13 → 06-18 = 5 days ago
-    assert "xwOBA .349/BB% 12.2" in joined  # ORIGINAL reason (first entry), not fallback
+    assert "xwOBA .349/BB% 12.2" in joined  # ORIGINAL reason (first entry)
     assert "now-snapshot" not in joined
-    assert "★★★★" in joined
+    assert "★" not in joined                # design doc Q1: star is NOT injected
 
 
 def test_format_ledger_note_falls_back_when_history_lacks_add_reason():
     # legacy rows recorded before add_reason existed → use the live snapshot.
     hist = [LedgerEntry("X", "watch", "2026-06-13", add_reason=None, stars=3)]
     lines = format_ledger_note(hist, today_str="2026-06-18",
-                               stars=3, add_reason_fallback="xwOBA .310/BB% 9")
+                               add_reason_fallback="xwOBA .310/BB% 9")
     assert "xwOBA .310/BB% 9" in " ".join(lines)
 
 
 def test_format_ledger_note_all_lines_machine_parseable():
     hist = [LedgerEntry("X", "watch", "2026-06-13",
                         add_reason="r", stars=3)]
-    lines = format_ledger_note(hist, "2026-06-18", stars=3,
-                               add_reason_fallback="r")
+    lines = format_ledger_note(hist, "2026-06-18", add_reason_fallback="r")
     assert lines and all(l.startswith("[") for l in lines)
 
 
-def test_format_ledger_note_unknown_stars_renders_safely():
-    # stars=None (enrichment failed) must not crash the note.
-    lines = format_ledger_note(history=[], today_str="2026-06-18",
-                               stars=None, add_reason_fallback="r")
-    assert lines  # still emits something parseable
+def test_format_ledger_note_no_add_reason_just_prev_line():
+    # established but no add_reason on record and no fallback → only prev line.
+    hist = [LedgerEntry("X", "watch", "2026-06-13", add_reason=None)]
+    lines = format_ledger_note(hist, "2026-06-18")
+    assert len(lines) == 1 and lines[0].startswith("[記事]")
 
 
 # ── B1a / 318b: enrich_candidate packs the full injection bundle ──
 
-def test_enrich_candidate_day0_packs_channel_stars_reason_note():
+def test_enrich_candidate_day0_keeps_stars_reason_but_no_note():
     sig = CandidateSignals(
         source=SOURCE_SCAN, xwoba=0.349, bb_pct=12.2, barrel_pct=14.0,
         prior_xwoba=0.349, prior_bb_pct=12.2, prior_barrel_pct=14.0,
@@ -305,9 +301,9 @@ def test_enrich_candidate_day0_packs_channel_stars_reason_note():
     enr = enrich_candidate(sig, history=[], today_str="2026-06-18")
     assert isinstance(enr, CandidateEnrichment)
     assert enr.channel == CHANNEL_STRUCTURE
-    assert enr.stars == 4
-    assert "xwOBA" in enr.add_reason         # snapshot computed at first contact
-    assert enr.note_lines and enr.note_lines[0].startswith("[")
+    assert enr.stars == 4                     # computed for gate/KPI, not injected
+    assert "xwOBA" in enr.add_reason          # snapshot persisted at first contact
+    assert enr.note_lines == []               # Q1: first contact = no memory line
 
 
 def test_enrich_candidate_reuses_persisted_add_reason():

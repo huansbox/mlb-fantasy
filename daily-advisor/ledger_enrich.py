@@ -201,13 +201,6 @@ def _fmt_xwoba3(v) -> str:
     return s[1:] if s.startswith("0.") else s
 
 
-def _star_glyphs(stars) -> str:
-    """1-5★ as glyphs; '★?' when the rating is unknown (enrichment failed)."""
-    if not stars or stars < 1:
-        return "★?"
-    return "★" * int(stars)
-
-
 def _days_between(earlier, later) -> int | None:
     """Whole days between two ISO date strings; None on bad/absent input."""
     try:
@@ -234,27 +227,30 @@ def snapshot_add_reason(sig: CandidateSignals) -> str:
     return " / ".join(parts) if parts else "?"
 
 
-def format_ledger_note(history, today_str, stars,
-                       add_reason_fallback=None) -> list[str]:
-    """Render a candidate's ledger context into payload lines.
+def format_ledger_note(history, today_str, add_reason_fallback=None) -> list[str]:
+    """Render a candidate's ledger MEMORY into payload lines.
 
-    day-0 (empty history): one star line (nothing to confront yet — 5★ still
-    needs a validated trigger, but the rating is the payload pre-screen prior).
-    Established: a prev-verdict+age+star line plus the ORIGINAL add reason
-    (first_add_reason, never re-judged), falling back to the live snapshot for
-    legacy rows recorded before add_reason existed.
+    Per design doc Q1, this injects the system's *memory* — what it last
+    decided and why it first picked him — NOT the star rating. The star (1-5★)
+    is a mechanical aggregate; surfacing it to the LLM walks back into the v2
+    "Sum exposed to the LLM" path that batter v4 thin retired. The star stays
+    pre-LLM (payload pre-screen + 041 gate + 051 KPI), never in the payload.
+
+    Empty history = first contact → NO lines (the player has no memory yet;
+    day-0 candidates get a looser budget). Established → two lines: the last
+    verdict + the ORIGINAL add reason (first_add_reason, never re-judged;
+    falls back to the live snapshot for legacy rows predating add_reason).
     """
-    star_str = _star_glyphs(stars)
     if not history:
-        return [f"[記事] 新候選 {star_str}"]
+        return []
     prev = history[-1]
     days = _days_between(getattr(prev, "ts", None), today_str)
-    when = f"{days}天前" if days is not None else getattr(prev, "ts", "?")
-    reason = first_add_reason(history) or add_reason_fallback or "?"
-    return [
-        f"[記事] 前判「{getattr(prev, 'verdict', '?')}」{when} {star_str}",
-        f"[原撿因] {reason}",
-    ]
+    when = f"{days} 天前" if days is not None else getattr(prev, "ts", "?")
+    reason = first_add_reason(history) or add_reason_fallback
+    lines = [f"[記事] 上次 {getattr(prev, 'verdict', '?')}（{when}）"]
+    if reason:
+        lines.append(f"[原撿因] {reason}")
+    return lines
 
 
 def enrich_candidate(sig: CandidateSignals, history, today_str) -> CandidateEnrichment:
@@ -267,9 +263,11 @@ def enrich_candidate(sig: CandidateSignals, history, today_str) -> CandidateEnri
     note lines. Pure given ``history`` + ``today_str`` — unit-tested without
     any fa_scan wiring; the fa_scan layer only extracts ``sig`` from an entry
     and persists/injects the result."""
+    # stars are still computed (041 gate + 051 KPI read them) but NOT injected
+    # into note_lines — design doc Q1 keeps the mechanical aggregate pre-LLM.
     stars, channel, _ = compute_candidate_stars(sig, history)
     add_reason = first_add_reason(history) or snapshot_add_reason(sig)
-    note_lines = format_ledger_note(history, today_str, stars,
+    note_lines = format_ledger_note(history, today_str,
                                     add_reason_fallback=add_reason)
     return CandidateEnrichment(channel=channel, stars=stars,
                                add_reason=add_reason, note_lines=note_lines)

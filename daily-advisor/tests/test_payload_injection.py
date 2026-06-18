@@ -58,21 +58,21 @@ def test_inject_empty_notes_empty():
 
 
 def test_inject_renders_notes_with_indent():
-    enr = CandidateEnrichment(stars=4, note_lines=[
-        "[記事] 前判「取代」5天前 ★★★★", "[原撿因] xwOBA .349/BB% 12"])
+    enr = CandidateEnrichment(note_lines=[
+        "[記事] 上次 取代（5 天前）", "[原撿因] xwOBA .349/BB% 12"])
     out = _inject_318b_lines("X", enr, "   ")
-    assert out == ["   [記事] 前判「取代」5天前 ★★★★",
+    assert out == ["   [記事] 上次 取代（5 天前）",
                    "   [原撿因] xwOBA .349/BB% 12"]
 
 
-def test_inject_day0_single_line_respects_other_indent():
-    enr = CandidateEnrichment(stars=4, note_lines=["[記事] 新候選 ★★★★"])
-    assert _inject_318b_lines("X", enr, "  ") == ["  [記事] 新候選 ★★★★"]
+def test_inject_single_note_line_respects_other_indent():
+    enr = CandidateEnrichment(note_lines=["[記事] 上次 觀察（3 天前）"])
+    assert _inject_318b_lines("X", enr, "  ") == ["  [記事] 上次 觀察（3 天前）"]
 
 
 def test_inject_within_three_line_budget_does_not_drop():
     # ledger alone is ≤2 lines — comfortably under the ≤3 per-candidate ceiling.
-    enr = CandidateEnrichment(stars=5, note_lines=["a", "b"])
+    enr = CandidateEnrichment(note_lines=["a", "b"])
     out = _inject_318b_lines("X", enr, "")
     assert out == ["a", "b"]
 
@@ -80,11 +80,10 @@ def test_inject_within_three_line_budget_does_not_drop():
 # ── _fmt_fa_block_batter_v4 wiring (FA + watch) ──
 
 def test_fa_block_appends_note_when_enrichment_given():
-    enr = CandidateEnrichment(stars=4,
-                              note_lines=["[記事] 前判「取代」5天前 ★★★★"])
+    enr = CandidateEnrichment(note_lines=["[記事] 上次 取代（5 天前）"])
     lines = _fmt_fa_block_batter_v4(_fa_entry(), 1, None, None,
                                     age=28, enrichment=enr)
-    assert any("[記事] 前判「取代」" in l for l in lines)
+    assert any("[記事] 上次 取代" in l for l in lines)
     # injected after the existing prior line — note is the block's tail
     assert "[記事]" in lines[-1]
 
@@ -101,11 +100,10 @@ def test_fa_block_default_no_enrichment_unchanged():
 # ── _fmt_anchor_block_batter_v4 wiring (my-team drop pool) ──
 
 def test_anchor_block_appends_note():
-    enr = CandidateEnrichment(stars=3,
-                              note_lines=["[記事] 前判「觀察」3天前 ★★★"])
+    enr = CandidateEnrichment(note_lines=["[記事] 上次 觀察（3 天前）"])
     lines = _fmt_anchor_block_batter_v4(_anchor_entry(), "P1", None,
                                         enrichment=enr)
-    assert any("[記事] 前判「觀察」" in l for l in lines)
+    assert any("[記事] 上次 觀察" in l for l in lines)
 
 
 def test_anchor_block_default_unchanged():
@@ -294,17 +292,28 @@ def test_parse_team_schedule_empty_inputs():
 
 # ── B3 / 318b: PA projection line + per-candidate budget eviction ──
 
-def test_inject_evicts_lowest_priority_over_budget():
-    # ledger 2 + pa 1 = 3 (full); swap is lowest priority → yields.
+def test_inject_swap_pool_independent_not_evicted_by_base():
+    # base full (ledger 2 + PA 1 = 3) but swap is in its OWN pool → still out
+    # (design doc Q3: the rare 4★+ exchange line is never crowded out).
     enr = CandidateEnrichment(note_lines=["[記事] a", "[原撿因] b"],
                               pa_line="[下週量] c", swap_line="[換算] d")
     out = _inject_318b_lines("X", enr, "")
-    assert out == ["[記事] a", "[原撿因] b", "[下週量] c"]
-    assert "[換算] d" not in out  # swap evicted (lowest priority)
+    assert out == ["[記事] a", "[原撿因] b", "[下週量] c", "[換算] d"]
+
+
+def test_inject_base_pool_evicts_pa_when_ledger_fills_it():
+    # contrived 3-line ledger fills the base budget → PA yields; swap stays
+    # (independent pool, design doc Q3).
+    enr = CandidateEnrichment(note_lines=["l1", "l2", "l3"],
+                              pa_line="[下週量] pa", swap_line="[換算] sw")
+    out = _inject_318b_lines("X", enr, "")
+    assert out[:3] == ["l1", "l2", "l3"]   # base full with ledger
+    assert "[下週量] pa" not in out         # PA yields to the base ceiling
+    assert "[換算] sw" in out               # swap independent → still out
 
 
 def test_inject_keeps_pa_and_swap_when_ledger_one_line():
-    # day-0 ledger = 1 line → pa + swap both fit (1+1+1 = 3).
+    # ledger 1 + PA 1 in base (≤3) + swap in its own pool → all three appear.
     enr = CandidateEnrichment(note_lines=["[記事] new"],
                               pa_line="[下週量] pa", swap_line="[換算] sw")
     out = _inject_318b_lines("X", enr, "")
