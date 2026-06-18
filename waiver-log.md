@@ -238,6 +238,13 @@ vs：Mauricio Dubón
 - 06-04：IL10 持續（左手腕扭傷）；14d OPS 1.052 傷前數據；season P95/P95/P95 菁英；等回歸 + DTD 清除再評（fa_scan）
 - 06-10：IL10 持續（左手腕扭傷）；14d OPS 1.052 / 4HR / 8RBI 傷前數據；season P95/P95/P95 菁英；等回歸再評（fa_scan）
 
+### Ceddanne Rafaela (BOS, 2B,CF) [mlb_id:678882] — hold 脈絡（選球進化 + 角色穩固）
+觸發：若考慮 drop Rafaela → 加回 SB 類別貢獻（速度型）+ CF 深度（隊上 CF-eligible 僅 Buxton/Rafaela/Dubón/Clemens）；McLain 等 SS/2B-only FA 不能取代 Rafaela 的 CF
+- 啟動 2026-06-18（player-eval 三方比較後的 hold 歸因）
+- 選球進化（fa_scan 數據層抓不到，chase 不在現有 CSV）：chase% 2025 42% → 2026 35%（Δ-7 遠超 issue 049 顯著門檻 3.6），first-pitch swing 49%→35% = plate discipline 真實改善
+- 角色穩固：簽 $50M 長約；AL 最佳守備 CF 主力，打第二棒；5月起 .294/.351/.480 / 4HR / 6SB
+- 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
+
 ## 已結案
 
 ### Isaac Paredes (HOU, 3B) — 被搶（自動偵測）
@@ -305,6 +312,7 @@ vs：Mauricio Dubón
 - 2026-06-10：Yahoo ownership_type=team，從觀察中移除。
 - 06-17：[取代→Christian Walker] P80/P80/P60+14d Savant .483 Δ+0.149爆發+4SB+buy-low gap -0.027；49% owned有搶人風險；26歲BB% P60→P80 breakout（fa_scan）
 - 06-18：[立即取代→Mauricio Dubón] P70/P95/P60結構+Savant Δ+0.142品質大幅上升+3HR/4SB/9BB五類別產出；48%健康FA直接撿（fa_scan）
+- 06-18：[eval] McLain/Dubón/Rafaela 三方比較，結論：撿 McLain 立即取代 Dubón（非 Rafaela）。守位決定性 — McLain 守 2B/SS 無縫接替隊上唯一 SS Dubón；取代 Rafaela 會損失 CF 深度（McLain 不守 CF）。McLain xwOBA P70/BB% P95 碾壓 Dubón P60/P25 + 11SB 季 + 運氣 -0.026 buy-low。Caveat：season .205/.670 低迷=bet on 結構回歸；賽季初曾被 Steer 分二壘 PT，但近 14 場 PA-TG 3.77 已回全職（需續監控持續先發）（player-eval）
 
 ### Edouard Julien (COL, 1B,2B) — 觸發失效（手動結案）
 - 2026-06-10：fa_scan 連 7+ 天建議結案 → 執行（建議結案 backlog）。platoon 確認 + PA-TG 從未達 3.0 + 14d 崩盤 10+ 天。
