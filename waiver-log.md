@@ -253,6 +253,9 @@ vs：Mauricio Dubón
 ### Dominic Canzone (SEA, LF,RF) — 被搶（自動偵測）
 - 2026-06-16：Yahoo ownership_type=team，從觀察中移除。
 
+### Willi Castro (COL, 1B/2B/3B/SS/LF/RF) [mlb_id:650489] — Pass
+- 2026-06-15：[eval] 結構性低於我方最弱 anchor Dubón，不值得撿。Season xwOBA .290 P40-45（2025 P55-60 → 逐年退步）/ Barrel% P25-40 / HH% P55-60，xwOBA P40-45 比 Dubón P60-70 還差；trad .278/.752 是 Coors 幻覺（xBA .224 / xSLG .344 = +54 點 BABIP/海拔膨脹）；Whiff% 29.1 + Chase% 37.2 選球差。亮點僅六守位彈性 + 5 SB（軟 punt SB 折價）。健康每日 utility（COL 2yr/$12.8M），但 fa_scan 連 Sum 門檻都沒過、未進 FA 池；真正該頂 Dubón 的是 fa_scan 已推薦的 Benintendi（P70/P50/P70/P80 碾壓）（player-eval）
+
 ### Shane Drohan (MIL, SP,RP) — 被搶（自動偵測）
 - 2026-06-12：Yahoo ownership_type=team，從觀察中移除。
 
