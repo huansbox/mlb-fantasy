@@ -24,7 +24,7 @@
 
 ## ET 2026-06-19
 - recorded_at: 2026-06-18T14:06:00+08:00
-- last_recheck_at: 2026-06-18T14:14:00+08:00
+- last_recheck_at: 2026-06-18T22:42:45+08:00
 
 ### TBD 場次（待補查）
 - TOR @ CHC (both TBD)
@@ -52,4 +52,34 @@
   - **Erick Fedde**：⚠️ 條件推 → **❌ 不推 (deep)**。差異訊號 = 近 6 場 ERA 5.87 + 0/6 QS（IP 全 <6，swingman 化 6/14 僅 2.2IP/58PC）+ floor 高（5/23 SF 8ER + 5/17 CHC 4ER 兩崩短局）。pending 條件推靠 xwOBACON P80-90 結構 + 對手偏弱，但 game log 即時命中率不支撐：IP 給不出 QS、K9 6.0 給不出 K、近 6 ERA 5.87 floor 高。近 3 場 ER 壓制好轉(1ER/12.7IP)是唯一利多但 IP 短 QS 仍 0。
   - **Kyle Freeland**：❌ 不推 → **❌ 維持 (deep)**。深評確認 = 近 6 場 ERA 10.05 + 0/6 QS + 4 次崩盤（含對弱打 6/13 ATH 6ER + 6/01 LAA 5ER）+ 主場 Coors 放大飛球。luck ✅撿便宜（ERA 7.98 vs xERA 6.02）被 game log 完全推翻，xERA 6.02 回歸點本身爛。災難級，pass。
 - 深評排序：**Fedde > Freeland**（兩位皆 ❌）。Fedde 近 6 ERA 5.87 < Freeland 10.05 + 對手 DET 中等降溫 + 近 3 場 ER 壓制好轉，是「比較不爛」的；但 IP/K/QS 三類別全給不出。Freeland Coors 主場 + 4 崩盤含對弱打，災難。兩位串流 ROI 皆負，本日機會在 8 場 TBD 公布後再找。
+- 2026-06-18 22:42 補查：8 場 TBD + 3 候選經 8.5h 零變化，無新公布 starter，僅更新 last_recheck_at。
+- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
+
+## ET 2026-06-20
+- recorded_at: 2026-06-18T22:42:45+08:00
+- last_recheck_at: —
+
+### TBD 場次（待補查）
+- CWS @ DET (CWS away TBD)
+- CIN @ NYY (NYY home TBD)
+- TOR @ CHC (both TBD)
+- SD @ TEX (TEX home TBD)
+- WSH @ TB (TB home TBD)
+- SF @ MIA (SF away TBD)
+- MIL @ ATL (ATL home TBD)
+- LAA @ ATH (LAA away TBD)
+- BAL @ LAD (BAL away TBD)
+- BOS @ SEA (SEA home TBD)
+- MIN @ AZ (MIN away TBD)
+
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Joey Cantillo | CLE @ HOU | HOU (.734 🟡 / vs LHP .736) | 24% | 21/24 | <P25·P60-70·<P25·P50-60·P50-60 | ⚠️ 條件推 | 純 SP（gate 🟢）+ K 有底（K9 8.4 / Whiff P60-70 / 2025 K9 10.2）+ xERA 4.37 穩無崩；但 BB/9 4.5 <P25 控球差（WHIP 1.49 傷 ratio）+ IP/GS 4.8 偏短 QS 不穩 + Sum 21 無 elite 軸。缺 K 可賭、要 QS/WHIP 不適合。樣本 none（信心高）|
+
+### 備註
+- 2026-06-20 首次評估（recorded 22:42）：1 位過 Rotation gate + Sum ≥15 + true_starter（Joey Cantillo）。Opener 排除 1 位（Miles Mikolas WSH @ TB — 機械 opener_verdict=true_starter 誤判，WebSearch 確認連續 6 場 opener 後 bulk reliever：6/14 接 Poulin、6/8 接 Lovelady，g15/gs6 是 performance demotion 非傷癒 ramp，6/20 預期 ~4-5 IP + W 非 pitcher of record 拿不到 + K9 5.4 → 串流 ROI 差）。owned_by_others 12 位（含 Paul Skenes / Freddy Peralta / Yoshinobu Yamamoto / Cristopher Sánchez / Zac Gallen / Spencer Arrighetti）+ 本隊 2 位（Walker Buehler SD @ TEX、J.T. Ginn ATH vs LAA）。無 v4 缺數據 / Rotation gate 🚫 / Sum<15 hard floor 排除項。
+- TBD 11 場（多到爆，6/20 是後天，probable 多未公布），建議 TW 6/19 晚上/6/20 早上 `/stream-sp 2026-06-20 --tbd-only` 補查；公布後可能有更好候選。
+- 排序：**Cantillo（⚠️ 條件推）唯一候選**。純 SP + K stuff 有底但控球差 + 對手中等，偏弱。
+- 用戶決策建議：① 缺 K + 能接受控球差/WHIP 風險 + 對手中等 → Cantillo（唯一可賭，K9 8.4 + 純先發穩定）② 要穩 QS（IP 短）/ 缺 ERA-WHIP（BB 多）→ 不適合，pass。整體本日無強推，待 11 場 TBD 公布後可能翻盤。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
