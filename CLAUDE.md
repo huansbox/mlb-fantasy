@@ -498,6 +498,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `docs/sp-decisions-backtest.md` | SP 決策 living log（9 筆歷史決策 + 元回測機制，每 2-4 週更新「後續走勢」）|
 | `docs/sp-decisions-backtest-automation.md` | SP 決策 backtest 自動化 design（2026-04-25）— Use Case B（xwOBACON 校準）待辦引用 |
 | `issues/prd-sp-b2-thin.md` + `issues/017-026-*.md` | **B2 cutover PRD + 10 個 vertical slice issues**（2026-05-27 prd-to-issues 拆出）|
+| `docs/318b-injection-design.md` | **318b payload 注入設計定稿（六題）**— star 不注入 / tag 算 0 行 / swap 獨立 pool / batter+SP 分兩批 / 三段 A/B / backfill tagged add_reason。**動 318b 注入（B6 SP / B7 backfill / 042）前必讀**（#316/#318；batter 批已 PR #351）|
 | 歷史設計文件（已 superseded/退役，內容仍在 disk，glob `docs/`+`issues/` 可尋）| `fa_scan-claude-decision-layer-design`（Phase 6 multi-agent → B2 已改 single-LLM）· `v4-cutover-plan`（v4→B1→B2 早過完）· `phase6-multi-agent-spike` · `savant-xwobacon-endpoint-research`（finding 已實作 `621a5d2`）· `savant-smoke-test-design` · `sp-b1-cutover-design` · `issues/prd.md`+`001-009`（B1 cutover）|
 
 ## 待辦
