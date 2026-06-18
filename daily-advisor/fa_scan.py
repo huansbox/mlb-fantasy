@@ -54,7 +54,8 @@ from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
 from batter_discipline import (
     compute_discipline, discipline_tag, fetch_batter_discipline_bulk)
 from platoon_classifier import classify_platoon, collect_platoon_games
-from pa_projection import project_weekly_pa
+from pa_projection import project_weekly_pa, project_weekly_categories
+from swap_batter import should_emit_swap, swap_vector_batter, format_swap_line
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -3326,6 +3327,41 @@ def _fetch_future_games(team_abbr, start_date, ahead_days=7):
         return []
 
 
+# ── B4 / 318b: per-category weekly swap delta (pure; rates injected) ──
+
+
+def _per_pa_rates(trad):
+    """A batter's 14d trad counting → per-PA rates (counting/PA) + ratio
+    passthrough, for the weekly projection. None when PA is too thin to divide
+    (the swap line is then simply absent)."""
+    if not trad:
+        return None
+    pa = trad.get("pa") or 0
+    if pa < 1:
+        return None
+    return {
+        "R": trad.get("r", 0) / pa,
+        "HR": trad.get("hr", 0) / pa,
+        "RBI": trad.get("rbi", 0) / pa,
+        "SB": trad.get("sb", 0) / pa,
+        "BB": trad.get("bb", 0) / pa,
+        "AVG": trad.get("avg", 0),
+        "OPS": trad.get("ops", 0),
+    }
+
+
+def _compute_swap_line(cand_name, cand_rate, cand_pa, inc_name, inc_rate, inc_pa):
+    """Per-category weekly swap delta line (issue 047 / B4): the literal
+    candidate−incumbent exchange in H2H categories, PA column last. None on
+    missing rates. Budgeted line; the 4★+ gate is the caller's (should_emit_swap)."""
+    if not cand_rate or not inc_rate:
+        return None
+    cand_cats = project_weekly_categories(cand_rate, cand_pa)
+    inc_cats = project_weekly_categories(inc_rate, inc_pa)
+    vec = swap_vector_batter(cand_cats, cand_pa, inc_cats, inc_pa)
+    return f"[換算] {format_swap_line(inc_name, cand_name, vec)}"
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None,
                                  enrichment=None) -> list[str]:
@@ -3575,6 +3611,24 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     except Exception as e:  # noqa: BLE001
         print(f"  discipline: bulk fetch failed ({type(e).__name__})",
               file=sys.stderr)
+    # B4 swap: the incumbent (anchor = our weakest drop candidate) weekly
+    # projection, computed ONCE and reused per actionable swap candidate.
+    # Best-effort — no anchor or a failed fetch just drops swap lines this run.
+    inc_swap_ctx = None
+    if weakest_pool:
+        _anc = weakest_pool[0]
+        _anc_platoon = _fetch_batter_platoon(
+            _anc.get("mlb_id"), _anc.get("team", ""), today_str)
+        if _anc_platoon:
+            _anc_proj = project_weekly_pa(
+                _fetch_future_games(_anc.get("team", ""), today_str),
+                _anc_platoon, _PA_PER_START_EST)
+            _anc_rate = _per_pa_rates(
+                (trad_14d or {}).get(str(_anc.get("mlb_id", ""))))
+            if _anc_rate:
+                inc_swap_ctx = {"name": _anc.get("name", "?"),
+                                "rate": _anc_rate,
+                                "pa": _anc_proj["projected_pa"]}
 
     # ── 我方候選 drop ──
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
@@ -3611,10 +3665,20 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                 if f.get("decision") in ("取代", "立即取代"):
                     platoon = _fetch_batter_platoon(
                         fid, f.get("team", ""), today_str)
-                    if platoon:  # B3 PA: future games × this platoon → PA line
-                        enr.pa_line = _compute_pa_line(
-                            _fetch_future_games(f.get("team", ""), today_str),
-                            platoon)
+                    if platoon:
+                        cand_future = _fetch_future_games(
+                            f.get("team", ""), today_str)
+                        enr.pa_line = _compute_pa_line(cand_future, platoon)  # B3
+                        # B4 swap vs incumbent — 4★+ only (the cost-bearing line)
+                        if inc_swap_ctx and should_emit_swap(enr.stars or 0):
+                            cand_proj = project_weekly_pa(
+                                cand_future, platoon, _PA_PER_START_EST)
+                            enr.swap_line = _compute_swap_line(
+                                f.get("name", "?"),
+                                _per_pa_rates((trad_14d or {}).get(str(fid))),
+                                cand_proj["projected_pa"],
+                                inc_swap_ctx["name"], inc_swap_ctx["rate"],
+                                inc_swap_ctx["pa"])
                 enr.inline_tags.extend(_compute_inline_tags(
                     f, f_age, ped, today_date,
                     disc_cur=disc_cur_bulk.get(fid),
