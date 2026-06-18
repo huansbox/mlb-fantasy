@@ -45,10 +45,17 @@ from decision_ledger import (
     VERDICT_PRECEDENCE,
 )
 from ledger_enrich import (
-    CandidateSignals, compute_candidate_stars,
+    CandidateSignals, enrich_candidate,
     SOURCE_SCAN, SOURCE_OWNED_RISER,
 )
 from decision_gate import gate, ACTIONABLE
+from payload_budget import PayloadBudget
+from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
+from batter_discipline import (
+    compute_discipline, discipline_tag, fetch_batter_discipline_bulk)
+from platoon_classifier import classify_platoon, collect_platoon_games
+from pa_projection import project_weekly_pa, project_weekly_categories
+from swap_batter import should_emit_swap, swap_vector_batter, format_swap_line
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -2133,9 +2140,11 @@ def _update_waiver_log_locked(advice, today_str, env=None, position_lookup=None,
         ledger = DecisionLedger(DECISION_LEDGER_PATH)
         emap = enrich_map or {}
         for player, verdict in ledger_records:
-            channel, stars = emap.get(player, (None, None))
+            enr = emap.get(player)
             ledger.record(player, verdict, ts=today_str,
-                          channel=channel, stars=stars)
+                          channel=enr.channel if enr else None,
+                          stars=enr.stars if enr else None,
+                          add_reason=enr.add_reason if enr else None)
         ledger_written = True
     except Exception as e:  # noqa: BLE001 — never break the waiver-log path
         msg = f"[fa_scan] decision-ledger skipped ({type(e).__name__}: {e})"
@@ -2635,20 +2644,22 @@ def _gate_notifications(enrich_map, roster, ledger, today_str):
     """Pure: ACT-NOW notify lines for today's actionable 4★+ verdicts.
 
     Reads each candidate's history from the injected ledger, runs the gate,
-    collects a line per player whose gate says notify. owned_trend is None for
-    now (fast-lane = 5★ only); the %owned-rising fast-lane is plumbed in 318b.
-    Only today's entry counts (the freshness guard skips stale players from a
-    no-op scan)."""
+    collects a line per player whose gate says notify. owned_trend = the
+    candidate's %owned shape (B8, set on the enrichment during payload build)
+    so a fast-rising add fast-lanes past the slow lane. Only today's entry
+    counts (the freshness guard skips stale players from a no-op scan)."""
     msgs = []
-    for name, (_channel, stars) in (enrich_map or {}).items():
+    for name, enr in (enrich_map or {}).items():
         hist = ledger.get_history(name)
         if not hist or hist[-1].ts != today_str:
             continue
         latest = hist[-1]
         if latest.verdict not in ACTIONABLE:
             continue
+        stars = enr.stars if enr else None
+        owned_shape = enr.owned_shape if enr else None
         result = gate(hist, latest.verdict, stars or 0,
-                      owned_trend=None, executed=(name in roster))
+                      owned_trend=owned_shape, executed=(name in roster))
         if result.notify:
             msgs.append(f"⚡ {name} — {result.reason}")
     return msgs
@@ -2668,13 +2679,15 @@ def _notify_gate_actions(enrich_map, config, env, today_str):
               file=sys.stderr)
 
 
-def build_ledger_enrich_map(entries, ledger):
-    """Map name → (channel, stars) for batter candidates (issue 039 / 318a).
+def build_ledger_enrich_map(entries, ledger, today_str):
+    """Map name → CandidateEnrichment for batter candidates (issue 039).
 
-    Channel honours first-contact (via ledger history); stars are today's
-    mechanical rating. The map is threaded to the waiver-log write point,
-    which persists channel/stars onto the recorded verdict. Pure given an
-    injected ledger — unit-tested in test_ledger_enrich_wiring.
+    Each bundle carries channel (first-contact honoured), today's mechanical
+    stars, the never-re-judged add_reason, and the rendered ledger note lines.
+    The map is threaded to (a) the waiver-log write point, which persists
+    channel/stars/add_reason onto the recorded verdict, and (b) the payload
+    builder, which injects note_lines (318b). Pure given an injected ledger —
+    unit-tested in test_ledger_enrich.
     """
     enrich_map = {}
     for entry in entries:
@@ -2682,8 +2695,7 @@ def build_ledger_enrich_map(entries, ledger):
         if not name:
             continue
         sig = _candidate_signals_from_entry(entry)
-        stars, channel, _ = compute_candidate_stars(sig, ledger.get_history(name))
-        enrich_map[name] = (channel, stars)
+        enrich_map[name] = enrich_candidate(sig, ledger.get_history(name), today_str)
     return enrich_map
 
 
@@ -2827,7 +2839,7 @@ def _filter_waiver_log_by_group(section_content, group_type, rostered_names=None
 
 def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
                          watch_tagged, changes, ref_1d, ref_3d, config,
-                         rostered_names=None):
+                         rostered_names=None, enrich_map=None):
     """Build Claude Layer 5 input string: mechanical report + context.
 
     Claude task is to text-ify the pre-computed Sum/urgency/tags/decision and
@@ -2841,6 +2853,7 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
         return _build_pass2_data_batter_v4(
             urgency_result, low_conf, fa_tagged, watch_tagged,
             changes, ref_1d, ref_3d, config, rostered_names,
+            enrich_map=enrich_map,
         )
 
     lines = []
@@ -3100,13 +3113,272 @@ def _fmt_season_luck_part(sv: dict) -> str | None:
     return f"運氣 {res['gap']:+.3f}{sig}"
 
 
+# ── B1b / 318b: per-candidate payload injection point ──
+
+_PAYLOAD_MAX_LINES_PER_CAND = 3  # base pool: ledger note + PA line (doc Q2)
+_SWAP_POOL_MAX_LINES = 1         # swap pool: own ceiling, never evicted (doc Q3)
+
+
+def _inject_318b_lines(name, enrichment, indent="   "):
+    """Assemble issue-318b injection lines for one candidate under a single
+    per-candidate line budget (User story 20's one enforcement point).
+
+    B1 contributes the ledger note (prev-verdict + add-reason + star). Later
+    slices append their own (slice_id, lines) pools below in priority order —
+    ledger is the churn-protection core and registers first, so if a future
+    slice pushes over budget the lowest-priority pools are the ones that yield.
+    Returns indented payload lines (possibly empty)."""
+    if enrichment is None:
+        return []
+    out = []
+    # Base pool (design doc Q2): ledger memory (highest priority) → PA line.
+    # When tight, the lower-priority PA yields; ledger is the churn-protection
+    # core. Inline tags (B2/B5) ride the header and are NOT budgeted here.
+    base = PayloadBudget(max_lines=_PAYLOAD_MAX_LINES_PER_CAND)
+    base_pools = [("ledger", list(enrichment.note_lines or []))]
+    if enrichment.pa_line:
+        base_pools.append(("pa", [enrichment.pa_line]))
+    for slice_id, slice_lines in base_pools:
+        if base.remaining() < len(slice_lines):
+            base.register(slice_id, 0)    # yields — would breach the base budget
+            continue
+        base.register(slice_id, len(slice_lines))
+        out.extend(slice_lines)
+    # Swap pool (design doc Q3): a SEPARATE budget instance. 4★+ swap
+    # candidates are rare (~6 in 2.5 months), so the category-exchange line
+    # gets its own ceiling and is NEVER crowded out by the base pool.
+    if enrichment.swap_line:
+        swap = PayloadBudget(max_lines=_SWAP_POOL_MAX_LINES)
+        swap.register("swap", 1)
+        if swap.within():
+            out.append(enrichment.swap_line)
+    return [f"{indent}{line}" for line in out]
+
+
+def _compute_inline_tags(entry, age, ped, today, disc_cur=None, disc_prior=None,
+                         platoon=None):
+    """Issue-318b inline header tags for one batter candidate (B5 post-hype +
+    chase/zone-contact, B2 platoon). Inline tags ride the header (like
+    add_tags/warn_tags) and do NOT consume the per-candidate line budget.
+    Best-effort — a tag that can't be computed is simply absent, never raises
+    into the scan.
+
+    disc_cur/disc_prior: this batter's {chase, zone_contact, pa} for the
+    current / prior season (looked up from the bulk Savant join), or None.
+    platoon: classify_platoon output dict (label/tag/start-rates), or None."""
+    tags = []
+    if ped is not None and today is not None:
+        try:
+            t = post_hype_tag(ped, entry.get("mlb_id"), age,
+                              default_weak_signal(entry.get("score")), today)
+            if t:
+                tags.append(t)
+        except Exception:  # noqa: BLE001 — a tag never blocks the scan
+            pass
+    if disc_cur is not None:
+        try:
+            t = discipline_tag(compute_discipline(disc_cur, disc_prior))
+            if t:
+                tags.append(t)
+        except Exception:  # noqa: BLE001
+            pass
+    if platoon and platoon.get("tag"):
+        tags.append(platoon["tag"])
+    return tags
+
+
+# ── B2 / 318b: platoon fetch (VPS-validated MLB Stats API; pure parse split out) ──
+
+
+def _parse_team_schedule(sched_json, team_id):
+    """Pure: MLB schedule JSON → [{game_pk, opp_starter_id}] for ``team_id``'s
+    games. Opponent = the side that isn't us; only games whose opponent has a
+    known probable/actual starter are kept (others can't be hand-classified)."""
+    out = []
+    for d in (sched_json or {}).get("dates", []):
+        for g in d.get("games", []):
+            gpk = g.get("gamePk")
+            sides = g.get("teams", {})
+            home, away = sides.get("home", {}), sides.get("away", {})
+            if home.get("team", {}).get("id") == team_id:
+                opp = away
+            elif away.get("team", {}).get("id") == team_id:
+                opp = home
+            else:
+                continue
+            opp_sp = (opp.get("probablePitcher") or {}).get("id")
+            if gpk and opp_sp:
+                out.append({"game_pk": gpk, "opp_starter_id": opp_sp})
+    return out
+
+
+def _fetch_pitch_hands(pids):
+    """Batch pitchHand lookup → {pid: "R"|"L"} (one /people call). Empty on
+    failure. VPS-validated."""
+    ids = [str(p) for p in pids if p]
+    if not ids:
+        return {}
+    try:
+        data = mlb_api_get(f"/people?personIds={','.join(ids)}")
+    except Exception:  # noqa: BLE001
+        return {}
+    out = {}
+    for person in data.get("people", []):
+        code = (person.get("pitchHand") or {}).get("code")
+        if person.get("id") and code in ("R", "L"):
+            out[person["id"]] = code
+    return out
+
+
+def _fetch_batter_started_map(mlb_id, season):
+    """{game_pk: started_bool} from a batter's hitting game log. Empty on
+    failure. VPS-validated."""
+    try:
+        data = mlb_api_get(f"/people/{mlb_id}/stats"
+                           f"?stats=gameLog&season={season}&group=hitting")
+    except Exception:  # noqa: BLE001
+        return {}
+    stats = data.get("stats") or []
+    splits = stats[0].get("splits", []) if stats else []
+    out = {}
+    for s in splits:
+        gpk = (s.get("game") or {}).get("gamePk")
+        if gpk is not None:
+            gs = int((s.get("stat") or {}).get("gamesStarted", 0) or 0)
+            out[gpk] = gs > 0
+    return out
+
+
+def _fetch_batter_platoon(mlb_id, team_abbr, end_date, lookback_days=30):
+    """Best-effort platoon classification for one batter (issue 044 / B2).
+
+    Schedule (team game_pk + opponent probable starter) × the batter's game log
+    (started per game) × opponent starter handedness → classify_platoon.
+    Returns None on any failure or too few classified games (the tag is simply
+    absent). VPS-validated: gated by the本機 Yahoo-touching hook; the MLB Stats
+    API response shapes are confirmed on the VPS."""
+    from datetime import date, timedelta
+    try:
+        from stream_sp_scan import ABBR_TO_ID
+        team_id = ABBR_TO_ID.get(team_abbr)
+        if team_id is None or not mlb_id:
+            return None
+        end = date.fromisoformat(end_date)
+        start = end - timedelta(days=lookback_days)
+        sched = mlb_api_get(
+            f"/schedule?sportId=1&teamId={team_id}"
+            f"&startDate={start.isoformat()}&endDate={end.isoformat()}"
+            f"&hydrate=probablePitcher")
+        team_games = _parse_team_schedule(sched, team_id)
+        if not team_games:
+            return None
+        started_map = _fetch_batter_started_map(mlb_id, end.year)
+        hand_map = _fetch_pitch_hands({tg["opp_starter_id"] for tg in team_games})
+        games, _counts = collect_platoon_games(
+            team_games,
+            get_started=lambda gpk: started_map.get(gpk, False),
+            get_pitch_hand=lambda pid: hand_map.get(pid))
+        games = [g for g in games if g.get("opp_hand") in ("R", "L")]
+        if len(games) < 5:  # too few classified games → no reliable signal
+            return None
+        return classify_platoon(games)
+    except Exception as e:  # noqa: BLE001
+        print(f"  platoon: failed for {mlb_id} ({type(e).__name__}: {e})",
+              file=sys.stderr)
+        return None
+
+
+# ── B3 / 318b: next-week PA projection (VPS-validated future schedule) ──
+
+_PA_PER_START_EST = 4.3  # league-typical PA for a starting batter in one game
+
+
+def _compute_pa_line(future_games, platoon, pa_per_start=_PA_PER_START_EST):
+    """Next-week PA projection line (issue 045 / B3), or None on insufficient
+    input. A budgeted independent line (not an inline tag): it makes the volume
+    gap explicit before a swap (the Arraez→Pederson −28%-PA lesson)."""
+    if not future_games or not platoon or not pa_per_start:
+        return None
+    proj = project_weekly_pa(future_games, platoon, pa_per_start)
+    if not proj.get("games"):
+        return None
+    return (f"[下週量] 預期 PA {proj['projected_pa']}"
+            f"（{proj['games']} 場 × 先發 {proj['expected_starts']}）")
+
+
+def _fetch_future_games(team_abbr, start_date, ahead_days=7):
+    """Future opponent-handedness games for the PA projection (issue 045 / B3):
+    [{opp_hand: "R"|"L"}] for the team's next ``ahead_days``. Best-effort,
+    VPS-validated (reuses the B2 schedule parse + pitchHand fetch)."""
+    from datetime import date, timedelta
+    try:
+        from stream_sp_scan import ABBR_TO_ID
+        team_id = ABBR_TO_ID.get(team_abbr)
+        if team_id is None:
+            return []
+        start = date.fromisoformat(start_date)
+        end = start + timedelta(days=ahead_days)
+        sched = mlb_api_get(
+            f"/schedule?sportId=1&teamId={team_id}"
+            f"&startDate={start.isoformat()}&endDate={end.isoformat()}"
+            f"&hydrate=probablePitcher")
+        team_games = _parse_team_schedule(sched, team_id)
+        hand_map = _fetch_pitch_hands({tg["opp_starter_id"] for tg in team_games})
+        return [{"opp_hand": hand_map[tg["opp_starter_id"]]}
+                for tg in team_games
+                if hand_map.get(tg["opp_starter_id"]) in ("R", "L")]
+    except Exception as e:  # noqa: BLE001
+        print(f"  pa-proj: future games failed ({type(e).__name__})",
+              file=sys.stderr)
+        return []
+
+
+# ── B4 / 318b: per-category weekly swap delta (pure; rates injected) ──
+
+
+def _per_pa_rates(trad):
+    """A batter's 14d trad counting → per-PA rates (counting/PA) + ratio
+    passthrough, for the weekly projection. None when PA is too thin to divide
+    (the swap line is then simply absent)."""
+    if not trad:
+        return None
+    pa = trad.get("pa") or 0
+    if pa < 1:
+        return None
+    return {
+        "R": trad.get("r", 0) / pa,
+        "HR": trad.get("hr", 0) / pa,
+        "RBI": trad.get("rbi", 0) / pa,
+        "SB": trad.get("sb", 0) / pa,
+        "BB": trad.get("bb", 0) / pa,
+        "AVG": trad.get("avg", 0),
+        "OPS": trad.get("ops", 0),
+    }
+
+
+def _compute_swap_line(cand_name, cand_rate, cand_pa, inc_name, inc_rate, inc_pa):
+    """Per-category weekly swap delta line (issue 047 / B4): the literal
+    candidate−incumbent exchange in H2H categories, PA column last. None on
+    missing rates. Budgeted line; the 4★+ gate is the caller's (should_emit_swap)."""
+    if not cand_rate or not inc_rate:
+        return None
+    cand_cats = project_weekly_categories(cand_rate, cand_pa)
+    inc_cats = project_weekly_categories(inc_rate, inc_pa)
+    vec = swap_vector_batter(cand_cats, cand_pa, inc_cats, inc_pa)
+    return f"[換算] {format_swap_line(inc_name, cand_name, vec)}"
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
-                                 trad_14d: dict | None) -> list[str]:
+                                 trad_14d: dict | None,
+                                 enrichment=None) -> list[str]:
     """Render one batter (anchor or watch) as raw + percentile + 14d trad.
 
     Positions intentionally omitted — design §1.2 + §3.4 require evaluation
     on hitting data only; surfacing positions risks LLM reasoning like
     "2B is scarce so drop is risky".
+
+    ``enrichment`` (issue 318b): when present, the ledger note is appended as
+    the block's tail (prev-verdict + add-reason + star).
     """
     name = entry.get("name", "?")
     team = entry.get("team", "")
@@ -3163,18 +3435,23 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
         lines.append(f"  Prior 2025: {' / '.join(prior_parts)}")
     else:
         lines.append("  Prior 2025: 無資料")
+    lines.extend(_inject_318b_lines(entry.get("name", "?"), enrichment, "  "))
     return lines
 
 
 def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
                              trad_14d: dict | None,
                              owned: dict | None,
-                             age: int | None = None) -> list[str]:
+                             age: int | None = None,
+                             enrichment=None) -> list[str]:
     """Render one FA / watch batter as raw + percentile + 14d trad + %owned.
 
     age: current age from _fetch_ages_bulk — rendered on the prior line so
     breakout-vs-fluke priors have the age context (issue 033, 23 歲二年生
     跳級 vs 31 歲 fluke 的先驗完全不同).
+
+    enrichment (issue 318b): when present, the ledger note (prev-verdict +
+    add-reason + star) is appended as the block's tail.
     """
     name = entry.get("name", "?")
     team = entry.get("team", "")
@@ -3192,7 +3469,9 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
     add_tags = entry.get("add_tags", [])
     warn_tags = entry.get("warn_tags", [])
-    minimal_tags = list(add_tags) + list(warn_tags)
+    # 318b inline tags (post-hype / platoon / chase-zone) ride the header too.
+    inline_tags = list(enrichment.inline_tags) if enrichment else []
+    minimal_tags = list(add_tags) + list(warn_tags) + inline_tags
     tag_str = f" / {' '.join(minimal_tags)}" if minimal_tags else ""
 
     shape_str = ""
@@ -3252,6 +3531,7 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
         lines.append(f"   Prior 2025: {' / '.join(prior_parts)}{age_part}")
     else:
         lines.append(f"   Prior 2025: 無資料 (新人 or 上季 PA 不足){age_part}")
+    lines.extend(_inject_318b_lines(name, enrichment, "   "))
     return lines
 
 
@@ -3278,7 +3558,7 @@ def _sort_fa_by_owned(fa_tagged: list[dict]) -> list[dict]:
 
 def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                                  watch_tagged, changes, ref_1d, ref_3d, config,
-                                 rostered_names=None):
+                                 rostered_names=None, enrich_map=None):
     """Batter v4 thin Pass-2 input string.
 
     Composition (per docs/batter-framework-upgrade-design.md §1):
@@ -3314,12 +3594,55 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     trad_14d = _fetch_14d_trad_bulk(trad_subjects)
     # Issue 033 ②: current age for FA + watch prior context (one bulk call)
     ages = _fetch_ages_bulk(list(fa_tagged) + list(watch_tagged))
+    # B5 post-hype: load the prospect pedigree once + resolve today as a date
+    # (best-effort — a missing asset or bad date just means no post-hype tags).
+    ped = None
+    try:
+        ped = load_pedigree()
+    except Exception as e:  # noqa: BLE001
+        print(f"  post-hype: pedigree unavailable ({type(e).__name__})",
+              file=sys.stderr)
+    try:
+        today_date = (datetime.strptime(today_str, "%Y-%m-%d").date()
+                      if today_str else None)
+    except ValueError:
+        today_date = None
+    # B5 chase/zone-contact: two league-bulk Savant CSVs (current + prior year),
+    # joined per batter by mlb_id. Best-effort — a failed fetch just drops the
+    # discipline tag this run (does not block the scan).
+    disc_cur_bulk, disc_prior_bulk = {}, {}
+    try:
+        disc_cur_bulk = fetch_batter_discipline_bulk(2026)
+        disc_prior_bulk = fetch_batter_discipline_bulk(2025)
+    except Exception as e:  # noqa: BLE001
+        print(f"  discipline: bulk fetch failed ({type(e).__name__})",
+              file=sys.stderr)
+    # B4 swap: the incumbent (anchor = our weakest drop candidate) weekly
+    # projection, computed ONCE and reused per actionable swap candidate.
+    # Best-effort — no anchor or a failed fetch just drops swap lines this run.
+    inc_swap_ctx = None
+    if weakest_pool:
+        _anc = weakest_pool[0]
+        _anc_platoon = _fetch_batter_platoon(
+            _anc.get("mlb_id"), _anc.get("team", ""), today_str)
+        if _anc_platoon:
+            _anc_proj = project_weekly_pa(
+                _fetch_future_games(_anc.get("team", ""), today_str),
+                _anc_platoon, _PA_PER_START_EST)
+            _anc_rate = _per_pa_rates(
+                (trad_14d or {}).get(str(_anc.get("mlb_id", ""))))
+            if _anc_rate:
+                inc_swap_ctx = {"name": _anc.get("name", "?"),
+                                "rate": _anc_rate,
+                                "pa": _anc_proj["projected_pa"]}
 
     # ── 我方候選 drop ──
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
     if weakest_pool:
         for i, r in enumerate(weakest_pool, start=1):
-            lines.extend(_fmt_anchor_block_batter_v4(r, f"P{i}", trad_14d))
+            lines.extend(_fmt_anchor_block_batter_v4(
+                r, f"P{i}", trad_14d,
+                enrichment=(enrich_map or {}).get(r.get("name"))))
     else:
         lines.append("- 池為空：全隊打者 Sum 皆 ≥25（強），無 drop 候選")
 
@@ -3337,8 +3660,38 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for idx, f in enumerate(fa_sorted, start=1):
             owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
                 if today_str else None
+            f_age = ages.get(str(f.get("mlb_id", "")))
+            enr = (enrich_map or {}).get(f.get("name"))
+            if enr is not None:
+                enr.owned_shape = (owned or {}).get("shape")  # B8 gate fast-lane
+                fid = f.get("mlb_id")
+                # B2 platoon: only for actionable swap candidates — the fetch is
+                # per-candidate (schedule + game log), not paid for every FA.
+                platoon = None
+                if f.get("decision") in ("取代", "立即取代"):
+                    platoon = _fetch_batter_platoon(
+                        fid, f.get("team", ""), today_str)
+                    if platoon:
+                        cand_future = _fetch_future_games(
+                            f.get("team", ""), today_str)
+                        enr.pa_line = _compute_pa_line(cand_future, platoon)  # B3
+                        # B4 swap vs incumbent — 4★+ only (the cost-bearing line)
+                        if inc_swap_ctx and should_emit_swap(enr.stars or 0):
+                            cand_proj = project_weekly_pa(
+                                cand_future, platoon, _PA_PER_START_EST)
+                            enr.swap_line = _compute_swap_line(
+                                f.get("name", "?"),
+                                _per_pa_rates((trad_14d or {}).get(str(fid))),
+                                cand_proj["projected_pa"],
+                                inc_swap_ctx["name"], inc_swap_ctx["rate"],
+                                inc_swap_ctx["pa"])
+                enr.inline_tags.extend(_compute_inline_tags(
+                    f, f_age, ped, today_date,
+                    disc_cur=disc_cur_bulk.get(fid),
+                    disc_prior=disc_prior_bulk.get(fid),
+                    platoon=platoon))
             lines.extend(_fmt_fa_block_batter_v4(
-                f, idx, trad_14d, owned, age=ages.get(str(f.get("mlb_id", "")))))
+                f, idx, trad_14d, owned, age=f_age, enrichment=enr))
     else:
         lines.append("\n--- FA 打者候選: 無通過品質門檻 ---")
 
@@ -3348,8 +3701,17 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for w in watch_tagged:
             owned = enrich_owned_trend(w.get("name", ""), fa_history, today_str) \
                 if today_str else None
+            w_age = ages.get(str(w.get("mlb_id", "")))
+            enr = (enrich_map or {}).get(w.get("name"))
+            if enr is not None:
+                enr.owned_shape = (owned or {}).get("shape")  # B8 gate fast-lane
+                wid = w.get("mlb_id")
+                enr.inline_tags.extend(_compute_inline_tags(
+                    w, w_age, ped, today_date,
+                    disc_cur=disc_cur_bulk.get(wid),
+                    disc_prior=disc_prior_bulk.get(wid)))
             lines.extend(_fmt_fa_block_batter_v4(
-                w, None, trad_14d, owned, age=ages.get(str(w.get("mlb_id", "")))))
+                w, None, trad_14d, owned, age=w_age, enrichment=enr))
 
     # ── %owned 升幅 ──
     group_changes = [
@@ -3489,6 +3851,20 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                 entry.update(fa_compute.compute_fa_tags(entry, anchor, group_type))
             watch_tagged.append(entry)
 
+        # Decision-ledger enrichment (issue 039): channel + stars + add_reason
+        # + rendered ledger note per candidate. Computed BEFORE Layer 5 so the
+        # note lines inject into the payload (318b), then reused at the
+        # waiver-log write point (persist channel/stars/add_reason) and the
+        # gate (notify). Best-effort — enrichment never blocks the scan.
+        enrich_map = {}
+        try:
+            enrich_map = build_ledger_enrich_map(
+                fa_tagged + watch_tagged,
+                DecisionLedger(DECISION_LEDGER_PATH), today_str)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
+                  file=sys.stderr)
+
         # ── Layer 5: Claude text layer ──
         print(f"  Layer 5 ({label}): Claude 文字化...", file=sys.stderr)
         prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_pass2_batter.txt")
@@ -3496,7 +3872,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         data = _build_pass2_data_v2(
             group_type, urgency_result, low_conf, fa_tagged, watch_tagged,
             changes, ref_1d, ref_3d, config,
-            rostered_names=rostered_names,
+            rostered_names=rostered_names, enrich_map=enrich_map,
         )
         advice = _call_claude(prompt_path, data, timeout=900)
 
@@ -3522,15 +3898,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             position_lookup = _build_position_lookup(
                 group_type, fa_candidates, watch_candidates, config,
             )
-            # Discovery channel + mechanical stars per candidate (issue 039 /
-            # 318a) — persisted onto the ledger at the write point. Best-effort.
-            enrich_map = {}
-            try:
-                enrich_map = build_ledger_enrich_map(
-                    fa_tagged + watch_tagged, DecisionLedger(DECISION_LEDGER_PATH))
-            except Exception as e:  # noqa: BLE001 — enrichment never blocks the scan
-                print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
-                      file=sys.stderr)
+            # enrich_map computed before Layer 5 (above) — reused here to
+            # persist channel/stars/add_reason onto the recorded verdict.
             _update_waiver_log(advice, today_str, env, position_lookup, enrich_map)
             # Decision gate (issue 041): targeted ACT-NOW push for 4★+ verdicts
             # after the ledger reflects today's records.

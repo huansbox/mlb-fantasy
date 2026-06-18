@@ -24,6 +24,7 @@ from decision_ledger import (
     VERDICT_REPLACE_NOW,
     VERDICT_WATCH,
 )
+from ledger_enrich import CandidateEnrichment
 
 
 def _hist(*rows):
@@ -264,8 +265,8 @@ def test_gate_notifications_pushes_4star_actionable_today():
         "New": [_ent("New", "2026-06-13", VERDICT_REPLACE)],   # day1 pending → no
         "Watched": [_ent("Watched", "2026-06-13", VERDICT_WATCH)],  # not actionable
     }
-    enrich_map = {"Hot": ("structure", 4), "New": ("structure", 4),
-                  "Watched": ("structure", 4)}
+    enrich_map = {n: CandidateEnrichment(channel="structure", stars=4)
+                  for n in ("Hot", "New", "Watched")}
     msgs = _gate_notifications(enrich_map, set(), _FakeLedger(histories), "2026-06-13")
     assert len(msgs) == 1 and msgs[0].startswith("⚡ Hot")
 
@@ -277,7 +278,31 @@ def test_gate_notifications_skips_rostered_and_stale():
                      _ent("Rostered", "2026-06-13", VERDICT_REPLACE)],
         "Stale": [_ent("Stale", "2026-06-10", VERDICT_REPLACE)],  # not today
     }
-    enrich_map = {"Rostered": ("structure", 5), "Stale": ("structure", 5)}
+    enrich_map = {n: CandidateEnrichment(channel="structure", stars=5)
+                  for n in ("Rostered", "Stale")}
     msgs = _gate_notifications(
         enrich_map, {"Rostered"}, _FakeLedger(histories), "2026-06-13")
     assert msgs == []  # rostered=executed (DONE); stale=not today
+
+
+def test_gate_notifications_owned_rising_fast_lanes_day1():
+    # B8: a day-1 4★ replace is PENDING on the slow lane, but a fast-rising
+    # %owned shape fast-lanes it → notify today (the O'Hearn/Horwitz remedy).
+    from fa_scan import _gate_notifications
+    histories = {"Riser": [_ent("Riser", "2026-06-13", VERDICT_REPLACE)]}
+    enrich_map = {"Riser": CandidateEnrichment(channel="market", stars=4,
+                                               owned_shape="rising")}
+    msgs = _gate_notifications(
+        enrich_map, set(), _FakeLedger(histories), "2026-06-13")
+    assert len(msgs) == 1 and msgs[0].startswith("⚡ Riser")
+
+
+def test_gate_notifications_plateau_shape_no_fast_lane_day1():
+    # B8: a non-fast shape leaves the day-1 replace on the slow lane → silent.
+    from fa_scan import _gate_notifications
+    histories = {"Flat": [_ent("Flat", "2026-06-13", VERDICT_REPLACE)]}
+    enrich_map = {"Flat": CandidateEnrichment(channel="structure", stars=4,
+                                              owned_shape="plateau")}
+    msgs = _gate_notifications(
+        enrich_map, set(), _FakeLedger(histories), "2026-06-13")
+    assert msgs == []

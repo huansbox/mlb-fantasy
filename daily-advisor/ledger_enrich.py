@@ -22,7 +22,8 @@ when trigger evaluation is built.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date
 
 from daily_advisor import BATTER_PCTILES
 from star_rating import (
@@ -65,6 +66,26 @@ class CandidateSignals:
     prior_barrel_pct: float | None = None
     prior_pa: int | None = None
     pa_tg: float | None = None
+
+
+@dataclass
+class CandidateEnrichment:
+    """The full 318b injection bundle for one candidate — what the payload
+    builder renders and what the ledger persists.
+
+    B1 fills channel / stars / add_reason / note_lines. Later slices
+    (platoon / PA / swap / micro) append their own *trailing-optional* fields
+    here, so enrich_map's value shape stays frozen for consumers: they read
+    ``.stars`` / ``.note_lines`` by name and never unpack a positional tuple
+    whose arity shifts every slice."""
+    channel: str | None = None
+    stars: int | None = None
+    add_reason: str | None = None
+    note_lines: list = field(default_factory=list)   # B1: ledger note (budgeted)
+    inline_tags: list = field(default_factory=list)  # B2/B5: header tags (not budgeted)
+    owned_shape: str | None = None                   # B8: %owned shape → gate fast-lane
+    pa_line: str | None = None                       # B3: next-week PA proj (budgeted)
+    swap_line: str | None = None                     # B4: per-category swap (budgeted)
 
 
 def percentile_of(value, metric) -> int:
@@ -119,6 +140,18 @@ def first_channel(history) -> str | None:
     return None
 
 
+def first_add_reason(history) -> str | None:
+    """Earliest recorded add_reason in a player's ledger history — the
+    "why we first picked/watched him" set at first contact, which a later
+    drop suggestion must be confronted with (PRD user story 1/9). Symmetric
+    to first_channel; None if no row carries one (e.g. legacy pre-318b rows)."""
+    for entry in history:
+        ar = getattr(entry, "add_reason", None)
+        if ar is not None:
+            return ar
+    return None
+
+
 def build_star_factors(sig: CandidateSignals, channel: str) -> dict:
     """Assemble the named factor dict star_rating.score consumes (3 pre-trigger
     factors; trigger added by the caller for established players)."""
@@ -151,3 +184,90 @@ def compute_candidate_stars(sig: CandidateSignals, history) -> tuple[int, str, S
         factors["trigger"] = "none"
         result = score(factors, day0=False)
     return result.stars, channel, result
+
+
+# ── B1 / 318b: payload note injection (prev-verdict + add-reason + star) ──
+#
+# These render the ledger context into LLM-payload lines. Every line carries a
+# bracketed `[...]` prefix so the read-back / backtest parser can locate it
+# (the 028/032 grammar already keys on bracketed milestones). The note answers
+# "what did we last decide, and why did we pick him" so a drop suggestion must
+# confront the original add reason instead of reacting to one bad day.
+
+
+def _fmt_xwoba3(v) -> str:
+    """xwOBA convention: 3 decimals, no leading zero (.349 not 0.349)."""
+    s = f"{v:.3f}"
+    return s[1:] if s.startswith("0.") else s
+
+
+def _days_between(earlier, later) -> int | None:
+    """Whole days between two ISO date strings; None on bad/absent input."""
+    try:
+        return (date.fromisoformat(later) - date.fromisoformat(earlier)).days
+    except (ValueError, TypeError):
+        return None
+
+
+def snapshot_add_reason(sig: CandidateSignals) -> str:
+    """A compact "why we picked him" snapshot from current signals, persisted
+    once at first contact. Mirrors the three core batter metrics; appends the
+    14d xwOBA when a heat spike is what surfaced the pickup. '?' if nothing is
+    known (never empty — the field is the anchor a later drop is confronted
+    with)."""
+    parts = []
+    if sig.xwoba is not None:
+        parts.append(f"xwOBA {_fmt_xwoba3(sig.xwoba)}")
+    if sig.bb_pct is not None:
+        parts.append(f"BB% {sig.bb_pct}")
+    if sig.barrel_pct is not None:
+        parts.append(f"Barrel% {sig.barrel_pct}")
+    if is_hot_14d(sig.xwoba_14d, sig.xwoba):
+        parts.append(f"14d xwOBA {_fmt_xwoba3(sig.xwoba_14d)}")
+    return " / ".join(parts) if parts else "?"
+
+
+def format_ledger_note(history, today_str, add_reason_fallback=None) -> list[str]:
+    """Render a candidate's ledger MEMORY into payload lines.
+
+    Per design doc Q1, this injects the system's *memory* — what it last
+    decided and why it first picked him — NOT the star rating. The star (1-5★)
+    is a mechanical aggregate; surfacing it to the LLM walks back into the v2
+    "Sum exposed to the LLM" path that batter v4 thin retired. The star stays
+    pre-LLM (payload pre-screen + 041 gate + 051 KPI), never in the payload.
+
+    Empty history = first contact → NO lines (the player has no memory yet;
+    day-0 candidates get a looser budget). Established → two lines: the last
+    verdict + the ORIGINAL add reason (first_add_reason, never re-judged;
+    falls back to the live snapshot for legacy rows predating add_reason).
+    """
+    if not history:
+        return []
+    prev = history[-1]
+    days = _days_between(getattr(prev, "ts", None), today_str)
+    when = f"{days} 天前" if days is not None else getattr(prev, "ts", "?")
+    reason = first_add_reason(history) or add_reason_fallback
+    lines = [f"[記事] 上次 {getattr(prev, 'verdict', '?')}（{when}）"]
+    if reason:
+        lines.append(f"[原撿因] {reason}")
+    return lines
+
+
+def enrich_candidate(sig: CandidateSignals, history, today_str) -> CandidateEnrichment:
+    """Assemble one candidate's full injection bundle.
+
+    Combines the mechanical stars + first-contact channel
+    (``compute_candidate_stars``), the never-re-judged ``add_reason``
+    (the persisted first-contact reason, or a fresh snapshot when none is on
+    record — first contact or a legacy pre-318b row), and the rendered ledger
+    note lines. Pure given ``history`` + ``today_str`` — unit-tested without
+    any fa_scan wiring; the fa_scan layer only extracts ``sig`` from an entry
+    and persists/injects the result."""
+    # stars are still computed (041 gate + 051 KPI read them) but NOT injected
+    # into note_lines — design doc Q1 keeps the mechanical aggregate pre-LLM.
+    stars, channel, _ = compute_candidate_stars(sig, history)
+    add_reason = first_add_reason(history) or snapshot_add_reason(sig)
+    note_lines = format_ledger_note(history, today_str,
+                                    add_reason_fallback=add_reason)
+    return CandidateEnrichment(channel=channel, stars=stars,
+                               add_reason=add_reason, note_lines=note_lines)
