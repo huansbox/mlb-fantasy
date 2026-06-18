@@ -49,6 +49,7 @@ from ledger_enrich import (
     SOURCE_SCAN, SOURCE_OWNED_RISER,
 )
 from decision_gate import gate, ACTIONABLE
+from payload_budget import PayloadBudget, PayloadBudgetExceeded
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -2831,7 +2832,7 @@ def _filter_waiver_log_by_group(section_content, group_type, rostered_names=None
 
 def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
                          watch_tagged, changes, ref_1d, ref_3d, config,
-                         rostered_names=None):
+                         rostered_names=None, enrich_map=None):
     """Build Claude Layer 5 input string: mechanical report + context.
 
     Claude task is to text-ify the pre-computed Sum/urgency/tags/decision and
@@ -2845,6 +2846,7 @@ def _build_pass2_data_v2(group_type, urgency_result, low_conf, fa_tagged,
         return _build_pass2_data_batter_v4(
             urgency_result, low_conf, fa_tagged, watch_tagged,
             changes, ref_1d, ref_3d, config, rostered_names,
+            enrich_map=enrich_map,
         )
 
     lines = []
@@ -3104,13 +3106,50 @@ def _fmt_season_luck_part(sv: dict) -> str | None:
     return f"運氣 {res['gap']:+.3f}{sig}"
 
 
+# ── B1b / 318b: per-candidate payload injection point ──
+
+_PAYLOAD_MAX_LINES_PER_CAND = 3  # PRD User story 20: ≤3 new lines per candidate
+
+
+def _inject_318b_lines(name, enrichment, indent="   "):
+    """Assemble issue-318b injection lines for one candidate under a single
+    per-candidate line budget (User story 20's one enforcement point).
+
+    B1 contributes the ledger note (prev-verdict + add-reason + star). Later
+    slices append their own (slice_id, lines) pools below in priority order —
+    ledger is the churn-protection core and registers first, so if a future
+    slice pushes over budget the lowest-priority pools are the ones that yield.
+    Returns indented payload lines (possibly empty)."""
+    if enrichment is None:
+        return []
+    budget = PayloadBudget(max_lines=_PAYLOAD_MAX_LINES_PER_CAND)
+    # (slice_id, lines) in descending priority. B2-B5 append platoon / PA /
+    # swap / micro pools here.
+    pools = [("ledger", list(enrichment.note_lines or []))]
+    out = []
+    for slice_id, slice_lines in pools:
+        budget.register(slice_id, len(slice_lines))
+        out.extend(slice_lines)
+    try:
+        budget.assert_within(name)
+    except PayloadBudgetExceeded as e:
+        # B1's single pool can't exceed; the eviction policy (drop lowest
+        # priority pools first) is wired when B2+ adds competing pools.
+        print(f"  318b-inject: {e}", file=sys.stderr)
+    return [f"{indent}{line}" for line in out]
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
-                                 trad_14d: dict | None) -> list[str]:
+                                 trad_14d: dict | None,
+                                 enrichment=None) -> list[str]:
     """Render one batter (anchor or watch) as raw + percentile + 14d trad.
 
     Positions intentionally omitted — design §1.2 + §3.4 require evaluation
     on hitting data only; surfacing positions risks LLM reasoning like
     "2B is scarce so drop is risky".
+
+    ``enrichment`` (issue 318b): when present, the ledger note is appended as
+    the block's tail (prev-verdict + add-reason + star).
     """
     name = entry.get("name", "?")
     team = entry.get("team", "")
@@ -3167,18 +3206,23 @@ def _fmt_anchor_block_batter_v4(entry: dict, label: str,
         lines.append(f"  Prior 2025: {' / '.join(prior_parts)}")
     else:
         lines.append("  Prior 2025: 無資料")
+    lines.extend(_inject_318b_lines(entry.get("name", "?"), enrichment, "  "))
     return lines
 
 
 def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
                              trad_14d: dict | None,
                              owned: dict | None,
-                             age: int | None = None) -> list[str]:
+                             age: int | None = None,
+                             enrichment=None) -> list[str]:
     """Render one FA / watch batter as raw + percentile + 14d trad + %owned.
 
     age: current age from _fetch_ages_bulk — rendered on the prior line so
     breakout-vs-fluke priors have the age context (issue 033, 23 歲二年生
     跳級 vs 31 歲 fluke 的先驗完全不同).
+
+    enrichment (issue 318b): when present, the ledger note (prev-verdict +
+    add-reason + star) is appended as the block's tail.
     """
     name = entry.get("name", "?")
     team = entry.get("team", "")
@@ -3256,6 +3300,7 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
         lines.append(f"   Prior 2025: {' / '.join(prior_parts)}{age_part}")
     else:
         lines.append(f"   Prior 2025: 無資料 (新人 or 上季 PA 不足){age_part}")
+    lines.extend(_inject_318b_lines(name, enrichment, "   "))
     return lines
 
 
@@ -3282,7 +3327,7 @@ def _sort_fa_by_owned(fa_tagged: list[dict]) -> list[dict]:
 
 def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                                  watch_tagged, changes, ref_1d, ref_3d, config,
-                                 rostered_names=None):
+                                 rostered_names=None, enrich_map=None):
     """Batter v4 thin Pass-2 input string.
 
     Composition (per docs/batter-framework-upgrade-design.md §1):
@@ -3323,7 +3368,9 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
     if weakest_pool:
         for i, r in enumerate(weakest_pool, start=1):
-            lines.extend(_fmt_anchor_block_batter_v4(r, f"P{i}", trad_14d))
+            lines.extend(_fmt_anchor_block_batter_v4(
+                r, f"P{i}", trad_14d,
+                enrichment=(enrich_map or {}).get(r.get("name"))))
     else:
         lines.append("- 池為空：全隊打者 Sum 皆 ≥25（強），無 drop 候選")
 
@@ -3342,7 +3389,8 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
                 if today_str else None
             lines.extend(_fmt_fa_block_batter_v4(
-                f, idx, trad_14d, owned, age=ages.get(str(f.get("mlb_id", "")))))
+                f, idx, trad_14d, owned, age=ages.get(str(f.get("mlb_id", ""))),
+                enrichment=(enrich_map or {}).get(f.get("name"))))
     else:
         lines.append("\n--- FA 打者候選: 無通過品質門檻 ---")
 
@@ -3353,7 +3401,8 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             owned = enrich_owned_trend(w.get("name", ""), fa_history, today_str) \
                 if today_str else None
             lines.extend(_fmt_fa_block_batter_v4(
-                w, None, trad_14d, owned, age=ages.get(str(w.get("mlb_id", "")))))
+                w, None, trad_14d, owned, age=ages.get(str(w.get("mlb_id", ""))),
+                enrichment=(enrich_map or {}).get(w.get("name"))))
 
     # ── %owned 升幅 ──
     group_changes = [
@@ -3493,6 +3542,20 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
                 entry.update(fa_compute.compute_fa_tags(entry, anchor, group_type))
             watch_tagged.append(entry)
 
+        # Decision-ledger enrichment (issue 039): channel + stars + add_reason
+        # + rendered ledger note per candidate. Computed BEFORE Layer 5 so the
+        # note lines inject into the payload (318b), then reused at the
+        # waiver-log write point (persist channel/stars/add_reason) and the
+        # gate (notify). Best-effort — enrichment never blocks the scan.
+        enrich_map = {}
+        try:
+            enrich_map = build_ledger_enrich_map(
+                fa_tagged + watch_tagged,
+                DecisionLedger(DECISION_LEDGER_PATH), today_str)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
+                  file=sys.stderr)
+
         # ── Layer 5: Claude text layer ──
         print(f"  Layer 5 ({label}): Claude 文字化...", file=sys.stderr)
         prompt_path = os.path.join(SCRIPT_DIR, "prompt_fa_scan_pass2_batter.txt")
@@ -3500,7 +3563,7 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
         data = _build_pass2_data_v2(
             group_type, urgency_result, low_conf, fa_tagged, watch_tagged,
             changes, ref_1d, ref_3d, config,
-            rostered_names=rostered_names,
+            rostered_names=rostered_names, enrich_map=enrich_map,
         )
         advice = _call_claude(prompt_path, data, timeout=900)
 
@@ -3526,16 +3589,8 @@ def _process_group(group_type, config, savant_2026, enriched, watch_enriched,
             position_lookup = _build_position_lookup(
                 group_type, fa_candidates, watch_candidates, config,
             )
-            # Discovery channel + mechanical stars per candidate (issue 039 /
-            # 318a) — persisted onto the ledger at the write point. Best-effort.
-            enrich_map = {}
-            try:
-                enrich_map = build_ledger_enrich_map(
-                    fa_tagged + watch_tagged,
-                    DecisionLedger(DECISION_LEDGER_PATH), today_str)
-            except Exception as e:  # noqa: BLE001 — enrichment never blocks the scan
-                print(f"  ledger-enrich: skipped ({type(e).__name__}: {e})",
-                      file=sys.stderr)
+            # enrich_map computed before Layer 5 (above) — reused here to
+            # persist channel/stars/add_reason onto the recorded verdict.
             _update_waiver_log(advice, today_str, env, position_lookup, enrich_map)
             # Decision gate (issue 041): targeted ACT-NOW push for 4★+ verdicts
             # after the ledger reflects today's records.
