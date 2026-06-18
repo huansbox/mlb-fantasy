@@ -84,6 +84,8 @@ class CandidateEnrichment:
     note_lines: list = field(default_factory=list)   # B1: ledger note (budgeted)
     inline_tags: list = field(default_factory=list)  # B2/B5: header tags (not budgeted)
     owned_shape: str | None = None                   # B8: %owned shape → gate fast-lane
+    pa_line: str | None = None                       # B3: next-week PA proj (budgeted)
+    swap_line: str | None = None                     # B4: per-category swap (budgeted)
 
 
 def percentile_of(value, metric) -> int:

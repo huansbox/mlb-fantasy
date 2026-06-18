@@ -290,3 +290,50 @@ def test_parse_team_schedule_empty_inputs():
     assert _parse_team_schedule(None, 10) == []
     assert _parse_team_schedule({}, 10) == []
     assert _parse_team_schedule({"dates": []}, 10) == []
+
+
+# ── B3 / 318b: PA projection line + per-candidate budget eviction ──
+
+def test_inject_evicts_lowest_priority_over_budget():
+    # ledger 2 + pa 1 = 3 (full); swap is lowest priority → yields.
+    enr = CandidateEnrichment(note_lines=["[記事] a", "[原撿因] b"],
+                              pa_line="[下週量] c", swap_line="[換算] d")
+    out = _inject_318b_lines("X", enr, "")
+    assert out == ["[記事] a", "[原撿因] b", "[下週量] c"]
+    assert "[換算] d" not in out  # swap evicted (lowest priority)
+
+
+def test_inject_keeps_pa_and_swap_when_ledger_one_line():
+    # day-0 ledger = 1 line → pa + swap both fit (1+1+1 = 3).
+    enr = CandidateEnrichment(note_lines=["[記事] new"],
+                              pa_line="[下週量] pa", swap_line="[換算] sw")
+    out = _inject_318b_lines("X", enr, "")
+    assert out == ["[記事] new", "[下週量] pa", "[換算] sw"]
+
+
+def test_compute_pa_line_projects_weekly_pa():
+    from fa_scan import _compute_pa_line
+    future = [{"opp_hand": "R"}] * 4 + [{"opp_hand": "L"}] * 2
+    platoon = {"start_rate_vs_r": 0.95, "start_rate_vs_l": 0.92,
+               "overall_start_rate": 0.94}
+    line = _compute_pa_line(future, platoon)
+    assert line.startswith("[下週量]") and "PA" in line and "6 場" in line
+
+
+def test_compute_pa_line_strong_side_projects_fewer_pa():
+    # the volume blind spot, made visible: a strong-side bat facing mostly LHP
+    # projects fewer PA than an everyday bat over the same schedule.
+    from pa_projection import project_weekly_pa
+    future = [{"opp_hand": "L"}] * 5 + [{"opp_hand": "R"}]
+    strong = {"start_rate_vs_r": 0.9, "start_rate_vs_l": 0.1,
+              "overall_start_rate": 0.5}
+    everyday = {"start_rate_vs_r": 0.95, "start_rate_vs_l": 0.92,
+                "overall_start_rate": 0.94}
+    assert (project_weekly_pa(future, strong, 4.3)["projected_pa"]
+            < project_weekly_pa(future, everyday, 4.3)["projected_pa"])
+
+
+def test_compute_pa_line_none_on_insufficient_input():
+    from fa_scan import _compute_pa_line
+    assert _compute_pa_line([], {"overall_start_rate": 0.9}) is None
+    assert _compute_pa_line([{"opp_hand": "R"}], None) is None

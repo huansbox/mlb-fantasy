@@ -49,11 +49,12 @@ from ledger_enrich import (
     SOURCE_SCAN, SOURCE_OWNED_RISER,
 )
 from decision_gate import gate, ACTIONABLE
-from payload_budget import PayloadBudget, PayloadBudgetExceeded
+from payload_budget import PayloadBudget
 from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
 from batter_discipline import (
     compute_discipline, discipline_tag, fetch_batter_discipline_bulk)
 from platoon_classifier import classify_platoon, collect_platoon_games
+from pa_projection import project_weekly_pa
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -3128,19 +3129,22 @@ def _inject_318b_lines(name, enrichment, indent="   "):
     if enrichment is None:
         return []
     budget = PayloadBudget(max_lines=_PAYLOAD_MAX_LINES_PER_CAND)
-    # (slice_id, lines) in descending priority. B2-B5 append platoon / PA /
-    # swap / micro pools here.
+    # (slice_id, lines) in DESCENDING priority — ledger is the churn-protection
+    # core and registers first, so when the budget is tight the lower-priority
+    # PA (B3) / swap (B4) pools are the ones that yield. Inline tags (B2/B5)
+    # ride the header and are NOT budgeted here.
     pools = [("ledger", list(enrichment.note_lines or []))]
+    if enrichment.pa_line:
+        pools.append(("pa", [enrichment.pa_line]))
+    if enrichment.swap_line:
+        pools.append(("swap", [enrichment.swap_line]))
     out = []
     for slice_id, slice_lines in pools:
+        if budget.remaining() < len(slice_lines):
+            budget.register(slice_id, 0)   # yields — would breach the budget
+            continue
         budget.register(slice_id, len(slice_lines))
         out.extend(slice_lines)
-    try:
-        budget.assert_within(name)
-    except PayloadBudgetExceeded as e:
-        # B1's single pool can't exceed; the eviction policy (drop lowest
-        # priority pools first) is wired when B2+ adds competing pools.
-        print(f"  318b-inject: {e}", file=sys.stderr)
     return [f"{indent}{line}" for line in out]
 
 
@@ -3275,6 +3279,51 @@ def _fetch_batter_platoon(mlb_id, team_abbr, end_date, lookback_days=30):
         print(f"  platoon: failed for {mlb_id} ({type(e).__name__}: {e})",
               file=sys.stderr)
         return None
+
+
+# ── B3 / 318b: next-week PA projection (VPS-validated future schedule) ──
+
+_PA_PER_START_EST = 4.3  # league-typical PA for a starting batter in one game
+
+
+def _compute_pa_line(future_games, platoon, pa_per_start=_PA_PER_START_EST):
+    """Next-week PA projection line (issue 045 / B3), or None on insufficient
+    input. A budgeted independent line (not an inline tag): it makes the volume
+    gap explicit before a swap (the Arraez→Pederson −28%-PA lesson)."""
+    if not future_games or not platoon or not pa_per_start:
+        return None
+    proj = project_weekly_pa(future_games, platoon, pa_per_start)
+    if not proj.get("games"):
+        return None
+    return (f"[下週量] 預期 PA {proj['projected_pa']}"
+            f"（{proj['games']} 場 × 先發 {proj['expected_starts']}）")
+
+
+def _fetch_future_games(team_abbr, start_date, ahead_days=7):
+    """Future opponent-handedness games for the PA projection (issue 045 / B3):
+    [{opp_hand: "R"|"L"}] for the team's next ``ahead_days``. Best-effort,
+    VPS-validated (reuses the B2 schedule parse + pitchHand fetch)."""
+    from datetime import date, timedelta
+    try:
+        from stream_sp_scan import ABBR_TO_ID
+        team_id = ABBR_TO_ID.get(team_abbr)
+        if team_id is None:
+            return []
+        start = date.fromisoformat(start_date)
+        end = start + timedelta(days=ahead_days)
+        sched = mlb_api_get(
+            f"/schedule?sportId=1&teamId={team_id}"
+            f"&startDate={start.isoformat()}&endDate={end.isoformat()}"
+            f"&hydrate=probablePitcher")
+        team_games = _parse_team_schedule(sched, team_id)
+        hand_map = _fetch_pitch_hands({tg["opp_starter_id"] for tg in team_games})
+        return [{"opp_hand": hand_map[tg["opp_starter_id"]]}
+                for tg in team_games
+                if hand_map.get(tg["opp_starter_id"]) in ("R", "L")]
+    except Exception as e:  # noqa: BLE001
+        print(f"  pa-proj: future games failed ({type(e).__name__})",
+              file=sys.stderr)
+        return []
 
 
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
@@ -3562,6 +3611,10 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
                 if f.get("decision") in ("取代", "立即取代"):
                     platoon = _fetch_batter_platoon(
                         fid, f.get("team", ""), today_str)
+                    if platoon:  # B3 PA: future games × this platoon → PA line
+                        enr.pa_line = _compute_pa_line(
+                            _fetch_future_games(f.get("team", ""), today_str),
+                            platoon)
                 enr.inline_tags.extend(_compute_inline_tags(
                     f, f_age, ped, today_date,
                     disc_cur=disc_cur_bulk.get(fid),
