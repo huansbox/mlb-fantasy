@@ -114,3 +114,68 @@ def test_anchor_block_default_unchanged():
                                            enrichment=None)
     assert plain == explicit
     assert not any("[記事]" in l for l in plain)
+
+
+# ── B5 / 318b: post-hype inline tag ──
+
+import datetime as _dt
+
+from fa_scan import _compute_inline_tags
+
+
+def _ped(mlb_id=123456, rank=5, year=2024, updated="2026-03-01"):
+    from prospect_pedigree import parse_pedigree
+    return parse_pedigree({
+        "meta": {"updated": updated, "stale_after_month": 3},
+        "prospects": {str(mlb_id): {"best_rank": rank, "best_rank_year": year,
+                                    "name": "Test FA"}},
+    })
+
+
+def test_inline_tags_post_hype_fires_young_weak_pedigreed():
+    # top-5 prospect, age 23, weak season Sum → discount tag fires
+    entry = _fa_entry(mlb_id=123456, score=12)
+    tags = _compute_inline_tags(entry, age=23, ped=_ped(),
+                                today=_dt.date(2026, 6, 18))
+    assert any("post-hype 新秀" in t and "#5" in t for t in tags)
+
+
+def test_inline_tags_not_young_no_fire():
+    entry = _fa_entry(mlb_id=123456, score=12)
+    tags = _compute_inline_tags(entry, age=30, ped=_ped(),
+                                today=_dt.date(2026, 6, 18))
+    assert not any("post-hype" in t for t in tags)
+
+
+def test_inline_tags_strong_sum_no_fire():
+    # good Sum = results not weak → no discount needed
+    entry = _fa_entry(mlb_id=123456, score=26)
+    tags = _compute_inline_tags(entry, age=23, ped=_ped(),
+                                today=_dt.date(2026, 6, 18))
+    assert not any("post-hype" in t for t in tags)
+
+
+def test_inline_tags_stale_list_marks_overdue():
+    # list 2 years behind → stale wording, never silently trusted
+    entry = _fa_entry(mlb_id=123456, score=12)
+    tags = _compute_inline_tags(entry, age=23, ped=_ped(updated="2024-03-01"),
+                                today=_dt.date(2026, 6, 18))
+    assert any("post-hype 名單過期" in t for t in tags)
+
+
+def test_inline_tags_no_ped_empty():
+    assert _compute_inline_tags(_fa_entry(), 23, None,
+                                _dt.date(2026, 6, 18)) == []
+
+
+def test_fa_block_header_shows_inline_tags():
+    enr = CandidateEnrichment(stars=3,
+                              inline_tags=["✅ post-hype 新秀 (#5 2024)"])
+    lines = _fmt_fa_block_batter_v4(_fa_entry(), 1, None, None,
+                                    age=23, enrichment=enr)
+    assert "post-hype 新秀" in lines[0]  # appears in the header line
+
+
+def test_fa_block_header_no_inline_tags_when_absent():
+    lines = _fmt_fa_block_batter_v4(_fa_entry(), 1, None, None, age=23)
+    assert "post-hype" not in lines[0]

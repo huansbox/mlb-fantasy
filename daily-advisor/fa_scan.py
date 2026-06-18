@@ -50,6 +50,7 @@ from ledger_enrich import (
 )
 from decision_gate import gate, ACTIONABLE
 from payload_budget import PayloadBudget, PayloadBudgetExceeded
+from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -3139,6 +3140,24 @@ def _inject_318b_lines(name, enrichment, indent="   "):
     return [f"{indent}{line}" for line in out]
 
 
+def _compute_inline_tags(entry, age, ped, today):
+    """Issue-318b inline header tags for one batter candidate (B5 post-hype;
+    B2 platoon + B5 chase-zone land here too). Inline tags ride the header
+    (like add_tags/warn_tags) and do NOT consume the per-candidate line budget.
+    Best-effort — a tag that can't be computed is simply absent, never raises
+    into the scan."""
+    tags = []
+    if ped is not None and today is not None:
+        try:
+            t = post_hype_tag(ped, entry.get("mlb_id"), age,
+                              default_weak_signal(entry.get("score")), today)
+            if t:
+                tags.append(t)
+        except Exception:  # noqa: BLE001 — a tag never blocks the scan
+            pass
+    return tags
+
+
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
                                  trad_14d: dict | None,
                                  enrichment=None) -> list[str]:
@@ -3240,7 +3259,9 @@ def _fmt_fa_block_batter_v4(entry: dict, idx: int | None,
     pa_tg_str = f"{pa_per_tg:.2f}" if isinstance(pa_per_tg, (int, float)) else "?"
     add_tags = entry.get("add_tags", [])
     warn_tags = entry.get("warn_tags", [])
-    minimal_tags = list(add_tags) + list(warn_tags)
+    # 318b inline tags (post-hype / platoon / chase-zone) ride the header too.
+    inline_tags = list(enrichment.inline_tags) if enrichment else []
+    minimal_tags = list(add_tags) + list(warn_tags) + inline_tags
     tag_str = f" / {' '.join(minimal_tags)}" if minimal_tags else ""
 
     shape_str = ""
@@ -3363,6 +3384,19 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
     trad_14d = _fetch_14d_trad_bulk(trad_subjects)
     # Issue 033 ②: current age for FA + watch prior context (one bulk call)
     ages = _fetch_ages_bulk(list(fa_tagged) + list(watch_tagged))
+    # B5 post-hype: load the prospect pedigree once + resolve today as a date
+    # (best-effort — a missing asset or bad date just means no post-hype tags).
+    ped = None
+    try:
+        ped = load_pedigree()
+    except Exception as e:  # noqa: BLE001
+        print(f"  post-hype: pedigree unavailable ({type(e).__name__})",
+              file=sys.stderr)
+    try:
+        today_date = (datetime.strptime(today_str, "%Y-%m-%d").date()
+                      if today_str else None)
+    except ValueError:
+        today_date = None
 
     # ── 我方候選 drop ──
     lines.append("--- 我方候選 drop（Sum<25 進池，BBE<40 已排除，cant_cut 排除）---")
@@ -3388,9 +3422,13 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for idx, f in enumerate(fa_sorted, start=1):
             owned = enrich_owned_trend(f.get("name", ""), fa_history, today_str) \
                 if today_str else None
+            f_age = ages.get(str(f.get("mlb_id", "")))
+            enr = (enrich_map or {}).get(f.get("name"))
+            if enr is not None:
+                enr.inline_tags.extend(
+                    _compute_inline_tags(f, f_age, ped, today_date))
             lines.extend(_fmt_fa_block_batter_v4(
-                f, idx, trad_14d, owned, age=ages.get(str(f.get("mlb_id", ""))),
-                enrichment=(enrich_map or {}).get(f.get("name"))))
+                f, idx, trad_14d, owned, age=f_age, enrichment=enr))
     else:
         lines.append("\n--- FA 打者候選: 無通過品質門檻 ---")
 
@@ -3400,9 +3438,13 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
         for w in watch_tagged:
             owned = enrich_owned_trend(w.get("name", ""), fa_history, today_str) \
                 if today_str else None
+            w_age = ages.get(str(w.get("mlb_id", "")))
+            enr = (enrich_map or {}).get(w.get("name"))
+            if enr is not None:
+                enr.inline_tags.extend(
+                    _compute_inline_tags(w, w_age, ped, today_date))
             lines.extend(_fmt_fa_block_batter_v4(
-                w, None, trad_14d, owned, age=ages.get(str(w.get("mlb_id", ""))),
-                enrichment=(enrich_map or {}).get(w.get("name"))))
+                w, None, trad_14d, owned, age=w_age, enrichment=enr))
 
     # ── %owned 升幅 ──
     group_changes = [

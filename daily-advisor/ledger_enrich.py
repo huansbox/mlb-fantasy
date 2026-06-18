@@ -81,7 +81,8 @@ class CandidateEnrichment:
     channel: str | None = None
     stars: int | None = None
     add_reason: str | None = None
-    note_lines: list = field(default_factory=list)
+    note_lines: list = field(default_factory=list)   # B1: ledger note (budgeted)
+    inline_tags: list = field(default_factory=list)  # B2/B5: header tags (not budgeted)
 
 
 def percentile_of(value, metric) -> int:
