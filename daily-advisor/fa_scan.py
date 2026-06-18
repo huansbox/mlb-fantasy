@@ -53,6 +53,7 @@ from payload_budget import PayloadBudget, PayloadBudgetExceeded
 from prospect_pedigree import post_hype_tag, default_weak_signal, load_pedigree
 from batter_discipline import (
     compute_discipline, discipline_tag, fetch_batter_discipline_bulk)
+from platoon_classifier import classify_platoon, collect_platoon_games
 
 # Decision ledger (issue 038) — per-player verdict history. apply_waiver_log_block
 # emits (player, verdict) into a sink only at real mutation points, so the
@@ -3143,15 +3144,17 @@ def _inject_318b_lines(name, enrichment, indent="   "):
     return [f"{indent}{line}" for line in out]
 
 
-def _compute_inline_tags(entry, age, ped, today, disc_cur=None, disc_prior=None):
+def _compute_inline_tags(entry, age, ped, today, disc_cur=None, disc_prior=None,
+                         platoon=None):
     """Issue-318b inline header tags for one batter candidate (B5 post-hype +
-    chase/zone-contact; B2 platoon lands here too). Inline tags ride the header
-    (like add_tags/warn_tags) and do NOT consume the per-candidate line budget.
+    chase/zone-contact, B2 platoon). Inline tags ride the header (like
+    add_tags/warn_tags) and do NOT consume the per-candidate line budget.
     Best-effort — a tag that can't be computed is simply absent, never raises
     into the scan.
 
     disc_cur/disc_prior: this batter's {chase, zone_contact, pa} for the
-    current / prior season (looked up from the bulk Savant join), or None."""
+    current / prior season (looked up from the bulk Savant join), or None.
+    platoon: classify_platoon output dict (label/tag/start-rates), or None."""
     tags = []
     if ped is not None and today is not None:
         try:
@@ -3168,7 +3171,110 @@ def _compute_inline_tags(entry, age, ped, today, disc_cur=None, disc_prior=None)
                 tags.append(t)
         except Exception:  # noqa: BLE001
             pass
+    if platoon and platoon.get("tag"):
+        tags.append(platoon["tag"])
     return tags
+
+
+# ── B2 / 318b: platoon fetch (VPS-validated MLB Stats API; pure parse split out) ──
+
+
+def _parse_team_schedule(sched_json, team_id):
+    """Pure: MLB schedule JSON → [{game_pk, opp_starter_id}] for ``team_id``'s
+    games. Opponent = the side that isn't us; only games whose opponent has a
+    known probable/actual starter are kept (others can't be hand-classified)."""
+    out = []
+    for d in (sched_json or {}).get("dates", []):
+        for g in d.get("games", []):
+            gpk = g.get("gamePk")
+            sides = g.get("teams", {})
+            home, away = sides.get("home", {}), sides.get("away", {})
+            if home.get("team", {}).get("id") == team_id:
+                opp = away
+            elif away.get("team", {}).get("id") == team_id:
+                opp = home
+            else:
+                continue
+            opp_sp = (opp.get("probablePitcher") or {}).get("id")
+            if gpk and opp_sp:
+                out.append({"game_pk": gpk, "opp_starter_id": opp_sp})
+    return out
+
+
+def _fetch_pitch_hands(pids):
+    """Batch pitchHand lookup → {pid: "R"|"L"} (one /people call). Empty on
+    failure. VPS-validated."""
+    ids = [str(p) for p in pids if p]
+    if not ids:
+        return {}
+    try:
+        data = mlb_api_get(f"/people?personIds={','.join(ids)}")
+    except Exception:  # noqa: BLE001
+        return {}
+    out = {}
+    for person in data.get("people", []):
+        code = (person.get("pitchHand") or {}).get("code")
+        if person.get("id") and code in ("R", "L"):
+            out[person["id"]] = code
+    return out
+
+
+def _fetch_batter_started_map(mlb_id, season):
+    """{game_pk: started_bool} from a batter's hitting game log. Empty on
+    failure. VPS-validated."""
+    try:
+        data = mlb_api_get(f"/people/{mlb_id}/stats"
+                           f"?stats=gameLog&season={season}&group=hitting")
+    except Exception:  # noqa: BLE001
+        return {}
+    stats = data.get("stats") or []
+    splits = stats[0].get("splits", []) if stats else []
+    out = {}
+    for s in splits:
+        gpk = (s.get("game") or {}).get("gamePk")
+        if gpk is not None:
+            gs = int((s.get("stat") or {}).get("gamesStarted", 0) or 0)
+            out[gpk] = gs > 0
+    return out
+
+
+def _fetch_batter_platoon(mlb_id, team_abbr, end_date, lookback_days=30):
+    """Best-effort platoon classification for one batter (issue 044 / B2).
+
+    Schedule (team game_pk + opponent probable starter) × the batter's game log
+    (started per game) × opponent starter handedness → classify_platoon.
+    Returns None on any failure or too few classified games (the tag is simply
+    absent). VPS-validated: gated by the本機 Yahoo-touching hook; the MLB Stats
+    API response shapes are confirmed on the VPS."""
+    from datetime import date, timedelta
+    try:
+        from stream_sp_scan import ABBR_TO_ID
+        team_id = ABBR_TO_ID.get(team_abbr)
+        if team_id is None or not mlb_id:
+            return None
+        end = date.fromisoformat(end_date)
+        start = end - timedelta(days=lookback_days)
+        sched = mlb_api_get(
+            f"/schedule?sportId=1&teamId={team_id}"
+            f"&startDate={start.isoformat()}&endDate={end.isoformat()}"
+            f"&hydrate=probablePitcher")
+        team_games = _parse_team_schedule(sched, team_id)
+        if not team_games:
+            return None
+        started_map = _fetch_batter_started_map(mlb_id, end.year)
+        hand_map = _fetch_pitch_hands({tg["opp_starter_id"] for tg in team_games})
+        games, _counts = collect_platoon_games(
+            team_games,
+            get_started=lambda gpk: started_map.get(gpk, False),
+            get_pitch_hand=lambda pid: hand_map.get(pid))
+        games = [g for g in games if g.get("opp_hand") in ("R", "L")]
+        if len(games) < 5:  # too few classified games → no reliable signal
+            return None
+        return classify_platoon(games)
+    except Exception as e:  # noqa: BLE001
+        print(f"  platoon: failed for {mlb_id} ({type(e).__name__}: {e})",
+              file=sys.stderr)
+        return None
 
 
 def _fmt_anchor_block_batter_v4(entry: dict, label: str,
@@ -3450,10 +3556,17 @@ def _build_pass2_data_batter_v4(urgency_result, low_conf, fa_tagged,
             if enr is not None:
                 enr.owned_shape = (owned or {}).get("shape")  # B8 gate fast-lane
                 fid = f.get("mlb_id")
+                # B2 platoon: only for actionable swap candidates — the fetch is
+                # per-candidate (schedule + game log), not paid for every FA.
+                platoon = None
+                if f.get("decision") in ("取代", "立即取代"):
+                    platoon = _fetch_batter_platoon(
+                        fid, f.get("team", ""), today_str)
                 enr.inline_tags.extend(_compute_inline_tags(
                     f, f_age, ped, today_date,
                     disc_cur=disc_cur_bulk.get(fid),
-                    disc_prior=disc_prior_bulk.get(fid)))
+                    disc_prior=disc_prior_bulk.get(fid),
+                    platoon=platoon))
             lines.extend(_fmt_fa_block_batter_v4(
                 f, idx, trad_14d, owned, age=f_age, enrichment=enr))
     else:

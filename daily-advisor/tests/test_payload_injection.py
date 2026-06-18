@@ -219,3 +219,74 @@ def test_inline_tags_combines_post_hype_and_discipline():
                                 disc_cur=cur, disc_prior=prior)
     assert any("post-hype" in t for t in tags)
     assert any("選球進化" in t for t in tags)
+
+
+# ── B2 / 318b: platoon-share inline tag ──
+
+def test_inline_tags_strong_side_platoon_warns():
+    # the Arraez→Pederson -28% weekly-PA blind spot: a strong-side platoon bat
+    # gets the warning so a quality-only swap doesn't silently lose PA.
+    entry = _fa_entry(mlb_id=123456, score=26)
+    platoon = {"label": "strong_side", "tag": "⚠️ 強側平台 (vs RHP)",
+               "start_rate_vs_r": 0.9, "start_rate_vs_l": 0.1,
+               "overall_start_rate": 0.55}
+    tags = _compute_inline_tags(entry, 28, None, _dt.date(2026, 6, 18),
+                                platoon=platoon)
+    assert any("強側平台" in t for t in tags)
+
+
+def test_inline_tags_everyday_platoon_no_warn():
+    entry = _fa_entry(mlb_id=123456, score=26)
+    platoon = {"label": "everyday", "tag": None, "start_rate_vs_r": 0.95,
+               "start_rate_vs_l": 0.92, "overall_start_rate": 0.94}
+    tags = _compute_inline_tags(entry, 28, None, _dt.date(2026, 6, 18),
+                                platoon=platoon)
+    assert not any("平台" in t for t in tags)
+
+
+def test_inline_tags_no_platoon_no_tag():
+    entry = _fa_entry(mlb_id=123456, score=26)
+    tags = _compute_inline_tags(entry, 28, None, _dt.date(2026, 6, 18))
+    assert not any("平台" in t or "替補" in t for t in tags)
+
+
+# ── B2 / 318b: team schedule parse (pure; the fetch path is VPS-validated) ──
+
+def test_parse_team_schedule_picks_opponent_starter_by_side():
+    from fa_scan import _parse_team_schedule
+    sched = {"dates": [{"games": [{
+        "gamePk": 1,
+        "teams": {
+            "home": {"team": {"id": 10}, "probablePitcher": {"id": 100}},
+            "away": {"team": {"id": 20}, "probablePitcher": {"id": 200}},
+        }}]}]}
+    # our team home → opponent is away (starter 200); our team away → starter 100
+    assert _parse_team_schedule(sched, 10) == [{"game_pk": 1, "opp_starter_id": 200}]
+    assert _parse_team_schedule(sched, 20) == [{"game_pk": 1, "opp_starter_id": 100}]
+
+
+def test_parse_team_schedule_skips_missing_probable():
+    from fa_scan import _parse_team_schedule
+    sched = {"dates": [{"games": [{
+        "gamePk": 1,
+        "teams": {"home": {"team": {"id": 10}}, "away": {"team": {"id": 20}}},
+    }]}]}
+    assert _parse_team_schedule(sched, 10) == []  # no opponent starter → skip
+
+
+def test_parse_team_schedule_skips_unrelated_game():
+    from fa_scan import _parse_team_schedule
+    sched = {"dates": [{"games": [{
+        "gamePk": 1,
+        "teams": {
+            "home": {"team": {"id": 30}, "probablePitcher": {"id": 100}},
+            "away": {"team": {"id": 40}, "probablePitcher": {"id": 200}},
+        }}]}]}
+    assert _parse_team_schedule(sched, 10) == []  # our team not in this game
+
+
+def test_parse_team_schedule_empty_inputs():
+    from fa_scan import _parse_team_schedule
+    assert _parse_team_schedule(None, 10) == []
+    assert _parse_team_schedule({}, 10) == []
+    assert _parse_team_schedule({"dates": []}, 10) == []
