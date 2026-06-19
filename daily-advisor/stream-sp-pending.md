@@ -4,24 +4,6 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-06-18
-- recorded_at: 2026-06-18T14:06:00+08:00
-- last_recheck_at: —
-
-### TBD 場次（待補查）
-- LAA @ ATH (LAA away TBD)
-
-### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Sean Burke | CWS @ NYY | NYY (.834 🔴 / vs RHP .763) | 20% | 15/11 | <P25·P25-40·P25-40·<P25·P60-70 | ❌ 不推 | 對手 NYY 🔴 客場 + 無 elite 軸（最高 xwOBACON P60-70）+ Sum 15 偏弱；ERA 4.15/xERA 3.90 小幅 buy-low 但不顯著（luck null）。結構平庸 + 對位最差。樣本 medium |
-
-### 備註
-- 2026-06-18 首次評估（recorded 14:06）：1 位過 Rotation gate + Sum ≥15 + true_starter（Sean Burke）。Sum<15 hard floor 排除 1 位（Matthew Liberatore STL @ KC Sum 11 — vs LHP .683 對手偏弱但結構崩 xwOBACON .425 <P25）。owned_by_others 14 位（含 Sonny Gray / Joe Ryan / Bryan Woo / Aaron Nola / Sean Manaea / Trey Yesavage）+ 本隊 1 位（Parker Messick CLE @ MIL）。無 v4 缺數據 / Rotation gate 🚫 排除項。
-- TBD 1 場（LAA @ ATH，LAA away SP 未公布；ATH = Gage Jump 別隊），建議 TW 6/18 晚上/6/19 早上 `/stream-sp 2026-06-18 --tbd-only` 補查。
-- 用戶決策建議：本日無值得串流候選。Sean Burke 結構平庸（Sum 15 五軸無 elite）+ 客場到 Yankee Stadium 面對 14d .834 全聯盟最熱打線，串流 ROI 差。
-- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
-
 ## ET 2026-06-19
 - recorded_at: 2026-06-18T14:06:00+08:00
 - last_recheck_at: 2026-06-18T22:42:45+08:00
