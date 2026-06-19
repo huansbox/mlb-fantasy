@@ -42,6 +42,7 @@
 - 06-16：K% 28.3觸發線邊緣但OPS .631極弱+Savant Δ-0.046品質下滑；觸發兩項均未達（fa_scan）
 - 06-17：K% 29.6>28%觸發線+OPS .658極弱+Savant Δ-0.062品質下滑；觸發兩項均未達（fa_scan）
 - 06-18：K% 27.8<28% ✓+OPS .701>.700 ✓觸發技術性達成但OPS僅超.001+Savant Δ-0.059品質下滑=觸發品質極弱；原錨Duran離池需重新錨定（fa_scan）
+- 06-19：K% 27.8<28% ✓+OPS .701>.700 ✓觸發技術性達成但OPS僅超.001+Savant Δ-0.024品質下滑；原錨重定至Albies（P80/P60/P80 vs P60/P40/P0碾壓）但14d產量1HR/5R極弱不執行（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -78,6 +79,7 @@
 - 06-16：IL10持續；14d OPS .874/4HR傷前數據；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-17：IL10持續；14d OPS .916/4HR；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-18：IL10持續；14d OPS .916/4HR；K% 29.5偏高；P95/P95底穩；等IL回歸+先發確認（fa_scan）
+- 06-19：IL10持續；14d OPS .916/4HR；K% 29.5偏高；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -112,6 +114,7 @@
 - 06-16：14d OPS .932/K% 26.5持續回落接近25%目標；Savant運氣+0.143嚴重膨脹；PA-TG 2.97接近3.0；C-plan維持（fa_scan）
 - 06-17：14d OPS .888/K% 28.6持續回落（26.5→28.6微反彈）；Savant運氣+0.087膨脹；PA-TG 2.99接近3.0；C-plan維持（fa_scan）
 - 06-18：14d OPS .844/K% 30.6反彈（28.6→30.6）；Savant Δ-0.047品質下滑；觸發K%≤28%遠未達；7%零壓力（fa_scan）
+- 06-19：14d K% 30.6反彈（28.6→30.6）+chase崩壞+Savant Δ-0.068品質下滑；觸發K%≤28%距離拉大；7%零壓力；接近結案邊緣（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -129,6 +132,7 @@
 - 06-16：[取代→Mauricio Dubón] [取代→Mauricio Dubón] 14d OPS .943 day 3/7；Savant Δ+0.019品質上升；4HR/11R爆發；P70/P50/P70/P80 vs Dubón P60/P25/P25/P0全面碾壓；2%零壓力（fa_scan）
 - 06-17：[立即取代→Mauricio Dubón] ⚠️已推薦3天未執行；14d OPS 1.032/5HR/11R爆發；Savant Δ+0.061品質上升；P70/P55/P70/P80 vs Dubón P60/P25/P25/P0全面碾壓；2%零壓力（fa_scan）
 - 06-18：[立即取代→Ozzie Albies] ⚠️已推薦4天未執行；錨點從Dubón上移至Albies（因McLain優先取代Dubón）；14d OPS .915/4HR/9R；P70/P55/P70/P80 vs Albies P60/P40/P0/P0全面碾壓；2%零壓力（fa_scan）
+- 06-19：[立即取代→Ozzie Albies] [立即取代→Ozzie Albies] ⚠️已推薦5天未執行；14d OPS 1.084/5HR/12RBI/10R全面爆發；P70/P55/P70/P80 vs Albies P60/P40/P0/P0碾壓；2%零壓力（fa_scan）
 
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -146,6 +150,7 @@
 - 06-16：IL10持續；PA-TG 2.12持續下滑；觸發3.0遠未達（fa_scan）
 - 06-17：IL10持續；PA-TG 2.09持續下滑；觸發3.0遠未達（fa_scan）
 - 06-18：IL10持續；PA-TG 2.12持續低迷；觸發3.0遠未達（fa_scan）
+- 06-19：IL10持續；PA-TG 2.14持續低迷；觸發3.0遠未達（fa_scan）
 
 ### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -162,6 +167,7 @@
 - 06-16：14d OPS .943/4HR/1SB；PA-TG 2.05觸發2.5遠未達；2%零壓力（fa_scan）
 - 06-17：14d OPS .901/4HR/1SB；K% 32.7高；PA-TG 2.08觸發2.5遠未達；2%零壓力（fa_scan）
 - 06-18：14d OPS .901/4HR/1SB；K% 32.7高；PA-TG 2.05觸發2.5遠未達；Savant Δ-0.044品質下滑；2%零壓力（fa_scan）
+- 06-19：PA-TG 2.05停滯+chase崩壞+Savant Δ-0.044品質下滑；觸發2.5遠未達；接近結案邊緣（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
@@ -174,6 +180,7 @@
 - 06-16：14d K% 30.9從32.7微降仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
 - 06-17：14d K% 27.3首次跌破28%觸發線 day 1/5 + OPS .962≥.800 ✓；P80/P95/P95/P80；需連5天維持（fa_scan）
 - 06-18：14d K% 27.3首次跌破28%觸發線 day 2/5 + OPS .866≥.800 ✓；P80/P95/P95/P80；Savant Δ+0.081品質大幅上升；需連5天維持（fa_scan）
+- 06-19：14d K% 28.8回升>28%觸發線 counter歸零（27.3→28.8）；OPS .887≥.800 ✓但K%未達；Savant Δ+0.060品質大幅上升；P80/P95/P95/P80；6%零壓力（fa_scan）
 
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
@@ -186,6 +193,7 @@ vs：待定
 - 06-16：14d OPS .975/Savant Δ+0.023品質上升；BBE 155觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
 - 06-17：14d OPS .938/Savant Δ+0.010品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
 - 06-18：14d OPS .973/Savant Δ+0.038品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
+- 06-19：14d OPS .973/Savant Δ+0.051品質上升；BBE 161觸發180接近中；prior P0未確認+Coors；1%零壓力（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -195,6 +203,7 @@ vs：Mauricio Dubón
 - 06-16：14d K% 39.3極端spike惡化（36.4→39.3）；OPS .824；Savant Δ-0.034品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
 - 06-17：14d K% 39.3極端spike持續惡化（36.4→39.3）；OPS .776；Savant Δ-0.058品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
 - 06-18：14d K% 39.3極端spike持續；OPS .679崩；Savant Δ-0.044品質下滑；觸發K%≤28%極遠；43% owned（fa_scan）
+- 06-19：14d K% 39.3極端spike持續；OPS .679崩盤；Savant Δ-0.054品質下滑；觸發K%≤28%極遠；43% owned（fa_scan）
 
 ## 隊上觀察
 
@@ -373,6 +382,7 @@ vs：Mauricio Dubón
 - 06-12：P95/P95 + 14d 5HR 爆發；DTD 等回歸（fa_scan）
 - 06-13：P95/P95/P60/P80 菁英 + prior confirmed；14d OPS .978/4HR；PA-TG 3.00 + 5% dropping（fa_scan）
 - 06-16：P80/P95/P60/P80 season優良；14d OPS .863/Savant Δ+0.021品質上升+運氣-0.063 buy-low；PA-TG 2.97接近3.0；4%零壓力（fa_scan）
+- 06-19：14d OPS .784穩健；Savant Δ+0.005持平+運氣-0.071重度buy-low；PA-TG 2.99接近3.0；P95/P95/P60/P80；zone-contact -4.4；4%零壓力（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
@@ -380,6 +390,7 @@ vs：Mauricio Dubón
 - 06-11：xwOBA P95/BB% P95 結構碾壓但 PA-TG 2.78 + prior P40/P0/P0 breakout 未確認（fa_scan）
 - 06-12：Season P95/P95 breakout 但 prior P40/P0/P0 未確認；PA-TG 2.78 低（fa_scan）
 - 06-18：P95/P95/P70/P60結構菁英但14d OPS .726冷+PA-TG 2.81不足；prior P40→P95 breakout需樣本驗證（fa_scan）
+- 06-19：14d OPS .726弱但Savant Δ+0.024品質上升+運氣-0.042 buy-low；P95/P95/P70菁英；BBE 144觸發160未達；21%（fa_scan）
 
 ### Luke Raley (SEA, 1B,LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
