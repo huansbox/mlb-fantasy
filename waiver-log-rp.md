@@ -17,6 +17,29 @@
 
 ## FA 觀察中
 
+### Tyler Rogers（TOR, RP）— 2026-06-19 掃描首選（建議撿，待執行）
+
+- **2026-06-19 /rp-svh 掃描**：rank-sum #3（22.0），但對「搶 punt 對手 SV+H 類別」目標為 **floor 最高**首選 → 建議 FA add（$0 即時生效），與 Ferrer 並列形成雙 hold 來源（1 RP → 2 RP）。
+- 數據：30d SV+H **10（候選池最高）**、14d 4（0SV/4H）、BB/9 2.57、whiff% 15%†、ERA **1.80** / IP 35、recent 10g 0SV/7H、BS 2 / SVO 4、21% owned。
+- † submarine 投手，低 whiff 是球路特性（靠滾地球），RP whiff 屬 second-order 不扣分。
+- role：TOR 高 volume hold 機器、rubber arm（出賽 MLB top 6），牛棚因先發傷兵吃重 → 出場頻率最高；高 leverage setup（closer = Louis Varland），偶有 spot save。角色穩、無擠壓。
+- **選他理由**：池內 30d 產出最高 + 本週 7 場最多（@CHC×3 含 6/20·6/21 / HOU×3 / TEX）+ 純 hold 低 variance（不必等球隊領先）+ ERA 1.80 不毒 ratio → 對 punt 對手「本週保證有產出」floor 最高。
+- **監看點**：spot save 頻率（若 Varland 受傷可短期升 SV 路徑）；rubber arm 過勞風險；ERA/WHIP 是否回吐。
+- 機會成本：撿入需 drop 一名現有球員（讓出 SP 串流格／替補位），drop 對象交 /weekly-review 或 /player-eval 定。
+
+### Jason Adam（SD, RP）— 2026-06-19 掃描次選（純 hold 備援）
+
+- 2026-06-19 rank-sum #2（19.5）。30d SV+H 7、14d 4（0SV/4H）、BB/9 2.73、whiff% 27%、ERA **1.71** / IP 26、18% owned。
+- role：SD 8th setup 鎖定（closer = Mason Miller，無 SV 路徑），對手 Estrada 進 IL → 角色更鞏固。純 hold、ERA 極佳不毒 ratio。
+- **次於 Rogers 之處**：30d 7 < 10、本週 6 場 < 7。若 Rogers 被別隊先撿走，Adam 是乾淨替代。
+
+### Tanner Scott（LAD, RP）— 2026-06-19 SV 路徑備援
+
+- 2026-06-19 rank-sum #1（14.5）。30d SV+H 6、14d 3（3SV/0H）、BB/9 **0.87**（控球菁英）、whiff% 34%、ERA 2.32 / IP 31、recent 10g 5SV/1H、BS 1 / SVO 10、**48% owned**。
+- role：LAD 功能性 closer（committee 名義，Roberts 點名 save 主要給他），Díaz 7-8 月才回。唯一真 SV 路徑候選。
+- **不選為首選的理由**：committee 稀釋 save 機會（30d 才 6）+ SV 依賴球隊領先才有 situation，頻率低於 hold；48% owned 競爭撿人風險高。
+- **觸發條件**：若想 SV+H 類別不只贏、想拉開差距累積 SV → Scott 是 SV 路徑首選，但須立刻搶（owned% 高）。
+
 ### Rico Garcia（BAL, RP）— 短期 SV 窗口
 
 - 2026-05-19 掃描 rank-sum #3（24.5），38% owned（聯盟關注度高）、ERA 0.45、14d 3（2SV/1H）。
