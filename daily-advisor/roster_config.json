@@ -41,7 +41,7 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "BN",
+      "selected_pos": "1B",
       "status": ""
     },
     {
@@ -64,8 +64,8 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "3B",
-      "status": ""
+      "selected_pos": "Util",
+      "status": "DTD"
     },
     {
       "name": "Manny Machado",
@@ -86,7 +86,7 @@
         "pa": 678,
         "g": 159
       },
-      "selected_pos": "BN",
+      "selected_pos": "3B",
       "status": ""
     },
     {
@@ -108,7 +108,7 @@
         "pa": 542,
         "g": 126
       },
-      "selected_pos": "CF",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -165,7 +165,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "1B",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -187,8 +187,8 @@
       "positions": [
         "2B"
       ],
-      "selected_pos": "Util",
-      "status": "",
+      "selected_pos": "IL",
+      "status": "IL10",
       "prior_stats": {
         "season": 2025,
         "xwoba": 0.363,
@@ -210,7 +210,7 @@
         "2B",
         "CF"
       ],
-      "selected_pos": "Util",
+      "selected_pos": "CF",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -262,7 +262,7 @@
         "CF",
         "RF"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "LF",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -274,6 +274,29 @@
         "pa_per_team_g": 2.38,
         "pa": 386,
         "g": 119
+      }
+    },
+    {
+      "name": "Matt McLain",
+      "mlb_id": 680574,
+      "yahoo_player_key": "469.p.12390",
+      "team": "CIN",
+      "positions": [
+        "2B",
+        "SS"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.29,
+        "barrel_pct": 7.7,
+        "hh_pct": 40.7,
+        "bb_pct": 9.5,
+        "ops": 0.643,
+        "pa_per_team_g": 3.56,
+        "pa": 577,
+        "g": 147
       }
     }
   ],
@@ -351,7 +374,7 @@
         "xwobacon": 0.37
       },
       "selected_pos": "IL",
-      "status": "IL15"
+      "status": "IL60"
     },
     {
       "name": "Parker Messick",
@@ -405,32 +428,6 @@
       }
     },
     {
-      "name": "Keider Montero",
-      "mlb_id": 672456,
-      "yahoo_player_key": "469.p.63428",
-      "team": "DET",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "P",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.67,
-        "xwoba_allowed": 0.333,
-        "hh_pct_allowed": 39.4,
-        "barrel_pct_allowed": 8.1,
-        "bbe": 284,
-        "era": 4.37,
-        "ip": 90.7,
-        "ip_per_gs": 4.8,
-        "whiff_pct": 19.5,
-        "gb_pct": 31.4,
-        "xwobacon": 0.377
-      }
-    },
-    {
       "name": "J.T. Ginn",
       "mlb_id": 669372,
       "yahoo_player_key": "469.p.12158",
@@ -461,7 +458,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -483,7 +480,7 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
