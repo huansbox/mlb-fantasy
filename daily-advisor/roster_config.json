@@ -65,7 +65,7 @@
         "g": 130
       },
       "selected_pos": "Util",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Manny Machado",
@@ -537,6 +537,29 @@
         "era": 4.93,
         "ip": 126.0,
         "ip_per_gs": 5.0
+      }
+    },
+    {
+      "name": "Jason Adam",
+      "mlb_id": 592094,
+      "yahoo_player_key": "469.p.11009",
+      "team": "SD",
+      "positions": [
+        "RP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 2.76,
+        "xwoba_allowed": 0.26,
+        "hh_pct_allowed": 38.0,
+        "barrel_pct_allowed": 7.0,
+        "bbe": 171,
+        "era": 1.93,
+        "k_per_9": 9.64,
+        "ip_per_team_g": 0.4,
+        "ip": 65.3
       }
     }
   ],
