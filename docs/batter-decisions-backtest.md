@@ -42,3 +42,16 @@ Decision KPIs (issue 051):
 - ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
 - 🔁 regret（撿入後 30 天內再推薦）: 0
 
+
+## Weekly Batter Backtest 2026-06-21 (no due episodes)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 0 (replace 0 / watch 0; episodes in lookback: 25) — 0 筆可對帳
+- Judge panel（issue 030）: 0 筆可判（無完整 scorecard 的帳）— 0 calls
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 0（hit-rate —）/ not-executed 0（hit-rate —）
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 0/0 (—) / ≤3★ 0/0 (—)
+- ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 0
+

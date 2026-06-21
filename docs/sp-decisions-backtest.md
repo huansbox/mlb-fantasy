@@ -296,3 +296,22 @@ By action:
 - `watch` n=0 (actionable 0) hit_rate=—
 - `pass` n=0 (actionable 0) hit_rate=—
 
+
+## Weekly Backtest 2026-06-21 (2026-05-28 ~ 2026-05-31)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 4 (actionable: 2; episodes in lookback: 16)
+- Hit rate: 0%
+- Average marginal benefit (xwOBACON Δ favoring add): -0.0385
+
+By action:
+- `drop_X_add_Y` n=3 (actionable 2) hit_rate=0%
+- `watch` n=0 (actionable 0) hit_rate=—
+- `pass` n=1 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-05-28 (1d) `pass` pass → **neutral**
+- 2026-05-29 (1d) `drop_X_add_Y` drop Coleman Crow → add Trevor McDonald → **miss**, Δ -0.005
+- 2026-05-30 (1d) `drop_X_add_Y` drop Luis Severino → add Trevor McDonald → **neutral**
+- 2026-05-31 (1d) `drop_X_add_Y` drop Keider Montero → add Trevor McDonald → **miss**, Δ -0.072
+
