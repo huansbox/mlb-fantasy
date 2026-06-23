@@ -281,6 +281,7 @@ vs：Christian Walker
 
 ### Shane Drohan (MIL, SP,RP) — 被搶（自動偵測）
 - 2026-06-12：Yahoo ownership_type=team，從觀察中移除。
+- 06-23：Drohan beats Buehler in 3 of 5 slots by visible margins — Whiff 28.4 (p80) vs 18.59 (p0), xwOBACON .328 (p95) vs .379 (p25), and BB/9 2.64 vs 2.85 — with BBE 136 and a stable 21d xwOBACON (.322, Δ -.0（fa_scan）
 
 ### Jac Caglianone (KC, 1B,RF) — 被搶（自動偵測）
 - 2026-06-12：Yahoo ownership_type=team，從觀察中移除。

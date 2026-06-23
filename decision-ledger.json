@@ -905,5 +905,16 @@
    "stars": 3,
    "executed_ts": null
   }
+ ],
+ "Shane Drohan": [
+  {
+   "player": "Shane Drohan",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }
