@@ -125,6 +125,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .337 / BB% 9.15 / Barrel% 12.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -235,6 +244,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Kyle Manzardo": [
@@ -304,6 +322,15 @@
    "player": "Kyle Manzardo",
    "verdict": "watch",
    "ts": "2026-06-20",
+   "add_reason": "xwOBA .313 / BB% 10.57 / Barrel% 11.4",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "Kyle Manzardo",
+   "verdict": "watch",
+   "ts": "2026-06-23",
    "add_reason": "xwOBA .313 / BB% 10.57 / Barrel% 11.4",
    "channel": "structure",
    "stars": 4,
@@ -409,6 +436,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Andrew Benintendi",
+   "verdict": "取代",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .322 / BB% 8.26 / Barrel% 10.8",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Vaughn Grissom": [
@@ -478,6 +514,15 @@
    "player": "Vaughn Grissom",
    "verdict": "watch",
    "ts": "2026-06-20",
+   "add_reason": "xwOBA .344 / BB% 9.2 / Barrel% 7.3",
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
+  },
+  {
+   "player": "Vaughn Grissom",
+   "verdict": "watch",
+   "ts": "2026-06-23",
    "add_reason": "xwOBA .344 / BB% 9.2 / Barrel% 7.3",
    "channel": "structure",
    "stars": 2,
@@ -555,6 +600,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Heriberto Hernández",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .350 / BB% 8.44 / Barrel% 8.9",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Garrett Mitchell": [
@@ -628,6 +682,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Garrett Mitchell",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .337 / BB% 12.39 / Barrel% 14.7 / 14d xwOBA .397",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kyle Karros": [
@@ -697,6 +760,15 @@
    "player": "Kyle Karros",
    "verdict": "watch",
    "ts": "2026-06-20",
+   "add_reason": "xwOBA .339 / BB% 12.4 / Barrel% 7.5 / 14d xwOBA .390",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Kyle Karros",
+   "verdict": "watch",
+   "ts": "2026-06-23",
    "add_reason": "xwOBA .339 / BB% 12.4 / Barrel% 7.5 / 14d xwOBA .390",
    "channel": "structure",
    "stars": 3,
@@ -822,6 +894,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .313 / BB% 11.31 / Barrel% 13.8",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Gabriel Moreno": [
@@ -904,6 +985,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Trevor Larnach",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .335 / BB% 12.27 / Barrel% 6.9 / 14d xwOBA .441",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Shane Drohan": [
@@ -914,6 +1004,28 @@
    "add_reason": null,
    "channel": null,
    "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Victor Caratini": [
+  {
+   "player": "Victor Caratini",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .347 / BB% 9.81 / Barrel% 7.1 / 14d xwOBA .389",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  }
+ ],
+ "Royce Lewis": [
+  {
+   "player": "Royce Lewis",
+   "verdict": "watch",
+   "ts": "2026-06-23",
+   "add_reason": "xwOBA .298 / BB% 9.78 / Barrel% 12.7",
+   "channel": "structure",
+   "stars": 2,
    "executed_ts": null
   }
  ]

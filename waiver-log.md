@@ -44,6 +44,7 @@
 - 06-18：K% 27.8<28% ✓+OPS .701>.700 ✓觸發技術性達成但OPS僅超.001+Savant Δ-0.059品質下滑=觸發品質極弱；原錨Duran離池需重新錨定（fa_scan）
 - 06-19：K% 27.8<28% ✓+OPS .701>.700 ✓觸發技術性達成但OPS僅超.001+Savant Δ-0.024品質下滑；原錨重定至Albies（P80/P60/P80 vs P60/P40/P0碾壓）但14d產量1HR/5R極弱不執行（fa_scan）
 - 06-20：K% 28.3觸發線邊緣但OPS .663極弱+14d 1HR/2RBI/4R產量無貢獻；觸發品質不足不執行（fa_scan）
+- 06-23：14d K% 21.6<28% ✓但OPS .690<.700差.010未達+1HR/2RBI產量極弱+Savant Δ-0.029;觸發OPS項未達（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -82,6 +83,7 @@
 - 06-18：IL10持續；14d OPS .916/4HR；K% 29.5偏高；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-19：IL10持續；14d OPS .916/4HR；K% 29.5偏高；P95/P95底穩；等IL回歸+先發確認（fa_scan）
 - 06-20：14d OPS .948/4HR/8R強勁；K% 31.6異常高需觀察；P95/P95底穩；確認先發+K%回落中（fa_scan）
+- 06-23：xwOBA P95/BB% P95+14d OPS .929強;%owned 10%未破30%觸發線;Swanson錨未過brand bias警戒;鎖窗口維持watch（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 觀察中
 觸發：立即行動
@@ -118,6 +120,7 @@
 - 06-18：14d OPS .844/K% 30.6反彈（28.6→30.6）；Savant Δ-0.047品質下滑；觸發K%≤28%遠未達；7%零壓力（fa_scan）
 - 06-19：14d K% 30.6反彈（28.6→30.6）+chase崩壞+Savant Δ-0.068品質下滑；觸發K%≤28%距離拉大；7%零壓力；接近結案邊緣（fa_scan）
 - 06-20：14d K% 23.5大幅改善（30.6→23.5）+OPS .950回升；但chase崩壞flag；暫緩結案觀察K%改善是否持續（fa_scan）
+- 06-23：14d OPS .711/K% 27.8接近28%但chase崩壞flag+xwOBA僅P60;觸發K%改善需持續驗證;7%零壓力（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -137,6 +140,7 @@
 - 06-18：[立即取代→Ozzie Albies] ⚠️已推薦4天未執行；錨點從Dubón上移至Albies（因McLain優先取代Dubón）；14d OPS .915/4HR/9R；P70/P55/P70/P80 vs Albies P60/P40/P0/P0全面碾壓；2%零壓力（fa_scan）
 - 06-19：[立即取代→Ozzie Albies] [立即取代→Ozzie Albies] ⚠️已推薦5天未執行；14d OPS 1.084/5HR/12RBI/10R全面爆發；P70/P55/P70/P80 vs Albies P60/P40/P0/P0碾壓；2%零壓力（fa_scan）
 - 06-20：[立即取代→Ozzie Albies] [立即取代→Ozzie Albies] ⚠️已推薦5天未執行；14d OPS .968/4HR/10RBI/9R；P70/P55/P70/P80 vs Albies P60/P25/P0/P0碾壓；2%零壓力（fa_scan）
+- 06-23：[取代→Ozzie Albies] 14d OPS .804>.800 ✓但從1.08回落+Savant Δ-0.028轉負品質下滑;3HR/9RBI;P70/P50/P70/P80 vs Albies P60/P40/P0/P0仍碾壓;⚠️已連續推薦取代6掃描日未執行;案子冷卻維持取代不升立即取代（fa_scan）
 
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -156,6 +160,7 @@
 - 06-18：IL10持續；PA-TG 2.12持續低迷；觸發3.0遠未達（fa_scan）
 - 06-19：IL10持續；PA-TG 2.14持續低迷；觸發3.0遠未達（fa_scan）
 - 06-20：PA-TG 2.14持續低迷+14d 2HR/14RBI/7R產量尚可但0SB；觸發3.0遠未達；P95結構仍在（fa_scan）
+- 06-23：PA-TG 2.12持續低迷+14d 2HR/14RBI/8R產量尚可但0SB;觸發PA-TG 3.0遠未達;P80結構仍在（fa_scan）
 
 ### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 觀察中
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
@@ -174,6 +179,7 @@
 - 06-18：14d OPS .901/4HR/1SB；K% 32.7高；PA-TG 2.05觸發2.5遠未達；Savant Δ-0.044品質下滑；2%零壓力（fa_scan）
 - 06-19：PA-TG 2.05停滯+chase崩壞+Savant Δ-0.044品質下滑；觸發2.5遠未達；接近結案邊緣（fa_scan）
 - 06-20：PA-TG 2.08停滯+chase崩壞+K% 32.7+Savant Δ-0.044品質下滑；觸發2.5遠未達；接近結案（fa_scan）
+- 06-23：PA-TG 2.10停滯(角色鎖局)+chase崩壞+K% 33.9高+Savant Δ持平;觸發PA-TG 2.5遠未達;xwOBA P95結構未轉弱故暫不結案但持續接近結案邊緣（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
@@ -188,6 +194,7 @@
 - 06-18：14d K% 27.3首次跌破28%觸發線 day 2/5 + OPS .866≥.800 ✓；P80/P95/P95/P80；Savant Δ+0.081品質大幅上升；需連5天維持（fa_scan）
 - 06-19：14d K% 28.8回升>28%觸發線 counter歸零（27.3→28.8）；OPS .887≥.800 ✓但K%未達；Savant Δ+0.060品質大幅上升；P80/P95/P95/P80；6%零壓力（fa_scan）
 - 06-20：14d K% 28.8回升>28%觸發線counter歸零；OPS .965+Savant Δ+0.060品質上升；P80/P95/P95/P80；6%零壓力（fa_scan）
+- 06-23：14d K% 29.8>28%觸發線counter歸零+OPS .825≥.800 ✓但K%未達;Savant Δ+0.020;P80/P95/P80;6%零壓力（fa_scan）
 
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
@@ -202,6 +209,7 @@ vs：待定
 - 06-18：14d OPS .973/Savant Δ+0.038品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
 - 06-19：14d OPS .973/Savant Δ+0.051品質上升；BBE 161觸發180接近中；prior P0未確認+Coors；1%零壓力（fa_scan）
 - 06-20：14d OPS .915/K% 6.5極低+Savant Δ+0.053品質上升；BBE 161→180接近中；prior P0未確認+Coors；2%零壓力（fa_scan）
+- 06-23：14d OPS .894+xwOBA P80 ✓;BBE 165接近180觸發線但未達;Savant Δ-0.036轉品質下滑;prior P0未確認+Coors;2%零壓力（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -213,11 +221,23 @@ vs：Mauricio Dubón
 - 06-18：14d K% 39.3極端spike持續；OPS .679崩；Savant Δ-0.044品質下滑；觸發K%≤28%極遠；43% owned（fa_scan）
 - 06-19：14d K% 39.3極端spike持續；OPS .679崩盤；Savant Δ-0.054品質下滑；觸發K%≤28%極遠；43% owned（fa_scan）
 - 06-20：14d K% 37.0極端spike+OPS .678崩盤+Savant Δ-0.068品質下滑；觸發K%≤28%極遠；42% owned（fa_scan）
+- 06-23：14d K% 34.5極端spike(從39微降仍遠超28%)+OPS .734<.750;Savant Δ-0.019;觸發K%≤28%極遠;K%spike疑傷待觀察;42% owned（fa_scan）
 
 ### Trevor Larnach (MIN, LF,RF) [mlb_id:663616] — 觀察中
 觸發：14d OPS ≥.850 連 7 天 + BBE ≥160 + xwOBA pctile ≥P80
 vs：Christian Walker
 - 06-20：Season P80/P95/P40/P0；14d OPS .931+Savant Δ+0.106品質飆升；prior P60確認；PA-TG 2.89偏低+Barrel% P40 power不足需驗證（fa_scan）（fa_scan）
+- 06-23：14d OPS .931≥.850 ✓+xwOBA P80 ✓+Savant Δ+0.069品質飆升+3d rising;BBE 158僅差2未達160;Barrel% P40 power不足為唯一保留;逼近觸發vs Christian Walker（fa_scan）
+
+### Victor Caratini (MIN, C,1B) [mlb_id:605170] — 觀察中
+觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
+vs：Ozzie Albies
+- 06-23：14d OPS 1.128/3HR/10RBI/K% 15.4;雙年P80/P70(prior確認);season運氣-0.032 buy-low;C+PA-TG 2.67限局為gate（fa_scan）
+
+### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
+觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
+vs：Christian Walker
+- 06-23：14d OPS .908/4HR/2SB+Barrel% P80真power+Savant Δ+0.032上升;但xwOBA P50中等+PA-TG 2.30限局需PT確認（fa_scan）
 
 ## 隊上觀察
 
