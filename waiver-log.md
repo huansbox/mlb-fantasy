@@ -232,13 +232,6 @@ vs：Mauricio Dubón
 - 06-23：14d K% 34.5極端spike(從39微降仍遠超28%)+OPS .734<.750;Savant Δ-0.019;觸發K%≤28%極遠;K%spike疑傷待觀察;42% owned（fa_scan）
 - 06-24：14d K% 33.9極端spike(疑傷)+OPS .719<.750;Savant Δ-0.021品質下滑;觸發K%≤28%極遠;42% owned（fa_scan）
 
-### Trevor Larnach (MIN, LF,RF) [mlb_id:663616] — 觀察中
-觸發：14d OPS ≥.850 連 7 天 + BBE ≥160 + xwOBA pctile ≥P80
-vs：Christian Walker
-- 06-20：Season P80/P95/P40/P0；14d OPS .931+Savant Δ+0.106品質飆升；prior P60確認；PA-TG 2.89偏低+Barrel% P40 power不足需驗證（fa_scan）（fa_scan）
-- 06-23：14d OPS .931≥.850 ✓+xwOBA P80 ✓+Savant Δ+0.069品質飆升+3d rising;BBE 158僅差2未達160;Barrel% P40 power不足為唯一保留;逼近觸發vs Christian Walker（fa_scan）
-- 06-24：14d OPS .931≥.850 ✓+xwOBA P80 ✓+Savant Δ+0.067飆升+3d rising;BBE 158僅差2未達160;Barrel% P40 power不足為唯一保留;逼近觸發vs Christian Walker（fa_scan）
-
 ### Victor Caratini (MIN, C,1B) [mlb_id:605170] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
 vs：Ozzie Albies
@@ -306,6 +299,9 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Trevor Larnach (MIN, LF,RF) — 被搶（自動偵測）
+- 2026-06-24：Yahoo ownership_type=team，從觀察中移除。
 
 ### Isaac Paredes (HOU, 3B) — 被搶（自動偵測）
 - 2026-06-17：Yahoo ownership_type=team，從觀察中移除。
