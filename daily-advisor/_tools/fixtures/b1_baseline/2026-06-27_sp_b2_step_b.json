@@ -1,0 +1,667 @@
+{
+  "step_a": {
+    "my_team_rank": [
+      {
+        "name": "Joey Cantillo",
+        "rank": 1,
+        "rationale": "BB/9 4.08 pct0, IP/GS 5.06 pct0, xwOBACON .362; 21d +.032"
+      },
+      {
+        "name": "J.T. Ginn",
+        "rank": 2,
+        "rationale": "xwOBACON .336 pct95, GB% 49.1 pct70, but BB/9 3.65 pct0"
+      },
+      {
+        "name": "Reid Detmers",
+        "rank": 3,
+        "rationale": "Whiff 28.4 pct80, BB/9 2.68, IP/GS 5.88, xERA 2.92, WHIP 1.05"
+      }
+    ],
+    "fa_classify": [
+      {
+        "name": "Ian Seymour",
+        "verdict": "borderline",
+        "rationale": "xwOBACON .34/Whiff edge but IP/GS 3.67, GB 30%, 3 GS reliever"
+      },
+      {
+        "name": "Sean Newcomb",
+        "verdict": "not_worth",
+        "rationale": "IP/GS 3.0, 1 GS reliever; 21d xwOBACON .424 +.071 fading"
+      },
+      {
+        "name": "Didier Fuentes",
+        "verdict": "not_worth",
+        "rationale": "IP/GS 3.0, 1 GS reliever; IP 30.7, no starter volume"
+      },
+      {
+        "name": "Shane Drohan",
+        "verdict": "worth",
+        "rationale": "BB/9 2.94 vs 4.08, xwOBACON .336, Whiff 26.6, BBE 148 IP 52"
+      },
+      {
+        "name": "Spencer Miles",
+        "verdict": "not_worth",
+        "rationale": "Whiff 20.5 pct0, IP/GS 3.0, 2 GS reliever; K9 8.8 hollow"
+      },
+      {
+        "name": "Kris Bubic",
+        "verdict": "not_worth",
+        "rationale": "BB/9 4.65, xwOBACON .379 both worse than Cantillo; IL15"
+      },
+      {
+        "name": "Robert Gasser",
+        "verdict": "borderline",
+        "rationale": "xwOBACON .304 edge but GB 26% pct0, BB/9 3.6, ERA 4.5, IP 30"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "name": "Joey Cantillo",
+      "team": "CLE",
+      "position": "SP",
+      "selected_pos": "P",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.06,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 26.422230320699704,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 4.0813953488372094,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 42.47787610619468,
+            "percentile": 45
+          },
+          "xwOBACON": {
+            "raw": 0.362,
+            "percentile": 60
+          }
+        },
+        "context": {
+          "xera": 4.19,
+          "era": 3.87,
+          "bbe": 226,
+          "ip": 86.0,
+          "g": 17,
+          "gs": 17,
+          "k9": 8.895348837209303,
+          "whip": 1.35
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.394,
+        "season_xwobacon": 0.362,
+        "delta": 0.03200000000000003,
+        "bbe": 51
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    },
+    {
+      "name": "J.T. Ginn",
+      "team": "ATH",
+      "position": "SP",
+      "selected_pos": "P",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.44,
+            "percentile": 45
+          },
+          "Whiff%": {
+            "raw": 26.367075038284842,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 3.6541353383458643,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 49.13043478260868,
+            "percentile": 70
+          },
+          "xwOBACON": {
+            "raw": 0.336,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.83,
+          "era": 3.15,
+          "bbe": 230,
+          "ip": 88.66666666666667,
+          "g": 18,
+          "gs": 15,
+          "k9": 7.917293233082706,
+          "whip": 1.22
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.322,
+        "season_xwobacon": 0.336,
+        "delta": -0.014000000000000012,
+        "bbe": 59
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    },
+    {
+      "name": "Reid Detmers",
+      "team": "LAA",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.88,
+            "percentile": 70
+          },
+          "Whiff%": {
+            "raw": 28.372679045092845,
+            "percentile": 80
+          },
+          "BB/9": {
+            "raw": 2.6808510638297873,
+            "percentile": 60
+          },
+          "GB%": {
+            "raw": 37.95918367346939,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.327,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 2.92,
+          "era": 3.93,
+          "bbe": 245,
+          "ip": 94.0,
+          "g": 16,
+          "gs": 16,
+          "k9": 9.957446808510639,
+          "whip": 1.05
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.304,
+        "season_xwobacon": 0.327,
+        "delta": -0.02300000000000002,
+        "bbe": 53
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": []
+    }
+  ],
+  "fa_candidates": [
+    {
+      "name": "Ian Seymour",
+      "team": "TB",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 3.67,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 27.641822721598,
+            "percentile": 70
+          },
+          "BB/9": {
+            "raw": 3.6,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 30.303030303030297,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.34,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.32,
+          "era": 4.32,
+          "bbe": 132,
+          "ip": 50.0,
+          "g": 30,
+          "gs": 3,
+          "k9": 9.36,
+          "whip": 1.14
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.27,
+        "season_xwobacon": 0.34,
+        "delta": -0.07,
+        "bbe": 47
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ 短局"
+      ],
+      "add_tags": [
+        "✅ K 壓制",
+        "✅ 撿便宜運氣",
+        "✅ 近況確認"
+      ],
+      "warn_tags": [
+        "⚠️ 短局",
+        "⚠️ Command 警示"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 8,
+      "d1": null,
+      "d3": null,
+      "waiver_date": "2026-06-28"
+    },
+    {
+      "name": "Sean Newcomb",
+      "team": "CWS",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 3.0,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 25.116988950276244,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 2.25,
+            "percentile": 70
+          },
+          "GB%": {
+            "raw": 51.200000000000024,
+            "percentile": 70
+          },
+          "xwOBACON": {
+            "raw": 0.353,
+            "percentile": 70
+          }
+        },
+        "context": {
+          "xera": 3.54,
+          "era": 2.44,
+          "bbe": 125,
+          "ip": 48.0,
+          "g": 30,
+          "gs": 1,
+          "k9": 8.625,
+          "whip": 0.94
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.424,
+        "season_xwobacon": 0.353,
+        "delta": 0.07100000000000001,
+        "bbe": 28
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ 短局"
+      ],
+      "add_tags": [
+        "✅ GB 重型"
+      ],
+      "warn_tags": [
+        "⚠️ 短局",
+        "⚠️ 賣高運氣",
+        "⚠️ 近況下滑"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 2,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    },
+    {
+      "name": "Didier Fuentes",
+      "team": "ATL",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 3.0,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 26.49092627599244,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 2.9347826086956523,
+            "percentile": 50
+          },
+          "GB%": {
+            "raw": 41.55844155844156,
+            "percentile": 45
+          },
+          "xwOBACON": {
+            "raw": 0.33,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 2.99,
+          "era": 2.35,
+          "bbe": 77,
+          "ip": 30.666666666666664,
+          "g": 23,
+          "gs": 1,
+          "k9": 10.271739130434783,
+          "whip": 1.04
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.359,
+        "season_xwobacon": 0.33,
+        "delta": 0.02899999999999997,
+        "bbe": 14
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ 短局"
+      ],
+      "add_tags": [],
+      "warn_tags": [
+        "⚠️ 短局"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 9,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    },
+    {
+      "name": "Shane Drohan",
+      "team": "MIL",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 4.56,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 26.60814639905549,
+            "percentile": 70
+          },
+          "BB/9": {
+            "raw": 2.9423076923076925,
+            "percentile": 50
+          },
+          "GB%": {
+            "raw": 43.91891891891893,
+            "percentile": 50
+          },
+          "xwOBACON": {
+            "raw": 0.336,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.29,
+          "era": 3.12,
+          "bbe": 148,
+          "ip": 52.0,
+          "g": 16,
+          "gs": 6,
+          "k9": 9.0,
+          "whip": 1.23
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.33,
+        "season_xwobacon": 0.336,
+        "delta": -0.006000000000000005,
+        "bbe": 61
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ 短局"
+      ],
+      "add_tags": [
+        "✅ K 壓制"
+      ],
+      "warn_tags": [
+        "⚠️ 短局"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 14,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    },
+    {
+      "name": "Spencer Miles",
+      "team": "TOR",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 3.0,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 20.46530089628681,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": 2.823529411764706,
+            "percentile": 55
+          },
+          "GB%": {
+            "raw": 55.22388059701488,
+            "percentile": 95
+          },
+          "xwOBACON": {
+            "raw": 0.349,
+            "percentile": 80
+          }
+        },
+        "context": {
+          "xera": 3.51,
+          "era": 3.0,
+          "bbe": 134,
+          "ip": 51.0,
+          "g": 23,
+          "gs": 2,
+          "k9": 8.823529411764707,
+          "whip": 1.06
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.349,
+        "season_xwobacon": 0.349,
+        "delta": 0.0,
+        "bbe": 30
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ 短局"
+      ],
+      "add_tags": [
+        "✅ GB 重型"
+      ],
+      "warn_tags": [
+        "⚠️ 短局",
+        "⚠️ K 壓制不足"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 2,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    },
+    {
+      "name": "Kris Bubic",
+      "team": "KC",
+      "position": "SP",
+      "selected_pos": null,
+      "status": "IL15",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.59,
+            "percentile": 55
+          },
+          "Whiff%": {
+            "raw": 26.073489519112204,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 4.6490066225165565,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 45.73643410852713,
+            "percentile": 60
+          },
+          "xwOBACON": {
+            "raw": 0.379,
+            "percentile": 25
+          }
+        },
+        "context": {
+          "xera": 4.46,
+          "era": 4.11,
+          "bbe": 129,
+          "ip": 50.333333333333336,
+          "g": 9,
+          "gs": 9,
+          "k9": 9.119205298013245,
+          "whip": 1.23
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.379,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": [
+        "⚠️ IL 短期"
+      ],
+      "add_tags": [],
+      "warn_tags": [
+        "⚠️ Command 警示",
+        "⚠️ IL 短期"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 46,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    },
+    {
+      "name": "Robert Gasser",
+      "team": "MIL",
+      "position": "SP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.0,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 25.154221388367734,
+            "percentile": 60
+          },
+          "BB/9": {
+            "raw": 3.6,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 26.190476190476186,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.304,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.13,
+          "era": 4.5,
+          "bbe": 84,
+          "ip": 30.0,
+          "g": 6,
+          "gs": 6,
+          "k9": 9.3,
+          "whip": 1.27
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.316,
+        "season_xwobacon": 0.304,
+        "delta": 0.01200000000000001,
+        "bbe": 44
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [
+        "✅ 撿便宜運氣"
+      ],
+      "warn_tags": [
+        "⚠️ Command 警示"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": 4,
+      "d1": null,
+      "d3": null,
+      "waiver_date": ""
+    }
+  ],
+  "non_data_context": {
+    "faab_remaining": 100,
+    "rostered_names": []
+  }
+}
