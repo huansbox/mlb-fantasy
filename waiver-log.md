@@ -268,16 +268,6 @@ vs：Mauricio Dubón
 - 06-27：14d K% 36.4極端spike(疑傷)+OPS .715<.750;Savant Δ-0.011;觸發K%≤28%極遠;42% owned（fa_scan）
 - 06-28：14d K% 36.4極端spike(疑傷)+OPS .687<.750;Savant Δ+0.010;觸發K%≤28%極遠;42% owned（fa_scan）
 
-### Victor Caratini (MIN, C,1B) [mlb_id:605170] — 觀察中
-觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
-vs：Ozzie Albies
-- 06-23：14d OPS 1.128/3HR/10RBI/K% 15.4;雙年P80/P70(prior確認);season運氣-0.032 buy-low;C+PA-TG 2.67限局為gate（fa_scan）
-- 06-24：14d OPS 1.195/4HR爆發+Savant Δ+0.069品質上升+3d rising+5;雙年P80/P70;season運氣-0.032 buy-low;PA-TG 2.69<3.0 C限局為gate;vs Albies（fa_scan）
-- 06-25：14d OPS 1.236/4HR爆發+Savant Δ+0.073上升+3d rising+5;雙年P80/P70+season運氣-0.034 buy-low;PA-TG 2.69<3.0 C限局為gate;vs Albies（fa_scan）
-- 06-26：[取代→Ozzie Albies] 14d OPS 1.236/4HR+Savant Δ+0.065品質上升+雙年P80/P70 buy-low;PA-TG 2.69<3.0 C限局gate未達故取代不升立即取代;vs Albies碾壓P0 power（fa_scan）
-- 06-27：[取代→Ozzie Albies] 14d OPS 1.034/3HR+Savant Δ+0.091上升+雙年P80/P70 buy-low;PA-TG 2.73<3.0 C限局gate未達故取代不升立即取代;vs Albies（fa_scan）
-- 06-28：[取代→Ozzie Albies] 14d OPS .961/3HR+Savant Δ+0.055上升+雙年P80/P70 buy-low;PA-TG 2.75<3.0 C限局gate未達故取代不升立即取代;⚠️已連續推薦取代2天;vs Albies（fa_scan）
-
 ### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
 vs：Christian Walker
@@ -356,6 +346,9 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Victor Caratini (MIN, C,1B) — 被搶（自動偵測）
+- 2026-06-28：Yahoo ownership_type=team，從觀察中移除。
 
 ### Trevor Larnach (MIN, LF,RF) — 被搶（自動偵測）
 - 2026-06-24：Yahoo ownership_type=team，從觀察中移除。
