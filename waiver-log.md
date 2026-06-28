@@ -285,6 +285,10 @@ vs：Ozzie Albies
 - 06-26：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
 - 06-27：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
 
+### Slade Cecconi (CLE, SP) [mlb_id:677944] — 觀察中
+觸發：B2 2-step add
+- 06-28：Leahy is a confident drop, not marginal: xwOBACON 0.420 p0 / xERA 5.88 / WHIP 1.51 on a 243-BBE sample — bottom of the pool with no rolling data to rescue it. Cecconi beats him on 4 of 5 slots — IP/GS（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。

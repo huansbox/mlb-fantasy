@@ -1585,5 +1585,16 @@
    "stars": 4,
    "executed_ts": null
   }
+ ],
+ "Slade Cecconi": [
+  {
+   "player": "Slade Cecconi",
+   "verdict": "watch",
+   "ts": "2026-06-28",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }
