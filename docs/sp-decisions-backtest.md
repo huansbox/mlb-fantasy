@@ -315,3 +315,25 @@ Episodes:
 - 2026-05-30 (1d) `drop_X_add_Y` drop Luis Severino → add Trevor McDonald → **neutral**
 - 2026-05-31 (1d) `drop_X_add_Y` drop Keider Montero → add Trevor McDonald → **miss**, Δ -0.072
 
+
+## Weekly Backtest 2026-06-28 (2026-06-01 ~ 2026-06-07)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 7 (actionable: 5; episodes in lookback: 20)
+- Hit rate: 40%
+- Average marginal benefit (xwOBACON Δ favoring add): -0.0130
+
+By action:
+- `drop_X_add_Y` n=3 (actionable 3) hit_rate=33%
+- `watch` n=2 (actionable 2) hit_rate=50%
+- `pass` n=2 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-06-01 (1d) `drop_X_add_Y` drop Joey Cantillo → add Trevor McDonald → **hit**, Δ +0.050
+- 2026-06-02 (1d) `pass` pass → **neutral**
+- 2026-06-03 (1d) `watch` watch Zebby Matthews → **miss**
+- 2026-06-04 (1d) `drop_X_add_Y` drop Walker Buehler → add Casey Mize → **miss**, Δ -0.080
+- 2026-06-05 (1d) `drop_X_add_Y` drop Walker Buehler → add Trevor McDonald → **miss**, Δ -0.009
+- 2026-06-06 (1d) `pass` pass → **neutral**
+- 2026-06-07 (2d) `watch` watch Peter Lambert → **hit**
+
