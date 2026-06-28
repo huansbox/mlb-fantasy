@@ -41,7 +41,7 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "BN",
+      "selected_pos": "1B",
       "status": ""
     },
     {
@@ -130,7 +130,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "2B",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -165,8 +165,8 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "Util",
-      "status": "DTD",
+      "selected_pos": "BN",
+      "status": "",
       "prior_stats": {
         "season": 2025,
         "xwoba": 0.303,
@@ -262,7 +262,7 @@
         "CF",
         "RF"
       ],
-      "selected_pos": "1B",
+      "selected_pos": "2B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -436,7 +436,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -480,8 +480,8 @@
       "positions": [
         "SP"
       ],
-      "selected_pos": "BN",
-      "status": "",
+      "selected_pos": "NA",
+      "status": "NA",
       "prior_stats": {
         "season": 2025,
         "xera": 4.3,
@@ -561,6 +561,29 @@
         "era": 3.21,
         "ip": 95.3,
         "ip_per_gs": 5.2
+      }
+    },
+    {
+      "name": "Kyle Leahy",
+      "mlb_id": 681517,
+      "yahoo_player_key": "469.p.61601",
+      "team": "STL",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.42,
+        "xwoba_allowed": 0.325,
+        "hh_pct_allowed": 44.1,
+        "barrel_pct_allowed": 9.8,
+        "bbe": 254,
+        "era": 3.07,
+        "ip": 88.0,
+        "ip_per_gs": 3.0
       }
     }
   ],
