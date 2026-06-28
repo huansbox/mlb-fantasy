@@ -251,32 +251,6 @@
       }
     },
     {
-      "name": "Kody Clemens",
-      "mlb_id": 665019,
-      "yahoo_player_key": "469.p.11309",
-      "team": "MIN",
-      "positions": [
-        "1B",
-        "2B",
-        "LF",
-        "CF",
-        "RF"
-      ],
-      "selected_pos": "2B",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xwoba": 0.331,
-        "barrel_pct": 12.0,
-        "hh_pct": 48.3,
-        "bb_pct": 7.5,
-        "ops": 0.715,
-        "pa_per_team_g": 2.38,
-        "pa": 386,
-        "g": 119
-      }
-    },
-    {
       "name": "Trevor Larnach",
       "mlb_id": 663616,
       "yahoo_player_key": "469.p.11347",
@@ -297,6 +271,29 @@
         "pa_per_team_g": 3.5,
         "pa": 567,
         "g": 142
+      }
+    },
+    {
+      "name": "Victor Caratini",
+      "mlb_id": 605170,
+      "yahoo_player_key": "469.p.10748",
+      "team": "MIN",
+      "positions": [
+        "C",
+        "1B"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.329,
+        "barrel_pct": 7.7,
+        "hh_pct": 40.7,
+        "bb_pct": 6.0,
+        "ops": 0.728,
+        "pa_per_team_g": 2.38,
+        "pa": 386,
+        "g": 114
       }
     }
   ],
