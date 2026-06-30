@@ -228,16 +228,6 @@ vs：Christian Walker
 - 06-29：14d OPS .716/2HR/2SB+Barrel% P80但PA-TG 2.41<3.0限局+xwOBA P50中等;觸發未達;vs Christian Walker（fa_scan）
 - 06-30：PA-TG 2.41<3.0+14d OPS .716<.850(從.862回落)兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 
-### Teoscar Hernández (LAD, LF,RF) [mlb_id:606192] — 觀察中
-觸發：IL 啟用 + 先發確認 + 14d OPS ≥.900 連 5 天
-vs：Ozzie Albies
-- 06-24：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add（fa_scan）
-- 06-25：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
-- 06-26：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
-- 06-27：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
-- 06-28：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
-- 06-29：IL10傷停;season P80/P60/P70+14d OPS 1.051/3HR/14RBI菁英;等IL回歸+先發確認不立即add;vs Albies（fa_scan）
-
 ### Slade Cecconi (CLE, SP) [mlb_id:677944] — 觀察中
 觸發：B2 2-step add
 - 06-28：Leahy is a confident drop, not marginal: xwOBACON 0.420 p0 / xERA 5.88 / WHIP 1.51 on a 243-BBE sample — bottom of the pool with no rolling data to rescue it. Cecconi beats him on 4 of 5 slots — IP/GS（fa_scan）
@@ -301,6 +291,9 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Teoscar Hernández (LAD, LF,RF) — 被搶（自動偵測）
+- 2026-06-30：Yahoo ownership_type=team，從觀察中移除。
 
 ### Heriberto Hernández (MIA, LF,RF) [mlb_id:681715] — 已結案（fa_scan CLOSE）
 觸發：PA-TG 升至 ≥2.5 連 5 天 + xwOBA 維持 P90+ → 升級
