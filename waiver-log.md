@@ -208,20 +208,6 @@ vs：Christian Walker
 - 06-30：PA-TG 2.41<3.0+14d OPS .716<.850(從.862回落)兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 - 07-01：PA-TG 2.41<3.0+14d OPS .665<.850兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 
-### Slade Cecconi (CLE, SP) [mlb_id:677944] — 觀察中
-觸發：B2 2-step add
-- 06-28：Leahy is a confident drop, not marginal: xwOBACON 0.420 p0 / xERA 5.88 / WHIP 1.51 on a 243-BBE sample — bottom of the pool with no rolling data to rescue it. Cecconi beats him on 4 of 5 slots — IP/GS（fa_scan）
-- 06-29：Cecconi is a true starter (17 GS, 285 BBE) who beats Leahy across IP/GS (5.31 p25 vs 5.08 p0), BB/9 (2.89 vs 3.43), GB (48.1 vs 44.9), xwOBACON (0.365 vs 0.42 p0) and xERA (4.4 vs 5.88) — a clean 5-sl（fa_scan）
-- 06-30：Cecconi beats Leahy in 4 of 5 slots — xwOBACON .365 vs .415, BB/9 2.89 vs 3.43, GB% 48.1 vs 44.3, IP/GS 5.31 vs 5.08 — with far cleaner xERA (4.38 vs 5.72) on a much larger full-rotation sample (285 B（fa_scan）
-- 07-01：Cecconi beats Leahy in 4 of 5 slots on a durable 285 BBE / 90.3 IP sample — IP/GS 5.31 vs 5.08 (pct0), BB/9 2.89 vs 3.43, GB 48.1 vs 44.3, xwOBACON .365 vs .415 (pct0, xERA 4.39 vs 5.72) — with only W（fa_scan）
-
-### A.J. Ewing (NYM, 2B,CF) [mlb_id:805999] — 觀察中
-觸發：PA-TG ≥3.0 連5天 + xwOBA pctile ≥P90 連5天
-vs：Ozzie Albies
-- 06-28：season xwOBA P95/BB% P80+14d .937/.311+Savant Δ+0.061上升;PA-TG 2.00限局PT gate未過故觀察;21歲新人無prior（fa_scan）
-- 06-29：season xwOBA P95/BB% P80+14d 1.043/.340但PA-TG 2.01限局PT gate未過;觀察;21歲無prior;vs Albies（fa_scan）
-- 06-30：season xwOBA P95/BB% P80+14d 1.043/.340+Savant Δ+0.061上升;PA-TG 2.01<3.0限局PT gate未過;21歲無prior;vs Albies（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -272,6 +258,12 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Slade Cecconi (CLE, SP) — 被搶（自動偵測）
+- 2026-07-01：Yahoo ownership_type=team，從觀察中移除。
+
+### A.J. Ewing (NYM, 2B,CF) — 被搶（自動偵測）
+- 2026-07-01：Yahoo ownership_type=team，從觀察中移除。
 
 ### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 已結案（fa_scan CLOSE）
 觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
