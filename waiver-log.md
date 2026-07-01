@@ -233,6 +233,7 @@ vs：Christian Walker
 - 06-28：Leahy is a confident drop, not marginal: xwOBACON 0.420 p0 / xERA 5.88 / WHIP 1.51 on a 243-BBE sample — bottom of the pool with no rolling data to rescue it. Cecconi beats him on 4 of 5 slots — IP/GS（fa_scan）
 - 06-29：Cecconi is a true starter (17 GS, 285 BBE) who beats Leahy across IP/GS (5.31 p25 vs 5.08 p0), BB/9 (2.89 vs 3.43), GB (48.1 vs 44.9), xwOBACON (0.365 vs 0.42 p0) and xERA (4.4 vs 5.88) — a clean 5-sl（fa_scan）
 - 06-30：Cecconi beats Leahy in 4 of 5 slots — xwOBACON .365 vs .415, BB/9 2.89 vs 3.43, GB% 48.1 vs 44.3, IP/GS 5.31 vs 5.08 — with far cleaner xERA (4.38 vs 5.72) on a much larger full-rotation sample (285 B（fa_scan）
+- 07-01：Cecconi beats Leahy in 4 of 5 slots on a durable 285 BBE / 90.3 IP sample — IP/GS 5.31 vs 5.08 (pct0), BB/9 2.89 vs 3.43, GB 48.1 vs 44.3, xwOBACON .365 vs .415 (pct0, xERA 4.39 vs 5.72) — with only W（fa_scan）
 
 ### A.J. Ewing (NYM, 2B,CF) [mlb_id:805999] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + xwOBA pctile ≥P90 連5天
