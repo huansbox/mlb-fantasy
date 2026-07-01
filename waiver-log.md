@@ -52,6 +52,7 @@
 - 06-28：14d K% 16.7<28%✓但OPS .625<.700觸發未達+2HR/4RBI產量極弱+Savant Δ-0.017;xwOBA P80結構仍在;接近結案（fa_scan）
 - 06-29：14d OPS .610/2HR4RBI弱+K% 17.6低但OPS<.700觸發未達+DTD不可add+xwOBA P80結構在;接近結案（fa_scan）
 - 06-30：14d OPS .816≥.700✓+K% 13.7<28✓觸發名義達成但Savant Δ-0.020品質下滑+產量僅4HR/6RBI modest;暫hold等Savant轉正連3天確認（fa_scan）
+- 07-01：14d OPS .800≥.700✓+K% 15.4<28✓+Savant Δ+0.053轉正day1(需連3天);xwOBA P80結構穩;vs Rafaela（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -98,6 +99,7 @@
 - 06-28：xwOBA P80/BB% P95底穩但14d OPS .665軟+Savant Δ-0.097下滑;%owned 10%未破30%觸發線;Swanson錨未過brand bias;鎖窗口維持watch（fa_scan）
 - 06-29：xwOBA P80/BB% P95底穩但14d OPS .655軟+Savant Δ-0.106下滑;%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 06-30：xwOBA P80/BB% P95底穩但14d OPS .464崩+Savant Δ-0.099下滑;%owned 10%未破30%觸發線;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
+- 07-01：14d OPS .384崩+Savant Δ-0.116下滑;xwOBA P80/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -125,33 +127,7 @@
 - 06-28：[取代→Ozzie Albies] 14d OPS .928≥.800✓/4HR/9RBI但Savant Δ-0.031轉負+BBE 30低信心案降溫;P70/P50/P70/P80 vs Albies P55/P25/P0/P0仍碾壓;⚠️已連續推薦取代11天未執行（fa_scan）
 - 06-29：14d OPS .908≥.800✓/4HR/9RBI但Savant Δ轉負(無5天正值)+BBE 34低信心;Kody Clemens(P80/P80健康+counting)成更佳vs Albies選項取代之;降級watch不續推取代;⚠️已推薦12天未執行—推測FAAB/用戶override（fa_scan）
 - 06-30：14d OPS .908≥.800✓/4HR/9RBI但Savant Δ+0.016僅day1(需連5天正值);Kody Clemens P80/P80健康更佳vs Albies選項;維持watch不升取代（fa_scan）
-
-### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 觀察中
-觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
-- 06-05：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + 無 prior + Barrel% P45（fa_scan）
-- 06-06：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + Barrel% P45 + DTD 傷觀察（fa_scan）
-- 06-07：14d OPS .751 / 16 RBI 爆量；PA-TG 2.42 上場有限 + DTD + Barrel% P45；觸發未達（fa_scan）
-- 06-08：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + DTD；觸發未達（fa_scan）
-- 06-09：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + IL10；觸發未達（fa_scan）
-- 06-10：IL10；14d 16 RBI 爆量；PA-TG 2.28 上場有限 + IL10；觸發未達（fa_scan）
-- 06-11：IL10；14d 16 RBI；PA-TG 2.25 上場有限 + IL10；觸發未達（fa_scan）
-- 06-12：IL10；PA-TG 2.25 持續下滑；觸發遠未達（fa_scan）
-- 06-13：IL10；PA-TG 2.21 持續下滑；觸發遠未達（fa_scan）
-- 06-14：IL10；PA-TG 2.21持續下滑（2.35→2.21）；觸發3.0遠未達（fa_scan）
-- 06-15：IL10持續；PA-TG 2.15持續下滑；觸發3.0遠未達（fa_scan）
-- 06-16：IL10持續；PA-TG 2.12持續下滑；觸發3.0遠未達（fa_scan）
-- 06-17：IL10持續；PA-TG 2.09持續下滑；觸發3.0遠未達（fa_scan）
-- 06-18：IL10持續；PA-TG 2.12持續低迷；觸發3.0遠未達（fa_scan）
-- 06-19：IL10持續；PA-TG 2.14持續低迷；觸發3.0遠未達（fa_scan）
-- 06-20：PA-TG 2.14持續低迷+14d 2HR/14RBI/7R產量尚可但0SB；觸發3.0遠未達；P95結構仍在（fa_scan）
-- 06-23：PA-TG 2.12持續低迷+14d 2HR/14RBI/8R產量尚可但0SB;觸發PA-TG 3.0遠未達;P80結構仍在（fa_scan）
-- 06-24：PA-TG 2.15持續低迷+14d 2HR/16RBI/9R產量尚可但0SB;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
-- 06-25：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
-- 06-26：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB+Savant Δ-0.082;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
-- 06-27：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB+Savant Δ-0.082;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
-- 06-28：PA-TG 2.11持續低迷+14d 1HR/9RBI/9R但0SB+Savant Δ-0.064;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
-- 06-29：PA-TG 2.12持續低迷遠未達3.0+14d 1HR/7RBI/9R但0SB+Savant Δ-0.064;xwOBA P80結構在（fa_scan）
-- 06-30：PA-TG 2.09持續低迷遠未達3.0+14d OPS .720/1HR/7RBI modest+0SB;xwOBA P80結構仍在;角色鎖局接近結案邊緣（fa_scan）
+- 07-01：14d OPS .957≥.800✓但Savant Δ+0.028未達連5天正值+BBE低信心;Albies空缺已由Pederson/Canzone更乾淨填補案降溫;⚠️已推薦13天未執行—推測FAAB/用戶override（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
@@ -174,6 +150,7 @@
 - 06-28：14d K% 27.5<28%觸發達(counter重啟day1)+OPS .854≥.800✓但需連5天;Savant Δ+0.000;P70/P95/P80;vs Rafaela（fa_scan）
 - 06-29：14d K% 27.5<28%✓但OPS .728<.800觸發破線+Savant Δ-0.021;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
 - 06-30：14d K% 30.0>28觸發線counter歸零+OPS .636<.800;Savant Δ-0.012;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
+- 07-01：14d K% 30.0>28觸發線counter歸零+OPS .636<.800;Savant Δ-0.012;P80/P95/P80;vs Rafaela（fa_scan）
 
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
@@ -196,6 +173,7 @@ vs：待定
 - 06-28：14d OPS 1.086+xwOBA P70但BBE 169<180觸發線未達+Savant Δ-0.049品質下滑+運氣+0.201膨脹;prior P0+Coors;2%零壓力（fa_scan）
 - 06-29：14d OPS 1.115但BBE 169<180觸發未達+Savant Δ-0.056品質下滑+運氣+0.182膨脹+Coors+prior P0;2%零壓力（fa_scan）
 - 06-30：BBE 172<180觸發線未達+14d OPS 1.142但運氣+0.188膨脹+Savant Δ-0.050品質下滑+Coors+prior P0未確認;2%零壓力skeptical（fa_scan）
+- 07-01：BBE 176<180觸發線未達+14d OPS 1.158但運氣+0.188膨脹+Savant Δ-0.036下滑+Coors+prior P0;2%零壓力skeptical（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -215,6 +193,7 @@ vs：Mauricio Dubón
 - 06-28：14d K% 36.4極端spike(疑傷)+OPS .687<.750;Savant Δ+0.010;觸發K%≤28%極遠;42% owned（fa_scan）
 - 06-29：14d K% 30.9極端spike(疑傷)+OPS .740<.750+Savant Δ+0.008;觸發K%≤28%遠;42%owned;vs Dubón（fa_scan）
 - 06-30：14d K% 26.8≤28(counter day1需連5天)+OPS .792≥.750✓+Savant Δ+0.025上升;K%疑傷spike消退中(36.4→26.8);42%owned;vs Dubón（fa_scan）
+- 07-01：14d K% 25.5≤28(counter day2)+OPS .820≥.750✓+Savant Δ+0.025上升;疑傷spike消退36.4→25.5;42%owned;vs Dubón（fa_scan）
 
 ### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
@@ -227,6 +206,7 @@ vs：Christian Walker
 - 06-28：14d OPS .862/3HR/2SB+Barrel% P80真power;xwOBA P50中等+PA-TG 2.37<3.0限局+%owned dropping;vs Christian Walker（fa_scan）
 - 06-29：14d OPS .716/2HR/2SB+Barrel% P80但PA-TG 2.41<3.0限局+xwOBA P50中等;觸發未達;vs Christian Walker（fa_scan）
 - 06-30：PA-TG 2.41<3.0+14d OPS .716<.850(從.862回落)兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
+- 07-01：PA-TG 2.41<3.0+14d OPS .665<.850兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 
 ### Slade Cecconi (CLE, SP) [mlb_id:677944] — 觀察中
 觸發：B2 2-step add
@@ -292,6 +272,34 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Vaughn Grissom (LAA, 1B,2B,3B) [mlb_id:687093] — 已結案（fa_scan CLOSE）
+觸發：PA-TG 升至 ≥3.0 連 5 天 + xwOBA 維持 P90+ → 升級
+- 06-05：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + 無 prior + Barrel% P45（fa_scan）
+- 06-06：xwOBA P95 / HH% P80；14d 16 RBI 爆量；PA-TG 2.46 上場有限 + Barrel% P45 + DTD 傷觀察（fa_scan）
+- 06-07：14d OPS .751 / 16 RBI 爆量；PA-TG 2.42 上場有限 + DTD + Barrel% P45；觸發未達（fa_scan）
+- 06-08：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + DTD；觸發未達（fa_scan）
+- 06-09：14d OPS .751 / 16 RBI；PA-TG 2.35 上場有限 + IL10；觸發未達（fa_scan）
+- 06-10：IL10；14d 16 RBI 爆量；PA-TG 2.28 上場有限 + IL10；觸發未達（fa_scan）
+- 06-11：IL10；14d 16 RBI；PA-TG 2.25 上場有限 + IL10；觸發未達（fa_scan）
+- 06-12：IL10；PA-TG 2.25 持續下滑；觸發遠未達（fa_scan）
+- 06-13：IL10；PA-TG 2.21 持續下滑；觸發遠未達（fa_scan）
+- 06-14：IL10；PA-TG 2.21持續下滑（2.35→2.21）；觸發3.0遠未達（fa_scan）
+- 06-15：IL10持續；PA-TG 2.15持續下滑；觸發3.0遠未達（fa_scan）
+- 06-16：IL10持續；PA-TG 2.12持續下滑；觸發3.0遠未達（fa_scan）
+- 06-17：IL10持續；PA-TG 2.09持續下滑；觸發3.0遠未達（fa_scan）
+- 06-18：IL10持續；PA-TG 2.12持續低迷；觸發3.0遠未達（fa_scan）
+- 06-19：IL10持續；PA-TG 2.14持續低迷；觸發3.0遠未達（fa_scan）
+- 06-20：PA-TG 2.14持續低迷+14d 2HR/14RBI/7R產量尚可但0SB；觸發3.0遠未達；P95結構仍在（fa_scan）
+- 06-23：PA-TG 2.12持續低迷+14d 2HR/14RBI/8R產量尚可但0SB;觸發PA-TG 3.0遠未達;P80結構仍在（fa_scan）
+- 06-24：PA-TG 2.15持續低迷+14d 2HR/16RBI/9R產量尚可但0SB;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
+- 06-25：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
+- 06-26：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB+Savant Δ-0.082;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
+- 06-27：PA-TG 2.15持續低迷+14d 1HR/11RBI/9R但0SB+Savant Δ-0.082;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
+- 06-28：PA-TG 2.11持續低迷+14d 1HR/9RBI/9R但0SB+Savant Δ-0.064;觸發PA-TG 3.0遠未達;xwOBA P80結構仍在（fa_scan）
+- 06-29：PA-TG 2.12持續低迷遠未達3.0+14d 1HR/7RBI/9R但0SB+Savant Δ-0.064;xwOBA P80結構在（fa_scan）
+- 06-30：PA-TG 2.09持續低迷遠未達3.0+14d OPS .720/1HR/7RBI modest+0SB;xwOBA P80結構仍在;角色鎖局接近結案邊緣（fa_scan）
+- 07-01：[結案] PA-TG 2.09角色鎖局持續遠未達3.0(≥14掃描日)+14d OPS .631疲軟0SB無改善;xwOBA P80結構仍在但無PT無add價值（fa_scan）
 
 ### Teoscar Hernández (LAD, LF,RF) — 被搶（自動偵測）
 - 2026-06-30：Yahoo ownership_type=team，從觀察中移除。
@@ -378,6 +386,7 @@ vs：Ozzie Albies
 ### Dominic Canzone (SEA, LF,RF) — 被搶（自動偵測）
 - 2026-06-16：Yahoo ownership_type=team，從觀察中移除。
 - 06-30：re-watch(15天前lapsed);雙年xwOBA P95/Barrel% P95真power+14d .986/4HR但Savant Δ-0.043下滑+PA-TG 2.55限局+K% 22.4（fa_scan）
+- 07-01：[取代→Ozzie Albies] 雙年xwOBA P95+Barrel% P95+14d .986/4HR健康;Savant Δ-0.014微降;Pederson替代選項vs Albies（fa_scan）
 
 ### Willi Castro (COL, 1B/2B/3B/SS/LF/RF) [mlb_id:650489] — Pass
 - 2026-06-15：[eval] 結構性低於我方最弱 anchor Dubón，不值得撿。Season xwOBA .290 P40-45（2025 P55-60 → 逐年退步）/ Barrel% P25-40 / HH% P55-60，xwOBA P40-45 比 Dubón P60-70 還差；trad .278/.752 是 Coors 幻覺（xBA .224 / xSLG .344 = +54 點 BABIP/海拔膨脹）；Whiff% 29.1 + Chase% 37.2 選球差。亮點僅六守位彈性 + 5 SB（軟 punt SB 折價）。健康每日 utility（COL 2yr/$12.8M），但 fa_scan 連 Sum 門檻都沒過、未進 FA 池；真正該頂 Dubón 的是 fa_scan 已推薦的 Benintendi（P70/P50/P70/P80 碾壓）（player-eval）
@@ -509,6 +518,7 @@ vs：Ozzie Albies
 - 06-28：[取代→Ozzie Albies] 健康FA雙年菁英xwOBA P95/BB% P95/HH% P80+14d 4HR/.844+Savant Δ+0.028;vs Albies P0 power碾壓;PA-TG 3.11 platoon落差故取代不升立即取代（fa_scan）
 - 06-29：[取代→Christian Walker] xwOBA P95/BB% P80/HH% P95 power+OBP+14d 5HR/OPS .833但K% 30.4高+zone-contact降;vs Walker(冷OPS .642)三類別升級;4%plateau（fa_scan）
 - 06-30：[取代→Christian Walker] xwOBA P95/BB% P80/Barrel% P70健康+14d 5HR/6R真power;vs Christian Walker 14d .563崩+K%spike;唯K% 30.4偏高;取代（fa_scan）
+- 07-01：[立即取代→Ozzie Albies] xwOBA P95/BB% P80/Barrel% P70菁英+14d 6HR/OPS .895健康;vs Albies無power立即升級（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
