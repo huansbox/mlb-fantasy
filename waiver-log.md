@@ -208,6 +208,10 @@ vs：Christian Walker
 - 06-30：PA-TG 2.41<3.0+14d OPS .716<.850(從.862回落)兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 - 07-01：PA-TG 2.41<3.0+14d OPS .665<.850兩項觸發皆未達+xwOBA P50中等;vs Christian Walker（fa_scan）
 
+### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
+觸發：B2 2-step watch
+- 07-02：Leahy's ugly season line (xwOBACON 0.415 pct0, xERA 5.74) is undercut by a strong 21d surge — 0.334 on 62 BBE (Δ -0.081), so the deterioration signal points away from dropping him. Gasser shows the cl（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。

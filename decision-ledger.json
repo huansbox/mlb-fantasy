@@ -2129,5 +2129,16 @@
    "stars": 2,
    "executed_ts": null
   }
+ ],
+ "Robert Gasser": [
+  {
+   "player": "Robert Gasser",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }
