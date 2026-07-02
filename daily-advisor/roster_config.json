@@ -42,7 +42,7 @@
         "g": 154
       },
       "selected_pos": "1B",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Jazz Chisholm Jr.",
@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "Util",
+      "selected_pos": "BN",
       "status": ""
     },
     {
@@ -108,8 +108,8 @@
         "pa": 542,
         "g": 126
       },
-      "selected_pos": "CF",
-      "status": ""
+      "selected_pos": "BN",
+      "status": "DTD"
     },
     {
       "name": "Ozzie Albies",
@@ -165,7 +165,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "2B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -210,7 +210,7 @@
         "2B",
         "CF"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "CF",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -282,7 +282,7 @@
         "C",
         "1B"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -349,31 +349,6 @@
       "status": ""
     },
     {
-      "name": "Cole Ragans",
-      "mlb_id": 666142,
-      "team": "KC",
-      "positions": [
-        "SP"
-      ],
-      "yahoo_player_key": "469.p.10610",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 2.67,
-        "xwoba_allowed": 0.256,
-        "hh_pct_allowed": 39.4,
-        "barrel_pct_allowed": 9.5,
-        "bbe": 137,
-        "era": 4.67,
-        "ip_per_gs": 4.7,
-        "ip": 61.7,
-        "whiff_pct": 34.5,
-        "gb_pct": 37.5,
-        "xwobacon": 0.37
-      },
-      "selected_pos": "IL",
-      "status": "IL60"
-    },
-    {
       "name": "Parker Messick",
       "mlb_id": 800048,
       "team": "CLE",
@@ -433,7 +408,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -569,7 +544,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
