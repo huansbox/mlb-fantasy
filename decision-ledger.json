@@ -206,6 +206,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .337 / BB% 9.15 / Barrel% 12.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -393,6 +402,15 @@
    "player": "J.P. Crawford",
    "verdict": "watch",
    "ts": "2026-07-01",
+   "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-07-02",
    "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
    "channel": "structure",
    "stars": 4,
@@ -588,6 +606,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "Dominic Canzone",
+   "verdict": "取代",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .382 / BB% 9.13 / Barrel% 15.6",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Andrew Benintendi": [
@@ -738,6 +765,15 @@
    "player": "Andrew Benintendi",
    "verdict": "watch",
    "ts": "2026-07-01",
+   "add_reason": "xwOBA .322 / BB% 8.26 / Barrel% 10.8",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Andrew Benintendi",
+   "verdict": "watch",
+   "ts": "2026-07-02",
    "add_reason": "xwOBA .322 / BB% 8.26 / Barrel% 10.8",
    "channel": "structure",
    "stars": 3,
@@ -1195,6 +1231,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Garrett Mitchell",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .337 / BB% 12.39 / Barrel% 14.7 / 14d xwOBA .397",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kyle Karros": [
@@ -1349,6 +1394,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Kyle Karros",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .339 / BB% 12.4 / Barrel% 7.5 / 14d xwOBA .390",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Kody Clemens": [
@@ -1473,6 +1527,15 @@
    "player": "Joc Pederson",
    "verdict": "立即取代",
    "ts": "2026-07-01",
+   "add_reason": "xwOBA .353 / BB% 12.67 / Barrel% 9.8",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Joc Pederson",
+   "verdict": "立即取代",
+   "ts": "2026-07-02",
    "add_reason": "xwOBA .353 / BB% 12.67 / Barrel% 9.8",
    "channel": "structure",
    "stars": 3,
@@ -1619,6 +1682,15 @@
    "player": "Spencer Torkelson",
    "verdict": "watch",
    "ts": "2026-07-01",
+   "add_reason": "xwOBA .313 / BB% 11.31 / Barrel% 13.8",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-07-02",
    "add_reason": "xwOBA .313 / BB% 11.31 / Barrel% 13.8",
    "channel": "structure",
    "stars": 4,
@@ -1927,6 +1999,15 @@
    "channel": "structure",
    "stars": 2,
    "executed_ts": null
+  },
+  {
+   "player": "Royce Lewis",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .298 / BB% 9.78 / Barrel% 12.7",
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
   }
  ],
  "Teoscar Hernández": [
@@ -2128,6 +2209,15 @@
    "channel": "structure",
    "stars": 2,
    "executed_ts": null
+  },
+  {
+   "player": "A.J. Ewing",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .352 / BB% 11.45 / Barrel% 5.9 / 14d xwOBA .413",
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
   }
  ],
  "Robert Gasser": [
@@ -2138,6 +2228,17 @@
    "add_reason": null,
    "channel": null,
    "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Kerry Carpenter": [
+  {
+   "player": "Kerry Carpenter",
+   "verdict": "watch",
+   "ts": "2026-07-02",
+   "add_reason": "xwOBA .317 / BB% 7.8 / Barrel% 11.6 / 14d xwOBA .378",
+   "channel": "structure",
+   "stars": 4,
    "executed_ts": null
   }
  ]
