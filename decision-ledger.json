@@ -2241,5 +2241,16 @@
    "stars": 4,
    "executed_ts": null
   }
+ ],
+ "Trevor McDonald": [
+  {
+   "player": "Trevor McDonald",
+   "verdict": "watch",
+   "ts": "2026-07-03",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }
