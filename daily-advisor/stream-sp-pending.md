@@ -4,43 +4,20 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-07-02
-- recorded_at: 2026-07-02T10:18:14+08:00
-- last_recheck_at: —
-
-### TBD 場次（待補查）
-- MIA @ COL (MIA away TBD)
-- STL @ ATL (ATL home TBD)
-
-### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-
-### 備註
-- 2026-07-02 首次評估（recorded TW 10:18）：**0 位過 filter 進主表**。Rotation gate 🚫 排除 2 位（Alan Rangel PHI vs PIT g3/gs0 long-relief spot start，Sum22 但無 GS 紀錄；Ian Seymour TB @ KC g30/gs3 IP/GS 3.67 bulk 型，6/20・6/24・6/25 已連續排除同人）。無 Sum<15 / 無 v4 缺數據 / 無 opener WebSearch 觸發（兩位皆在 gate 就淘汰，省額度）。owned_by_others 13 位（含 Jared Jones / Chase Burns / Misiorowski / Cecconi / Dustin May / Valdez / Eovaldi / Bryce Miller / Sasaki）+ 本隊 1 位（Stephen Kolek KC vs TB）。
-- 排序：**本日無值得串流候選**。TBD 僅 2 場（MIA 客場 / ATL 主場先發未公布），建議 TW 7/2 傍晚 `/stream-sp 2026-07-02 --tbd-only` 補查。
-- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
-
 ## ET 2026-07-03
 - recorded_at: 2026-07-02T10:18:14+08:00
-- last_recheck_at: 2026-07-02T10:21:55+08:00
+- last_recheck_at: 2026-07-03T09:52:00+08:00
 
 ### TBD 場次（待補查）
-- STL @ CHC (CHC home TBD)
-- PIT @ WSH (PIT away TBD)
-- NYM @ ATL (ATL home TBD)
-- SF @ COL (both TBD)
-- TB @ HOU (TB away TBD)
-- BOS @ LAA (LAA home TBD)
-- MIA @ ATH (MIA away TBD)
-- MIL @ AZ (MIL away TBD)
-- TOR @ SEA (SEA home TBD)
+- SF @ COL (SF away TBD)
 
 ### 已評估
 | SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
 |---|---|---|---|---|---|---|---|
-| Jose Cabrera | AZ vs MIL | MIL (.737 🟡 / vs RHP .760) | 1% | 33/— | <P25·**P70-80**·**>P90**·P40-50·**P80-90** | ❌ 不推 (deep) | deep：MIL 回歸後中強偏熱（30d .802/26 場大樣本 + 7d .841 + R/G 5.4，scan 的 14d .739 🟡 反而是唯一低窗）+ QS 天花板被新秀球數上限鎖死（兩場先發都正好 5.0 IP，PC 62→80，需 ~90 球內投完 6 局）+ 唯一客場先發即爆（6/27 @TB 4ER/2HR）。Sum 33 結構利多僅 10 IP 樣本，game log 1 gem 1 爆無獨立支撐。純缺 K 且 ERA/WHIP 已輸定者可零成本小賭 5IP+4K；正常情境 pass。樣本 medium |
-| Mike Paredes | MIN @ NYY | NYY (.542 🟢 / vs RHP .731) | 1% | 16/— | <P25·<P25·P25-40·P40-50·P50-60 | ❌ 不推 | 5-slot 無 elite 軸 + K9 4.62 幾無 K 價值 + ⚠️ 賣高運氣（ERA 4.26 < xERA 5.41）+ IP/GS 4.5 QS 難。唯一利多 = NYY 14d .542 🟢 聯盟級冰冷。純賭對手冷的 ratio 一場，無 K/QS upside，不值 1 次異動。樣本 medium |
+| Jose Cabrera | AZ home | MIL (.737 🟡 / vs RHP .760) | 1% | 33/— | <P25·**P70-80**·**>P90**·P40-50·**P80-90** | ❌ 不推 (deep) | deep：MIL 回歸後中強偏熱（30d .802/26 場大樣本 + 7d .841 + R/G 5.4，scan 的 14d .739 🟡 反而是唯一低窗）+ QS 天花板被新秀球數上限鎖死（兩場先發都正好 5.0 IP，PC 62→80，需 ~90 球內投完 6 局）+ 唯一客場先發即爆（6/27 @TB 4ER/2HR）。Sum 33 結構利多僅 10 IP 樣本，game log 1 gem 1 爆無獨立支撐。純缺 K 且 ERA/WHIP 已輸定者可零成本小賭 5IP+4K；正常情境 pass。樣本 medium |
+| Mike Paredes | MIN away | NYY (.542 🟢 / vs RHP .731) | 1% | 16/— | <P25·<P25·P25-40·P40-50·P50-60 | ❌ 不推 | 5-slot 無 elite 軸 + K9 4.62 幾無 K 價值 + ⚠️ 賣高運氣（ERA 4.26 < xERA 5.41）+ IP/GS 4.5 QS 難。唯一利多 = NYY 14d .542 🟢 聯盟級冰冷。純賭對手冷的 ratio 一場，無 K/QS upside，不值 1 次異動。樣本 medium。0703 補查：已被別隊認領 |
+| Brady Singer | CIN home | BAL (.688 🟢 / vs RHP .734) | 19% | 19/21 | <P25·P50-60·P50-60·P40-50·<P25 | ❌ 不推 | 無 elite 軸 + xwOBACON <P25（ERA 5.12 / xERA 5.56 更差）+ IP/GS 4.83 QS 難；唯一利多 BAL 🟢，結構不支撐 |
+| Ryan Feltner | COL home | SF (.691 🟢 / vs RHP .741) | 2% | 18/25 | <P25·P40-50·P25-40·P50-60·P25-40 | ❌ 不推 | Coors 主場 + 無 elite 軸 + K9 5.9 無 K 價值；SF 🟢 不足以抵 Coors ratio 風險 |
 
 ### 備註
 - 2026-07-03 首次評估（recorded TW 10:18，ET 7/3 為後天，9 場 TBD 多未公布）：2 位過 Rotation gate + Sum ≥15 + true_starter 進主表（Cabrera ⚠️ / Paredes ❌）。Sum<15 hard floor 排除 1 位（Christian Scott NYM @ ATL Sum11 — K9 10.6 名氣款但 BB/9 4.2 + xwOBACON <P25 + ⚠️ 賣高運氣 ERA 3.20 < xERA 4.61）。Rotation gate 🚫 排除 1 位（Jack Perkins ATH vs MIA g22/gs5 pure RP，6/21 亦排除過同人）。owned_by_others 11 位（含 Gerrit Cole / Dylan Cease / Ohtani / Michael King / Gavin Williams / Arrighetti）+ 本隊 1 位（Andre Pallante STL @ CHC）。
@@ -49,4 +26,45 @@
 - 2026-07-02 10:21 deep eval（1 位候選）：
   - **Jose Cabrera**：⚠️ 條件推 → **❌ 不推 (deep) 降級**。差異訊號 = ① 對手重評：MIL 30d .802（26 場大樣本）+ 7d .841 + R/G 5.4，scan 錨定的 14d .739 是三窗中唯一低點 → 回歸判斷中強偏熱（.760-.790），非 🟡 中性；② QS 結構天花板：兩場 MLB 先發都被新秀 leash 鎖在正好 5.0 IP（PC 62→80），QS 需 ~90 球內吃完 6 局 → QS% 僅 ~15-20%，pending「QS 邊緣」高估；③ floor：唯一客場先發 6/27 @TB 即 4ER/2HR。sample medium 下結構訊號需 game log 獨立支撐，但 1 gem 1 爆撐不起 ⚠️。
 - deep 排序：**本日（7/3）無可推候選**（Cabrera ❌ deep / Paredes ❌ scan）。等 9 場 TBD 公布後補查再議。
+- 2026-07-03 09:52 補查：9 場 TBD 公布 8 場，剩 SF @ COL 的 SF 端。新評 2 位進主表（🆕 Singer ❌ / 🆕 Feltner ❌），Christian Scott 再次 Sum11 hard floor 排除。Paredes 已被別隊認領（lost_to_others）。Cabrera 官方 statsapi 已確認 7/3 先發（前次「部分站點標 TBD」疑慮解除），deep ❌ 維持。**本日維持無可推候選**。註：前次表格「隊」欄寫 `AZ vs MIL` 格式不符 pending_parser（要求 `AZ home`），pending_diff 曾全空，本次已修正格式。
+- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
+
+## ET 2026-07-04
+- recorded_at: 2026-07-03T09:55:00+08:00
+- last_recheck_at: —
+
+### TBD 場次（待補查）
+- SF @ COL (SF away TBD)
+
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Griffin Canning | SD away | LAD (.800 🔴 / vs RHP .807) | 1% | 18/18 | <P25·P50-60·<P25·P60-70·P25-40 | ❌ 不推 | @ LAD 🔴 全表最硬對手 + BB/9 5.36 <P25 爆局風險；✅ 撿便宜運氣（ERA 7.09 / xERA 5.04）不足以抵 |
+
+### 備註
+- 2026-07-03 首次評估：僅 1 位過 filter（Canning ❌）。Sum<15 hard floor 排除 3 位（Sam Aldegheri 11 / Aaron Civale 11 / Merrill Kelly 14 — Kelly 36% owned 名氣款但 2026 xERA 7.55 崩盤 + ⚠️ 賣高運氣）。Rotation gate 🚫 排除 1 位（Sean Manaea NYM @ ATL g18/gs4 — gate 判 long-relief；ATL 14d .543 聯盟最冷，若官方 confirm 他拉長局數可手動重看）。**本日無值得串流候選**。
+- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
+
+## ET 2026-07-05
+- recorded_at: 2026-07-03T09:55:00+08:00
+- last_recheck_at: —
+
+### TBD 場次（待補查）
+- TB @ HOU (TB away TBD)
+- SF @ COL (SF away TBD)
+
+### 已評估
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|
+| Javier Assad | CHC home | STL (.664 🟢 / vs RHP .716) | 11% | 25/21 | P40-50·<P25·P70-80·P50-60·P40-50 | ⚠️ 條件推 | WHIP 1.12 + BB/9 P70-80 控球型 + STL 冷 + 主場；缺 K（Whiff 13.9% <P25 / K9 5.4）→ 只補 IP/QS/ratio；g13/gs6 swing 角色留意官方 confirm。樣本 medium |
+| Miles Mikolas | WSH home | PIT (.874 🔴 / vs RHP .785) | 1% | 25/19 | <P25·<P25·>P90·P60-70·P50-60 | ❌ 不推 | Sum 25 靠 BB/9 >P90 單軸；PIT 14d .874 全表最燙 + K9 5.0 無 K + g18/gs7 IP/GS 4.57 QS 難 |
+| Luinder Avila | KC home | PHI (.784 🔴 / vs RHP .724) | 3% | 22/— | <P25·P50-60·<P25·P50-60·P70-80 | ❌ 不推 | BB/9 5.79 <P25 爆局風險 + PHI 🔴 + IP/GS 4.05 QS 幾無可能 |
+| Ryan Johnson | LAA home | BOS (.694 🟢 / vs RHP .676) | 2% | 19/— | <P25·P40-50·P25-40·<P25·P80-90 | ⚠️ 條件推 | WebSearch 確認真先發（G-Rod IL 缺輪值位，近 3 場常規先發，6/23 vs BAL 6IP 8K 0R、6/29 5IP 1ER）+ xwOBACON P80-90 + ✅ 撿便宜運氣（ERA 7.40 / xERA 4.29）+ BOS 🟢；⚠️ G-Rod 傷癒啟用在即，7/5 先發僅 tentatively projected — claim 前必確認官方 probable |
+| Tanner Gordon | COL home | SF (.675 🟢 / vs RHP .741) | — | 19/13 | <P25·P50-60·>P90·<P25·<P25 | ❌ 不推 | Coors 主場 + xwOBACON <P25 被打爆 + ERA 6.69；BB/9 >P90 唯一亮點 |
+| Aaron Nola | PHI away | KC (.634 🟢 / vs RHP .708) | 47% | 16/25 | <P25·P50-60·P40-50·P25-40·<P25 | ❌ 不推 | 名氣款：雙年 ERA 6+ + xwOBACON <P25 結構性被打爆；KC 🟢 + K9 9.2 唯一誘因，✅ 撿便宜運氣不足以翻 |
+| Brandon Sproat | MIL away | AZ (.684 🟢 / vs RHP .665) | 21% | 15/21 | <P25·P60-70·<P25·P40-50·<P25 | ❌ 不推 | Sum 15 貼 hard floor + BB/9 4.08 + xwOBACON <P25；K9 9.6 有 K 但 WHIP / 爆局風險高 |
+
+### 備註
+- 2026-07-03 首次評估：7 位過 filter 進主表（Assad ⚠️ / Johnson ⚠️ / 其餘 ❌）。Sum<15 hard floor 排除 3 位（Erick Fedde 13 / Matthew Liberatore 9 / JP Sears 9 — Sears 為 small_sample 但先被 hard floor 淘汰，省 WebSearch）。Rotation gate 🚫 排除 1 位（Cal Quantrill TEX vs DET g17/gs2 IP/GS 3.0）。
+- **排序：Johnson（席位確認前提下最佳）> Assad（安全但零 K 上限）**。Johnson 的先發需在 TW 7/4-7/5 確認 LAA 官方 probable（G-Rod activation 新聞）；若被擠掉則 Assad 是唯一可用。TB @ HOU 的 TB 端 + SF 端仍 TBD，建議 TW 7/4 `/stream-sp 2026-07-05 --tbd-only` 補查。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
