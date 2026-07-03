@@ -6,7 +6,7 @@
 
 ## ET 2026-07-03
 - recorded_at: 2026-07-02T10:18:14+08:00
-- last_recheck_at: 2026-07-03T10:00:00+08:00
+- last_recheck_at: 2026-07-03T10:10:00+08:00
 
 ### TBD 場次（待補查）
 - SF @ COL (SF away TBD)
@@ -18,6 +18,7 @@
 | Mike Paredes | MIN away | NYY (.542 🟢 / vs RHP .731) | 1% | 16/— | <P25·<P25·P25-40·P40-50·P50-60 | ❌ 不推 | 5-slot 無 elite 軸 + K9 4.62 幾無 K 價值 + ⚠️ 賣高運氣（ERA 4.26 < xERA 5.41）+ IP/GS 4.5 QS 難。唯一利多 = NYY 14d .542 🟢 聯盟級冰冷。純賭對手冷的 ratio 一場，無 K/QS upside，不值 1 次異動。樣本 medium。0703 補查：已被別隊認領 |
 | Brady Singer | CIN home | BAL (.688 🟢 / vs RHP .734) | 19% | 19/21 | <P25·P50-60·P50-60·P40-50·<P25 | ⚠️ 條件推 (deep) | deep：近 6 場 ERA 3.45 + BAL 三窗連降（.713→.688→.623、K% 27%）+ 近 5 場場均 ~5.8K → K+QS 賭注成立。風險 = 全季 5 崩盤 4 次對弱隊（含 6/28 @PIT 4.1IP/5ER）+ HR 病（xwOBACON <P25）+ GABP。QS ~45-50% |
 | Ryan Feltner | COL home | SF (.691 🟢 / vs RHP .741) | 2% | 18/25 | <P25·P40-50·P25-40·P50-60·P25-40 | ⚠️ 條件推 (deep) | deep：IL 復歸後 6 場 4QS + ERA 3.27（Coors 3QS）+ SF 14d .691 冷（R/G 3.25）→ QS/IP/ratio 賭注成立。風險 = 零 K（近 6 場 33IP 僅 18K）+ Coors variance（6/11 CHC 6ER）+ SF 30d .777 回升 risk。QS ~50% |
+| Christian Scott | NYM away | ATL (.547 🟢 / vs RHP .721) | 14% | 11/— | <P25·P60-70·<P25·<P25·<P25 | ⚠️ 條件推 (deep) | deep（scan Sum11 hard floor 排除，用戶點名翻案）：ATL 三窗塌陷 .599→.544→.503（R/G 3.0，24 場大樣本）+ 近 6 場 ERA 3.07 + K9 10.1 → ER/K/ratio 賭注成立。天花板 = **10 場先發 0 QS、最高 5.2 IP**（leash ~90 球，QS ~10-15%）+ HR 病（GB/xwOBACON <P25，6/11 STL 3HR）+ ⚠️ 賣高運氣。純 K+ratio 用 |
 
 ### 備註
 - 2026-07-03 首次評估（recorded TW 10:18，ET 7/3 為後天，9 場 TBD 多未公布）：2 位過 Rotation gate + Sum ≥15 + true_starter 進主表（Cabrera ⚠️ / Paredes ❌）。Sum<15 hard floor 排除 1 位（Christian Scott NYM @ ATL Sum11 — K9 10.6 名氣款但 BB/9 4.2 + xwOBACON <P25 + ⚠️ 賣高運氣 ERA 3.20 < xERA 4.61）。Rotation gate 🚫 排除 1 位（Jack Perkins ATH vs MIA g22/gs5 pure RP，6/21 亦排除過同人）。owned_by_others 11 位（含 Gerrit Cole / Dylan Cease / Ohtani / Michael King / Gavin Williams / Arrighetti）+ 本隊 1 位（Andre Pallante STL @ CHC）。
@@ -31,6 +32,9 @@
   - **Brady Singer**：❌ 不推 → **⚠️ 條件推 升級**。差異訊號 = ① 近 6 場 ERA 3.45 / QS 2/6 / IP/GS 5.22（scan 的 IP/GS 4.83 + xwOBACON <P25 是全季值，近況已回穩，6/22 MIL 7IP/0ER/7K）；② BAL 三窗連降 30d .713 → 14d .688 → 7d .623 + K% 27%（Singer 近 5 場 29K/26.3IP，K 上行）；③ 對強隊反而穩（ATL 3ER / NYM 1ER / SD 2ER）。抵消訊號 = 全季 5 次崩盤 4 次對弱隊（MIA/PIT/CLE/PIT，最近 6/28 @PIT 4.1IP/5ER 2HR）— 對弱隊 BAL 是雙面刃 + GABP HR park。
   - **Ryan Feltner**：❌ 不推 → **⚠️ 條件推 升級**。差異訊號 = ① 5/30 IL 復歸為明確 inflection point，復歸後 6 場 4QS / ERA 3.27 / IP/GS 5.5，其中 3 QS 在 Coors（scan 的 Coors 排除被 game log 反證）；② 對中-強隊 2/2 QS（BOS 2ER / MIN 1ER）；③ SF 14d .691 + R/G 3.25 冷。抵消訊號 = 零 K 價值（近 6 場 K9 4.9，6/28 6IP 0K）+ SF 30d .777 回升 risk + 6/11 CHC 6ER。
 - deep 排序：**Singer > Feltner**。Singer 給 K+QS 雙賭（BAL 更冷 + 高 K%、非 Coors）；Feltner QS 率較高但零 K，只適合 ERA/WHIP 已輸定或純缺 QS/IP 情境。兩位皆 ⚠️ — 7/3 從「無可推」改為「有條件可賭」。
+- 2026-07-03 10:10 deep eval（1 位，用戶點名 hard-floor 翻案檢驗）：
+  - **Christian Scott**：scan Sum11 hard floor 排除 → **⚠️ 條件推 升級（限定用途）**。差異訊號 = ① ATL 崩盤級冰冷（30d .599 → 14d .544 → 7d .503、R/G 3.0，24 場大樣本非噪音）— 全表最弱對手，遠低於季 vs RHP .721；② 近 6 場 ERA 3.07 + K9 10.1（兩場 8K），結構弱訊號近 6 場僅 6/11 STL 3HR 一次兌現；③ 6/11→6/27 有 16 天 gap（跳過輪值），6/27 復出 4.1IP/2ER/6K 正常。天花板 = 10 場先發 0 QS、單場最高 5.2 IP（NYM leash ~90 球）→ QS ~10-15%、IP 貢獻低。Scan 的 Sum11 hard floor 判「不值得串」對 QS/IP 視角正確，但 K/ratio 視角漏掉對手極端情境。
+- deep 排序更新（7/3 三位 ⚠️）：**Singer ≈ Scott > Feltner**，按類別需求選 — Singer 最均衡（K + QS 機會 + W）；Scott ER/K/ratio 上限最高但 QS≈0、IP 低；Feltner 純 QS/IP。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
 
 ## ET 2026-07-04
