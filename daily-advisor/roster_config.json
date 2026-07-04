@@ -20,7 +20,7 @@
         "g": 123
       },
       "selected_pos": "C",
-      "status": ""
+      "status": "DTD"
     },
     {
       "name": "Christian Walker",
@@ -41,8 +41,8 @@
         "pa": 640,
         "g": 154
       },
-      "selected_pos": "1B",
-      "status": "DTD"
+      "selected_pos": "BN",
+      "status": ""
     },
     {
       "name": "Jazz Chisholm Jr.",
@@ -64,7 +64,7 @@
         "pa": 531,
         "g": 130
       },
-      "selected_pos": "BN",
+      "selected_pos": "Util",
       "status": ""
     },
     {
@@ -108,7 +108,7 @@
         "pa": 542,
         "g": 126
       },
-      "selected_pos": "CF",
+      "selected_pos": "BN",
       "status": "DTD"
     },
     {
@@ -130,7 +130,7 @@
         "pa": 667,
         "g": 157
       },
-      "selected_pos": "Util",
+      "selected_pos": "2B",
       "status": ""
     },
     {
@@ -165,7 +165,7 @@
         "1B",
         "2B"
       ],
-      "selected_pos": "2B",
+      "selected_pos": "1B",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -385,7 +385,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "P",
+      "selected_pos": "BN",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -453,7 +453,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -514,16 +514,27 @@
       }
     },
     {
-      "name": "Christian Scott",
-      "mlb_id": 681035,
-      "yahoo_player_key": "469.p.60292",
-      "team": "NYM",
+      "name": "Ryan Johnson",
+      "mlb_id": 696270,
+      "yahoo_player_key": "469.p.64367",
+      "team": "LAA",
       "positions": [
-        "SP"
+        "SP",
+        "RP"
       ],
       "selected_pos": "P",
       "status": "",
-      "prior_stats": null
+      "prior_stats": {
+        "season": 2025,
+        "xera": 3.53,
+        "xwoba_allowed": 0.293,
+        "hh_pct_allowed": 35.3,
+        "barrel_pct_allowed": 7.8,
+        "bbe": 51,
+        "era": 7.36,
+        "ip": 14.7,
+        "ip_per_gs": null
+      }
     }
   ],
   "teams": {
