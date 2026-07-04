@@ -35,6 +35,17 @@
 - **交易掃描工具擴充**：SP 端排名掃描 + 「我方打者對方排 ≤8 × 對方 SP 品質」自動交叉比對
 - **preview 加聯盟 scoreboard**：預測時有數據基礎
 
+## 非目標（Non-goals）
+
+刻意不做的事，防止未來的自己或 AI「好心」加回來：
+
+- **不做「預測未來 roster」機制** — waiver 結果 TW 15:00 後拉即知；pending claim 本就可能失敗，不該預測
+- **不用 hot/cold streaks 與 BvP 對戰史進評估框架** — 前者零預測力、後者樣本太小（7×7 格式規則明文）
+- **不為 SV+H 加碼 RP** — Punt SV+H 策略，RP 上限 2 位；SB 軟 punt，不刻意追速度
+- **串流 SP 不是常態** — 預設不串流，contested 類別 + controllable 變數推算成立才走 `/stream-sp`
+- **breakout 家族與 research_more 不進 #316** — PRD 明列 out of scope，不夾帶進執行層切片
+- **不本機 call Yahoo、token 不落地本機** — 架構層約束，由 PreToolUse hook 機械化執行
+
 ## 賽季時間軸
 
 - 每週節奏：週一覆盤 / 週四 IP 檢查 / 每日 lineup 微調

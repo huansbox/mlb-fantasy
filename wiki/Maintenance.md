@@ -57,6 +57,23 @@ bash bin/vps-run.sh --no-retry 'cd /opt/mlb-fantasy/daily-advisor && python3 git
 | 週四 | 查 IP 進度（scoreboard），不夠才考慮 `/stream-sp` 串流 |
 | 事件觸發 | 球員受傷 / 表現差 → 查 `waiver-log.md` → `/player-eval` → 執行 |
 
+## 已知地雷（Gotchas）
+
+皆為實際踩過、已記錄於 CLAUDE.md / issues 的教訓——本段是人類可讀摘要，動手前讀對應追蹤檔。
+
+### 系統面
+
+- **Yahoo read-after-write lag × 浮水印**：交易寫入後 roster 查詢有延遲窗；watermark 在 lag 窗內推進會**永久漏交易**（踩過三次才根治為 monotonic watermark + 每日 reconcile）。動同步邏輯前先讀 `issues/roster-sync-watermark-feed-lag.md`
+- **Daily-Tomorrow 次日生效 claim**：waiver claim 以當天時間戳記錄 successful，但 roster 效果 ET 隔日才反映——同步窗口不足 30h 會在生效前放棄並跳過該交易（commit `1a56c6f` 教訓）
+- **`claude -p` 的 thinking 誘發**：在 prompt 加「只在實質變化時才 UPDATE」這類 skip 規則，實測誘發 ~12K thinking token、output 3 倍、cost +68%——「省 output」的直覺操作會 backfire（lever 2 已放棄，動 master prompt 前先做配對 A/B）
+- **backtest「no verdicts」≠ 沒有 verdict**：曾因 parse regex 不匹配 production 格式 + outcome fetch 是 stub，兩班 cron 靜默空跑；單元測試全綠（手寫假樣本測不出）。驗收自動化必須拿 production 真實資料實測
+
+### 決策面
+
+- **SP 的 selected_pos 不是品質訊號**：投手在 SP/BN 間輪換調度，BN ≠ 非主力；drop 理由只能來自結構面（v4 5-slot / 雙年 prior / 樣本 / 21d 趨勢）
+- **v2 退役指標（HH% / xERA / xwOBA）不可判 SP**：2026-05-04 曾用 HH% P5 反向誤判結構性弱；不在 5-slot 的百分位只是 context，不是 first-order signal
+- **投手 drop 前查 probable starts**：BN ≠ 本週沒先發，用實證輪值取代 selected_pos 推測貢獻
+
 ## 故障排查
 
 - **roster 沒同步**：查 VPS `/var/log/roster-sync.log` 與 git log；watermark 案例史見 `issues/roster-sync-watermark-feed-lag.md`
