@@ -478,6 +478,7 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `league-scouting.md` | 聯賽 12 隊 GM 策略分析 |
 | `賽季管理入門.md` | H2H One Win 賽季管理入門要點 |
 | `docs/architecture.md` | 系統架構資料流圖（CLAUDE.md / daily_advisor / fa_scan / roster_config / waiver-log 讀寫關係） |
+| `wiki/` + `.github/workflows/publish-wiki.yml` | GitHub wiki 唯一編輯處（Home / Maintenance / Roadmap / Plan / Tech-Debt，zh-tw）— push 到 master 且 `wiki/**` 有變動時 CI 自動發佈到 `.wiki.git`，**不要在 GitHub 網頁上編輯 wiki**。穩定頁（Home/Maintenance）跟著機制變更的 PR 順手改；快照頁（Plan/Roadmap/Tech-Debt）標快照日期，milestone 時重讀 repo 刷新 |
 | `docs/streaming-sp-playbook.md` | 串流 SP 詳細手冊（mental model / 決策規則 / 操作流程） — 預設不串流，需要時才查 |
 | `docs/rp-svh-metrics.md` | **RP-SV+H 評估 SOP 唯一規格依據** — production-first 大名單產生 / 三軸 rank-sum 候選池縮減 / LLM 層輸入設計。`/rp-svh` skill 引用此處 |
 | `issues/rp-svh-sop.md` | RP-SV+H SOP 落地規劃 issue（A 機械層 / B skill / C 整合退役）— 8 個開放決策 2026-05-19 定案 |
