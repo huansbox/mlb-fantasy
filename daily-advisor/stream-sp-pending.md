@@ -37,6 +37,7 @@
   - **Gordon**：❌ → **❌ (deep) 維持**。floor 高（近 6 場 3 崩含弱打 MIA）+ 缺陣整月後回歸首戰又崩。
   - **Mahle**（hard floor 排除者，用戶指名深評，不入表）：**❌ 確認**。近 6 ERA 6.46 + floor 高（gem/崩極端交替：PHI/LAD/TB/ATH 0ER vs CIN 8ER / AZ 6ER 等 7 次 4+ER）+ COL 三窗 .861/.871/.892 全聯盟最燙級 + Coors；2025 Sum 28 prior 是唯一支撐，擋不住對手/場地。
   - deep 排序：**Assad >> Avila > Mahle ≈ Gordon**。lens 下只有 Assad 三類別（IP/W/WHIP）正期望；要 K 靠隊上 Johnson 今晚 vs BOS，Avila 的 K ~4-5 帶 WHIP 1.5+ 代價不划算。
+- 2026-07-05 ~13:00 執行：**已 drop Leahy → add Assad（FA $0）**。決策依據：五選一 drop 分析（Leahy 本週剩餘 0 + 結構最弱 xERA 5.74/xwOBACON pct0 + 最易撿回）；RP 不動（Gaddis 今晚 ~25% hold 是 SV+H 主票、Ashby 是 W/K 禿鷹票）；B 案（改撿 Petersen 拉 SV+H）經 scoreboard 比較後棄 — IP −2.1 / K −2 / W 6-6 三個 loss/tie flip 的期望 ~0.8 格 > SV+H 單類 +23pp ~0.23 格。
 - _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
 
 ## ET 2026-07-06
