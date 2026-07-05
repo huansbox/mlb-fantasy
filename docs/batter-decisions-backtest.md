@@ -68,3 +68,36 @@ Decision KPIs (issue 051):
 - ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
 - 🔁 regret（撿入後 30 天內再推薦）: 0
 
+
+## Weekly Batter Backtest 2026-07-05 (2026-06-11 ~ 2026-06-14)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 17 (replace 7 / watch 10; episodes in lookback: 52)
+- Judge panel（issue 030）: 2 位裁判同指示合議，2 calls（強制二選一＋明顯/勉強；同人+至少一明顯=採用，餘=難分）；機械類別比數僅為稽核底稿，不參與判定
+- 命中率 — replace（量太衝動）: 71%（5/7），難分 0 / watch（鏡像，量太保守；難分=看對計 hit）: 57%（4/7）
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 3（hit-rate 50%（1/2））/ not-executed 14（hit-rate 67%（8/12））
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 4/4 (100%) / ≤3★ 3/6 (50%)
+- ⏱ 觸發→執行延遲中位: 1.5 天（n=2；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 1 — Kody Clemens
+
+Episodes:
+- 2026-06-11 (2d) `replace/取代` add Isaac Paredes ⇄ drop Albies → 機械比數 FA 3W-2L-1T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **hit** 〔not executed〕
+- 2026-06-11 (1d) `replace/立即取代` add Jac Caglianone ⇄ drop Arraez → 機械比數 FA 4W-2L-0T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **hit** 〔not executed〕
+- 2026-06-11 (1d) `replace/立即取代` add Spencer Steer ⇄ drop Rafaela → 機械比數 FA 2W-3L-1T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔already rostered 2026-06-10〕
+- 2026-06-11 (1d) `watch` watch Curtis Mead vs Duran → 機械比數 FA 6W-0L-0T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **miss** 〔not executed〕
+- 2026-06-11 (1d) `watch` watch Joc Pederson vs Arraez → 機械比數 FA 3W-2L-1T → 裁判 J1 A·明顯 / J2 A·勉強 ⇒ adopted A → **miss** 〔not executed〕
+- 2026-06-11 (1d) `watch` watch Kyle Karros vs 待定 → 機械比數 no data → **no-data** 〔not executed〕（unresolved id: 待定）
+- 2026-06-11 (1d) `watch` watch Samuel Basallo vs 待定 → 機械比數 no data → **no-data** 〔not executed〕（unresolved id: 待定）
+- 2026-06-12 (1d) `replace/立即取代` add Spencer Steer ⇄ drop Dubón → 機械比數 FA 2W-3L-1T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔not executed〕
+- 2026-06-12 (1d) `watch` watch Curtis Mead vs Albies → 機械比數 FA 2W-4L-0T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **hit** 〔not executed〕
+- 2026-06-12 (1d) `watch` watch Joc Pederson vs Dubón → 機械比數 FA 2W-1L-3T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **miss** 〔not executed〕
+- 2026-06-12 (1d) `watch` watch Samuel Basallo vs Albies → 機械比數 FA 3W-2L-1T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **hit** 〔not executed〕
+- 2026-06-13 (1d) `replace/取代` add Cam Smith ⇄ drop Ezequiel Duran → 機械比數 FA 3W-3L-0T → 裁判 J1 A·明顯 / J2 A·勉強 ⇒ adopted A → **hit** 〔not executed〕
+- 2026-06-13 (4d) `replace/取代` add Isaac Paredes ⇄ drop Ozzie Albies → 機械比數 FA 3W-2L-1T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **hit** 〔not executed〕
+- 2026-06-13 (1d) `watch` watch Joc Pederson vs Albies → 機械比數 FA 4W-2L-0T → 裁判 J1 A·勉強 / J2 A·勉強 ⇒ 難分 → **hit** 〔not executed〕
+- 2026-06-13 (1d) `watch` watch Kody Clemens vs Duran/Albies → 機械比數 no data → **no-data** 〔executed 2026-06-15〕（unresolved id: Duran/Albies）
+- 2026-06-14 (1d) `replace/取代` add Kody Clemens ⇄ drop Ezequiel Duran → 機械比數 FA 5W-0L-1T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **hit** 〔executed 2026-06-15〕
+- 2026-06-14 (1d) `watch` watch Spencer Torkelson vs Mauricio Dubón → 機械比數 FA 1W-3L-2T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **hit** 〔not executed〕
+

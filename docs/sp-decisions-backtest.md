@@ -337,3 +337,21 @@ Episodes:
 - 2026-06-06 (1d) `pass` pass → **neutral**
 - 2026-06-07 (2d) `watch` watch Peter Lambert → **hit**
 
+
+## Weekly Backtest 2026-07-05 (2026-06-09 ~ 2026-06-12)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 3 (actionable: 3; episodes in lookback: 23)
+- Hit rate: 100%
+- Average marginal benefit (xwOBACON Δ favoring add): +0.0580
+
+By action:
+- `drop_X_add_Y` n=1 (actionable 1) hit_rate=100%
+- `watch` n=2 (actionable 2) hit_rate=100%
+- `pass` n=0 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-06-09 (2d) `watch` watch Shane Drohan → **hit**
+- 2026-06-11 (7d) `drop_X_add_Y` drop Walker Buehler → add Peter Lambert → **hit**, Δ +0.058
+- 2026-06-12 (1d) `watch` watch Peter Lambert → **hit**
+
