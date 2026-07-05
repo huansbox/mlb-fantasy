@@ -580,6 +580,7 @@ vs：Ozzie Albies
 - 06-05：Trevor McDonald beats Buehler on all 5 slots: IP/GS 5.67 (P60) vs 4.81 (P0), Whiff% P60 vs P0, BB/9 P60 vs P40, GB% P95 vs P60, xwOBACON P80 vs P25. McDonald has 99 BBE (credible sample), 6 GS in 6 G（fa_scan）
 - 07-03：P1 Christian Scott is genuinely weak (IP/GS 4.5 p0, BB/9 4.2 p0, GB% 29.1 p0, xwOBACON .399 p0, only 45 IP), so a drop is defensible, but Step A's top 'worth' adds are shaky: Bryce Elder shows a +.116（fa_scan）
 - 07-04：P1 Ryan Johnson is a 24.3 IP capped swingman (4 GS, ERA 7.40, IP/GS 4.83 p0, GB 37 p0) whose only edge is a tiny-sample xwOBACON .345 p80 on 83 BBE. Trevor McDonald beats him in 4 of 5 slots — GB 56.2（fa_scan）
+- 07-05：McDonald beats P1 Johnson on 4 of 5 slots with a full 11-GS role vs Johnson's capped 4-GS/24-IP role: IP/GS 5.18 vs 4.83, GB% 56.2 (95p) vs 37.3 (0p), xwOBACON 0.331 (95p) vs 0.345 (80p), K9 7.9 vs 6.（fa_scan）
 
 ### Trent Grisham (NYY, CF) — 被搶（自動偵測）
 - 2026-05-29：Yahoo ownership_type=team，從觀察中移除。
