@@ -108,8 +108,8 @@
         "pa": 542,
         "g": 126
       },
-      "selected_pos": "BN",
-      "status": "DTD"
+      "selected_pos": "CF",
+      "status": ""
     },
     {
       "name": "Ozzie Albies",
@@ -445,29 +445,6 @@
       }
     },
     {
-      "name": "Kyle Leahy",
-      "mlb_id": 681517,
-      "yahoo_player_key": "469.p.61601",
-      "team": "STL",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "P",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 4.42,
-        "xwoba_allowed": 0.325,
-        "hh_pct_allowed": 44.1,
-        "barrel_pct_allowed": 9.8,
-        "bbe": 254,
-        "era": 3.07,
-        "ip": 88.0,
-        "ip_per_gs": 3.0
-      }
-    },
-    {
       "name": "Aaron Ashby",
       "mlb_id": 676879,
       "yahoo_player_key": "469.p.11489",
@@ -534,6 +511,29 @@
         "era": 7.36,
         "ip": 14.7,
         "ip_per_gs": null
+      }
+    },
+    {
+      "name": "Javier Assad",
+      "mlb_id": 665871,
+      "yahoo_player_key": "469.p.12682",
+      "team": "CHC",
+      "positions": [
+        "SP",
+        "RP"
+      ],
+      "selected_pos": "P",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xera": 4.86,
+        "xwoba_allowed": 0.339,
+        "hh_pct_allowed": 40.4,
+        "barrel_pct_allowed": 3.5,
+        "bbe": 114,
+        "era": 3.65,
+        "ip": 37.0,
+        "ip_per_gs": 5.0
       }
     }
   ],
