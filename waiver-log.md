@@ -141,32 +141,6 @@
 - 07-04：14d OPS .718<.800觸發破線(從.860回落)+Savant Δ-0.005;xwOBA P70/Barrel P60中庸;Albies空缺Grisham/Pederson更乾淨填補;降溫watch（fa_scan）
 - 07-05：14d OPS .718<.800觸發破線(從.860回落)+Savant Δ-0.004;xwOBA P70中庸;Albies已有Grisham/Pederson更乾淨取代;接近結案,明日無反彈則CLOSE;vs Albies（fa_scan）
 
-### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
-觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
-- 06-10：Season P70/P95/P95/P80 power 結構強但 14d K% 35.8 massive spike 警訊；prior P40/P60/P40 非雙年確認；5% 零壓力（fa_scan）
-- 06-11：14d K% 35.8 massive spike 持續；觸發 <28% 連 5 天極遠；prior P40 非雙年確認；5% 零壓力（fa_scan）
-- 06-12：14d K% 35.8 massive spike 持續；觸發 <28% 極遠；prior P40 非雙年確認（fa_scan）
-- 06-13：14d K% 33.3 從 35.8 回落但仍遠超 28% 觸發線；OPS .901；5% 零壓力（fa_scan）
-- 06-14：14d K% 32.7從35.8回落但仍遠超28%觸發線；OPS .944；5%零壓力（fa_scan）
-- 06-15：14d K% 30.9從32.7微降但仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
-- 06-16：14d K% 30.9從32.7微降仍遠超28%觸發線；OPS .845；5%零壓力（fa_scan）
-- 06-17：14d K% 27.3首次跌破28%觸發線 day 1/5 + OPS .962≥.800 ✓；P80/P95/P95/P80；需連5天維持（fa_scan）
-- 06-18：14d K% 27.3首次跌破28%觸發線 day 2/5 + OPS .866≥.800 ✓；P80/P95/P95/P80；Savant Δ+0.081品質大幅上升；需連5天維持（fa_scan）
-- 06-19：14d K% 28.8回升>28%觸發線 counter歸零（27.3→28.8）；OPS .887≥.800 ✓但K%未達；Savant Δ+0.060品質大幅上升；P80/P95/P95/P80；6%零壓力（fa_scan）
-- 06-20：14d K% 28.8回升>28%觸發線counter歸零；OPS .965+Savant Δ+0.060品質上升；P80/P95/P95/P80；6%零壓力（fa_scan）
-- 06-23：14d K% 29.8>28%觸發線counter歸零+OPS .825≥.800 ✓但K%未達;Savant Δ+0.020;P80/P95/P80;6%零壓力（fa_scan）
-- 06-24：14d K% 29.1>28%觸發線counter歸零+OPS .819≥.800 ✓但K%未達;Savant Δ+0.006;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 06-25：14d K% 29.1>28%觸發線counter歸零+OPS .819≥.800 ✓但K%未達;Savant Δ+0.006;P70/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 06-26：14d K% 28.3>28%觸發線counter歸零+OPS .722<.800;Savant Δ+0.007;P70/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 06-27：14d K% 27.5<28%觸發線達(counter重啟day1)+OPS .854≥.800✓但需連5天;Savant Δ+0.000;P70/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 06-28：14d K% 27.5<28%觸發達(counter重啟day1)+OPS .854≥.800✓但需連5天;Savant Δ+0.000;P70/P95/P80;vs Rafaela（fa_scan）
-- 06-29：14d K% 27.5<28%✓但OPS .728<.800觸發破線+Savant Δ-0.021;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 06-30：14d K% 30.0>28觸發線counter歸零+OPS .636<.800;Savant Δ-0.012;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 07-01：14d K% 30.0>28觸發線counter歸零+OPS .636<.800;Savant Δ-0.012;P80/P95/P80;vs Rafaela（fa_scan）
-- 07-02：14d K% 29.3>28觸發破線counter歸零+OPS .852≥.800;Savant Δ-0.024;P80/P80/P80;6%零壓力;vs Rafaela（fa_scan）
-- 07-03：14d K% 23.8<28✓(counter重啟day1)+OPS .999≥.800✓+Savant Δ+0.030;P80/P95/P80;6%零壓力;vs Rafaela（fa_scan）
-- 07-04：14d K% 22.2<28✓(counter重啟day1)+OPS 1.089≥.800✓+Savant Δ+0.046上升;P80/P95/P95;7%零壓力;vs Rafaela（fa_scan）
-
 ### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
 觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
 vs：待定
@@ -309,6 +283,9 @@ vs：Christian Walker
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Garrett Mitchell (MIL, CF,RF) — 被搶（自動偵測）
+- 2026-07-05：Yahoo ownership_type=team，從觀察中移除。
 
 ### Slade Cecconi (CLE, SP) — 被搶（自動偵測）
 - 2026-07-01：Yahoo ownership_type=team，從觀察中移除。
