@@ -56,6 +56,7 @@
 - 07-02：14d OPS .800≥.700✓+K% 15.4<28✓+Savant Δ+0.014弱轉正;xwOBA P80結構穩;需Savant連3天正確認;vs Rafaela（fa_scan）
 - 07-03：14d OPS .800≥.700✓+K% 15.4<28✓但Savant Δ+0.002持平(未達連3天正);xwOBA P80結構穩;vs Rafaela（fa_scan）
 - 07-04：14d OPS .800≥.700✓+K% 13.5<28✓但Savant Δ+0.005持平(未達連3天正);xwOBA P80結構穩;vs Rafaela（fa_scan）
+- 07-05：14d OPS .700貼觸發線+K% 13.5<28✓+Savant Δ+0.028轉正day1(需連3天);4HR/6RBI modest;xwOBA P80穩;vs Rafaela（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -106,6 +107,7 @@
 - 07-02：14d OPS .384崩+Savant Δ-0.114下滑;xwOBA P80/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-03：14d OPS .362崩(連日下滑)+Savant Δ-0.110;xwOBA P80/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-04：14d OPS .435崩+Savant Δ-0.099下滑;xwOBA P80/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
+- 07-05：14d OPS .455續崩+Savant Δ-0.098;xwOBA P80/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 觀察中
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -137,6 +139,7 @@
 - 07-02：14d OPS .933≥.800✓/3HR9RBI+Savant Δ+0.071轉正但未達連5天正值;Albies空缺由Canzone更乾淨填補案降溫;⚠️已推薦14天未執行—推測FAAB/用戶override（fa_scan）
 - 07-03：14d OPS .860≥.800✓/3HR8RBI但Savant Δ+0.015未達連5天正值;Albies空缺今由Pederson更乾淨填補案降溫;⚠️已推薦取代14天未執行—推測FAAB/用戶override;降級watch（fa_scan）
 - 07-04：14d OPS .718<.800觸發破線(從.860回落)+Savant Δ-0.005;xwOBA P70/Barrel P60中庸;Albies空缺Grisham/Pederson更乾淨填補;降溫watch（fa_scan）
+- 07-05：14d OPS .718<.800觸發破線(從.860回落)+Savant Δ-0.004;xwOBA P70中庸;Albies已有Grisham/Pederson更乾淨取代;接近結案,明日無反彈則CLOSE;vs Albies（fa_scan）
 
 ### Garrett Mitchell (MIL, CF,RF) [mlb_id:669003] — 觀察中
 觸發：14d K% 回落 <28% 連 5 天 + OPS 維持 ≥.800 → 升級取代 Rafaela
@@ -189,6 +192,7 @@ vs：待定
 - 07-02：BBE 177<180觸發線未達+14d OPS 1.148但運氣+0.176膨脹+Savant Δ-0.042下滑+Coors+prior P0;2%零壓力skeptical（fa_scan）
 - 07-03：BBE 177<180觸發線未達+14d OPS 1.145但運氣+0.186膨脹+Savant Δ-0.007持平+Coors+prior P0;2%零壓力skeptical（fa_scan）
 - 07-04：BBE 181≥180觸發線今達+xwOBA P80≥P75✓但運氣+0.179巨膨脹+Savant Δ+0.012持平+Coors+prior P0;14d OPS 1.241灌水;skeptical不升級（fa_scan）
+- 07-05：BBE 181≥180✓+xwOBA P80≥P75✓但運氣+0.199巨膨脹+Savant Δ+0.028弱+Coors+prior P0;14d OPS 1.114灌水;skeptical不升級（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -212,6 +216,7 @@ vs：Mauricio Dubón
 - 07-02：14d K% 25.0≤28(counter day3需連5天)+OPS .832≥.750✓+Savant Δ+0.062上升;疑傷spike消退36.4→25.0;42%owned;vs Dubón（fa_scan）
 - 07-03：K% 25.0≤28 counter day3(需連5天)+OPS .832≥.750+Savant Δ+0.062上升;疑傷spike消退36.4→25.0;44%owned;vs Dubón（fa_scan）
 - 07-04：14d K% 25.0≤28(counter day4需連5天)+OPS .871≥.750✓+Savant Δ+0.073上升;疑傷spike消退36.4→25.0;44%owned;vs Dubón（fa_scan）
+- 07-05：14d K% 28.1>28觸發破線(counter從day4重置)+OPS .854≥.750✓+Savant Δ+0.073上升;43%owned;vs Dubón（fa_scan）
 
 ### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
@@ -228,6 +233,7 @@ vs：Christian Walker
 - 07-02：PA-TG 2.48<3.0+14d OPS .654<.850兩項觸發皆未達+xwOBA P50中等+K% 29.0;vs Christian Walker（fa_scan）
 - 07-03：PA-TG 2.48<3.0+14d OPS .654<.850兩項觸發皆未達+xwOBA P50中等+K% 29.0;vs Christian Walker（fa_scan）
 - 07-04：PA-TG 2.49<3.0+14d OPS .682<.850兩項觸發皆未達+xwOBA P50中庸+K% 29.5;vs Christian Walker（fa_scan）
+- 07-05：PA-TG 2.52<3.0+14d OPS .716<.850兩項觸發皆未達+xwOBA P50中庸;vs Christian Walker（fa_scan）
 
 ### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
 觸發：B2 2-step watch
@@ -239,12 +245,19 @@ vs：Ceddanne Rafaela
 - 07-02：xwOBA P60/Barrel% P70+14d .891/4HR/Savant Δ+0.061但PA-TG 2.36 platoon限局（fa_scan）
 - 07-03：xwOBA P60/Barrel P70+14d OPS .771(從.891回落)/3HR9RBI但PA-TG 2.39 platoon限局+Savant Δ+0.054;vs Rafaela（fa_scan）
 - 07-04：14d OPS .771<.850(從.891回落)+PA-TG 2.39 platoon限局兩項觸發未達+Savant Δ+0.035;vs Rafaela（fa_scan）
+- 07-05：14d OPS .731<.850+PA-TG 2.40 platoon限局兩項觸發未達+Savant Δ+0.038;xwOBA P60;vs Rafaela（fa_scan）
 
 ### Tommy Edman (LAD, 2B,3B,LF,CF) [mlb_id:669242] — 觀察中
 觸發：PA-TG≥3.0連5天+BBE達50
 vs：Ozzie Albies
 - 07-03：xwOBA P95/14d OPS 1.028菁英但PA-TG 0.56/BBE 32剛回歸量能全未確認（fa_scan）
 - 07-04：xwOBA P95/14d OPS 1.017菁英但PA-TG 0.59/BBE 36剛回歸量能未確認;運氣+0.109;vs Albies（fa_scan）
+- 07-05：xwOBA P95+14d OPS 1.017菁英但PA-TG 0.63<3.0/BBE 36<50量能未確認;3d+6→25%持有壓力升;運氣+0.097;vs Albies（fa_scan）
+
+### Josh Bell (MIN, 1B) [mlb_id:605137] — 觀察中
+觸發：PA-TG ≥3.0連5天 + 14d OPS ≥.850連5天
+vs：Christian Walker
+- 07-05：14d OPS 1.007/5HR/13RBI+Savant Δ+0.076/xwOBA P70;疑下週先發量,待確認（fa_scan）
 
 ## 隊上觀察
 
@@ -558,6 +571,7 @@ vs：Ozzie Albies
 - 07-02：[立即取代→Ceddanne Rafaela] xwOBA P95/BB% P80/Barrel% P70雙年菁英+14d 6HR/OPS .895健康;立即取代Rafaela只損SB（fa_scan）
 - 07-03：[立即取代→Ozzie Albies] xwOBA P95/BB% P80/Barrel P70+14d 6HR/OPS .895/Savant Δ+0.025上升/運氣-0.005無泡沫;5% owned零競爭;立即取代Albies（fa_scan）
 - 07-04：[取代→Christian Walker] xwOBA P95/Barrel P70+14d 6HR/Savant xwOBA .398(Δ+0.043上升);HR/RBI/R火力補Walker崩盤;K% 31.0唯一風險;⚠️已推薦取代2天未執行推測FAAB/override;vs崩盤中Christian Walker（fa_scan）
+- 07-05：[取代→Christian Walker] xwOBA P95/Barrel P70/HH P95健康+14d 5HR+Savant Δ+0.068;力量勝崩中Walker(P55);4%owned FAAB便宜;取代（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
@@ -589,6 +603,7 @@ vs：Ozzie Albies
 - 06-27：雙年P95/P95+BB% P95+14d OPS .948/2HR/13R/3SB菁英IL stash;IL10剛啟用不立即add（fa_scan）
 - 06-30：雙年雙菁英P95/BB% P95/Barrel% P80+14d .948/13R/3SB全能;但IL10 claim需佔slot預設不add;等脫IL恢復先發再評（fa_scan）
 - 07-04：[立即取代→Ozzie Albies] 雙年菁英xwOBA P95/P95+BB% P95/P95+Barrel P80/P95;14d OPS .973/R14/SB3/BB7/K% 8.2全類別輾壓Albies;健康plateau 44%;PA-TG 3.08唯一小疵但14d先發穩;升級立即取代（fa_scan）
+- 07-05：[立即取代→Ozzie Albies] 雙年菁英xwOBA P95/BB% P95/Barrel P70健康+14d OPS .922/R13/SB4;全面勝Albies且多SB軸;立即取代（fa_scan）
 
 ### Spencer Horwitz (PIT, 1B) — 被搶（自動偵測）
 - 2026-05-28：Yahoo ownership_type=team，從觀察中移除。
