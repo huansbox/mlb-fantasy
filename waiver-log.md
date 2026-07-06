@@ -208,6 +208,12 @@ vs：Ozzie Albies
 vs：Christian Walker
 - 07-05：14d OPS 1.007/5HR/13RBI+Savant Δ+0.076/xwOBA P70;疑下週先發量,待確認（fa_scan）
 - 07-06：[取代→Christian Walker] 14d OPS .959/4HR/13RBI+Savant xwOBA .433 Δ+0.098+PA-TG 3.85滿檔上場+雙年P80/P95;升級取代Walker（fa_scan）
+- 07-06：[eval] vs Christian Walker，結論：次選不撿（Walker 格位建議讓給 Mead），理由：33歲老化區深查 — 多年 wRC+ 104→101→107 無 decay curve、power 底盤在（Barrel P70-80/BBE 243），但 chase 26.7→30.8（+4.1 過顯著門檻 3.6）+BB% P70-80→P45-50 選球軸退化 + DH 為主有固定輪休；14d 熱有底層（Savant .433）但屬當週價值，季線 xwOBA .335 低於 Mead .357（player-eval）
+
+### Victor Bericoto (SF, LF,RF) [mlb_id:682674] — 觀察中
+觸發：Jung Hoo Lee 歸隊後仍每日先發 + season BBE ≥40 + BB% 回升 ≥5%
+vs：（無錨點 — 純 upside watch）
+- 07-06：[eval] 新條目，結論：觀察不撿，理由：24歲非 top-30 新秀 5/22 首升（Lee IL 補位）；power 真（Barrel 14.7/HH 52.9 皆>P90）但 BBE 34 低信心 + BB% 2.1 <P25（48PA 僅 1BB，7×7 BB+OBP 雙重扣分）+ 14d wOBA−xwOBA +0.120 運氣灌水（OPS .930 不可持續）；6/24 起 LF 近每日先發（8場/11天）但繫於 Lee 歸隊時程（player-eval）
 
 ## 隊上觀察
 
@@ -574,6 +580,7 @@ vs：Christian Walker
 - 06-27：xwOBA P95/BB% P80/Barrel P70菁英但單年breakout(prior P40)+14d OPS .721軟+PA-TG 2.90限局（fa_scan）
 - 06-28：xwOBA P95/BB% P80結構菁英但14d OPS .620/AVG.149/K% 23.5冷棒;產出對不上結構;19%維持watch（fa_scan）
 - 06-29：xwOBA P95/Barrel% P70/BB% P80結構菁英但14d OPS .668/.167軟+PA-TG 2.91 PT落差;%owned rising+1;觀察PT+熱度（fa_scan）
+- 07-06：[eval] vs Christian Walker，結論：撿（取代 Walker），理由：**初判修正 — fa_scan watch 主因 PA-TG 2.98 是季初板凳期稀釋**（3/28 才被 CWS 交易來、5月中 Brady House 下放後接管 3B：85% workload + 近8場先發7場 + 打序2-3棒、對左對右都先發，出賽時實質 ~4 PA/場）；breakout 結構真 — Whiff 21.1→17.2（−3.9pp）+ zone-contact +3.3 過顯著門檻 + chase −2.3 + BB% 5.7→11.1 plate skills 整組上移，AVG .227<xBA .259 無運氣灌水，BBE 182 高信心；14d .718 降溫屬波動（仍 3HR/2SB）非警訊 = 進場窗；風險：Tena/Vivas 左打 platoon 側偶爾分場 + House 從 AAA 打回來的中期威脅（player-eval）
 
 ### Luke Raley (SEA, 1B,LF,CF,RF) — 被搶（自動偵測）
 - 2026-06-01：Yahoo ownership_type=team，從觀察中移除。
@@ -594,6 +601,7 @@ vs：Christian Walker
 - 07-04：[立即取代→Ozzie Albies] 雙年菁英xwOBA P95/P95+BB% P95/P95+Barrel P80/P95;14d OPS .973/R14/SB3/BB7/K% 8.2全類別輾壓Albies;健康plateau 44%;PA-TG 3.08唯一小疵但14d先發穩;升級立即取代（fa_scan）
 - 07-05：[立即取代→Ozzie Albies] 雙年菁英xwOBA P95/BB% P95/Barrel P70健康+14d OPS .922/R13/SB4;全面勝Albies且多SB軸;立即取代（fa_scan）
 - 07-06：[立即取代→Ozzie Albies] 雙年雙菁英xwOBA P95/P95+BB% P95+14d OPS .922/4SB/13R/K% 9.8;健康;全面碾壓Albies（fa_scan）
+- 07-06：[eval] vs Ozzie Albies，結論：立即撿（drop Albies），理由：IL 實為 6/13-7/3 右腿 hamstring（比 fa_scan 認知的窗口長）；PA-TG 3.09 純 IL artifact — 出賽時 3.99 PA/場且打第一棒；7/3 回歸即 everyday CF、NYY 為此下放 Spencer Jones = 最硬角色背書；vs L OPS .773 > vs R .758 無 platoon 折價；7/4 已跑出 SB 無 hamstring 再發警訊；唯復發風險窗（回歸後 2-4 週）未完全過 + 守位 CF-only（本隊 CF 深度僅 Buxton DTD/Dubón，反而契合）（player-eval）
 
 ### Spencer Horwitz (PIT, 1B) — 被搶（自動偵測）
 - 2026-05-28：Yahoo ownership_type=team，從觀察中移除。
