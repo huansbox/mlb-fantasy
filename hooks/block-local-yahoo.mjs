@@ -14,6 +14,8 @@
 //   - bash bin/vps-run.sh '<cmd>'（VPS 端跑，token 在 VPS）
 //   - ssh root@... <cmd> / scp ...（純 SSH/SCP 工具）
 //   - uv run pytest / uv run python -m pytest（測試走 mock fetchers）
+//   - git 開頭的 sub-command（git add/log/diff -- <裸路徑> 只是版控操作，
+//     不會執行腳本 — issue #407 item 5 誤擋修正）
 //
 // 跨平台：Bash 走 stripHeredocs + stripQuotes（沿用 block-bare-python 邏輯），
 // PowerShell 走簡化版（PS 字面量規則不同但本 hook 不需精確 — Yahoo .py 名出現
@@ -104,6 +106,7 @@ let offender = null;
 for (const raw of subCommands) {
   const tokens = raw.trim().replace(/^[({\s]+/, "").split(/\s+/).filter(Boolean);
   if (tokens.length === 0) continue;
+  if (basename(tokens[0]) === "git") continue; // git 不會執行腳本（#407 item 5）
   if (hasAllowlistedToken(tokens)) continue;
   for (const t of tokens) {
     if (YAHOO_SCRIPTS.has(basename(t))) {
