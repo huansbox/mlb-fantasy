@@ -16,6 +16,7 @@ from stream_sp_scan import (
     apply_projected,
     classify_opener,
     compute_pending_diff,
+    compute_recent_form,
     compute_sample_warning,
     cross_check_fa,
     parse_projected_arg,
@@ -95,6 +96,110 @@ class TestClassifyOpener:
             GameLog(date="2026-05-08", gs=1, ip=4.1),
         ]
         assert classify_opener(games) == "true_starter"
+
+    def test_pure_bulk_long_relief_returns_bulk_suspect(self):
+        # Mikolas 2026-06 型（issue #405 F2 盲點）：全 GS=0 但單場 IP 4-5 的
+        # piggyback bulk — 舊規則 fall-through 成 true_starter
+        games = [
+            GameLog(date="2026-06-01", gs=0, ip=4.0),
+            GameLog(date="2026-06-06", gs=0, ip=5.0),
+            GameLog(date="2026-06-11", gs=0, ip=4.2),
+            GameLog(date="2026-06-16", gs=0, ip=5.0),
+            GameLog(date="2026-06-21", gs=0, ip=4.0),
+            GameLog(date="2026-06-26", gs=0, ip=4.1),
+        ]
+        assert classify_opener(games) == "bulk_suspect"
+
+    def test_all_relief_mixed_ip_short_avg_returns_opener_suspect(self):
+        # GS=0 全 relief、混一場長局但平均 ≤3 — 從未先發，不可能是
+        # true_starter（舊規則因「不是全部 IP≤3」也 fall-through）
+        games = [
+            GameLog(date="2026-06-01", gs=0, ip=1.0),
+            GameLog(date="2026-06-06", gs=0, ip=1.0),
+            GameLog(date="2026-06-11", gs=0, ip=1.0),
+            GameLog(date="2026-06-16", gs=0, ip=1.0),
+            GameLog(date="2026-06-21", gs=0, ip=1.0),
+            GameLog(date="2026-06-26", gs=0, ip=5.0),
+        ]
+        assert classify_opener(games) == "opener_suspect"
+
+    def test_all_relief_avg_exactly_three_returns_opener_suspect(self):
+        # avg_ip 恰 3.0 邊界：>3 才算 bulk，=3 仍 opener
+        games = [
+            GameLog(date="2026-06-01", gs=0, ip=3.0),
+            GameLog(date="2026-06-06", gs=0, ip=3.0),
+            GameLog(date="2026-06-11", gs=0, ip=3.0),
+        ]
+        assert classify_opener(games) == "opener_suspect"
+
+
+class TestComputeRecentForm:
+    @staticmethod
+    def _mk(entries):
+        # entries: list of (er, ip)
+        return [
+            GameLog(date=f"2026-06-{i + 1:02d}", gs=1, ip=ip, er=er)
+            for i, (er, ip) in enumerate(entries)
+        ]
+
+    def test_zero_collapse_returns_low_floor(self):
+        form = compute_recent_form(self._mk(
+            [(2, 6.0), (1, 5.0), (3, 6.0), (0, 7.0), (2, 6.0), (1, 6.0)]
+        ))
+        assert form["collapse_count"] == 0
+        assert form["floor_hint"] == "低"
+        assert form["last6_era"] == pytest.approx(2.25)  # 9 ER / 36 IP × 9
+        assert form["last6_ip_gs"] == pytest.approx(6.0)
+
+    def test_one_collapse_low_era_returns_mid(self):
+        # 1 崩 + 近 6 ERA < 4.50 → 中
+        form = compute_recent_form(self._mk(
+            [(4, 6.0), (1, 6.0), (0, 6.0), (1, 6.0), (2, 6.0), (1, 6.0)]
+        ))
+        assert form["collapse_count"] == 1
+        assert form["floor_hint"] == "中"
+
+    def test_one_collapse_high_era_returns_mid_high(self):
+        # 1 崩 + 近 6 ERA ≥ 4.50 → 中-高
+        form = compute_recent_form(self._mk(
+            [(6, 5.0), (3, 5.0), (2, 5.0), (3, 5.0), (2, 5.0), (2, 5.0)]
+        ))
+        assert form["collapse_count"] == 1
+        assert form["last6_era"] == pytest.approx(5.40)  # 18 ER / 30 IP × 9
+        assert form["floor_hint"] == "中-高"
+
+    def test_two_collapses_returns_high(self):
+        form = compute_recent_form(self._mk(
+            [(4, 5.0), (0, 6.0), (5, 4.0), (1, 6.0), (0, 6.0), (2, 6.0)]
+        ))
+        assert form["collapse_count"] == 2
+        assert form["floor_hint"] == "高"
+
+    def test_uses_last_six_only(self):
+        # 8 場：頭 2 場大崩不在近 6 窗 → 不計
+        entries = [(7, 3.0), (6, 3.0)] + [(1, 6.0)] * 6
+        form = compute_recent_form(self._mk(entries))
+        assert form["collapse_count"] == 0
+        assert form["floor_hint"] == "低"
+        assert form["last6_era"] == pytest.approx(1.5)  # 6 ER / 36 IP × 9
+
+    def test_empty_log_returns_all_none(self):
+        assert compute_recent_form([]) == {
+            "last6_era": None,
+            "collapse_count": None,
+            "last6_ip_gs": None,
+            "floor_hint": None,
+        }
+
+    def test_er_defaults_zero_for_legacy_gamelog(self):
+        # GameLog 未帶 er（舊 fixture / 未升級 fetcher）→ 視為 0，不炸
+        games = [
+            GameLog(date=f"2026-06-{i + 1:02d}", gs=1, ip=6.0) for i in range(3)
+        ]
+        form = compute_recent_form(games)
+        assert form["collapse_count"] == 0
+        assert form["last6_era"] == pytest.approx(0.0)
+        assert form["floor_hint"] == "低"
 
 
 class TestTierOpponent:
@@ -448,6 +553,11 @@ class TestScan:
 
         # vs_hand_2026 key 一定存在（schema contract）；fetcher 未注入 → None
         assert c["vs_hand_2026"] is None
+
+        # recent_form key 一定存在（S1 schema contract）；burke_log 無 er → 0 崩
+        assert c["recent_form"]["collapse_count"] == 0
+        assert c["recent_form"]["floor_hint"] == "低"
+        assert c["recent_form"]["last6_ip_gs"] == pytest.approx(5.33, abs=0.01)
 
     def test_tbd_games_and_owned_segments_populated(self):
         schedule = {"dates": [{"games": [

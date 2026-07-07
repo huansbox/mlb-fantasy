@@ -133,7 +133,9 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan
         "team": "CWS", "opponent": "CHC", "is_home": false,
         "projected": false,
         "percent_owned": "25%",
-        "opener_verdict": "true_starter|opener_suspect|small_sample",
+        "opener_verdict": "true_starter|opener_suspect|bulk_suspect|small_sample",
+        "recent_form": {"last6_era": 4.50, "collapse_count": 2,
+                        "last6_ip_gs": 4.67, "floor_hint": "低|中|中-高|高"},
         "opponent_14d": {"ops": 0.702, "tier": "🟢|🟡|🔴"},
         "sample_warning": "low|medium|none|null",
         "vs_hand_2026": {
@@ -166,7 +168,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 stream_sp_scan
 }
 ```
 
-scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-check（帶 percent_owned）/ v4 5-slot Sum + breakdown_pct labels / rotation gate / luck tag（xERA-ERA 差 ≥ P70 0.81 才標；BBE<40 也不標）/ opener 規則化 / 對手 14d OPS → tier / 對手 vs SP 慣用手 OPS（`vs_hand_2026`，PA ≥400 取 split / <400 自動 fallback 季全 OPS + `low_pa_fallback=true`，scan 在 schema 已套 sample gate；MLB API 失敗 emit null）/ `sample_warning`（2026 only — BBE<30 AND GS<6 → `"low"`；其餘 BBE≤80 或 GS≤12 → `"medium"`；BBE>80 AND GS>12 → `"none"`；v4 unavailable → null。**機械層不 demote verdict**，僅供 LLM 信心校正用）。stderr 走 sp_data_fetchers 的 progress prints（用 `2>/dev/null` 過濾掉），stdout 純 JSON。
+scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-check（帶 percent_owned）/ v4 5-slot Sum + breakdown_pct labels / rotation gate / luck tag（xERA-ERA 差 ≥ P70 0.81 才標；BBE<40 也不標）/ opener・bulk 規則化（GS=0 全 relief：avg IP ≤3 → `opener_suspect`、>3 → `bulk_suspect`）/ `recent_form` 近況軸（近 6 場 ERA / ER≥4 崩盤數 / IP/GS / floor hint — 與 deep `comparison_table` 同邏輯，issue #404）/ 對手 14d OPS → tier / 對手 vs SP 慣用手 OPS（`vs_hand_2026`，PA ≥400 取 split / <400 自動 fallback 季全 OPS + `low_pa_fallback=true`，scan 在 schema 已套 sample gate；MLB API 失敗 emit null）/ `sample_warning`（2026 only — BBE<30 AND GS<6 → `"low"`；其餘 BBE≤80 或 GS≤12 → `"medium"`；BBE>80 AND GS>12 → `"none"`；v4 unavailable → null。**機械層不 demote verdict**，僅供 LLM 信心校正用）。stderr 走 sp_data_fetchers 的 progress prints（用 `2>/dev/null` 過濾掉），stdout 純 JSON。
 
 > **Yahoo FA pool 短路**：scan 把當天所有 probable starter 名單傳給 fetcher，hit 完所有 hits 就提早停止分頁（避免無條件拉滿 12 頁 300 row）。
 
@@ -179,7 +181,7 @@ scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-c
 | `v4_2026.v4_available == false` | 移到「已過濾 / 無 v4 數據」段（rookie / Savant 抓不到 — 標註讓用戶判斷是否手動跟） |
 | `v4_2026.rotation_gate == "🚫"` | 移到「已過濾 / Rotation gate 排除」段，**不**進主表（pure-RP / long-relief，IP 期望太低）|
 | `v4_2026.sum_score < 15` | 移到「已過濾 / Sum hard floor 排除」段（5 軸全 P25 以下，opener 與否都不值得串）|
-| `opener_verdict in {"opener_suspect", "small_sample"}` | **必須 WebSearch 確認**（見下段）。確認為 opener → 移到「已過濾 / Opener 排除」段 |
+| `opener_verdict in {"opener_suspect", "bulk_suspect", "small_sample"}` | **先查角色 registry，查無才 WebSearch**（見下段）。確認為 opener / bulk → 移到「已過濾 / Opener・Bulk 排除」段 |
 | 通過以上全部 | 進「FA 真先發候選」主表 |
 
 > 設計理由（為什麼這個順序）：rotation_gate / sum_score / v4_available 是純規則，已由 scan 算好；不浪費 WebSearch 額度（~50K tokens / 70+ 秒每次）在結構性確認弱的候選上。opener_verdict 規則粗篩**不能**單從 game log 判斷邊界場景（「真先發 + 早季 2 場短局」vs「指定 opener」game log 看起來相似），需要新聞脈絡。
@@ -192,15 +194,23 @@ scan 已內建：schedule parse（TBD 三態 both/away/home）/ Yahoo FA cross-c
 - Sum 25-30：邊緣，看單軸 elite
 - Sum ≥ 30：整體菁英軸
 
-### 自動 WebSearch（opener_verdict ≠ true_starter 才觸發）
+### 角色確認：registry → WebSearch（opener_verdict ≠ true_starter 才觸發）
 
-Spawn `general-purpose` agent，prompt 範本：
+**Step A — 先查角色 registry**（`daily-advisor/stream-sp-roles.md`，issue #405）：
+
+- 該 SP 在表內、`confirmed_at` 距今 ≤ 21 天（TTL），且本次 game log **沒有** GS=1 且 IP≥5 的新訊號 → **直接沿用結論，不 WebSearch**：
+  - 結論 `opener` / `bulk` → 移到「已過濾 / Opener・Bulk 排除」段，報告註明「registry 沿用（confirmed_at {date}）」
+  - 結論 `true_starter` → 過關進主表
+- 表內沒有 / TTL 過期 / 出現 GS=1 且 IP≥5（角色可能變回先發）→ 走 Step B WebSearch，**結論寫回 registry**（新 SP append 行；既有 SP 覆寫該行並更新 confirmed_at）
+
+**Step B — WebSearch**：Spawn `general-purpose` agent，prompt 範本：
 
 ```
 Search for news about {name} ({team}) starting on {ET_date} vs {opponent}.
 
 Determine:
-1. True starter or "opener" (1-2 IP + bulk reliever behind)?
+1. True starter, "opener" (1-2 IP + bulk reliever behind), or bulk/piggyback
+   reliever (3-5 IP entering after an opener)?
 2. If opener, who is the planned bulk pitcher?
 3. Expected workload / pitch count if known?
 
@@ -212,7 +222,9 @@ Report under 200 words.
 
 WebSearch 結論：
 - **真先發 + 預期 IP ≥ 5** → 過關進主表
-- **Opener / piggyback / 沒拉長 → 預期 IP ≤ 4** → 移到「已過濾 / Opener 排除」段（QS 機率太低，串流 ROI 差）
+- **Opener / bulk piggyback / 沒拉長 → 預期 IP ≤ 4** → 移到「已過濾 / Opener・Bulk 排除」段（QS 機率太低，串流 ROI 差）
+
+無論結論為何，**寫回 registry**（`daily-advisor/stream-sp-roles.md`）供 TTL 內下次 scan 沿用。
 
 ### 補查模式：用 pending_diff 偵測失效 SP（issue 014）
 
@@ -271,18 +283,20 @@ scan 對 `--et-dates` 給的所有日期都跑完整流程，**並**讀 `--pendi
 - 無 v4 數據: {N} 位（{name} - rookie / Savant 暫無，建議手動跟新聞 + game log）
 - Rotation gate 🚫 排除: {N} 位（{name} G/GS={g}/{gs} - pure-RP / long-relief）
 - v4 Sum < 15 hard floor 排除: {N} 位（{name} Sum {n} - 五軸全 P25 以下，跳過 opener filter 直接淘汰）
-- Opener 排除: {N} 位（{name} - {WebSearch 結論摘要}）
+- Opener・Bulk 排除: {N} 位（{name} - {WebSearch 結論摘要 / registry 沿用（confirmed_at {date}）}）
 
 ### FA 真先發候選（按 v4 Sum 排序）
 
-| # | SP | 隊 | 對手 | %own | v4 Sum26/25 | 5-slot 細節 | 對手 14d OPS / tier | 對手 vs hand OPS | 樣本 | 推/不推 |
-|---|----|---|---|---|---|---|---|---|---|---|
-| 1 | Keider Montero | DET | KC 🟢 | 9% | 29/22 | IP/GS P60-70 \| Whiff <P25 \| BB/9 >P90 \| GB <P25 \| xwOBACON >P90 | .698 🟢 | .672 (R) | — | ✅ 推 |
+| # | SP | 隊 | 對手 | %own | v4 Sum26/25 | 5-slot 細節 | 對手 14d OPS / tier | 對手 vs hand OPS | 樣本 | 近況 | 推/不推 |
+|---|----|---|---|---|---|---|---|---|---|---|---|
+| 1 | Keider Montero | DET | KC 🟢 | 9% | 29/22 | IP/GS P60-70 \| Whiff <P25 \| BB/9 >P90 \| GB <P25 \| xwOBACON >P90 | .698 🟢 | .672 (R) | — | 3.20 / 1崩 / 中 | ✅ 推 |
 | ... |
 
 > 「對手 vs hand OPS」欄取自 `vs_hand_2026.ops`（含手 R/L 標註）。`low_pa_fallback=true` 時值已 fallback 成季全 OPS，在欄位加 `(season)` 標註提醒 reader 用 season OPS scale 解讀（≥.770 強 / .720-.770 中 / ≤.720 弱）。null = MLB API 失敗無資料。
 >
 > 「樣本」欄取自 `sample_warning`（BBE + GS 雙軸），**選擇性顯示**：`low` / `medium` 才標（如 `⚠️ low (BBE=0/GS=1)` / `⚠️ medium`），`none` 或 `null` 用 `—`。當天全表所有 SP 都是 `none` / `null` 時整欄可省略。
+>
+> 「近況」欄取自 `recent_form`，格式 `{last6_era} / {collapse_count}崩 / {floor_hint}`（如 `4.50 / 2崩 / 高`）。無 game log（recent_form 全 null）用 `—`。
 >
 > **Projected 候選（`projected:true`）**：SP 名前標 🔮（如 `🔮 MacKenzie Gore`），與官方確認 probable 區分。表格下方加一行可靠度提醒：「🔮 = projected（輪值推算，非官方確認）— 會因 off-day / 雨延 / 傷兵變動，**claim 前再確認當天官方公布**」。
 
@@ -307,6 +321,7 @@ ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pen
 ### 報告原則
 
 - 推薦標準：v4 Sum ≥ 25 + 至少 1 個 elite 軸（>P90 或 P80-90）+ 對手不是 🔴 強打 — 三條件至少滿足兩條
+- **Floor cap（issue #404 拍板）**：`recent_form.floor_hint` = 高 → verdict 上限 ⚠️ 條件推（不給 ✅ 推）。近 6 場 ≥2 崩（或依 deep hard rule 等價條件）的候選歷史上被 deep 系統性降級，scan 不先背書
 - **不算翻盤期望勝率**（用戶自己判斷對本週類別狀況的影響）
 - **不建議 drop 對象**（用戶自己看當天 fa_scan SP-v4 issue 找 worst SP）
 - **不算 lineup lock 時序**（用戶自己換算）
@@ -329,10 +344,10 @@ ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pen
 - DET @ KC (both TBD)
 
 ### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Cade Cavalli | WSH | MIA (.618) | 20% | 25/31 | <P25·P70-80·<P25·P50-60·**P80-90** | ✅ 強推 | Whiff/xwOBACON 雙菁英 + 對手最弱 |
-| Chris Bassitt | BAL | ATH (.780) | 13% | 18/28 | <P25·<P25·<P25·P70-80·P60-70 | ❌ 不推 | 5 軸 3 <P25 + 對手最硬 |
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | 近況 | Verdict | 一行理由 |
+|---|---|---|---|---|---|---|---|---|
+| Cade Cavalli | WSH | MIA (.618) | 20% | 25/31 | <P25·P70-80·<P25·P50-60·**P80-90** | 3.20 / 1崩 / 中 | ✅ 強推 | Whiff/xwOBACON 雙菁英 + 對手最弱 |
+| Chris Bassitt | BAL | ATH (.780) | 13% | 18/28 | <P25·<P25·<P25·P70-80·P60-70 | 5.10 / 2崩 / 高 | ❌ 不推 | 5 軸 3 <P25 + 對手最硬 |
 
 ### 備註
 _（free-form 區，用戶可手寫「已 claim X $3」「想下週再評估 Y」等註記。AI 讀進來但不主動覆寫。）_

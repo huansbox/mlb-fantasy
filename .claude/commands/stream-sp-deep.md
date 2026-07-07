@@ -331,6 +331,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
 **不改**（保留 scan baseline 作 audit）：
 - Sum26/25 — 5-slot 結構訊號
 - 5-slot 細節 cell — 同上
+- 近況 cell — scan 當天 recent_form 取值
 - 對手 OPS（14d）— scan 當天取值
 - SP / 隊 / 對手 / %own — 識別欄位
 
@@ -358,3 +359,7 @@ Pending Verdict 若已含 `(deep)` 戳記 → divergence callout 比對 baseline
 ### 7e：原始 scan verdict 哪裡留 audit？
 
 不留。Verdict 欄被 deep 覆寫後 scan 原 verdict 失去，但 Sum26/25 + 5-slot 細節 cell 保留 — 那是 scan 的結構性 ground truth。若需要回看 scan verdict，從 git log 翻 pending file 歷史版本。
+
+### 7f：角色結論寫回 roles registry（issue #405）
+
+深評若確認 / 更新了 SP 的**角色事實**（opener / bulk piggyback / workload cap / 回歸真先發）→ 同步寫 `daily-advisor/stream-sp-roles.md`：新 SP append 行；既有 SP 覆寫該行並更新 `confirmed_at`（來源填 `deep eval`）。純 verdict 變化（推/不推）**不寫** — registry 只記角色，不記評價。

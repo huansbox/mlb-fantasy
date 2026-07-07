@@ -23,6 +23,7 @@ class GameLog:
     date: str
     gs: int
     ip: float
+    er: int = 0  # earned runs — recent_form 用；default 0 讓舊 caller 相容
 
 
 @dataclass(frozen=True)
@@ -81,14 +82,50 @@ class Fetchers:
 def classify_opener(games):
     if len(games) < 3:
         return "small_sample"
-    if all(g.gs == 0 and g.ip <= 3 for g in games):
-        return "opener_suspect"
     gs_count = sum(1 for g in games if g.gs == 1)
     relief_count = len(games) - gs_count
     avg_ip = sum(g.ip for g in games) / len(games)
+    if gs_count == 0:
+        # 從未先發 → 不可能是 true_starter。短局 = opener；
+        # 長局（piggyback bulk，issue #405 F2）= bulk_suspect。
+        return "bulk_suspect" if avg_ip > 3 else "opener_suspect"
     if 2 <= gs_count <= 3 and 2 <= relief_count <= 3 and avg_ip < 4:
         return "opener_suspect"
     return "true_starter"
+
+
+def compute_recent_form(games):
+    """近況軸（S1, issue #404）— 近 6 場 ERA / 崩盤數 / IP/GS / floor hint.
+
+    邏輯對齊 mlb_query._recent_era / _floor_risk_hint（deep_batch
+    comparison_table 同源），讓 scan 階段就看到 deep 才補的近況訊號。
+    """
+    recent = games[-6:] if len(games) >= 6 else list(games)
+    if not recent:
+        return {
+            "last6_era": None,
+            "collapse_count": None,
+            "last6_ip_gs": None,
+            "floor_hint": None,
+        }
+    total_er = sum(g.er for g in recent)
+    total_ip = sum(g.ip for g in recent)
+    era = round(total_er * 9 / total_ip, 2) if total_ip > 0 else None
+    collapses = sum(1 for g in recent if g.er >= 4)
+    if collapses >= 2:
+        hint = "高"
+    elif collapses == 1 and era is not None and era >= 4.50:
+        hint = "中-高"
+    elif collapses == 1:
+        hint = "中"
+    else:
+        hint = "低"
+    return {
+        "last6_era": era,
+        "collapse_count": collapses,
+        "last6_ip_gs": round(total_ip / len(recent), 2),
+        "floor_hint": hint,
+    }
 
 
 def parse_schedule(schedule_json):
@@ -451,6 +488,7 @@ def scan(et_dates, *, fetchers, pending_data=None, projected=None):
                 **_starter_to_summary(sp),
                 "percent_owned": pct_by_name.get(sp.name, "—"),
                 "opener_verdict": classify_opener(log),
+                "recent_form": compute_recent_form(log),
                 "opponent_14d": {"ops": ops, "tier": tier_opponent(ops)},
                 "sample_warning": sample_warning,
                 "v4_2026": v4_26,
@@ -523,6 +561,7 @@ def fetch_game_log(mlb_id, season, *, limit=6):
             date=s.get("date", ""),
             gs=int(st.get("gamesStarted", 0)),
             ip=_ip_str_to_float(st.get("inningsPitched", "0")),
+            er=int(st.get("earnedRuns", 0)),
         ))
     return logs
 
