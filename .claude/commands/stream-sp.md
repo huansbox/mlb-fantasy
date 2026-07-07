@@ -344,10 +344,12 @@ ET {日期} 剩 {N} 場 TBD probable，已記錄至 `daily-advisor/stream-sp-pen
 - DET @ KC (both TBD)
 
 ### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | 近況 | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|---|
-| Cade Cavalli | WSH | MIA (.618) | 20% | 25/31 | <P25·P70-80·<P25·P50-60·**P80-90** | 3.20 / 1崩 / 中 | ✅ 強推 | Whiff/xwOBACON 雙菁英 + 對手最弱 |
-| Chris Bassitt | BAL | ATH (.780) | 13% | 18/28 | <P25·<P25·<P25·P70-80·P60-70 | 5.10 / 2崩 / 高 | ❌ 不推 | 5 軸 3 <P25 + 對手最硬 |
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | 近況 | Verdict | 一行理由 | mlb_id |
+|---|---|---|---|---|---|---|---|---|---|
+| Cade Cavalli | WSH | MIA (.618) | 20% | 25/31 | <P25·P70-80·<P25·P50-60·**P80-90** | 3.20 / 1崩 / 中 | ✅ 強推 | Whiff/xwOBACON 雙菁英 + 對手最弱 | 676917 |
+| Chris Bassitt | BAL | ATH (.780) | 13% | 18/28 | <P25·<P25·<P25·P70-80·P60-70 | 5.10 / 2崩 / 高 | ❌ 不推 | 5 軸 3 <P25 + 對手最硬 | 605135 |
+
+> `mlb_id` 從 scan JSON `candidates[i].mlb_id` 取（**勿手查 / 勿憑記憶**）— `/stream-sp-deep` 的 `--pending-file` 模式靠它免 people/search（issue #406）。
 
 ### 備註
 _（free-form 區，用戶可手寫「已 claim X $3」「想下週再評估 Y」等註記。AI 讀進來但不主動覆寫。）_
