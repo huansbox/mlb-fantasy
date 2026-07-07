@@ -2,7 +2,6 @@
 
 from micro_fields_sp import (
     compute_velo,
-    csw_context,
     kbb_ladder,
     velo_tag,
 )
@@ -94,15 +93,3 @@ def test_kbb_no_bf_none():
 def test_kbb_none_counts_treated_zero():
     out = kbb_ladder(None, None, 50)
     assert out["kbb_pct"] == 0.0
-
-
-# ── csw_context ──
-
-def test_csw_context_present():
-    assert csw_context({"csw_pct": 28.3, "pitches": 412}) == {
-        "csw_pct": 28.3, "pitches": 412}
-
-
-def test_csw_context_absent():
-    assert csw_context(None) is None
-    assert csw_context({"velo_fb": 94.0}) is None

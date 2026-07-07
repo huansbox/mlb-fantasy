@@ -38,7 +38,12 @@ from datetime import timedelta
 
 MAX_STARTS_PER_WEEK = 2   # a 5/6-man rotation gives at most 2 starts in 7 days
 _SNAP_SLACK_DAYS = 1      # a projected start may slide ±1 day to a real game day
-STALE_SLACK_DAYS = 2      # last start older than cadence+this → off turn by Monday
+STALE_SLACK_DAYS = 2      # calendar-day staleness slack (retro fallback path)
+# Game-day staleness needs NO slack: "team played more than round(cadence)
+# games since his last start" already excludes off-days/breaks. Retro
+# 2026-07-07 (2354 cells): game-day slack 0 → 85.3% vs calendar slack 2 →
+# 85.0%, and only the game-day form survives the All-Star break week.
+STALE_GAP_GAMES_SLACK = 0
 PUSH_SLACK_DAYS = 2       # a pushed (not skipped) turn resurfaces within this
 
 
@@ -72,25 +77,38 @@ def _snap(candidate, schedule_dates):
 
 def project_starts(last_start, cadence_days, week_start, week_end,
                    *, probable_dates=(), schedule_dates=None,
-                   probable_horizon_end=None) -> dict:
+                   probable_horizon_end=None, gap_game_days=None) -> dict:
     """Project starts in [week_start, week_end].
 
     last_start: SP's most recent start date. cadence_days: rest between starts.
     probable_dates: confirmed starts (MLB probables) — authoritative; the
     cadence walk continues from the LAST in-window probable. schedule_dates:
     team game days in the window — when given, cadence candidates must snap to
-    a real game day. probable_horizon_end: last date probables are published
-    through (as of scan time) — enables the visibly-skipped-turn suppression.
+    a real game day. probable_horizon_end: last date the pitcher's TEAM has
+    probables published through (per-team, not league-wide — teams publish to
+    different depths and an absence only means something once the team itself
+    has announced that far). gap_game_days: the team's game dates in
+    (last_start, week_start) — when given, staleness counts games the team
+    played without him starting instead of calendar days, so a league-wide
+    break (All-Star) doesn't mark every healthy SP stale.
     Returns {starts (0..2), projected_dates, source} where source is
     "probable" / "cadence" / "stale" (walk suppressed by staleness) / "none".
     """
     dates = {d for d in probable_dates if week_start <= d <= week_end}
     has_probables = bool(dates)
 
+    if gap_game_days is not None and last_start:
+        gap = sum(1 for d in gap_game_days if last_start < d < week_start)
+        slack = STALE_GAP_GAMES_SLACK
+    elif last_start:
+        gap = (week_start - last_start).days
+        slack = STALE_SLACK_DAYS
+    else:
+        gap = 0
+        slack = STALE_SLACK_DAYS
     stale = bool(
         last_start and cadence_days and cadence_days > 0
-        and (week_start - last_start).days
-        > round(cadence_days) + STALE_SLACK_DAYS
+        and gap > round(cadence_days) + slack
     )
 
     if has_probables:

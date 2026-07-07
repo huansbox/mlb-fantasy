@@ -32,8 +32,6 @@ _V4_SLOT_LABELS = {
     "gb_pct": "GB%",
     "xwobacon": "xwOBACON",
 }
-_V4_REVERSE = {"bb9", "xwobacon"}
-
 _PA_TAGS = {"✅ 球隊主力", "⚠️ 上場有限"}
 _SAMPLE_TAGS = {"⚠️ 樣本小", "⚠️ 短局", "⚠️ IL 短期", "⚠️ Swingman 角色"}
 _ADD_TAGS_2026 = {
@@ -57,21 +55,11 @@ _ALLOWED_TAG_PREFIXES = ("⚠️ 球速下滑", "✅ 球速上升")
 
 
 def _v4_percentile(value, metric: str) -> int | None:
-    """Return the v4 SP percentile bucket in elite direction."""
-    if value is None:
+    """v4 SP percentile bucket in elite direction (display: ≥P90 shown as 95).
+    The band walk itself lives in fa_compute.v4_percentile_of."""
+    if value is None or metric not in fa_compute.PITCHER_V4_PCTILES:
         return None
-    bands = fa_compute.PITCHER_V4_PCTILES.get(metric)
-    if not bands:
-        return None
-
-    reverse = metric in _V4_REVERSE
-    matched = 0
-    for pct, threshold in bands:
-        if reverse:
-            if value <= threshold:
-                matched = pct
-        elif value >= threshold:
-            matched = pct
+    matched = fa_compute.v4_percentile_of(value, metric)
     if matched >= 90:
         return 95
     return matched
@@ -186,11 +174,17 @@ def _inject_318b(full_entry: dict, payload: dict) -> None:
     the churn-protection core) > 046 next-week starts (the volume headline) >
     050 velo dict > 050 K-BB ladder; lower priorities yield gracefully. The
     048 swap line rides its own pool (Q3). All fields are attached upstream
-    by _phase6_sp best-effort — absent keys inject nothing."""
+    by _phase6_sp best-effort — absent keys inject nothing.
+
+    Budget unit note: this payload is a JSON dict, so a "line" here is one
+    injected FIELD (the Q2 batter text-line analog); the actual token cost is
+    owned by the 段③ paired A/B, not this count."""
     base = PayloadBudget(max_lines=_INJECTION_BASE_MAX_LINES)
 
-    note = full_entry.get("ledger_note") or []
-    base.register("ledger", min(len(note), _INJECTION_BASE_MAX_LINES))
+    # inject exactly what is registered — a future >ceiling note is truncated,
+    # never silently smuggled past the budget
+    note = (full_entry.get("ledger_note") or [])[:_INJECTION_BASE_MAX_LINES]
+    base.register("ledger", len(note))
     if note:
         payload["ledger_note"] = note
 

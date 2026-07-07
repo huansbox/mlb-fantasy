@@ -26,12 +26,59 @@ def _gamelog_payload():
     ]}]})
 
 
+@pytest.fixture(autouse=True)
+def _clear_gamelog_cache(monkeypatch):
+    monkeypatch.setattr(sdf, "_gamelog_splits_cache", {})
+
+
 def test_fetch_gamelog_starts_parse(monkeypatch):
     monkeypatch.setattr(sdf, "fetch_url", lambda url, timeout=30: _gamelog_payload())
     out = sdf.fetch_gamelog_starts(123, 2026)
     assert out["start_dates"] == ["2026-06-20", "2026-06-26", "2026-07-02"]
     assert out["team_id"] == 158
     assert out["qs_rate"] == pytest.approx(2 / 3)
+
+
+def test_fetch_gamelog_splits_memoized(monkeypatch):
+    calls = []
+
+    def counting(url, timeout=30):
+        calls.append(url)
+        return _gamelog_payload()
+    monkeypatch.setattr(sdf, "fetch_url", counting)
+    sdf.fetch_gamelog_starts(123, 2026)
+    sdf._ip_per_gs_gamelog(123, 2026)
+    sdf.fetch_gamelog_starts(123, 2026)
+    assert len(calls) == 1     # one HTTP round serves all consumers
+
+
+def test_fetch_gamelog_starts_team_id_from_latest_start(monkeypatch):
+    """Traded pitcher whose splits arrive most-recent-first: team must come
+    from the max-date start, not iteration order."""
+    def split(d, tid):
+        return {"date": d, "team": {"id": tid},
+                "stat": {"gamesStarted": 1, "inningsPitched": "6.0",
+                         "earnedRuns": 2}}
+    payload = json.dumps({"stats": [{"splits": [
+        split("2026-07-02", 999),   # newest first — new team
+        split("2026-06-20", 158),
+    ]}]})
+    monkeypatch.setattr(sdf, "fetch_url", lambda url, timeout=30: payload)
+    assert sdf.fetch_gamelog_starts(123, 2026)["team_id"] == 999
+
+
+def test_fetch_gamelog_starts_malformed_split_skipped(monkeypatch):
+    """A split missing its date must not abort the parse (best-effort)."""
+    def split(d, gs):
+        return {"date": d, "team": {"id": 158},
+                "stat": {"gamesStarted": gs, "inningsPitched": "6.0",
+                         "earnedRuns": 2}}
+    payload = json.dumps({"stats": [{"splits": [
+        split(None, 1), split("2026-07-02", 1),
+    ]}]})
+    monkeypatch.setattr(sdf, "fetch_url", lambda url, timeout=30: payload)
+    out = sdf.fetch_gamelog_starts(123, 2026)
+    assert out["start_dates"] == ["2026-07-02"]
 
 
 def test_fetch_gamelog_starts_no_starts_none(monkeypatch):
@@ -68,7 +115,9 @@ def test_fetch_week_schedule_parse(monkeypatch):
     out = sdf.fetch_week_schedule("2026-07-13", "2026-07-19")
     assert out["team_days"][158] == ["2026-07-13", "2026-07-15", "2026-07-18"]
     assert out["probables"][777] == ["2026-07-13", "2026-07-15"]
-    assert out["horizon_end"] == "2026-07-15"   # last date with ANY probable
+    # per-team horizon: only team 158's sides carry probables (07-13 home,
+    # 07-15 away) → its horizon is the later date; 112 never announced → absent
+    assert out["team_horizon"] == {158: "2026-07-15"}
 
 
 def test_fetch_standings_winpct_parse(monkeypatch):
@@ -117,7 +166,7 @@ def wired(monkeypatch):
         "team_days": {158: [f"2026-07-{d}" for d in range(13, 20)],
                       112: [f"2026-07-{d}" for d in range(13, 20)]},
         "probables": {2: ["2026-07-14"]},
-        "horizon_end": "2026-07-17",
+        "team_horizon": {158: "2026-07-17", 112: "2026-07-17"},
     })
     monkeypatch.setattr(sdf, "fetch_standings_winpct",
                         lambda season: {158: 0.55, 112: 0.60})

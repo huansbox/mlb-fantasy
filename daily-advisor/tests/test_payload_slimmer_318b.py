@@ -58,6 +58,15 @@ def test_ledger_plus_velo_fits_without_starts():
     assert slim["velo"] == VELO              # 1 + 1 ≤ 3
 
 
+def test_oversized_ledger_note_truncated_to_ceiling():
+    # a future format_ledger_note emitting >3 lines must not smuggle lines
+    # past the budget — inject exactly what is registered
+    slim = payload_slimmer.slim_entry(
+        _entry(ledger_note=["a", "b", "c", "d"], next_week_starts=NWS), "fa")
+    assert slim["ledger_note"] == ["a", "b", "c"]
+    assert "next_week_starts" not in slim    # ledger filled the base pool
+
+
 def test_swap_rides_its_own_pool_even_when_base_full():
     slim = payload_slimmer.slim_entry(
         _entry(ledger_note=["a", "b"], next_week_starts=NWS,

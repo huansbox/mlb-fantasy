@@ -954,13 +954,14 @@ def _compute_derived_batter(mlb_stats, team_games, team, year):
 def _ip_per_gs_from_gamelog(mlb_id, season):
     """Calculate IP/GS using only games where gamesStarted=1 (game log based).
 
-    Returns float or None if no starts found or API error.
+    Returns float or None if no starts found or API error. Raw splits come
+    from sp_data_fetchers' memoized fetch — the same game log feeds the
+    Layer 1.5 gate, assemble_data's ip_gs and the 318b start projection, so
+    one HTTP round serves all within a scan run.
     """
     try:
-        stats = mlb_api_get(
-            f"/people/{mlb_id}/stats?stats=gameLog&season={season}&group=pitching"
-        )
-        splits = (stats.get("stats") or [{}])[0].get("splits", [])
+        from sp_data_fetchers import fetch_gamelog_splits
+        splits = fetch_gamelog_splits(mlb_id, season)
         starts = [s for s in splits if int(s["stat"].get("gamesStarted", 0)) == 1]
         if not starts:
             return None

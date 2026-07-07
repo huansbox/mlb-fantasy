@@ -202,8 +202,6 @@ HOT_21D_XWOBACON_DELTA = 0.040  # 21d xwOBACON ≥ .040 BELOW season = surge
                                 # (mirrors the batter +.040 xwOBA spike)
 PRIOR_SAMPLE_IP_SP = 50         # prior-year IP floor (the retired ✅雙年菁英 line)
 
-_V4_REVERSE_SP = frozenset({"bb9", "xwobacon"})
-
 
 @dataclass
 class SPSignals:
@@ -221,21 +219,9 @@ class SPSignals:
     rotation_ok: bool = True
 
 
-def sp_percentile_of(value, metric) -> int:
-    """Numeric elite-direction percentile = the highest 2025 SP v4 bracket
-    ``value`` clears (reverse metrics compare downward); 0 below P25 or for
-    None. Mirrors payload_slimmer._v4_percentile without the display cap."""
-    if value is None:
-        return 0
-    bands = fa_compute.PITCHER_V4_PCTILES.get(metric)
-    if not bands:
-        return 0
-    reverse = metric in _V4_REVERSE_SP
-    matched = 0
-    for pct, threshold in bands:
-        if (value <= threshold) if reverse else (value >= threshold):
-            matched = pct
-    return matched
+# The single v4 band walk lives in fa_compute (one place to touch when the
+# 2026 percentile table lands); re-exported under the SP-section name.
+sp_percentile_of = fa_compute.v4_percentile_of
 
 
 def is_season_strong_sp(sig: SPSignals) -> bool:

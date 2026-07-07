@@ -67,12 +67,7 @@ def _ip_per_gs_gamelog(pid: int, year: int):
     Returns float or None. None on API failure or no starts; downstream
     metric_to_score handles None as score 0 (fail-loud, visible in breakdown).
     """
-    url = f"{MLB_API}/people/{pid}/stats?stats=gameLog&season={year}&group=pitching"
-    try:
-        data = json.loads(fetch_url(url, timeout=20))
-    except Exception:
-        return None
-    splits = (data.get("stats") or [{}])[0].get("splits", []) or []
+    splits = fetch_gamelog_splits(pid, year)
     starts = [s for s in splits if int(s.get("stat", {}).get("gamesStarted", 0)) == 1]
     if not starts:
         return None
@@ -216,54 +211,80 @@ def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
 
 # ── 318b B6 fetchers (046 start projection / 048 swap context) ──
 
-def fetch_gamelog_starts(pid: int, year: int) -> dict | None:
-    """One game-log call → the 046/048 per-pitcher context: start dates for
-    the cadence walk, the team as of the last start (schedule lookup key), and
-    the QS rate for the per-start production vector.
+# Raw game-log splits, memoized per (pid, year) — the same endpoint is hit by
+# the Layer 1.5 rotation gate, assemble_data's ip_gs, and the 046 projection
+# within one scan run; one fetch serves all.
+_gamelog_splits_cache: dict = {}
 
-    Returns {start_dates: [ISO...] (sorted), team_id, qs_rate} or None when
-    the pitcher has no starts / the API fails (best-effort callers skip)."""
-    from mlb_query import is_quality_start, parse_ip
 
+def fetch_gamelog_splits(pid: int, year: int) -> list:
+    """Memoized raw pitching game-log splits for one pitcher ([] on failure)."""
+    key = (pid, year)
+    if key in _gamelog_splits_cache:
+        return _gamelog_splits_cache[key]
     url = (f"{MLB_API}/people/{pid}/stats"
            f"?stats=gameLog&group=pitching&season={year}")
     try:
         data = json.loads(fetch_url(url, timeout=30))
         splits = (data.get("stats") or [{}])[0].get("splits", [])
     except Exception:
+        splits = []
+    _gamelog_splits_cache[key] = splits
+    return splits
+
+
+def fetch_gamelog_starts(pid: int, year: int) -> dict | None:
+    """Game-log → the 046/048 per-pitcher context: start dates for the
+    cadence walk, the team as of the LATEST start (schedule lookup key — not
+    iteration order, which the API does not guarantee), and the QS rate for
+    the per-start production vector.
+
+    Returns {start_dates: [ISO...] (sorted), team_id, qs_rate} or None when
+    the pitcher has no starts / the data is malformed (best-effort callers
+    skip — one bad split must never abort the whole attach)."""
+    from mlb_query import is_quality_start, parse_ip
+
+    try:
+        starts = []   # (date, team_id)
+        qs = 0
+        for s in fetch_gamelog_splits(pid, year):
+            stat = s.get("stat", {})
+            if safe_int(stat.get("gamesStarted"), 0) < 1:
+                continue
+            d = s.get("date")
+            if not d:
+                continue
+            starts.append((d, (s.get("team") or {}).get("id")))
+            try:
+                ip_dec = parse_ip(str(stat.get("inningsPitched", "0.0")))
+            except (ValueError, AttributeError):
+                ip_dec = 0.0
+            if is_quality_start(ip_dec, safe_int(stat.get("earnedRuns"), 0)):
+                qs += 1
+        if not starts:
+            return None
+        starts.sort()
+        return {"start_dates": [d for d, _ in starts],
+                "team_id": starts[-1][1],
+                "qs_rate": qs / len(starts)}
+    except Exception:
         return None
-    dates, team_id, qs = [], None, 0
-    for s in splits:
-        stat = s.get("stat", {})
-        if safe_int(stat.get("gamesStarted"), 0) < 1:
-            continue
-        dates.append(s.get("date"))
-        team_id = (s.get("team") or {}).get("id") or team_id
-        try:
-            ip_dec = parse_ip(str(stat.get("inningsPitched", "0.0")))
-        except (ValueError, AttributeError):
-            ip_dec = 0.0
-        if is_quality_start(ip_dec, safe_int(stat.get("earnedRuns"), 0)):
-            qs += 1
-    if not dates:
-        return None
-    dates.sort()
-    return {"start_dates": dates, "team_id": team_id,
-            "qs_rate": qs / len(dates)}
 
 
 def fetch_week_schedule(start_date: str, end_date: str) -> dict:
     """ONE league schedule call for [start_date, end_date] with probables.
 
     Returns {team_days: {team_id: [ISO...]}, probables: {pid: [ISO...]},
-    horizon_end: ISO|None} — horizon_end is the last date with ANY published
-    probable, feeding the projector's visibly-skipped-turn suppression."""
+    team_horizon: {team_id: ISO}} — team_horizon is the last date each TEAM
+    has a probable published for, feeding the projector's visibly-skipped-turn
+    suppression (per-team: an unlisted pitcher only means something once his
+    own team has announced that far; teams publish to different depths)."""
     url = (f"{MLB_API}/schedule?sportId=1&startDate={start_date}"
            f"&endDate={end_date}&hydrate=probablePitcher")
     data = json.loads(fetch_url(url, timeout=30))
     team_days: dict[int, list] = {}
     probables: dict[int, list] = {}
-    horizon_end = None
+    team_horizon: dict[int, str] = {}
     for day in data.get("dates", []):
         d = day.get("date")
         for g in day.get("games", []):
@@ -277,10 +298,10 @@ def fetch_week_schedule(start_date: str, end_date: str) -> dict:
                 pp = (t.get("probablePitcher") or {}).get("id")
                 if pp:
                     probables.setdefault(pp, []).append(d)
-                    if horizon_end is None or d > horizon_end:
-                        horizon_end = d
+                    if tid and d > team_horizon.get(tid, ""):
+                        team_horizon[tid] = d
     return {"team_days": team_days, "probables": probables,
-            "horizon_end": horizon_end}
+            "team_horizon": team_horizon}
 
 
 def fetch_standings_winpct(season: int) -> dict:

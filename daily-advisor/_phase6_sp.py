@@ -39,6 +39,11 @@ _PROMPTS = {
 
 _LLM_TIMEOUT = 600
 
+# 046: schedule fetch reaches this far before the window so staleness is
+# judged in team game days (a 10-day reach covers any turn gap the staleness
+# rule can care about: round(cadence)+2 ≤ 9 for a 6-man rotation).
+_SCHED_LOOKBACK_DAYS = 10
+
 _STEP_A_REQUIRED_KEYS = {"my_team_rank", "fa_classify"}
 _STEP_A_FA_VERDICTS = {"worth", "borderline", "not_worth"}
 _STEP_B_REQUIRED_KEYS = {"action", "reason"}
@@ -128,17 +133,22 @@ def _sp_signals_from_entry(entry: dict):
 
 
 def _week_window_et(today=None):
-    """The ET Mon-Sun week containing tomorrow-ET — the first week an add can
-    affect. At the TW-Monday 12:30 scan (= ET Sunday night) this is the full
-    upcoming week with ~5 days of probable coverage, the exact protocol the
-    046 retro gate validated at 85.0%."""
+    """The CAPTURABLE window: from tomorrow-ET (Daily-Tomorrow lock — the
+    first day an add can play) through the Sunday of tomorrow's ET week.
+
+    At the TW-Monday 12:30 scan (= ET Sunday night) this is the full upcoming
+    Mon-Sun week with ~5 days of probable coverage — the exact protocol the
+    046 retro gate validated at 85.0%. Mid-week scans get the REMAINDER of the
+    current matchup week: clamping the start to tomorrow keeps already-thrown
+    starts out of the count (they are volume an add can no longer capture, and
+    the schedule API still lists probables for completed games)."""
     from datetime import datetime, timedelta
     from zoneinfo import ZoneInfo
 
     et_today = today or datetime.now(ZoneInfo("America/New_York")).date()
     tomorrow = et_today + timedelta(days=1)
-    week_start = tomorrow - timedelta(days=tomorrow.weekday())
-    return week_start, week_start + timedelta(days=6)
+    week_monday = tomorrow - timedelta(days=tomorrow.weekday())
+    return tomorrow, week_monday + timedelta(days=6)
 
 
 def _swap_rates(entry: dict, gamelog: dict | None, winpct: dict) -> dict:
@@ -172,19 +182,23 @@ def _attach_318b(weakest: list[dict], fa_entries: list[dict], h: dict,
     from swap_batter import should_emit_swap
     from swap_sp import format_swap_line_sp, project_sp_weekly, swap_vector_sp
 
+    from datetime import timedelta
+
     all_entries = list(weakest) + list(fa_entries)
 
     # ── 046: one league schedule call + per-pid game log → start projection ──
+    # The schedule fetch reaches back before the window so staleness can be
+    # judged in TEAM GAME DAYS (a league-wide break must not read as "missed
+    # a turn" — sp_start_projector gap_game_days).
     week_start, week_end = _week_window_et()
+    lookback_start = week_start - timedelta(days=_SCHED_LOOKBACK_DAYS)
     try:
-        sched = sdf.fetch_week_schedule(week_start.isoformat(),
+        sched = sdf.fetch_week_schedule(lookback_start.isoformat(),
                                         week_end.isoformat())
     except Exception as e:
         print(f"  318b: week schedule skipped ({type(e).__name__}: {e})",
               file=sys.stderr)
-        sched = {"team_days": {}, "probables": {}, "horizon_end": None}
-    horizon_end = (date.fromisoformat(sched["horizon_end"])
-                   if sched.get("horizon_end") else None)
+        sched = {"team_days": {}, "probables": {}, "team_horizon": {}}
 
     import time
 
@@ -198,50 +212,65 @@ def _attach_318b(weakest: list[dict], fa_entries: list[dict], h: dict,
         gl = gamelogs[pid]
         if not gl:
             continue
-        starts = [date.fromisoformat(d) for d in gl["start_dates"]]
-        probables = [date.fromisoformat(d)
-                     for d in sched["probables"].get(pid, [])]
-        team_days = [date.fromisoformat(d)
-                     for d in sched["team_days"].get(gl["team_id"], [])]
-        out = project_starts(
-            starts[-1], infer_cadence(starts), week_start, week_end,
-            probable_dates=probables,
-            schedule_dates={d for d in team_days} or None,
-            probable_horizon_end=horizon_end,
-        )
-        entry["next_week_starts"] = {
-            "starts": out["starts"],
-            "window": [week_start.isoformat(), week_end.isoformat()],
-            "dates": [d.isoformat() for d in out["projected_dates"]],
-            "source": out["source"],
-        }
+        try:
+            starts = [date.fromisoformat(d) for d in gl["start_dates"]]
+            probables = [date.fromisoformat(d)
+                         for d in sched["probables"].get(pid, [])
+                         if d >= week_start.isoformat()]
+            team_days = {date.fromisoformat(d)
+                         for d in sched["team_days"].get(gl["team_id"], [])}
+            horizon = sched.get("team_horizon", {}).get(gl["team_id"])
+            out = project_starts(
+                starts[-1], infer_cadence(starts), week_start, week_end,
+                probable_dates=probables,
+                schedule_dates={d for d in team_days
+                                if d >= week_start} or None,
+                probable_horizon_end=(date.fromisoformat(horizon)
+                                      if horizon else None),
+                gap_game_days=team_days,
+            )
+            entry["next_week_starts"] = {
+                "starts": out["starts"],
+                "window": [week_start.isoformat(), week_end.isoformat()],
+                "dates": [d.isoformat() for d in out["projected_dates"]],
+                "source": out["source"],
+            }
+        except Exception as e:   # one bad entry never drops the others
+            print(f"  318b: projection skipped for {entry.get('name')} "
+                  f"({type(e).__name__}: {e})", file=sys.stderr)
 
     # ── 050: velo deltas + tag / K-BB small-sample ladder ──
     velo_cur, velo_prior = {}, {}
-    try:
-        velo_cur = mf.fetch_season_velo_bulk(2026)
-        velo_prior = mf.fetch_season_velo_bulk(2025)
-    except Exception as e:
-        print(f"  318b: velo bulk skipped ({type(e).__name__}: {e})",
-              file=sys.stderr)
+    if any((e.get("rolling_21d") or {}).get("velo_fb") is not None
+           for e in all_entries):
+        try:
+            velo_cur = mf.fetch_season_velo_bulk(2026)
+            velo_prior = mf.fetch_season_velo_bulk(2025)
+        except Exception as e:
+            print(f"  318b: velo bulk skipped ({type(e).__name__}: {e})",
+                  file=sys.stderr)
     for entry in all_entries:
-        pid = entry.get("mlb_id")
-        sv4 = entry.get("savant_v4") or {}
-        velo = mf.compute_velo(entry.get("rolling_21d"),
-                               velo_cur.get(pid), velo_prior.get(pid))
-        if velo:
-            entry["micro_velo"] = velo
-            tag = mf.velo_tag(velo)
-            if tag:
-                key = "warn_tags" if tag.startswith("⚠️") else "add_tags"
-                entry.setdefault(key, [])
-                if tag not in entry[key]:
-                    entry[key].append(tag)
-        bbe = sv4.get("bbe")
-        if bbe is not None and bbe < 30:
-            kbb = mf.kbb_ladder(sv4.get("k"), sv4.get("bb"), sv4.get("bf"))
-            if kbb:
-                entry["kbb_small_sample"] = kbb
+        try:
+            pid = entry.get("mlb_id")
+            sv4 = entry.get("savant_v4") or {}
+            velo = mf.compute_velo(entry.get("rolling_21d"),
+                                   velo_cur.get(pid), velo_prior.get(pid))
+            if velo:
+                entry["micro_velo"] = velo
+                tag = mf.velo_tag(velo)
+                if tag:
+                    key = "warn_tags" if tag.startswith("⚠️") else "add_tags"
+                    entry.setdefault(key, [])
+                    if tag not in entry[key]:
+                        entry[key].append(tag)
+            bbe = sv4.get("bbe")
+            if bbe is not None and bbe < 30:
+                kbb = mf.kbb_ladder(sv4.get("k"), sv4.get("bb"), sv4.get("bf"))
+                if kbb:
+                    entry["kbb_small_sample"] = kbb
+        except Exception as e:
+            print(f"  318b: micro skipped for {entry.get('name')} "
+                  f"({type(e).__name__}: {e})", file=sys.stderr)
 
     # ── ledger memory + SP stars (318a's SP mirror) ──
     enrich_map = {}
@@ -249,8 +278,14 @@ def _attach_318b(weakest: list[dict], fa_entries: list[dict], h: dict,
     if h.get("ledger_histories"):
         histories = h["ledger_histories"]([e["name"] for e in all_entries]) or {}
     for entry in all_entries:
-        enr = enrich_candidate_sp(_sp_signals_from_entry(entry),
-                                  histories.get(entry["name"], []), today_str)
+        try:
+            enr = enrich_candidate_sp(_sp_signals_from_entry(entry),
+                                      histories.get(entry["name"], []),
+                                      today_str)
+        except Exception as e:
+            print(f"  318b: enrich skipped for {entry.get('name')} "
+                  f"({type(e).__name__}: {e})", file=sys.stderr)
+            continue
         if enr.note_lines:
             entry["ledger_note"] = list(enr.note_lines)
         entry["_stars"] = enr.stars   # pre-LLM only; never slimmed into payload

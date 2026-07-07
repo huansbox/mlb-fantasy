@@ -145,7 +145,6 @@ def _pitch_level_metrics(rows):
         "velo_fb_type": fb_type,
         "velo_by_type": velo_by_type,
         "velo_fb_last_game": velo_fb_last,
-        "last_game_date": last_date or None,
     }
 
 

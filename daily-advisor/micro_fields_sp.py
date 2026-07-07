@@ -36,18 +36,15 @@ VELO_DELTA_SIG = 1.0
 BF_STABLE = 70
 BF_EARLY = 40
 
-# The rolling velo_fb key ("FF"/"SI"/"FC") ↔ pitch-arsenals CSV column.
-_ARSENAL_SPEED_COLS = {
-    "FF": "ff_avg_speed", "SI": "si_avg_speed", "FC": "fc_avg_speed",
-}
-
-
 # ── network (thin) ──
 
 def fetch_season_velo_bulk(year: int) -> dict[int, dict]:
-    """One league-bulk pitch-arsenals CSV → {pid: {"FF": mph, "SI": mph,
-    "FC": mph}} (fastball types only — the micro-field tracks the primary
-    fastball)."""
+    """One league-bulk pitch-arsenals CSV → {pid: {"FF": mph, "SI": mph, ...}}.
+
+    Every ``*_avg_speed`` column is parsed generically (keyed by uppercased
+    pitch-type code), so whatever fastball type the rolling aggregation picks
+    as primary (savant_rolling._FASTBALL_TYPES) joins without this module
+    keeping a parallel type list in lockstep."""
     url = (
         "https://baseballsavant.mlb.com/leaderboard/pitch-arsenals"
         f"?year={year}&min=10&type=avg_speed&csv=true"
@@ -61,10 +58,12 @@ def fetch_season_velo_bulk(year: int) -> dict[int, dict]:
         except (ValueError, KeyError, TypeError):
             continue
         speeds = {}
-        for ptype, col in _ARSENAL_SPEED_COLS.items():
-            v = _f(r.get(col))
+        for col, raw_v in r.items():
+            if not col or not col.endswith("_avg_speed"):
+                continue
+            v = _f(raw_v)
             if v is not None:
-                speeds[ptype] = v
+                speeds[col[:-len("_avg_speed")].upper()] = v
         if speeds:
             out[pid] = speeds
     return out
@@ -144,11 +143,5 @@ def kbb_ladder(k, bb, bf) -> dict | None:
         "bf": bf,
         "tier": tier,
     }
-
-
-def csw_context(rolling: dict | None) -> dict | None:
-    """CSW% 21d level (context-only — no season baseline exists, see module
-    docstring). Returns {csw_pct, pitches} or None."""
-    if not rolling or rolling.get("csw_pct") is None:
-        return None
-    return {"csw_pct": rolling["csw_pct"], "pitches": rolling.get("pitches")}
+# NOTE: the CSW 21d passthrough lives in payload_slimmer._rolling_payload
+# (it rides the existing rolling dict, 0 budget lines) — no helper here.
