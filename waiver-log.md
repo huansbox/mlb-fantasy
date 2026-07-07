@@ -210,13 +210,6 @@ vs：Ozzie Albies
 - 07-06：xwOBA P95+14d OPS .950菁英但PA-TG 0.63<3.0/BBE 38<50量能未確認+DTD;運氣+0.084;vs Albies（fa_scan）
 - 07-07：xwOBA P95+14d OPS .950菁英但PA-TG 0.63<3.0/BBE 38<50量能未確認+DTD;運氣+0.090;vs Albies（fa_scan）
 
-### Josh Bell (MIN, 1B) [mlb_id:605137] — 觀察中
-觸發：PA-TG ≥3.0連5天 + 14d OPS ≥.850連5天
-vs：Christian Walker
-- 07-05：14d OPS 1.007/5HR/13RBI+Savant Δ+0.076/xwOBA P70;疑下週先發量,待確認（fa_scan）
-- 07-06：[取代→Christian Walker] 14d OPS .959/4HR/13RBI+Savant xwOBA .433 Δ+0.098+PA-TG 3.85滿檔上場+雙年P80/P95;升級取代Walker（fa_scan）
-- 07-06：[eval] vs Christian Walker，結論：次選不撿（Walker 格位建議讓給 Mead），理由：33歲老化區深查 — 多年 wRC+ 104→101→107 無 decay curve、power 底盤在（Barrel P70-80/BBE 243），但 chase 26.7→30.8（+4.1 過顯著門檻 3.6）+BB% P70-80→P45-50 選球軸退化 + DH 為主有固定輪休；14d 熱有底層（Savant .433）但屬當週價值，季線 xwOBA .335 低於 Mead .357（player-eval）
-
 ### Victor Bericoto (SF, LF,RF) [mlb_id:682674] — 觀察中
 觸發：Jung Hoo Lee 歸隊後仍每日先發 + season BBE ≥40 + BB% 回升 ≥5%
 vs：（無錨點 — 純 upside watch）
@@ -277,6 +270,9 @@ vs：（無錨點 — 純 upside watch）
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Josh Bell (MIN, 1B) — 被搶（自動偵測）
+- 2026-07-07：Yahoo ownership_type=team，從觀察中移除。
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 已結案（fa_scan CLOSE）
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
