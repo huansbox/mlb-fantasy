@@ -113,6 +113,26 @@ def bucket_playing_time(pa_tg) -> str:
     return "low"
 
 
+# SP volume buckets aligned to the same population anchors as the batter
+# thresholds (batter 3.5 PA/TG ≈ P80, 2.5 ≈ P40 of the 2025 table): 2025 SP
+# IP/GS P80 = 5.89, P40 = 5.35 (calc_v4_percentiles.py, n=178).
+SP_IPGS_HIGH = 5.89
+SP_IPGS_MID = 5.35
+
+
+def bucket_playing_time_sp(ip_gs, rotation_ok: bool = True) -> str:
+    """IP/GS + Rotation Gate → playing-time level (PRD 040: 「SP 以 IP/GS +
+    Rotation Gate 對應」). A pitcher failing the Rotation Gate (pure RP /
+    long relief) has no start volume to credit regardless of IP/GS."""
+    if not rotation_ok or ip_gs is None:
+        return "low"
+    if ip_gs >= SP_IPGS_HIGH:
+        return "high"
+    if ip_gs >= SP_IPGS_MID:
+        return "mid"
+    return "low"
+
+
 def bucket_dual_year(prior_percentiles, sample_ok: bool) -> str:
     """Prior-year core percentiles → dual-year confirmation level.
 

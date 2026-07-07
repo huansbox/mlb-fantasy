@@ -108,11 +108,16 @@ _FASTBALL_TYPES = ("FF", "SI", "FC")
 def _pitch_level_metrics(rows):
     """Per-pitch CSW% + velocity from ALL pitches (issue #329 aggregation
     extension — needs `description` + `release_speed`, which the event-gated
-    aggregation drops). Returns {} when there are no pitches."""
+    aggregation drops). Also isolates the LATEST game's fastball velo
+    (velo_fb_last_game) — the 050 injury-precursor window is a single start,
+    which the 21d average dilutes. Returns {} when there are no pitches."""
     total = 0
     csw = 0
     velo_sum: dict[str, float] = {}
     velo_n: dict[str, int] = {}
+    last_date = max((row.get("game_date") or "").strip() for row in rows) if rows else ""
+    last_sum: dict[str, float] = {}
+    last_n: dict[str, int] = {}
     for row in rows:
         total += 1
         if (row.get("description") or "").strip() in _CSW_DESCRIPTIONS:
@@ -122,18 +127,25 @@ def _pitch_level_metrics(rows):
         if pt and rs is not None:
             velo_sum[pt] = velo_sum.get(pt, 0.0) + rs
             velo_n[pt] = velo_n.get(pt, 0) + 1
+            if last_date and (row.get("game_date") or "").strip() == last_date:
+                last_sum[pt] = last_sum.get(pt, 0.0) + rs
+                last_n[pt] = last_n.get(pt, 0) + 1
     if total == 0:
         return {}
     velo_by_type = {pt: round(velo_sum[pt] / velo_n[pt], 1) for pt in velo_sum}
     fb_type = next((pt for pt in sorted(
         _FASTBALL_TYPES, key=lambda t: velo_n.get(t, 0), reverse=True)
         if velo_n.get(pt, 0) > 0), None)
+    velo_fb_last = (round(last_sum[fb_type] / last_n[fb_type], 1)
+                    if fb_type and last_n.get(fb_type) else None)
     return {
         "csw_pct": round(csw / total * 100, 1),
         "pitches": total,
         "velo_fb": velo_by_type.get(fb_type) if fb_type else None,
         "velo_fb_type": fb_type,
         "velo_by_type": velo_by_type,
+        "velo_fb_last_game": velo_fb_last,
+        "last_game_date": last_date or None,
     }
 
 

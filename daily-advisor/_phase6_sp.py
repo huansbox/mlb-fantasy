@@ -101,6 +101,188 @@ def _attach_v4_to_fa(fa_entries: list[dict]) -> None:
             p["breakdown"] = breakdown
 
 
+# ── 318b B6 attach (046 starts / 050 micro / ledger memory / 048 swap) ──
+
+def _sp_signals_from_entry(entry: dict):
+    """Extract ledger_enrich.SPSignals from a normalized SP entry (my-team or
+    FA — both carry savant_v4 / prior_stats / rolling_21d)."""
+    from ledger_enrich import SPSignals
+
+    sv4 = entry.get("savant_v4") or {}
+    prior = entry.get("prior_stats") or {}
+    roll = entry.get("rolling_21d") or {}
+    return SPSignals(
+        source=entry.get("source", "scan-query"),
+        ip_gs=sv4.get("ip_gs"),
+        whiff_pct=sv4.get("whiff_pct"),
+        bb9=sv4.get("bb9"),
+        gb_pct=sv4.get("gb_pct"),
+        xwobacon=sv4.get("xwobacon"),
+        rolling_xwobacon=roll.get("xwobacon"),
+        prior_whiff_pct=prior.get("whiff_pct"),
+        prior_bb9=prior.get("bb9"),
+        prior_xwobacon=prior.get("xwobacon"),
+        prior_ip=prior.get("ip"),
+        rotation_ok=True,  # FA pool already passed the Layer 1.5 Rotation Gate
+    )
+
+
+def _week_window_et(today=None):
+    """The ET Mon-Sun week containing tomorrow-ET — the first week an add can
+    affect. At the TW-Monday 12:30 scan (= ET Sunday night) this is the full
+    upcoming week with ~5 days of probable coverage, the exact protocol the
+    046 retro gate validated at 85.0%."""
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
+
+    et_today = today or datetime.now(ZoneInfo("America/New_York")).date()
+    tomorrow = et_today + timedelta(days=1)
+    week_start = tomorrow - timedelta(days=tomorrow.weekday())
+    return week_start, week_start + timedelta(days=6)
+
+
+def _swap_rates(entry: dict, gamelog: dict | None, winpct: dict) -> dict:
+    """Per-start production rates for swap_sp from an entry + its game log."""
+    sv4 = entry.get("savant_v4") or {}
+    team_id = (gamelog or {}).get("team_id")
+    return {
+        "ip_per_gs": sv4.get("ip_gs"),
+        "k9": sv4.get("k9"),
+        "qs_rate": (gamelog or {}).get("qs_rate"),
+        "team_win_pct": winpct.get(team_id),
+        "era": sv4.get("era"),
+        "whip": sv4.get("whip"),
+    }
+
+
+def _attach_318b(weakest: list[dict], fa_entries: list[dict], h: dict,
+                 today_str: str) -> dict:
+    """Attach the 318b B6 injection fields in-place; return the SP enrich map
+    (name → CandidateEnrichment) for the waiver-log/ledger write.
+
+    Every stage is individually best-effort — a failed fetch drops that field
+    for that run, never the scan (batter 段① precedent: zero best-effort
+    skips on VPS, but the guarantee must hold)."""
+    from datetime import date
+
+    import micro_fields_sp as mf
+    import sp_data_fetchers as sdf
+    from ledger_enrich import enrich_candidate_sp
+    from sp_start_projector import infer_cadence, project_starts
+    from swap_batter import should_emit_swap
+    from swap_sp import format_swap_line_sp, project_sp_weekly, swap_vector_sp
+
+    all_entries = list(weakest) + list(fa_entries)
+
+    # ── 046: one league schedule call + per-pid game log → start projection ──
+    week_start, week_end = _week_window_et()
+    try:
+        sched = sdf.fetch_week_schedule(week_start.isoformat(),
+                                        week_end.isoformat())
+    except Exception as e:
+        print(f"  318b: week schedule skipped ({type(e).__name__}: {e})",
+              file=sys.stderr)
+        sched = {"team_days": {}, "probables": {}, "horizon_end": None}
+    horizon_end = (date.fromisoformat(sched["horizon_end"])
+                   if sched.get("horizon_end") else None)
+
+    import time
+
+    gamelogs: dict[int, dict | None] = {}
+    for entry in all_entries:
+        pid = entry.get("mlb_id")
+        if not pid:
+            continue
+        time.sleep(0.2)  # MLB API rate limit (mirrors _prep_my_roster)
+        gamelogs[pid] = sdf.fetch_gamelog_starts(pid, 2026)
+        gl = gamelogs[pid]
+        if not gl:
+            continue
+        starts = [date.fromisoformat(d) for d in gl["start_dates"]]
+        probables = [date.fromisoformat(d)
+                     for d in sched["probables"].get(pid, [])]
+        team_days = [date.fromisoformat(d)
+                     for d in sched["team_days"].get(gl["team_id"], [])]
+        out = project_starts(
+            starts[-1], infer_cadence(starts), week_start, week_end,
+            probable_dates=probables,
+            schedule_dates={d for d in team_days} or None,
+            probable_horizon_end=horizon_end,
+        )
+        entry["next_week_starts"] = {
+            "starts": out["starts"],
+            "window": [week_start.isoformat(), week_end.isoformat()],
+            "dates": [d.isoformat() for d in out["projected_dates"]],
+            "source": out["source"],
+        }
+
+    # ── 050: velo deltas + tag / K-BB small-sample ladder ──
+    velo_cur, velo_prior = {}, {}
+    try:
+        velo_cur = mf.fetch_season_velo_bulk(2026)
+        velo_prior = mf.fetch_season_velo_bulk(2025)
+    except Exception as e:
+        print(f"  318b: velo bulk skipped ({type(e).__name__}: {e})",
+              file=sys.stderr)
+    for entry in all_entries:
+        pid = entry.get("mlb_id")
+        sv4 = entry.get("savant_v4") or {}
+        velo = mf.compute_velo(entry.get("rolling_21d"),
+                               velo_cur.get(pid), velo_prior.get(pid))
+        if velo:
+            entry["micro_velo"] = velo
+            tag = mf.velo_tag(velo)
+            if tag:
+                key = "warn_tags" if tag.startswith("⚠️") else "add_tags"
+                entry.setdefault(key, [])
+                if tag not in entry[key]:
+                    entry[key].append(tag)
+        bbe = sv4.get("bbe")
+        if bbe is not None and bbe < 30:
+            kbb = mf.kbb_ladder(sv4.get("k"), sv4.get("bb"), sv4.get("bf"))
+            if kbb:
+                entry["kbb_small_sample"] = kbb
+
+    # ── ledger memory + SP stars (318a's SP mirror) ──
+    enrich_map = {}
+    histories = {}
+    if h.get("ledger_histories"):
+        histories = h["ledger_histories"]([e["name"] for e in all_entries]) or {}
+    for entry in all_entries:
+        enr = enrich_candidate_sp(_sp_signals_from_entry(entry),
+                                  histories.get(entry["name"], []), today_str)
+        if enr.note_lines:
+            entry["ledger_note"] = list(enr.note_lines)
+        entry["_stars"] = enr.stars   # pre-LLM only; never slimmed into payload
+        enrich_map[entry["name"]] = enr
+
+    # ── 048: per-category weekly swap delta vs the incumbent, 4★+ only ──
+    try:
+        incumbent = weakest[0]
+        winpct = {}
+        if any(should_emit_swap(e.get("_stars") or 0) for e in fa_entries):
+            winpct = sdf.fetch_standings_winpct(2026)
+        inc_proj = (incumbent.get("next_week_starts") or {}).get("starts")
+        inc_rates = _swap_rates(incumbent, gamelogs.get(incumbent.get("mlb_id")),
+                                winpct)
+        for entry in fa_entries:
+            if not should_emit_swap(entry.get("_stars") or 0):
+                continue
+            proj = (entry.get("next_week_starts") or {}).get("starts")
+            if proj is None or inc_proj is None:
+                continue
+            cand_rates = _swap_rates(entry, gamelogs.get(entry.get("mlb_id")),
+                                     winpct)
+            vec = swap_vector_sp(project_sp_weekly(cand_rates, proj),
+                                 project_sp_weekly(inc_rates, inc_proj))
+            entry["swap_vs_incumbent"] = format_swap_line_sp(
+                incumbent["name"], entry["name"], vec)
+    except Exception as e:
+        print(f"  318b: swap skipped ({type(e).__name__}: {e})", file=sys.stderr)
+
+    return enrich_map
+
+
 # ── Payload builders ──
 
 def _slim_my_team_entry(entry: dict) -> dict:
@@ -294,6 +476,16 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
             tags = fa_compute.compute_fa_tags_v4_sp(f, anchor)
             fa_tagged.append({**f, **tags})
 
+        # 318b B6: attach injection fields (046 starts / 050 micro / ledger
+        # memory / 048 swap) + build the SP enrich map for the ledger write.
+        # Best-effort — a failure drops the injections, never the scan.
+        sp_enrich_map = {}
+        try:
+            sp_enrich_map = _attach_318b(weakest, fa_tagged, h, today_str)
+        except Exception as e:  # noqa: BLE001
+            print(f"  318b ({label}): attach skipped ({type(e).__name__}: {e})",
+                  file=sys.stderr)
+
         # ── Layer 5: 2-step single-LLM ──
         print(f"  Layer 5 ({label}): Step A — rank + classify...", file=sys.stderr)
         step_a_payload = _build_step_a_payload(weakest, fa_tagged, low_conf)
@@ -331,7 +523,7 @@ def process_sp_v4(config, savant_2026, enriched, watch_enriched,
 
         _emit_b2_final(
             label, step_a_result, step_b_result, today_str, env, args, h,
-            weakest=weakest, fa_tagged=fa_tagged,
+            weakest=weakest, fa_tagged=fa_tagged, enrich_map=sp_enrich_map,
         )
 
     except Exception as e:
@@ -397,7 +589,8 @@ def _emit_b2_pass(label, anchor, fa_tagged, today_str, env, args, h, reason: str
 
 
 def _emit_b2_final(label, step_a: dict, step_b: dict, today_str, env, args, h,
-                   weakest: list[dict], fa_tagged: list[dict]) -> None:
+                   weakest: list[dict], fa_tagged: list[dict],
+                   enrich_map: dict | None = None) -> None:
     """Publish Step B verdict to Telegram + Issue + waiver-log."""
     action = step_b.get("action")
     reason = step_b.get("reason") or ""
@@ -444,7 +637,10 @@ def _emit_b2_final(label, step_a: dict, step_b: dict, today_str, env, args, h,
     h["publish"](today_str, label, advice_telegram, advice_issue, full_raw, env, args)
 
     if waiver_block_lines and not getattr(args, "no_waiver_log", False):
-        h["update_waiver_log"](advice_full, today_str, env)
+        # enrich_map threads SP channel/stars/add_reason into the ledger via
+        # the shared waiver-log write (318a's SP mirror, 318b B6).
+        h["update_waiver_log"](advice_full, today_str, env,
+                               enrich_map=enrich_map)
 
 
 def _lookup_team_position(name: str, fa_pool: list[dict],

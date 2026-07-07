@@ -2555,6 +2555,11 @@ def _normalize_fa_for_compute(p, group_type, fa_rolling):
             prior_stats["whiff_pct"] = v4_25.get("whiff_pct")
             prior_stats["gb_pct"] = v4_25.get("gb_pct")  # likely None for past year
             prior_stats["xwobacon"] = v4_25.get("xwobacon")
+            # prior BB/9 — the third dual-year quality slot for the 318b SP
+            # star factor (ledger_enrich.build_star_factors_sp)
+            if mlb_25 and prior_ip:
+                bb25 = int(mlb_25.get("baseOnBalls", 0) or 0)
+                prior_stats["bb9"] = round(9 * bb25 / prior_ip, 2)
     else:
         if savant_25:
             prior_bb_pct = None
@@ -3930,6 +3935,7 @@ def _process_group_sp_v4(config, savant_2026, enriched, watch_enriched,
         "load_savant_rolling": _load_savant_rolling,
         "fetch_fa_rolling": _fetch_fa_rolling,
         "ip_per_gs_from_gamelog": _ip_per_gs_from_gamelog,
+        "ledger_histories": _ledger_histories,
     }
     process_sp_v4(
         config, savant_2026, enriched, watch_enriched,
@@ -3937,6 +3943,20 @@ def _process_group_sp_v4(config, savant_2026, enriched, watch_enriched,
         rostered_names=rostered_names,
         fa_scan_helpers=helpers,
     )
+
+
+def _ledger_histories(names):
+    """Best-effort {name: [LedgerEntry]} for the SP 318b enrich (channel
+    honours first contact / add_reason never re-judged). {} on any failure —
+    the enrich then treats every candidate as day-0, which under-rates but
+    never crashes the scan."""
+    try:
+        ledger = DecisionLedger(DECISION_LEDGER_PATH)
+        return {n: ledger.get_history(n) for n in names}
+    except Exception as e:  # noqa: BLE001
+        print(f"  ledger-histories: skipped ({type(e).__name__}: {e})",
+              file=sys.stderr)
+        return {}
 
 
 def _run_daily_scan(access_token, config, today_str, env, args):

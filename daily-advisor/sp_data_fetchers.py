@@ -195,6 +195,8 @@ def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
                     ip_gs = _ip_per_gs_gamelog(pid, year) if gs else None
                     out[pid] = {
                         "g": g, "gs": gs, "ip": ip_real, "bb": bb, "k": k,
+                        # batters faced — K-BB% denominator (050 small-sample ladder)
+                        "bf": safe_int(stat.get("battersFaced"), 0),
                         "ip_gs": ip_gs,
                         "bb9": 9 * bb / ip_real if ip_real else 0,
                         "k9": 9 * k / ip_real if ip_real else 0,
@@ -209,6 +211,90 @@ def fetch_mlb_season_stats(pitcher_ids, year: int) -> dict:
                     break
         except Exception as e:
             print(f"[warn] MLB API batch {i} failed: {e}", file=sys.stderr)
+    return out
+
+
+# ── 318b B6 fetchers (046 start projection / 048 swap context) ──
+
+def fetch_gamelog_starts(pid: int, year: int) -> dict | None:
+    """One game-log call → the 046/048 per-pitcher context: start dates for
+    the cadence walk, the team as of the last start (schedule lookup key), and
+    the QS rate for the per-start production vector.
+
+    Returns {start_dates: [ISO...] (sorted), team_id, qs_rate} or None when
+    the pitcher has no starts / the API fails (best-effort callers skip)."""
+    from mlb_query import is_quality_start, parse_ip
+
+    url = (f"{MLB_API}/people/{pid}/stats"
+           f"?stats=gameLog&group=pitching&season={year}")
+    try:
+        data = json.loads(fetch_url(url, timeout=30))
+        splits = (data.get("stats") or [{}])[0].get("splits", [])
+    except Exception:
+        return None
+    dates, team_id, qs = [], None, 0
+    for s in splits:
+        stat = s.get("stat", {})
+        if safe_int(stat.get("gamesStarted"), 0) < 1:
+            continue
+        dates.append(s.get("date"))
+        team_id = (s.get("team") or {}).get("id") or team_id
+        try:
+            ip_dec = parse_ip(str(stat.get("inningsPitched", "0.0")))
+        except (ValueError, AttributeError):
+            ip_dec = 0.0
+        if is_quality_start(ip_dec, safe_int(stat.get("earnedRuns"), 0)):
+            qs += 1
+    if not dates:
+        return None
+    dates.sort()
+    return {"start_dates": dates, "team_id": team_id,
+            "qs_rate": qs / len(dates)}
+
+
+def fetch_week_schedule(start_date: str, end_date: str) -> dict:
+    """ONE league schedule call for [start_date, end_date] with probables.
+
+    Returns {team_days: {team_id: [ISO...]}, probables: {pid: [ISO...]},
+    horizon_end: ISO|None} — horizon_end is the last date with ANY published
+    probable, feeding the projector's visibly-skipped-turn suppression."""
+    url = (f"{MLB_API}/schedule?sportId=1&startDate={start_date}"
+           f"&endDate={end_date}&hydrate=probablePitcher")
+    data = json.loads(fetch_url(url, timeout=30))
+    team_days: dict[int, list] = {}
+    probables: dict[int, list] = {}
+    horizon_end = None
+    for day in data.get("dates", []):
+        d = day.get("date")
+        for g in day.get("games", []):
+            for side in ("home", "away"):
+                t = g.get("teams", {}).get(side, {})
+                tid = (t.get("team") or {}).get("id")
+                if tid:
+                    days = team_days.setdefault(tid, [])
+                    if d not in days:
+                        days.append(d)
+                pp = (t.get("probablePitcher") or {}).get("id")
+                if pp:
+                    probables.setdefault(pp, []).append(d)
+                    if horizon_end is None or d > horizon_end:
+                        horizon_end = d
+    return {"team_days": team_days, "probables": probables,
+            "horizon_end": horizon_end}
+
+
+def fetch_standings_winpct(season: int) -> dict:
+    """{team_id: win_pct} from league standings — the W coefficient input for
+    the 048 per-start vector."""
+    url = f"{MLB_API}/standings?leagueId=103,104&season={season}"
+    data = json.loads(fetch_url(url, timeout=30))
+    out = {}
+    for rec in data.get("records", []):
+        for tr in rec.get("teamRecords", []):
+            tid = (tr.get("team") or {}).get("id")
+            pct = safe_float(tr.get("winningPercentage"))
+            if tid and pct is not None:
+                out[tid] = pct
     return out
 
 
@@ -249,5 +335,9 @@ def assemble_data(pitcher_ids, year: int) -> dict:
             "k9": m.get("k9"),
             "whip": m.get("whip"),
             "arsenal_pitches": a.get("arsenal_pitches", 0),
+            # raw counting for the 050 K-BB% small-sample ladder
+            "k": m.get("k"),
+            "bb": m.get("bb"),
+            "bf": m.get("bf"),
         }
     return merged

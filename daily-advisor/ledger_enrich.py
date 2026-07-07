@@ -25,11 +25,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
+import fa_compute
 from daily_advisor import BATTER_PCTILES
 from star_rating import (
     StarResult,
     bucket_dual_year,
     bucket_playing_time,
+    bucket_playing_time_sp,
     score,
 )
 
@@ -184,6 +186,133 @@ def compute_candidate_stars(sig: CandidateSignals, history) -> tuple[int, str, S
         factors["trigger"] = "none"
         result = score(factors, day0=False)
     return result.stars, channel, result
+
+
+# ── 318b B6: SP-side channel + stars (the SP mirror of the batter section) ──
+#
+# Same taxonomy, same first-contact-never-re-judged rule, SP-shaped signals:
+# season strength reads the v4 5-slot, heat reads the 21d xwOBACON surge, and
+# playing time is IP/GS + Rotation Gate (PRD 040). Prior-year confirmation
+# uses the three quality slots obtainable in bulk for any pitcher (whiff /
+# bb9 / xwobacon — past-year GB% is broken at the Savant endpoint and prior
+# IP/GS needs per-pid game logs).
+
+SEASON_STRONG_MIN_SP = 3        # ≥3 of 5 v4 slots at P60+ (batter: 2 of 3)
+HOT_21D_XWOBACON_DELTA = 0.040  # 21d xwOBACON ≥ .040 BELOW season = surge
+                                # (mirrors the batter +.040 xwOBA spike)
+PRIOR_SAMPLE_IP_SP = 50         # prior-year IP floor (the retired ✅雙年菁英 line)
+
+_V4_REVERSE_SP = frozenset({"bb9", "xwobacon"})
+
+
+@dataclass
+class SPSignals:
+    source: str
+    ip_gs: float | None = None        # 2026 v4 slot raws
+    whiff_pct: float | None = None
+    bb9: float | None = None
+    gb_pct: float | None = None
+    xwobacon: float | None = None
+    rolling_xwobacon: float | None = None   # 21d rolling (heat proxy)
+    prior_whiff_pct: float | None = None    # 2025 prior quality slots
+    prior_bb9: float | None = None
+    prior_xwobacon: float | None = None
+    prior_ip: float | None = None
+    rotation_ok: bool = True
+
+
+def sp_percentile_of(value, metric) -> int:
+    """Numeric elite-direction percentile = the highest 2025 SP v4 bracket
+    ``value`` clears (reverse metrics compare downward); 0 below P25 or for
+    None. Mirrors payload_slimmer._v4_percentile without the display cap."""
+    if value is None:
+        return 0
+    bands = fa_compute.PITCHER_V4_PCTILES.get(metric)
+    if not bands:
+        return 0
+    reverse = metric in _V4_REVERSE_SP
+    matched = 0
+    for pct, threshold in bands:
+        if (value <= threshold) if reverse else (value >= threshold):
+            matched = pct
+    return matched
+
+
+def is_season_strong_sp(sig: SPSignals) -> bool:
+    pcts = [
+        sp_percentile_of(sig.ip_gs, "ip_gs"),
+        sp_percentile_of(sig.whiff_pct, "whiff_pct"),
+        sp_percentile_of(sig.bb9, "bb9"),
+        sp_percentile_of(sig.gb_pct, "gb_pct"),
+        sp_percentile_of(sig.xwobacon, "xwobacon"),
+    ]
+    return sum(1 for p in pcts if p >= SEASON_STRONG_P) >= SEASON_STRONG_MIN_SP
+
+
+def is_hot_21d_sp(rolling_xwobacon, season_xwobacon) -> bool:
+    """A 21d contact-damage surge (xwOBACON well below season) — heat-led."""
+    if rolling_xwobacon is None or season_xwobacon is None:
+        return False
+    return (season_xwobacon - rolling_xwobacon) >= HOT_21D_XWOBACON_DELTA
+
+
+def build_star_factors_sp(sig: SPSignals, channel: str) -> dict:
+    prior_pcts = [
+        sp_percentile_of(sig.prior_whiff_pct, "whiff_pct"),
+        sp_percentile_of(sig.prior_bb9, "bb9"),
+        sp_percentile_of(sig.prior_xwobacon, "xwobacon"),
+    ]
+    sample_ok = (sig.prior_ip or 0) >= PRIOR_SAMPLE_IP_SP
+    return {
+        "channel": channel,
+        "dual_year": bucket_dual_year(prior_pcts, sample_ok=sample_ok),
+        "playing_time": bucket_playing_time_sp(sig.ip_gs, sig.rotation_ok),
+    }
+
+
+def compute_candidate_stars_sp(sig: SPSignals, history) -> tuple[int, str, StarResult]:
+    """SP mirror of compute_candidate_stars: first-contact channel honored,
+    day-0 path (cap 4★) for empty history, trigger deferred to 'none'."""
+    channel = first_channel(history) or classify_channel(
+        sig.source,
+        is_season_strong_sp(sig),
+        is_hot_21d_sp(sig.rolling_xwobacon, sig.xwobacon),
+    )
+    factors = build_star_factors_sp(sig, channel)
+    if not history:
+        result = score(factors, day0=True)
+    else:
+        factors["trigger"] = "none"
+        result = score(factors, day0=False)
+    return result.stars, channel, result
+
+
+def snapshot_add_reason_sp(sig: SPSignals) -> str:
+    """Compact 5-slot "why we picked him" snapshot, persisted at first
+    contact. '?' if nothing is known (never empty)."""
+    parts = []
+    if sig.ip_gs is not None:
+        parts.append(f"IP/GS {sig.ip_gs:.2f}")
+    if sig.whiff_pct is not None:
+        parts.append(f"Whiff% {sig.whiff_pct:.1f}")
+    if sig.bb9 is not None:
+        parts.append(f"BB/9 {sig.bb9:.2f}")
+    if sig.gb_pct is not None:
+        parts.append(f"GB% {sig.gb_pct:.1f}")
+    if sig.xwobacon is not None:
+        parts.append(f"xwOBACON {_fmt_xwoba3(sig.xwobacon)}")
+    return " / ".join(parts) if parts else "?"
+
+
+def enrich_candidate_sp(sig: SPSignals, history, today_str) -> CandidateEnrichment:
+    """SP mirror of enrich_candidate — stars/channel computed (persisted +
+    gate/KPI), ledger note rendered, star itself never injected (doc Q1)."""
+    stars, channel, _ = compute_candidate_stars_sp(sig, history)
+    add_reason = first_add_reason(history) or snapshot_add_reason_sp(sig)
+    note_lines = format_ledger_note(history, today_str,
+                                    add_reason_fallback=add_reason)
+    return CandidateEnrichment(channel=channel, stars=stars,
+                               add_reason=add_reason, note_lines=note_lines)
 
 
 # ── B1 / 318b: payload note injection (prev-verdict + add-reason + star) ──
