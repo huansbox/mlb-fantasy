@@ -22,6 +22,7 @@ from stream_sp_scan import (
     parse_projected_arg,
     parse_schedule,
     scan,
+    summarize_schedule,
     tier_opponent,
 )
 
@@ -1337,3 +1338,30 @@ class TestScanProjected:
         )
         # projected 綁在 06-21，06-20 的 away 仍 TBD
         assert result["2026-06-20"]["tbd_games"] == [{"away": "WSH", "home": "TB", "side": "away"}]
+
+
+class TestSummarizeSchedule:
+    """issue #407 — --list-days 的單日賽程摘要。"""
+
+    def test_counts_games_and_tbd(self):
+        schedule = {"dates": [{"games": [
+            {"teams": {
+                "away": {"team": {"id": 145},
+                         "probablePitcher": {"id": 1, "fullName": "A"}},
+                "home": {"team": {"id": 112},
+                         "probablePitcher": {"id": 2, "fullName": "B"}},
+            }},
+            {"teams": {
+                "away": {"team": {"id": 119}},
+                "home": {"team": {"id": 137}},
+            }},
+            {"teams": {
+                "away": {"team": {"id": 110},
+                         "probablePitcher": {"id": 3, "fullName": "C"}},
+                "home": {"team": {"id": 111}},
+            }},
+        ]}]}
+        assert summarize_schedule(schedule) == {"games": 3, "tbd": 2}
+
+    def test_empty_schedule(self):
+        assert summarize_schedule({"dates": []}) == {"games": 0, "tbd": 0}

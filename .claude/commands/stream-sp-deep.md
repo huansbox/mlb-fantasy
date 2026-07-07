@@ -25,7 +25,7 @@ description: "Fantasy Baseball 串流 SP 候選深評。用戶在 /stream-sp 跑
 3. 若找到：取該 row 的 opponent / %own / Sum26/25 / 5-slot 細節作為起手 context
 4. 若找不到：
    - 該 SP 名可能在 `owned_by_others` / `owned_by_me` / `已過濾` — 提醒用戶該 SP 不在 FA 候選池
-   - 或用戶名字拼錯 → AskUserQuestion 確認
+   - 或用戶名字拼錯 → 純文字列出最接近的候選名向用戶確認
 
 ### 0c：取 MLB Player ID
 
@@ -91,10 +91,12 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
         "7d": {"ops": ".769", ...}, "14d": {...}, "30d": {...},
         "vs_hand": {"ops": ".686", "pa": 1200, "hand": "R", ...}
       },
-      "sp_meta": {"name": "Trevor McDonald", "team": "?", "hand": "R"}
+      "sp_meta": {"name": "Trevor McDonald", "team": "SF", "hand": "R"}
     },
     "<mlb_id_failed>": {"error": "..."}  // partial failure：單 SP fetch 失敗不會中斷整批
   },
+  // sp_meta.team 來自 caller 的 sp_team：--pending-file 模式自動從 pending 表填；
+  // 手抄 fallback 模式沒有 --sp-team 參數 → 顯示 "?"（語義：未提供，非 bug）
   "comparison_table": {
     "headers": ["7d OPS", "30d→7d Δ", "vs hand OPS", "近 6 場 ERA", "Floor risk hint", "Sum26", "雙年 prior"],
     "rows": [

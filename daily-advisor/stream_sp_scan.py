@@ -272,6 +272,15 @@ def _extract_tbd_games(games):
     return tbd
 
 
+def summarize_schedule(schedule_json):
+    """`--list-days` 用（issue #407）：單日賽程 → {games, tbd}。
+
+    tbd = 至少一側 probable 未公布的場數（與 scan 的 tbd_games 同口徑）。
+    """
+    games = parse_schedule(schedule_json)
+    return {"games": len(games), "tbd": len(_extract_tbd_games(games))}
+
+
 def _starter_to_summary(sp):
     return {
         "name": sp.name,
@@ -780,8 +789,13 @@ def main():
         description="Stream SP scan — pipeline Step 2-6 (schedule + FA cross-check + v4 + opener filter + opponent strength + optional pending diff)",
     )
     parser.add_argument(
-        "--et-dates", required=True,
+        "--et-dates",
         help="comma-separated ET dates, e.g. 2026-05-14,2026-05-15",
+    )
+    parser.add_argument(
+        "--list-days", type=int,
+        help="list next N ET days' games/TBD counts (Step 1b helper) and exit "
+             "— statsapi only, no Yahoo",
     )
     parser.add_argument(
         "--pending-file",
@@ -797,6 +811,21 @@ def main():
     )
     parser.add_argument("--pretty", action="store_true", help="pretty-print JSON")
     args = parser.parse_args()
+
+    if args.list_days:
+        from datetime import datetime, timedelta
+        from zoneinfo import ZoneInfo
+        base = datetime.now(ZoneInfo("America/New_York")).date()
+        out = {}
+        for offset in range(args.list_days):
+            d = (base + timedelta(days=offset)).isoformat()
+            out[d] = summarize_schedule(fetch_mlb_schedule(d))
+        print(_json.dumps(out, indent=2 if args.pretty else None,
+                          ensure_ascii=False))
+        return
+
+    if not args.et_dates:
+        parser.error("--et-dates is required unless --list-days is given")
 
     et_dates = [d.strip() for d in args.et_dates.split(",") if d.strip()]
     projected = parse_projected_arg(args.projected) if args.projected else None
