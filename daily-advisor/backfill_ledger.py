@@ -66,9 +66,18 @@ _WATCH_HEADER_RE = re.compile(
 _FIRST_BULLET_RE = re.compile(r"^- \d{2}-\d{2}：(?P<text>.+)$", re.M)
 
 # Channel evidence in discovery-era text. Strong percentile mentions
-# (P60+..P95, or 「>P90」 style) ×2 or an explicit 雙年 claim → structure;
-# a 14d/21d short-window stat → heat; ownership movement → market.
+# (P60+..P95, or 「>P90」 style) ×2, an explicit 雙年 claim, or an SP 5-slot
+# comparison (≥3 distinct v4 slot names — SP reasons cite raw slot values,
+# not P-notation) → structure; a 14d/21d short-window stat → heat; ownership
+# movement → market.
 _STRONG_PCT_RE = re.compile(r"P(?:[6-9]\d)\b")
+_SP_SLOT_RES = (
+    re.compile(r"IP/GS", re.I),
+    re.compile(r"Whiff", re.I),
+    re.compile(r"BB/9", re.I),
+    re.compile(r"\bGB\b", re.I),
+    re.compile(r"xwOBACON", re.I),
+)
 _HEAT_RE = re.compile(r"14d|21d")
 _MARKET_RE = re.compile(r"%owned|持有壓力|被搶風險")
 
@@ -112,7 +121,9 @@ def classify_channel_from_text(body: str) -> str:
     """
     m = _FIRST_BULLET_RE.search(body)
     text = m.group("text") if m else body
-    if "雙年" in text or len(_STRONG_PCT_RE.findall(text)) >= 2:
+    slot_mentions = sum(1 for rx in _SP_SLOT_RES if rx.search(text))
+    if ("雙年" in text or len(_STRONG_PCT_RE.findall(text)) >= 2
+            or slot_mentions >= 3):
         return CHANNEL_STRUCTURE
     if _HEAT_RE.search(text):
         return CHANNEL_HEAT

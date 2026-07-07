@@ -34,7 +34,7 @@ def test_parse_watchlist_real_fixture_names():
     assert names == [
         "Cam Smith", "J.P. Crawford", "Kyle Karros", "Spencer Torkelson",
         "Royce Lewis", "Robert Gasser", "Kerry Carpenter", "Tommy Edman",
-        "Josh Bell", "Victor Bericoto",
+        "Josh Bell", "Victor Bericoto", "Clay Holmes",
     ]
 
 
@@ -72,6 +72,13 @@ def test_classify_real_bericoto_is_heat():
     """One >P90 mention (not two) + 14d luck-inflated hot stretch → heat."""
     body = {e["name"]: e for e in parse_active_watchlist(REAL_LOG)}["Victor Bericoto"]["body"]
     assert classify_channel_from_text(body) == "heat"
+
+
+def test_classify_real_holmes_is_structure():
+    """SP reason cites raw 5-slot dominance ("wins 4 of 5 slots: IP/GS ...
+    BB/9 ... GB ... xwOBACON") without P-notation → structure via slot names."""
+    body = {e["name"]: e for e in parse_active_watchlist(REAL_LOG)}["Clay Holmes"]["body"]
+    assert classify_channel_from_text(body) == "structure"
 
 
 def test_classify_structure_dual_year():
