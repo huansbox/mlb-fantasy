@@ -42,11 +42,11 @@ _（6 場 TBD 已於 07-06 補查全部公布，無剩餘）_
 - TOR @ SF (TOR away TBD)
 
 ### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Trevor McDonald | SF home | TOR (.570 🟢 / vs RHP .701) | 5% | 29/46 | <P25·P25-40·P40-50·**>P90**·**>P90** | ⚠️ 條件推 (deep) | deep 降級：近 6 場 ERA 4.50（觸 ❌ 邊界）+ 弱-中打崩盤 fingerprint（5/22 CWS 7ER·6/13 CHC 4ER）+ 近 6 IP/GS 4.67 → QS 轉換率低於 Sum 29 結構暗示；但 TOR 14d .570 全日最冷（7d .487 噪音、14d 錨仍極弱）+ 末 2 場回穩（ATL 3ER·AZ 6IP 0ER）→ 當日最佳但非安全串流點 |
-| Andrew Alvarez | WSH home | HOU (.710 🟢 / vs LHP .714) | 4% | 22/25 | <P25·**P80-90**·<P25·**>P90**·<P25 | ⚠️ 條件推 (deep) | deep 維持（範圍收窄）：全季 11 出賽 0 QS、單場上限 4.2 IP / PC≤90 硬 workload cap → QS 0%·W≈0%（先發 W 需 5 完整局，本季從未達過）；近 6 ERA 2.45 + K9 10.9 floor 低 — 純「4 局賭 5-6 K + 小補 IP」窄情境 |
-| Zac Gallen | AZ away | SD (.770 🔴 / vs RHP .675) | 35% | 16/28 | <P25·<P25·P50-60·P60-70·<P25 | ❌ 不推 (deep) | deep 維持（強化）：近 6 場 ERA 8.54、5/6 場 ER≥4、7 HR、K9 3.9 全面崩壞；SD 30d→7d .735→.785 遞增火燙蓋過季 vs RHP .675 — 硬避開 |
+| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 | mlb_id |
+|---|---|---|---|---|---|---|---|---|
+| Trevor McDonald | SF home | TOR (.570 🟢 / vs RHP .701) | 5% | 29/46 | <P25·P25-40·P40-50·**>P90**·**>P90** | ⚠️ 條件推 (deep) | deep 降級：近 6 場 ERA 4.50（觸 ❌ 邊界）+ 弱-中打崩盤 fingerprint（5/22 CWS 7ER·6/13 CHC 4ER）+ 近 6 IP/GS 4.67 → QS 轉換率低於 Sum 29 結構暗示；但 TOR 14d .570 全日最冷（7d .487 噪音、14d 錨仍極弱）+ 末 2 場回穩（ATL 3ER·AZ 6IP 0ER）→ 當日最佳但非安全串流點 | 686790 |
+| Andrew Alvarez | WSH home | HOU (.710 🟢 / vs LHP .714) | 4% | 22/25 | <P25·**P80-90**·<P25·**>P90**·<P25 | ⚠️ 條件推 (deep) | deep 維持（範圍收窄）：全季 11 出賽 0 QS、單場上限 4.2 IP / PC≤90 硬 workload cap → QS 0%·W≈0%（先發 W 需 5 完整局，本季從未達過）；近 6 ERA 2.45 + K9 10.9 floor 低 — 純「4 局賭 5-6 K + 小補 IP」窄情境 | 674841 |
+| Zac Gallen | AZ away | SD (.770 🔴 / vs RHP .675) | 35% | 16/28 | <P25·<P25·P50-60·P60-70·<P25 | ❌ 不推 (deep) | deep 維持（強化）：近 6 場 ERA 8.54、5/6 場 ER≥4、7 HR、K9 3.9 全面崩壞；SD 30d→7d .735→.785 遞增火燙蓋過季 vs RHP .675 — 硬避開 | 668678 |
 
 ### 備註
 - 2026-07-06 09:22 deep eval（3 位候選）：
