@@ -80,3 +80,54 @@ def test_probable_outside_window_ignored():
         date(2026, 6, 10), 5, MON, SUN,
         probable_dates=[date(2026, 6, 25)])  # next week — ignored
     assert date(2026, 6, 25) not in out["projected_dates"]
+
+
+# ── retro-gate rules (2026-07-07: 85.0% on 2354 cells) ──
+
+def test_probable_anchors_walk_no_same_turn_double_count():
+    # last 06-10 cad 5 alone → {06-15, 06-20}; probable says the turn actually
+    # falls 06-16. Old union counted 06-15 AND 06-16 (same turn, 2354-cell
+    # retro: pred-2/actual-1 4×'d). New: walk continues FROM the probable.
+    out = project_starts(
+        date(2026, 6, 10), 5, MON, SUN,
+        probable_dates=[date(2026, 6, 16)])
+    assert out["projected_dates"] == [date(2026, 6, 16), date(2026, 6, 21)]
+    assert out["starts"] == 2
+
+
+def test_stale_last_start_suppresses_walk():
+    # last start 06-01, cadence 5 → by 06-15 he has visibly missed a turn
+    # (14 > 5+2): IL/demotion. No probables → 0, source "stale".
+    out = project_starts(date(2026, 6, 1), 5, MON, SUN)
+    assert out["starts"] == 0
+    assert out["source"] == "stale"
+
+
+def test_stale_with_probable_still_counts():
+    # returning pitcher: stale by cadence but probable-listed → probable wins
+    # and the walk continues from it (he is back on turn).
+    out = project_starts(
+        date(2026, 6, 1), 5, MON, SUN,
+        probable_dates=[date(2026, 6, 16)])
+    assert out["projected_dates"] == [date(2026, 6, 16), date(2026, 6, 21)]
+    assert out["source"] == "probable"
+
+
+def test_horizon_absence_suppresses_visibly_skipped_turn():
+    # probables published through 06-19; candidate 06-15 sits ≥2 days inside
+    # that horizon with no probable for him → visibly skipped. The 06-20
+    # candidate is beyond the horizon → kept.
+    out = project_starts(
+        date(2026, 6, 10), 5, MON, SUN,
+        probable_horizon_end=date(2026, 6, 19))
+    assert out["projected_dates"] == [date(2026, 6, 20)]
+    assert out["starts"] == 1
+
+
+def test_horizon_edge_candidate_kept():
+    # candidate 06-17 with horizon 06-18: a 1-2 day push would fall beyond
+    # the horizon and be invisible → do not suppress.
+    out = project_starts(
+        date(2026, 6, 12), 5, MON, SUN,
+        probable_horizon_end=date(2026, 6, 18))
+    assert out["projected_dates"] == [date(2026, 6, 17)]
