@@ -215,6 +215,10 @@ vs：Christian Walker
 vs：（無錨點 — 純 upside watch）
 - 07-06：[eval] 新條目，結論：觀察不撿，理由：24歲非 top-30 新秀 5/22 首升（Lee IL 補位）；power 真（Barrel 14.7/HH 52.9 皆>P90）但 BBE 34 低信心 + BB% 2.1 <P25（48PA 僅 1BB，7×7 BB+OBP 雙重扣分）+ 14d wOBA−xwOBA +0.120 運氣灌水（OPS .930 不可持續）；6/24 起 LF 近每日先發（8場/11天）但繫於 Lee 歸隊時程（player-eval）
 
+### Clay Holmes (NYM, SP) [mlb_id:605280] — 觀察中
+觸發：B2 2-step add
+- 07-07：Holmes wins 4 of 5 slots over Cantillo on credible 150 BBE: IP/GS 5.85 vs 5.06, BB/9 3.08 vs Cantillo's 4.35 (pct0), GB 55.3 vs 42.3, xwOBACON 0.348 vs 0.362; Cantillo only holds Whiff% (27.7 vs 21.9)（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。

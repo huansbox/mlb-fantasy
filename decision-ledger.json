@@ -2717,5 +2717,16 @@
    "stars": 4,
    "executed_ts": null
   }
+ ],
+ "Clay Holmes": [
+  {
+   "player": "Clay Holmes",
+   "verdict": "watch",
+   "ts": "2026-07-07",
+   "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
  ]
 }
