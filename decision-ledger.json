@@ -2607,6 +2607,15 @@
    "channel": null,
    "stars": null,
    "executed_ts": null
+  },
+  {
+   "player": "Robert Gasser",
+   "verdict": "watch",
+   "ts": "2026-07-07",
+   "add_reason": null,
+   "channel": "heat",
+   "stars": null,
+   "executed_ts": null
   }
  ],
  "Kerry Carpenter": [
@@ -2689,6 +2698,15 @@
    "verdict": "watch",
    "ts": "2026-07-05",
    "add_reason": null,
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  },
+  {
+   "player": "Trevor McDonald",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.18 / Whiff% 22.4 / BB/9 3.00 / GB% 56.2 / xwOBACON .331 / IP 57.0",
    "channel": null,
    "stars": null,
    "executed_ts": null
@@ -2805,7 +2823,7 @@
    "verdict": "watch",
    "ts": "2026-07-07",
    "add_reason": null,
-   "channel": null,
+   "channel": "structure",
    "stars": null,
    "executed_ts": null
   }
@@ -2818,6 +2836,215 @@
    "add_reason": "xwOBA .298 / BB% 1.92 / Barrel% 14.7 / 14d xwOBA .378",
    "channel": "heat",
    "stars": 1,
+   "executed_ts": null
+  }
+ ],
+ "Shea Langeliers": [
+  {
+   "player": "Shea Langeliers",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .363 / BB% 7.7 / Barrel% 14.5 / PA 363",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Christian Walker": [
+  {
+   "player": "Christian Walker",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .302 / BB% 8.3 / Barrel% 10.3 / PA 373",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Jazz Chisholm Jr.": [
+  {
+   "player": "Jazz Chisholm Jr.",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .294 / BB% 10.4 / Barrel% 8.9 / PA 336",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Manny Machado": [
+  {
+   "player": "Manny Machado",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .319 / BB% 11.7 / Barrel% 10.8 / PA 366",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Byron Buxton": [
+  {
+   "player": "Byron Buxton",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .351 / BB% 6.9 / Barrel% 18.7 / PA 335",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Ozzie Albies": [
+  {
+   "player": "Ozzie Albies",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .298 / BB% 6.9 / Barrel% 4.3 / PA 379",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Jordan Walker": [
+  {
+   "player": "Jordan Walker",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .368 / BB% 8 / Barrel% 14.2 / PA 364",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Luis Arraez": [
+  {
+   "player": "Luis Arraez",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .308 / BB% 5.4 / Barrel% 0.6 / PA 371",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Gleyber Torres": [
+  {
+   "player": "Gleyber Torres",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .342 / BB% 15.3 / Barrel% 7.9 / PA 190",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Mauricio Dubón": [
+  {
+   "player": "Mauricio Dubón",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] xwOBA .323 / BB% 7.3 / Barrel% 4.9 / PA 341",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Tarik Skubal": [
+  {
+   "player": "Tarik Skubal",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.97 / Whiff% 29.3 / BB/9 1.10 / GB% 48.2 / xwOBACON .381 / IP 65.7",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Chris Sale": [
+  {
+   "player": "Chris Sale",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.94 / Whiff% 29.6 / BB/9 2.27 / GB% 45.7 / xwOBACON .365 / IP 95.0",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Parker Messick": [
+  {
+   "player": "Parker Messick",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.89 / Whiff% 25.1 / BB/9 2.72 / GB% 44.1 / xwOBACON .343 / IP 106.0",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Reid Detmers": [
+  {
+   "player": "Reid Detmers",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.81 / Whiff% 29.0 / BB/9 2.92 / GB% 37.0 / xwOBACON .339 / IP 104.7",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "J.T. Ginn": [
+  {
+   "player": "J.T. Ginn",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.48 / Whiff% 26.4 / BB/9 3.90 / GB% 47.7 / xwOBACON .343 / IP 94.7",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Andre Pallante": [
+  {
+   "player": "Andre Pallante",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.59 / Whiff% 21.3 / BB/9 2.56 / GB% 54.6 / xwOBACON .324 / IP 95.0",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Joey Cantillo": [
+  {
+   "player": "Joey Cantillo",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 5.06 / Whiff% 27.7 / BB/9 4.35 / GB% 42.3 / xwOBACON .362 / IP 91.0",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Aaron Ashby": [
+  {
+   "player": "Aaron Ashby",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] IP/GS 2.33 / Whiff% 32.0 / BB/9 4.78 / GB% 51.2 / xwOBACON .327 / IP 52.7",
+   "channel": null,
+   "stars": null,
+   "executed_ts": null
+  }
+ ],
+ "Hunter Gaddis": [
+  {
+   "player": "Hunter Gaddis",
+   "verdict": "hold",
+   "ts": "2026-07-07",
+   "add_reason": "[backfill：上線日季線，非真實 add 理由] Whiff% 29.9 / BB/9 3.00 / GB% 33.7 / xwOBACON .373 / IP 27.0",
+   "channel": null,
+   "stars": null,
    "executed_ts": null
   }
  ]
