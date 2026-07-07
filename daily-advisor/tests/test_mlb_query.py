@@ -9,6 +9,7 @@ from mlb_query import (
     is_quality_start,
     opponent_context,
     parse_ip,
+    players_from_pending,
 )
 
 
@@ -375,3 +376,74 @@ class TestDeepBatch:
         assert result["comparison_table"]["rows"][0]["values"][4] == "中-高"
         # And recent ERA cell (column 3) = "5.70"
         assert result["comparison_table"]["rows"][0]["values"][3] == "5.70"
+
+
+class TestPlayersFromPending:
+    """issue #406 — deep CLI 從 pending file 自建 players list。"""
+
+    @staticmethod
+    def _ev(name, team="SF", is_home=True, mlb_id=669952,
+            sum26=29, sum25=46, opp_abbr="TOR"):
+        return {"name": name, "team": team, "is_home": is_home,
+                "mlb_id": mlb_id, "sum26": sum26, "sum25": sum25,
+                "opp_abbr": opp_abbr}
+
+    _ABBR = {"TOR": 141, "HOU": 117}
+
+    def test_full_row_builds_player_dict(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("Trevor McDonald"),
+        ]}}
+        players = players_from_pending(parsed, "2026-07-07", abbr_to_id=self._ABBR)
+        assert players == [{
+            "mlb_id": 669952, "et_date": "2026-07-07",
+            "sp_name": "Trevor McDonald", "sp_team": "SF",
+            "opp_abbr": "TOR", "opp_team_id": 141,
+            "sum26": 29, "sum25": 46,
+        }]
+
+    def test_names_filter_selects_subset_and_ignores_projected_prefix(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("🔮 MacKenzie Gore", mlb_id=669022),
+            self._ev("Zac Gallen", mlb_id=668678, opp_abbr="HOU"),
+        ]}}
+        players = players_from_pending(
+            parsed, "2026-07-07", names=["MacKenzie Gore"], abbr_to_id=self._ABBR,
+        )
+        assert len(players) == 1
+        assert players[0]["mlb_id"] == 669022
+        assert players[0]["sp_name"] == "MacKenzie Gore"  # 🔮 已剝除
+
+    def test_missing_et_section_raises(self):
+        with pytest.raises(SystemExit, match="no `## ET 2026-07-08` section"):
+            players_from_pending({"2026-07-07": {"evaluations": []}}, "2026-07-08")
+
+    def test_empty_selection_raises(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("Zac Gallen"),
+        ]}}
+        with pytest.raises(SystemExit, match="no matching evaluations"):
+            players_from_pending(parsed, "2026-07-07", names=["Nobody Here"])
+
+    def test_row_without_mlb_id_raises_with_name(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("Old Format Guy", mlb_id=None),
+        ]}}
+        with pytest.raises(SystemExit, match="Old Format Guy"):
+            players_from_pending(parsed, "2026-07-07")
+
+    def test_unknown_abbr_omits_opp_team_id(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("Trevor McDonald", opp_abbr="XXX"),
+        ]}}
+        players = players_from_pending(parsed, "2026-07-07", abbr_to_id=self._ABBR)
+        assert players[0]["opp_abbr"] == "XXX"
+        assert "opp_team_id" not in players[0]
+
+    def test_none_sums_omitted(self):
+        parsed = {"2026-07-07": {"tbd_games": [], "evaluations": [
+            self._ev("Rookie Guy", sum26=None, sum25=None),
+        ]}}
+        players = players_from_pending(parsed, "2026-07-07", abbr_to_id=self._ABBR)
+        assert "sum26" not in players[0]
+        assert "sum25" not in players[0]

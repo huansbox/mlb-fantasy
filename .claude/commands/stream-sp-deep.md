@@ -30,8 +30,9 @@ description: "Fantasy Baseball 串流 SP 候選深評。用戶在 /stream-sp 跑
 ### 0c：取 MLB Player ID
 
 優先序：
-1. **/stream-sp scan 上次 stdout JSON**（剛跑過 /stream-sp 時 `candidates[i].mlb_id` 已含）— 從對話 context 取，免 API call
-2. **MLB Stats API search** fallback（跨 session 已遺失 scan cache 時）：
+1. **pending file `mlb_id` 欄**（issue #406 起 Step 8 寫入時已帶）— `--pending-file` 模式自動讀，**不需手動抄**
+2. **/stream-sp scan 上次 stdout JSON**（剛跑過 /stream-sp 時 `candidates[i].mlb_id` 已含）— 從對話 context 取，免 API call
+3. **MLB Stats API search** 最後手段（跨 session 失 cache 且 pending 是無 mlb_id 欄的舊 row）：
 
 ```bash
 bash bin/vps-run.sh "curl -s 'https://statsapi.mlb.com/api/v1/people/search?names=Sean%20Burke' | python3 -m json.tool | head -50"
@@ -41,7 +42,23 @@ bash bin/vps-run.sh "curl -s 'https://statsapi.mlb.com/api/v1/people/search?name
 
 ## Step 1-2：拉 game log + 對手 context（**單一批次命令**，N 位 SP 一起跑）
 
-### 1a + 2a：呼叫 `mlb_query.py deep` batch CLI
+### 1a + 2a：呼叫 `mlb_query.py deep` batch CLI（預設 `--pending-file` 模式）
+
+**預設 — pending file 自讀（issue #406）**，2 個參數搞定，不手抄 list：
+
+```bash
+bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py deep \
+  --pending-file stream-sp-pending.md \
+  --et-date 2026-07-07 \
+  --names "Trevor McDonald|Andrew Alvarez" \
+  --pretty'
+```
+
+- `--et-date`：**深評對象比賽的 ET 日期**（= pending H2 `## ET YYYY-MM-DD` 的日期，**不是執行報告當下的日期**）
+- `--names`：pipe 分隔的 SP 名 filter（🔮 前綴自動忽略）；**省略 = 該 ET 日全部已評估 SP**
+- mlb_id / Sum26/25 / 對手（abbr → team id）全部從 pending 已評估表自動抽取；任一選中 row 缺 `mlb_id`（舊格式）→ 整批報錯並列出缺漏 SP，改走下方 fallback
+
+**Fallback — 手抄參數模式**（pending 無該 SP / 舊格式 row 無 mlb_id / 臨時評 pending 外的 SP）：
 
 ```bash
 bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py deep \
@@ -55,10 +72,9 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
   --pretty'
 ```
 
-**替換**：
-- `--players`：comma-separated MLB Player IDs（從 /stream-sp scan 上次 stdout `candidates[i].mlb_id` 取；跨 session 失 cache fallback 走 `https://statsapi.mlb.com/api/v1/people/search?names=...`）
-- `--et-dates`：**深評對象比賽的 ET 日期 ISO 字串**（例 `2026-05-27`，**不是執行報告當下的日期**），與 `--players` 一一對應
-- `--opp-teams`：對手 team ID（BAL=110 / CLE=114 / WSH=120 / CHC=112 / KC=118 ...，不確定先 `curl https://statsapi.mlb.com/api/v1/teams?sportId=1`）
+- `--players`：comma-separated MLB Player IDs（Step 0c 優先序取得）
+- `--et-dates`：與 `--players` 一一對應
+- `--opp-teams`：對手 team ID（不確定先 `curl https://statsapi.mlb.com/api/v1/teams?sportId=1` 查）
 - `--sp-names`：**用 `|` 分隔**（名字含空格 → comma 會誤切）
 - `--opp-abbrs` / `--sum26` / `--sum25`：comma-separated
 

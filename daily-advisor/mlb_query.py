@@ -392,6 +392,61 @@ def deep_batch(players: list[dict], fetchers: dict | None = None) -> dict:
 # ---------- CLI ----------
 
 
+def players_from_pending(
+    parsed: dict,
+    et_date: str,
+    names: list[str] | None = None,
+    abbr_to_id: dict | None = None,
+) -> list[dict]:
+    """Build deep_batch players list from parse_pending output (issue #406).
+
+    ``parsed``: pending_parser.parse_pending output. ``names``: optional SP
+    display-name filter (🔮 projected prefix ignored on both sides).
+    ``abbr_to_id``: opponent abbr → MLB team id map (stream_sp_scan.ABBR_TO_ID).
+
+    Raises SystemExit on: missing ET section, empty selection, or any selected
+    row lacking mlb_id (loud failure → caller falls back to explicit --players).
+    """
+    day = parsed.get(et_date)
+    if not day:
+        raise SystemExit(f"pending file has no `## ET {et_date}` section")
+    evals = day.get("evaluations", [])
+    if names is not None:
+        wanted = {n.replace("🔮", "").strip() for n in names if n.strip()}
+        evals = [
+            e for e in evals
+            if e["name"].replace("🔮", "").strip() in wanted
+        ]
+    if not evals:
+        raise SystemExit(f"no matching evaluations for ET {et_date}"
+                         + (f" with names {names}" if names else ""))
+    missing = [e["name"] for e in evals if not e.get("mlb_id")]
+    if missing:
+        raise SystemExit(
+            "pending rows missing mlb_id: " + ", ".join(missing)
+            + " — pass explicit --players/--et-dates for these SPs"
+        )
+    players = []
+    for e in evals:
+        p = {
+            "mlb_id": e["mlb_id"],
+            "et_date": et_date,
+            "sp_name": e["name"].replace("🔮", "").strip(),
+            "sp_team": e["team"],
+        }
+        opp = e.get("opp_abbr")
+        if opp:
+            p["opp_abbr"] = opp
+            if abbr_to_id and opp in abbr_to_id:
+                p["opp_team_id"] = abbr_to_id[opp]
+        if e.get("sum26") is not None:
+            p["sum26"] = e["sum26"]
+        if e.get("sum25") is not None:
+            p["sum25"] = e["sum25"]
+        players.append(p)
+    return players
+
+
 def _split_csv(value: str | None, length: int, sep: str = ",") -> list:
     if not value:
         return [None] * length
@@ -404,6 +459,31 @@ def _split_csv(value: str | None, length: int, sep: str = ",") -> list:
 
 
 def _cli_deep(args) -> None:
+    if args.pending_file:
+        if not args.et_date:
+            raise SystemExit("--pending-file requires --et-date")
+        from pending_parser import parse_pending
+        from stream_sp_scan import ABBR_TO_ID
+        try:
+            with open(args.pending_file, encoding="utf-8") as f:
+                text = f.read()
+        except OSError as e:
+            raise SystemExit(f"cannot read pending file: {e}")
+        names = ([s.strip() for s in args.names.split("|") if s.strip()]
+                 if args.names else None)
+        players = players_from_pending(
+            parse_pending(text), args.et_date,
+            names=names, abbr_to_id=ABBR_TO_ID,
+        )
+        result = deep_batch(players=players)
+        indent = 2 if args.pretty else None
+        print(json.dumps(result, indent=indent, ensure_ascii=False, default=str))
+        return
+
+    if not args.players or not args.et_dates:
+        raise SystemExit(
+            "need either --pending-file + --et-date, or --players + --et-dates"
+        )
     ids = [s.strip() for s in args.players.split(",") if s.strip()]
     et_dates = [s.strip() for s in args.et_dates.split(",") if s.strip()]
     if len(ids) != len(et_dates):
@@ -452,9 +532,17 @@ def main() -> None:
         "deep",
         help="Batch deep-eval (game_log + opponent_context) for N SPs in one call",
     )
-    deep.add_argument("--players", required=True,
+    deep.add_argument("--pending-file",
+                      help="stream-sp-pending.md path — build players list from "
+                           "its eval table (issue #406); requires --et-date")
+    deep.add_argument("--et-date",
+                      help="single ET date ISO for --pending-file mode")
+    deep.add_argument("--names",
+                      help='pipe-separated SP name filter for --pending-file mode '
+                           '(default: all evaluated SPs of that ET date)')
+    deep.add_argument("--players",
                       help="comma-separated MLB Player IDs (e.g. 686790,605488)")
-    deep.add_argument("--et-dates", required=True,
+    deep.add_argument("--et-dates",
                       help="comma-separated ET dates ISO (e.g. 2026-05-27,2026-05-27)")
     deep.add_argument("--opp-teams",
                       help="comma-separated opponent team IDs (required for opponent_context)")
