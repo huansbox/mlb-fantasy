@@ -65,7 +65,7 @@
         "g": 130
       },
       "selected_pos": "Util",
-      "status": "DTD"
+      "status": ""
     },
     {
       "name": "Manny Machado",
@@ -272,6 +272,30 @@
         "pa": 386,
         "g": 114
       }
+    },
+    {
+      "name": "Curtis Mead",
+      "mlb_id": 678554,
+      "yahoo_player_key": "469.p.12558",
+      "team": "WSH",
+      "positions": [
+        "1B",
+        "2B",
+        "3B"
+      ],
+      "selected_pos": "BN",
+      "status": "",
+      "prior_stats": {
+        "season": 2025,
+        "xwoba": 0.289,
+        "barrel_pct": 4.5,
+        "hh_pct": 34.8,
+        "bb_pct": 5.7,
+        "ops": 0.62,
+        "pa_per_team_g": 1.63,
+        "pa": 264,
+        "g": 90
+      }
     }
   ],
   "pitchers": [
@@ -430,7 +454,7 @@
         "SP",
         "RP"
       ],
-      "selected_pos": "BN",
+      "selected_pos": "P",
       "status": "",
       "prior_stats": {
         "season": 2025,
@@ -488,29 +512,6 @@
         "k_per_9": 9.85,
         "ip_per_team_g": 0.41,
         "ip": 66.7
-      }
-    },
-    {
-      "name": "Ryan Johnson",
-      "mlb_id": 696270,
-      "yahoo_player_key": "469.p.64367",
-      "team": "LAA",
-      "positions": [
-        "SP",
-        "RP"
-      ],
-      "selected_pos": "P",
-      "status": "",
-      "prior_stats": {
-        "season": 2025,
-        "xera": 3.53,
-        "xwoba_allowed": 0.293,
-        "hh_pct_allowed": 35.3,
-        "barrel_pct_allowed": 7.8,
-        "bbe": 51,
-        "era": 7.36,
-        "ip": 14.7,
-        "ip_per_gs": null
       }
     },
     {
