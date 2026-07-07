@@ -4,39 +4,15 @@
 > 過期清理：ET 該日 13:00 後整段刪除（含備註，因決策週期結束）。
 > Schema / 寫入規則見 `.claude/commands/stream-sp.md` Step 8。
 
-## ET 2026-07-06
-- recorded_at: 2026-07-04T20:55:00+08:00
-- last_recheck_at: 2026-07-06T09:12:56+08:00
-
-### TBD 場次（待補查）
-_（6 場 TBD 已於 07-06 補查全部公布，無剩餘）_
-
-### 已評估
-| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 | 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | Verdict | 一行理由 |
-|---|---|---|---|---|---|---|---|
-| Miles Mikolas | WSH home | HOU (.695 🟢 / vs RHP .728) | 1% | 25/19 | <P25·<P25·**>P90**·P60-70·P50-60 | ❌ 不推 (deep) | deep 降級：近 6 場 3 次 HR 崩局（MIA 6ER/3HR·TB 5ER/2HR·BOS 6ER/2HR，近 6 ERA 4.50，floor hard rule 觸發）— Sum 25 靠 elite BB/9 撐但 HR boom/bust 打穿 WHIP-only；K9 5.0 零 K + swingman 無 QS。僅「本週唯一缺 WHIP + 能吃 HR variance」窄情境 |
-| Noah Cameron | KC home | PHI (.774 🔴 / vs LHP .667) | 21% | 17/29 | P25-40·P40-50·P60-70·<P25·<P25 | ❌ 不推 (deep) | deep 維持：近 4 場 ERA 9.00 tailspin（TB 兩連爆，sample=none 高信心非噪音）+ GB/xwOBACON <P25。唯一利多 PHI vs LHP .667 弱 + K9 8.1 → 三位裡最有 K 賭注（限 K contested + ERA/WHIP 零邊際情境小賭 5-7K）|
-| Kyle Freeland | COL away | LAD (.847 🔴 / vs LHP .762) | 1% | 17/19 | <P25·P25-40·P80-90·P25-40·<P25 | ❌ 不推 (deep) | deep 維持：最糟串流點 — LAD 全面火燙（30d .801→14d .845）+ @Dodger + 季 ERA 7.25；近 6 場 3 崩含 2 次對弱打 LAA/ATH（floor hard rule (a)）。硬避開 |
-
-### 備註
-- 2026-07-06 09:12 補查（6 場 TBD 全公布）+ deep eval（3 位候選）：
-  - **Miles Mikolas**：⚠️ 條件推（scan） → **❌ 不推 (deep) 降級**。差異訊號 = 近 6 場 3 次 HR 驅動崩局（含對弱打 MIA），floor risk 高；scan Sum 25 靠 elite BB/9，反映不到 HR boom/bust；K9 5.0 零 K + IP/GS <P25 無 QS。
-  - **Noah Cameron**：❌（scan） → **❌ 不推 (deep) 維持**。差異訊號 = 近 4 場 ERA 9.00 tailspin（TB 兩連爆）蓋過唯一利多 PHI vs LHP .667；但 K9 8.1 + PHI 高 K% 保留 K 天花板（6/2 CIN 8K / 6/7 MIN 7K）。
-  - **Kyle Freeland**：❌（scan） → **❌ 不推 (deep) 維持**。差異訊號 = LAD 三窗遞增 .801→.845 全聯盟頂燙 + @Dodger + 對弱打 LAA/ATH 都崩，無翻案。
-- deep 排序：**Cameron ≈ Mikolas >> Freeland**。要 K（K contested + ERA/WHIP 零邊際）→ Cameron；要 WHIP/吃 IP → Mikolas；Freeland 硬避開。**本日無安全串流點**，三位皆 ❌，僅在必動 acquisition 補特定 contested 類別時二選一（Cameron 賭 K / Mikolas 賭 WHIP）。
-- _（free-form 區，用戶可手寫註記。AI 讀進來但不主動覆寫。）_
-
 ## ET 2026-07-07
 - recorded_at: 2026-07-06T09:19:00+08:00
-- last_recheck_at: 2026-07-06T09:22:00+08:00
+- last_recheck_at: 2026-07-07T11:52:00+08:00
 
 ### TBD 場次（待補查）
 - MIL @ STL (STL home TBD)
 - MIL @ STL (both TBD)（雙重賽 G2）
-- ATL @ PIT (ATL away TBD)
 - SEA @ MIA (SEA away TBD)
-- NYY @ TB (TB home TBD)
-- KC @ NYM (both TBD)
+- KC @ NYM (NYM home TBD)
 - PHI @ CIN (PHI away TBD)
 - AZ @ SD (SD home TBD)
 - TOR @ SF (TOR away TBD)
