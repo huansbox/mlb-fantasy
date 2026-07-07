@@ -17,8 +17,8 @@
 ## Acceptance criteria
 
 - [x] **擴充 `savant_rolling` 聚合保留 pitch-level（merge `ea4b9e3`）**：`_pitch_level_metrics` 逐球遍歷算 CSW%（called+swinging strikes / 總球）+ velo by pitch_type + primary fastball velo，merge 進 pitcher result（batter 不變）。真實 CSV 欄名已對 2025 Savant 驗證（`description`/`release_speed`/`pitch_type` 皆在）。+6 tests。**環境註記**：本機抓 2026 窗回 0 rows（模擬季無真實 Savant 資料），2025 窗正常 — VPS 端視其資料源。
-- [ ] CSW% 21d delta vs season / velo 三窗 delta / K-BB% ladder 各為純函式 + payload 行（CSW 永遠 context 行不進 Sum）— **計算用聚合已備的 csw_pct/velo_fb**
-- [ ] 三 tag 注入 SP payload，受 039 payload_budget 守門 — **併 318b 批**
+- [x] 純函式層（`micro_fields_sp.py`，2026-07-07 merge `7ecdfd1`）：velo 三窗 delta（21d vs season / YoY，同 pitch-type via pitch-arsenals CSV；最近一場 = savant_rolling 新增 `velo_fb_last_game`）+ K-BB% ladder（BF 70/40 stabilization tiers）。**Scope 修正：CSW「delta vs season」不可行** — custom leaderboard `csw_percent` selection 經 CSV 回空欄（2026-07-07 驗證），CSW 只出 21d level（騎 rolling dict，context-only 不進 Sum）
+- [x] 注入 SP payload（318b B6）：velo dict + kbb dict 受 039 payload_budget 守門；velo 顯著移動（±1.0 mph）出 prefix 白名單 tag（⚠️ 球速下滑 / ✅ 球速上升）
 
 ## Blocked by
 

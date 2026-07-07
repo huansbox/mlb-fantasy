@@ -153,9 +153,9 @@ PR #351（318b-batter）merge（`9449fa2`）+ VPS deploy 後，VPS production co
 ## 拆 slice 清單與順序
 
 1. **318b-batter 注入**（✅ merge PR #351 `9449fa2` + VPS deploy + 段① A/B 通過，2026-06-18）：batter pass2 注入 → 基礎 + swap 兩 pool register → 段① A/B。backfill（B7）改拆第二批，故段① 跑時 ledger add_reason 多為空/季線快照（見「段① 實測結果」）。
-2. **042 prompt 契約**（#321，HITL，**暫緩**）：段① 數據已出 — 注入裸上零誘發、事實型 tag LLM 自發使用，但 ledger 規則增益未證實 + drop 規則 blocked by backfill B7 → **042 不上**。重評觸發見「段① 實測結果」。
-3. **318b-sp 注入**（B6，延後，AFK）：`payload_slimmer.slim_entry` dict 注入 046/048/050 → 段③ A/B。fetcher best-effort 模式可比照 batter 段①（VPS 已驗）。
-4. **legacy backfill**（B7，前置一次性，AFK）：active roster + watchlist 的 ledger 回填（roster 用 tagged `add_reason`）。042 的 drop 規則依賴此。
+2. **042 prompt 契約**（#321，HITL，**暫緩**）：段① 數據已出 — 注入裸上零誘發、事實型 tag LLM 自發使用，但 ledger 規則增益未證實 + drop 規則 blocked by backfill B7 → **042 不上**。重評觸發：B7 已跑完（2026-07-07 ✓），仍待真實翻供（verdict 改變）或 drop 回溯案例出現。
+3. **318b-sp 注入**（B6，✅ merge `7ecdfd1`，2026-07-07）：`slim_entry` dict 注入 — 046 `next_week_starts`（probable 錨定 cadence 投影，retro gate 85.3% production config / 85.0% 日曆協議，2354 cells；窗口 = 明天 ET 起算的當週剩餘，staleness 用球隊比賽日免疫 All-Star break，horizon-absence per-team）+ 050 micro（CSW 21d 騎 rolling dict 0 行 — season CSW 經驗證不可得；velo 21d/YoY delta + prefix 白名單 tag；K-BB ladder BBE<30 only）+ ledger 記憶 2 行 + 048 swap line（4★+ 獨立 pool）。SP 端 channel/stars wiring（318a SP mirror）同批 — SP 條目今後自動有 channel。prompt 未動。**段③ A/B 待首個注入 production payload（部署後首次 12:30 scan）**：取 capture fixture 反注入配對，比照段①。
+4. **legacy backfill**（B7，✅ 已執行，2026-07-07）：`daily-advisor/backfill_ledger.py`（26 tests）實跑 22 筆 — roster 20 人 tagged 季線快照 add_reason（batter 3 核心 / SP 5-slot）+ SP watchlist 2 人 channel（Gasser heat / Holmes structure，文字回推 classifier：structure > heat > market > unknown，含 SP slot-name 規則）。驗收通過：roster 23/23 有 add_reason、watchlist 11/11 有 channel；再跑 plan 0 筆（冪等）。
 
 ## 尚待決定的實作細節（design doc 不卡、實作時定）
 

@@ -12,11 +12,11 @@ SP 下週先發場次投影 — 推算每位 SP 候選/被換者下週投 {0,1,2
 
 ## Acceptance criteria
 
-- [ ] 場次投影核心為純函式，schedule/probable 注入式（可離線測）
-- [ ] 輸出域 {0,1,2}，doubleheader / skip / 六人輪值邊界處理
-- [ ] retro 驗收 gate：對季初至今逐週「用當週一可得資料投影 vs 實際 game log」準確率 ≥85%（機器可判）
-- [ ] 單元測試：cadence 推算 + 賽程 walk + probable 覆蓋
-- [ ] payload 行注入，受 039 payload_budget 守門
+- [x] 場次投影核心為純函式，schedule/probable 注入式（可離線測）
+- [x] 輸出域 {0,1,2}，doubleheader / skip / 六人輪值邊界處理
+- [x] retro 驗收 gate（2026-07-07，192 SP × 14 週 = 2354 cells）：**85.3%**（production config：probable 錨定 walk + 球隊比賽日 staleness slack 0 + per-team horizon-absence；日曆協議 85.0%）。基線 66.0% → 三規則各 +9pp / 修 probable 重複計數 / +1.5pp
+- [x] 單元測試：cadence 推算 + 賽程 walk + probable 覆蓋 + staleness/horizon/gap-game-days（30 tests）
+- [x] payload 注入（318b B6 merge `7ecdfd1`）：`next_week_starts` dict，受 039 payload_budget 守門；窗口 = 明天 ET 起算當週剩餘（Daily-Tomorrow 語意，過去場次不計）
 
 ## Blocked by
 

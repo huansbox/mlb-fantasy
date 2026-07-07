@@ -12,10 +12,10 @@ SP 換人逐類別週差額表 + per-start 產出向量。對 4★+ SP 候選輸
 
 ## Acceptance criteria
 
-- [ ] per-start 產出向量 + 逐類別週 delta 純函式（吃 046 場次 + 043 算術）
-- [ ] 只對 4★+ 候選 emit，受 039 payload_budget 守門
-- [ ] 單元測試：per-start 向量 + 場次乘算 + 差額 + 4★ gate
-- [ ] 回溯抽樣驗證 SP swap 方向合理
+- [x] per-start 產出向量 + 逐類別週 delta 純函式（吃 046 場次 + 043 算術）— `swap_sp.py`
+- [x] 只對 4★+ 候選 emit（SP stars = 318b B6 新增 ledger_enrich SP wiring），受 039 payload_budget 獨立 swap pool 守門（merge `7ecdfd1`）
+- [x] 單元測試：per-start 向量 + 場次乘算 + 差額 + 4★ gate
+- [x] 回溯抽樣：live smoke（Skubal↔Messick swap line 方向與量級合理；stale SP 正確不 emit）
 
 ## Blocked by
 
