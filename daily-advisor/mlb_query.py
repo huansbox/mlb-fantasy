@@ -137,6 +137,64 @@ def _default_split_fetch(team_id: int, hand: str) -> dict:
     }
 
 
+def _default_league_ops_fetch(season: int) -> dict:
+    """全聯盟 30 隊 season OPS 一次拉（issue #408）→ {abbr: ops_float}。"""
+    url = (
+        f"{_BASE}/teams/stats?season={season}"
+        f"&group=hitting&stats=season&sportIds=1"
+    )
+    data = json.loads(urllib.request.urlopen(url).read())
+    out: dict[str, float] = {}
+    stats = data.get("stats") or []
+    for split in (stats[0].get("splits", []) if stats else []):
+        team_id = split.get("team", {}).get("id")
+        ops = split.get("stat", {}).get("ops")
+        if team_id is None or not ops:
+            continue
+        try:
+            out[_team_abbr(team_id)] = float(ops)
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+# Season-OPS scale 對手分級門檻（deep skill Step 1b 既有 scale，issue #408）
+_TIER_STRONG = 0.770
+_TIER_MID_STRONG = 0.720
+_TIER_MID = 0.680
+
+
+def tier_from_season_ops(ops) -> str | None:
+    """強 ≥.770 / 中強 .720-.770 / 中 .680-.720 / 弱 ≤.680。None 傳回 None。"""
+    if ops is None:
+        return None
+    if ops >= _TIER_STRONG:
+        return "強"
+    if ops >= _TIER_MID_STRONG:
+        return "中強"
+    if ops > _TIER_MID:
+        return "中"
+    return "弱"
+
+
+def attach_opp_tiers(game_log: list[dict], league_ops: dict) -> list[dict]:
+    """game log 每場 row 加 opp_season_ops / opp_tier（issue #408）。
+
+    取代 deep skill Step 1b 的「記憶 take 隊伍分類」靜態清單（5 月寫的季中
+    drift + session 間 variance）。未知 abbr / 空 map → 兩欄皆 None。
+    Pure function — 回傳新 list，原 rows 不動。
+    """
+    out = []
+    for row in game_log:
+        ops = league_ops.get(row.get("opp")) if league_ops else None
+        out.append({
+            **row,
+            "opp_season_ops": ops,
+            "opp_tier": tier_from_season_ops(ops),
+        })
+    return out
+
+
 def gamelog_with_qs(mlb_id: int, season: int, fetch_fn=None) -> list[dict]:
     """Fetch pitching game log + enrich each entry with ip_decimal (float) + qs (bool).
 
@@ -312,8 +370,8 @@ def deep_batch(players: list[dict], fetchers: dict | None = None) -> dict:
                  Optional: `opp_team_id` (for opponent_context), `sp_name`,
                  `opp_abbr`, `sp_team`, `sum26`, `sum25`.
         fetchers: dict of injectable fetchers (for tests). Keys:
-                  `gamelog`, `meta`, `range`, `split`. Each falls back to
-                  the live MLB Stats API fetcher when missing.
+                  `gamelog`, `meta`, `range`, `split`, `league_ops`. Each
+                  falls back to the live MLB Stats API fetcher when missing.
 
     Returns:
         {
@@ -337,6 +395,8 @@ def deep_batch(players: list[dict], fetchers: dict | None = None) -> dict:
     rows: list[dict] = []
 
     meta_fn = fetchers.get("meta") or _default_meta_fetch
+    league_fn = fetchers.get("league_ops") or _default_league_ops_fetch
+    league_cache: dict[int, dict] = {}  # season → {abbr: ops}，每 run 各拉一次
 
     for p in players:
         mlb_id = p["mlb_id"]
@@ -350,6 +410,12 @@ def deep_batch(players: list[dict], fetchers: dict | None = None) -> dict:
 
         try:
             game_log = gamelog_with_qs(mlb_id, season, fetch_fn=fetchers.get("gamelog"))
+            if season not in league_cache:
+                try:
+                    league_cache[season] = league_fn(season)
+                except Exception:  # league OPS 失敗不擋整批 — rows 拿 None tier
+                    league_cache[season] = {}
+            game_log = attach_opp_tiers(game_log, league_cache[season])
             opp_ctx = None
             if opp_team_id is not None:
                 opp_ctx = opponent_context(

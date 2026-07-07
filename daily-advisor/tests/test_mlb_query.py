@@ -36,8 +36,12 @@ def _ok_split(team_id, hand):
             "k_pct": 24.0, "bb_pct": 10.0, "hand": hand}
 
 
+def _ok_league_ops(season):
+    return {"NYM": 0.750}
+
+
 def _ok_fetchers():
-    return {"gamelog": _ok_gamelog, "meta": _ok_meta, "range": _ok_range, "split": _ok_split}
+    return {"gamelog": _ok_gamelog, "meta": _ok_meta, "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops}
 
 
 class TestParseIp:
@@ -221,7 +225,7 @@ class TestDeepBatch:
         ]
         deep_batch(players=players, fetchers={
             "gamelog": _ok_gamelog, "meta": _ok_meta,
-            "range": range_fn, "split": _ok_split,
+            "range": range_fn, "split": _ok_split, "league_ops": _ok_league_ops,
         })
 
         dates_109 = {d for tid, d, _ in captured if tid == 109}
@@ -238,7 +242,7 @@ class TestDeepBatch:
                 players=[{"mlb_id": 999999, "et_date": "2026-05-27", "opp_team_id": 109,
                           "sp_name": "Ghost", "opp_abbr": "X"}],
                 fetchers={"gamelog": gamelog_fn, "meta": _ok_meta,
-                          "range": _ok_range, "split": _ok_split},
+                          "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops},
             )
 
     def test_partial_failure_one_sp_errors_others_continue(self):
@@ -257,7 +261,7 @@ class TestDeepBatch:
         ]
         result = deep_batch(players=players, fetchers={
             "gamelog": gamelog_fn, "meta": _ok_meta,
-            "range": _ok_range, "split": _ok_split,
+            "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops,
         })
 
         # Bad SP marked with error, others have full payload
@@ -286,7 +290,7 @@ class TestDeepBatch:
         ]
         result = deep_batch(players=players, fetchers={
             "gamelog": gamelog_fn, "meta": _ok_meta,
-            "range": _ok_range, "split": _ok_split,
+            "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops,
         })
 
         err = result["by_player"]["222"]["error"].lower()
@@ -308,7 +312,8 @@ class TestDeepBatch:
                       "sp_name": "McDonald", "opp_abbr": "AZ",
                       "sum26": 40, "sum25": 46}],
             fetchers={"gamelog": _ok_gamelog, "meta": _ok_meta,
-                      "range": range_fn, "split": split_fn},
+                      "range": range_fn, "split": split_fn,
+                      "league_ops": _ok_league_ops},
         )
 
         row = result["comparison_table"]["rows"][0]
@@ -341,7 +346,7 @@ class TestDeepBatch:
             players=[{"mlb_id": 686790, "et_date": "2026-05-27", "opp_team_id": 109,
                       "sp_name": "X", "opp_abbr": "Y"}],
             fetchers={"gamelog": gamelog_fn, "meta": _ok_meta,
-                      "range": _ok_range, "split": _ok_split},
+                      "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops},
         )
 
         # Floor risk hint = column index 4
@@ -369,7 +374,7 @@ class TestDeepBatch:
             players=[{"mlb_id": 686790, "et_date": "2026-05-27", "opp_team_id": 109,
                       "sp_name": "X", "opp_abbr": "Y"}],
             fetchers={"gamelog": gamelog_fn, "meta": _ok_meta,
-                      "range": _ok_range, "split": _ok_split},
+                      "range": _ok_range, "split": _ok_split, "league_ops": _ok_league_ops},
         )
 
         # Floor risk hint = column index 4 ; recent ERA = 19*9/30 = 5.70
@@ -447,3 +452,86 @@ class TestPlayersFromPending:
         players = players_from_pending(parsed, "2026-07-07", abbr_to_id=self._ABBR)
         assert "sum26" not in players[0]
         assert "sum25" not in players[0]
+
+
+class TestOppTier:
+    """issue #408 — 對手強弱分級機械化（取代 deep skill 記憶 take 清單）。"""
+
+    @pytest.mark.parametrize(
+        "ops,expected",
+        [
+            (0.800, "強"), (0.770, "強"),
+            (0.769, "中強"), (0.720, "中強"),
+            (0.719, "中"), (0.681, "中"),
+            (0.680, "弱"), (0.600, "弱"),
+            (None, None),
+        ],
+    )
+    def test_tier_boundaries(self, ops, expected):
+        from mlb_query import tier_from_season_ops
+        assert tier_from_season_ops(ops) == expected
+
+    def test_attach_opp_tiers_enriches_rows(self):
+        from mlb_query import attach_opp_tiers
+        log = [{"date": "2026-06-01", "opp": "NYM", "er": 2},
+               {"date": "2026-06-07", "opp": "XXX", "er": 3}]
+        out = attach_opp_tiers(log, {"NYM": 0.750})
+        assert out[0]["opp_season_ops"] == 0.750
+        assert out[0]["opp_tier"] == "中強"
+        # 未知 abbr → None
+        assert out[1]["opp_season_ops"] is None
+        assert out[1]["opp_tier"] is None
+        # 原欄位保留、原 list 不被改動
+        assert out[0]["er"] == 2
+        assert "opp_tier" not in log[0]
+
+    def test_attach_opp_tiers_empty_map(self):
+        from mlb_query import attach_opp_tiers
+        out = attach_opp_tiers([{"opp": "NYM"}], {})
+        assert out[0]["opp_tier"] is None
+
+    def test_deep_batch_rows_carry_opp_tier(self):
+        result = deep_batch(
+            players=[{"mlb_id": 111, "et_date": "2026-05-27", "opp_team_id": 109,
+                      "sp_name": "A", "opp_abbr": "AZ"}],
+            fetchers=_ok_fetchers(),
+        )
+        row = result["by_player"]["111"]["game_log"][0]
+        assert row["opp"] == "NYM"
+        assert row["opp_season_ops"] == 0.750
+        assert row["opp_tier"] == "中強"
+
+    def test_league_ops_failure_degrades_to_none(self):
+        def boom(season):
+            raise ConnectionError("teams/stats down")
+
+        f = _ok_fetchers()
+        f["league_ops"] = boom
+        result = deep_batch(
+            players=[{"mlb_id": 111, "et_date": "2026-05-27", "opp_team_id": 109,
+                      "sp_name": "A", "opp_abbr": "AZ"}],
+            fetchers=f,
+        )
+        row = result["by_player"]["111"]["game_log"][0]
+        assert row["opp_tier"] is None
+        assert "error" not in result["by_player"]["111"]
+
+    def test_league_ops_fetched_once_per_season(self):
+        calls = []
+
+        def counting(season):
+            calls.append(season)
+            return {"NYM": 0.750}
+
+        f = _ok_fetchers()
+        f["league_ops"] = counting
+        deep_batch(
+            players=[
+                {"mlb_id": 111, "et_date": "2026-05-27", "opp_team_id": 109,
+                 "sp_name": "A", "opp_abbr": "AZ"},
+                {"mlb_id": 222, "et_date": "2026-05-28", "opp_team_id": 110,
+                 "sp_name": "B", "opp_abbr": "BAL"},
+            ],
+            fetchers=f,
+        )
+        assert calls == [2026]
