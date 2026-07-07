@@ -5,6 +5,14 @@ from pathlib import Path
 from pending_parser import parse_pending
 
 
+def _ev(name, team, is_home, mlb_id=None, sum26=None, sum25=None, opp_abbr=None):
+    """Full evaluation dict — schema contract for parse_pending output."""
+    return {
+        "name": name, "team": team, "is_home": is_home,
+        "mlb_id": mlb_id, "sum26": sum26, "sum25": sum25, "opp_abbr": opp_abbr,
+    }
+
+
 class TestEmptyAndMalformed:
     def test_empty_string_returns_empty_dict(self):
         assert parse_pending("") == {}
@@ -42,14 +50,16 @@ class TestEvalRowParsing:
         )
         out = parse_pending(text)
         evals = out["2026-05-26"]["evaluations"]
-        assert evals == [{"name": "Griffin Canning", "team": "SD", "is_home": True}]
+        assert evals == [_ev("Griffin Canning", "SD", True,
+                             sum26=27, sum25=20, opp_abbr="PHI")]
 
     def test_single_eval_row_away(self):
         text = self._wrap(
             "| Jason Alexander | HOU away | TEX (.740) | — | 21/12 | foo | ❌ 不推 | reason |\n"
         )
         evals = parse_pending(text)["2026-05-26"]["evaluations"]
-        assert evals == [{"name": "Jason Alexander", "team": "HOU", "is_home": False}]
+        assert evals == [_ev("Jason Alexander", "HOU", False,
+                             sum26=21, sum25=12, opp_abbr="TEX")]
 
     def test_multiple_eval_rows_preserve_order(self):
         text = self._wrap(
@@ -91,7 +101,71 @@ class TestEvalRowParsing:
         )
         evals = parse_pending(text)["2026-05-26"]["evaluations"]
         # Two Cells 雖然 cells 數少但 name+team 都齊 → 應接受
-        assert evals == [{"name": "Two Cells", "team": "NYY", "is_home": True}]
+        assert evals == [_ev("Two Cells", "NYY", True)]
+
+
+class TestEvalRowNewSchema:
+    """issue #406 — mlb_id / 近況 欄 + header-driven 欄位解析。"""
+
+    _NEW_HEADER = (
+        "| SP | 隊 | 對手 (14d OPS) | %own | Sum26/25 "
+        "| 5-slot (IP/GS·Whiff·BB/9·GB·xwOBACON) | 近況 | Verdict | 一行理由 | mlb_id |\n"
+        "|---|---|---|---|---|---|---|---|---|---|\n"
+    )
+
+    def _wrap(self, table_rows: str) -> str:
+        return (
+            "## ET 2026-07-07\n"
+            "- recorded_at: 2026-07-06T09:19:00+08:00\n\n"
+            "### 已評估\n"
+            f"{self._NEW_HEADER}"
+            f"{table_rows}"
+        )
+
+    def test_new_format_row_extracts_all_fields(self):
+        text = self._wrap(
+            "| Trevor McDonald | SF home | TOR (.570 🟢 / vs RHP .701) | 5% | 29/46 "
+            "| <P25·P25-40·P40-50·**>P90**·**>P90** | 4.50 / 2崩 / 高 | ⚠️ 條件推 | 理由 | 669952 |\n"
+        )
+        evals = parse_pending(text)["2026-07-07"]["evaluations"]
+        assert evals == [_ev("Trevor McDonald", "SF", True,
+                             mlb_id=669952, sum26=29, sum25=46, opp_abbr="TOR")]
+
+    def test_mlb_id_cell_non_digit_yields_none(self):
+        text = self._wrap(
+            "| Old Row | SF home | TOR (.570) | 5% | 29/46 | foo | — | ⚠️ | 理由 | — |\n"
+        )
+        evals = parse_pending(text)["2026-07-07"]["evaluations"]
+        assert evals[0]["mlb_id"] is None
+
+    def test_sum_cell_partial_dash(self):
+        text = self._wrap(
+            "| Rookie Guy | SF home | TOR (.570) | 5% | -/25 | foo | — | ⚠️ | 理由 | 123456 |\n"
+        )
+        ev = parse_pending(text)["2026-07-07"]["evaluations"][0]
+        assert ev["sum26"] is None
+        assert ev["sum25"] == 25
+
+    def test_projected_prefix_name_kept_raw(self):
+        text = self._wrap(
+            "| 🔮 MacKenzie Gore | WSH home | CHC (.700) | 9% | 30/33 | foo | — | ✅ (projected) | 理由 | 669022 |\n"
+        )
+        ev = parse_pending(text)["2026-07-07"]["evaluations"][0]
+        assert ev["name"] == "🔮 MacKenzie Gore"
+        assert ev["mlb_id"] == 669022
+
+    def test_column_order_shuffled_still_resolves_by_header(self):
+        # header-driven：欄序不同也解析正確
+        text = (
+            "## ET 2026-07-07\n\n"
+            "### 已評估\n"
+            "| mlb_id | SP | 隊 | Sum26/25 | 對手 (14d OPS) |\n"
+            "|---|---|---|---|---|\n"
+            "| 669952 | Trevor McDonald | SF home | 29/46 | TOR (.570) |\n"
+        )
+        evals = parse_pending(text)["2026-07-07"]["evaluations"]
+        assert evals == [_ev("Trevor McDonald", "SF", True,
+                             mlb_id=669952, sum26=29, sum25=46, opp_abbr="TOR")]
 
 
 class TestTbdSectionParsing:
@@ -146,7 +220,7 @@ class TestSectionDispatch:
         )
         out = parse_pending(text)["2026-05-26"]
         assert out["tbd_games"] == [{"away": "CIN", "home": "NYM", "side": "home"}]
-        assert out["evaluations"] == [{"name": "Real SP", "team": "NYY", "is_home": True}]
+        assert out["evaluations"] == [_ev("Real SP", "NYY", True, opp_abbr="BOS")]
 
 
 class TestMultipleDates:
@@ -167,9 +241,9 @@ class TestMultipleDates:
         )
         out = parse_pending(text)
         assert set(out.keys()) == {"2026-05-26", "2026-05-27"}
-        assert out["2026-05-26"]["evaluations"] == [{"name": "Alpha", "team": "NYY", "is_home": True}]
+        assert out["2026-05-26"]["evaluations"] == [_ev("Alpha", "NYY", True, opp_abbr="BOS")]
         assert out["2026-05-26"]["tbd_games"] == []
-        assert out["2026-05-27"]["evaluations"] == [{"name": "Beta", "team": "LAD", "is_home": False}]
+        assert out["2026-05-27"]["evaluations"] == [_ev("Beta", "LAD", False, opp_abbr="SF")]
         assert out["2026-05-27"]["tbd_games"] == [{"away": "LAD", "home": "SF", "side": "home"}]
 
 
