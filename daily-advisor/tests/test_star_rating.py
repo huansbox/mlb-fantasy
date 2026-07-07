@@ -153,6 +153,20 @@ def test_bucket_playing_time():
     assert bucket_playing_time(None) == "low"
 
 
+def test_bucket_playing_time_sp():
+    from star_rating import bucket_playing_time_sp
+    # anchors = 2025 SP IP/GS P80 (5.89) / P40 (5.35), the same population
+    # positions as the batter 3.5 / 2.5 PA-TG thresholds
+    assert bucket_playing_time_sp(6.1) == "high"
+    assert bucket_playing_time_sp(5.89) == "high"
+    assert bucket_playing_time_sp(5.88) == "mid"
+    assert bucket_playing_time_sp(5.35) == "mid"
+    assert bucket_playing_time_sp(5.34) == "low"
+    assert bucket_playing_time_sp(None) == "low"
+    # Rotation Gate: no start volume to credit however long the outings
+    assert bucket_playing_time_sp(6.5, rotation_ok=False) == "low"
+
+
 def test_bucket_dual_year():
     # ≥2 core metrics P70+ with adequate sample = full
     assert bucket_dual_year([72, 80, 65], sample_ok=True) == "full"

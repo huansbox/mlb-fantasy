@@ -543,6 +543,29 @@ _V4_SP_LABELS = {
 }
 
 
+def v4_percentile_of(value, metric: str) -> int:
+    """Elite-direction v4 percentile = the highest 2025 SP band ``value``
+    clears; 0 below P25 or for None/unknown metric. THE single band-matching
+    walk — v4_metric_to_score buckets it into scores, payload_slimmer and
+    ledger_enrich consume it directly (one place to touch when the 2026
+    percentile table lands)."""
+    if value is None:
+        return 0
+    bp = PITCHER_V4_PCTILES.get(metric)
+    if not bp:
+        return 0
+    reverse = metric in _V4_REVERSE_METRICS
+    # bp is listed in elite direction: for forward, ascending thresholds; for
+    # reverse metrics value <= threshold means AT LEAST that elite percentile
+    # (bp ordered by elite-pct ascending, threshold in descending real-value
+    # order — P25=3.47, P90=1.96 for BB/9).
+    matched = 0
+    for pct, thresh in bp:
+        if (value <= thresh) if reverse else (value >= thresh):
+            matched = pct
+    return matched
+
+
 def v4_metric_to_score(value, metric: str) -> int:
     """Convert value → 0-10 score using 2025 v4 percentile bands.
 
@@ -551,23 +574,9 @@ def v4_metric_to_score(value, metric: str) -> int:
     """
     if value is None:
         return 0
-    bp = PITCHER_V4_PCTILES.get(metric)
-    if not bp:
+    if metric not in PITCHER_V4_PCTILES:
         return 0
-    reverse = metric in _V4_REVERSE_METRICS
-    # bp is listed in elite direction: for forward, ascending thresholds;
-    # for reverse, we still iterate but compare lower-is-better.
-    matched = 0
-    for pct, thresh in bp:
-        if reverse:
-            # For reverse metrics: value <= threshold means AT LEAST that elite
-            # percentile. bp ordered by elite-pct ascending, but threshold is
-            # in descending real-value order (P25=3.47, P90=1.96 for BB/9).
-            if value <= thresh:
-                matched = pct
-        else:
-            if value >= thresh:
-                matched = pct
+    matched = v4_percentile_of(value, metric)
     if matched >= 90:
         return 10
     if matched >= 80:
