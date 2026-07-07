@@ -87,6 +87,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
   "by_player": {
     "<mlb_id>": {
       "game_log": [...],          // gamelog_with_qs 輸出，每場含 ip/ip_decimal/qs/h/r/er/bb/k/hr/pc/era
+                                  // + opp_season_ops/opp_tier（#408 機械分級；league fetch 失敗 → None）
       "opponent_context": {       // opponent_context 輸出
         "7d": {"ops": ".769", ...}, "14d": {...}, "30d": {...},
         "vs_hand": {"ops": ".686", "pa": 1200, "hand": "R", ...}
@@ -115,6 +116,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
 | `ip` (string) / `ip_decimal` (float) | "5.2" 跟 5.667 兩個都給；報告用 `ip`，QS 邏輯內部用 `ip_decimal` |
 | `qs` (bool) | Quality Start = IP ≥ 6 且 ER ≤ 3，已 mechanical 算好 |
 | `h` / `r` / `er` / `bb` / `k` / `hr` / `pc` / `era` | 比賽其他 raw 欄位 |
+| `opp_season_ops` / `opp_tier` | 對手 season OPS + 機械分級 強/中強/中/弱（issue #408，league fetch 失敗 → None）|
 
 > **不要再自己手算 QS**。helper 已用 `parse_ip("5.2") = 5.667` 邏輯保證 5⅔ IP 不會被誤判為 QS（單元測試覆蓋）。
 
@@ -131,7 +133,7 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
 
 對 game log 每場：
 
-**主錨：對手 vs SP 慣用手 OPS**（target 對手從 scan candidates JSON 的 `vs_hand_2026.ops` 取；game log 歷史對手用記憶 take 作 rough proxy，無需逐場查 statSplits）
+**主錨：對手 vs SP 慣用手 OPS**（target 對手從 scan candidates JSON 的 `vs_hand_2026.ops` 取；game log 歷史對手直接讀每場 row 的 `opp_tier` 機械分級，見下，無需逐場查 statSplits）
 - **對手「強」**：vs hand OPS ≥ .770 — 高 contact / power 線
 - **對手「中強」**：vs hand OPS .720-.770 — 中上
 - **對手「中」**：vs hand OPS .680-.720 — 中等
@@ -142,13 +144,9 @@ bash bin/vps-run.sh 'cd /opt/mlb-fantasy/daily-advisor && python3 mlb_query.py d
 
 > **參考門檻**：2026 MLB 全聯盟季 OPS 約 .720 (League avg)；vs hand split 通常比季全 OPS 低 .020-.040（同手壓制效應），所以 vs hand scale 的「弱」門檻整體下移 .040。
 >
-> **預設操作：AI 從記憶 take 隊伍分類，不必每隊查**（rough proxy，季全 OPS 量級）：
-> - **強**：LAD / NYY / PHI / ATL / NYM / BOS（contact + power 雙佳）
-> - **中-強**：TOR / TB / HOU / MIN / SD / SEA
-> - **中**：CHC / STL / SF / DET / AZ / CIN / TEX / MIL
-> - **弱**：COL / CWS / MIA / WSH / PIT / KC / LAA / OAK / BAL / CLE
+> **預設操作：讀 game log 每場 row 的 `opp_season_ops` / `opp_tier`**（issue #408 — deep_batch 每 run 拉一次全聯盟 30 隊 season OPS，機械分級：強 ≥.770 / 中強 .720-.770 / 中 .680-.720 / 弱 ≤.680，season OPS scale）。取代舊「記憶 take 靜態清單」— 5 月寫的清單季中 drift、LLM 逐場分類有 session 間 variance。
 >
-> Target 對手有 `vs_hand_2026.ops` 時優先用該值對照 vs hand 主錨表；game log 歷史對手仍用記憶 take。Edge case（一年內格局重洗 / 不確定的隊）才補拉一次 `byDateRange` 全季 OPS 確認。
+> Target 對手有 `vs_hand_2026.ops` 時優先用該值對照 vs hand 主錨表（不變）；game log 歷史對手一律用 `opp_tier`。`opp_tier` = None（league fetch 失敗 / 未知隊縮寫）才 fallback 補拉一次 `byDateRange` 全季 OPS 確認。
 
 整理後輸出兩個 split：
 - 對「中-弱」打線 X/Y QS（含 ER ≤2）
