@@ -1,6 +1,6 @@
 # 路線圖
 
-> 快照日期：2026-07-04。長期方向在此；逐項執行狀態見 [Plan](Plan)。
+> 快照日期：2026-07-07。長期方向在此；逐項執行狀態見 [Plan](Plan)。
 
 ## 已完成里程碑
 
@@ -17,6 +17,7 @@
 | 2026-06-12 | roster_sync watermark 第三次根修（monotonic watermark + 每日 reconcile 防呆網）驗證完成 |
 | 2026-06-13 | **fa_scan 決策執行層 + 量修復 PRD 定稿** — 主 issue #316，14 子切片（#317-#330） |
 | 2026-06-18 | 318b batter payload 注入 merge + VPS 段① A/B 通過 |
+| 2026-07-07 | **stream-sp / stream-sp-deep 優化批（#404-#409）全數落地** — scan `recent_form` 近況軸 + floor cap / `bulk_suspect` 分類 + 角色 registry（TTL 21 天免重付 WebSearch）/ deep CLI pending 自讀（7 手抄參數 → 2）/ `opp_tier` 對手分級機械化去記憶 take；`issues/011` 以 OBE 結案 |
 
 ## 進行中主軸
 

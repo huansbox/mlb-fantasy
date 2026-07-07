@@ -1,6 +1,6 @@
 # 技術債
 
-> 快照日期：2026-07-04。依**利息**排序——利息高 = 平常就在付出成本；利息低 = 特定情境才痛。技術債 = 已知的權衡，記錄成本與償還條件，**不代表馬上要處理**。多數項目在 repo `issues/` 有對應追蹤檔。
+> 快照日期：2026-07-07。依**利息**排序——利息高 = 平常就在付出成本；利息低 = 特定情境才痛。技術債 = 已知的權衡，記錄成本與償還條件，**不代表馬上要處理**。多數項目在 repo `issues/` 有對應追蹤檔。
 
 ## 高利息（每天都在付成本）
 
@@ -16,7 +16,6 @@
 | waiver-log NEW 入口 mlb_id 誤配 | 同名球員新增時才觸發，但一旦寫錯會**長期靜默誤導**該球員的所有後續追蹤（auto-close 端已根治，入口端未驗證） | NEW 寫入前走 Yahoo API 交叉驗證 team / position，不符即標記人工確認 | CLAUDE.md 待辦 |
 | `docs/player-eval-sp.md` 4 處裸 SSH | 每次 `/player-eval` SP 子流程有機率撞 30-40s handshake 卡死（含 2 處 here-doc） | here-doc 轉 VPS 端腳本後，4 處全部改走 `vps-run.sh` wrapper | `issues/player-eval-sp-ssh-wrapper.md` |
 | 本機↔VPS 間歇丟包（環境債）【接受現狀】 | 新增任何 SSH step 都要記得走 wrapper 的心智負擔；漏了就偶發卡死 | **明文接受現狀**：不追根治（根因在網路路徑）；維持 wrapper 約定 + 新增 SSH step 時檢查 | `issues/vps-ssh-handshake-hang.md` |
-| 011 stream-sp-deep parity 未驗 | 串流窗口用 deep 評估做決策時，承擔「refactor 後正確性只有單元測試背書」的風險 | 條件：下次串流窗前重跑，對 2026-05-16 三 SP 手算基準比對，divergence 做 root cause 文件化 | `issues/011-stream-sp-deep-e2e-parity.md` |
 
 ## 低利息（記錄在案）
 
@@ -25,6 +24,7 @@
 | SP / Batter 框架不對稱 | 規則漂移風險 + 每次框架討論的認知負擔 | 條件：batter Phase 6 升級決策時一併定案——升 batter 或明文維持 thin |
 | 042 payload 注入暫緩帳 | 「暫緩但未結案」的追蹤負擔 | 條件：B7 backfill 完成後重啟 A/B 評估，屆時收或棄 |
 | repo root 殘留診斷檔 | `bash.exe.stackdump`、`ssh_diag*.sh` 造成的雜訊 | 搭車處理：碰到該區時順手移除或歸檔 `archive/` |
+| stream-sp registry 的 true_starter 盲邊 | 機械層判 `true_starter` 時不查角色 registry — role-capped SP（混 GS 且 avg IP >4，如 Alvarez 型）會以 true_starter 進主表，registry 記載的 workload cap 未被對照；現靠 pending row 的 deep verdict 兜底（2026-07-07 首航實測） | 條件：再實戰出現一次 → skill 過濾規則加一行「主表候選也對照 registry」 |
 | 歷史設計文件已 superseded 未歸檔 | 誤讀舊設計的低機率風險 | 已靠 CLAUDE.md 檔案索引「歷史」列標註；不另動 |
 | handoff 過渡文件治理靠約定 | 殭屍 handoff 累積 | 維持「active 進待辦、done 即刪」約定；`glob docs/handoff-*` 可稽核 |
 
@@ -38,6 +38,8 @@
 ## 歷史償還紀錄
 
 債務會被還的證據（詳情看 git log / 對應 issue）：
+
+- 2026-07-07 — `issues/011` deep parity 以 OBE 結案：deep_batch 上線 6 週 ~20 次實戰無數值異常 + #406 e2e 雙模式輸出全等 + #408 對照官方端點，原 regression 疑慮已被覆蓋（檔已刪，紀錄見 #409 關閉留言）
 
 - `1a56c6f` — roster_sync 同步窗口拉到 30h：修掉「Daily-Tomorrow 次日生效 claim 被浮水印永久跳過」
 - 2026-06-12 — watermark 第三次根修驗證完成（monotonic `compute_watermark` + 每日 `--reconcile` 全量對帳網）
