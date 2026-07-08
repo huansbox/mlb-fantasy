@@ -115,35 +115,6 @@
 - 07-07：14d OPS .472續崩+Savant Δ-0.099;xwOBA P70/BB% P95底穩但%owned 10%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-08：14d OPS .498續崩+Savant Δ-0.117;xwOBA P70/BB% P95底穩但%owned 9%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 
-### Kyle Karros (COL, 3B) [mlb_id:691720] — 觀察中
-觸發：BBE ≥180 + xwOBA P75+ + 客場 OPS ≥.750 → 升級
-vs：待定
-- 06-11：xwOBA P80/BB% P95 + 14d Savant 0.417；prior P0 未確認 + Coors 疑慮；1% 零壓力（fa_scan）
-- 06-12：14d OPS .941 / Savant Δ+0.063 品質上升；xwOBA P80/BB% P95；prior P0 未確認 + Coors；1%（fa_scan）
-- 06-13：14d OPS .913/Savant Δ+0.063 品質上升；BBE 143 觸發 180 遠未達；1%（fa_scan）
-- 06-14：14d OPS .998/Savant Δ+0.040品質上升；BBE 147觸發180遠未達；prior P0未確認+Coors；1%（fa_scan）
-- 06-15：14d OPS 1.080/Savant Δ+0.022品質上升；BBE 149觸發180遠未達；prior P0未確認+Coors；1%（fa_scan）
-- 06-16：14d OPS .975/Savant Δ+0.023品質上升；BBE 155觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
-- 06-17：14d OPS .938/Savant Δ+0.010品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
-- 06-18：14d OPS .973/Savant Δ+0.038品質上升；BBE 157觸發180遠未達；prior P0未確認+Coors；1%零壓力（fa_scan）
-- 06-19：14d OPS .973/Savant Δ+0.051品質上升；BBE 161觸發180接近中；prior P0未確認+Coors；1%零壓力（fa_scan）
-- 06-20：14d OPS .915/K% 6.5極低+Savant Δ+0.053品質上升；BBE 161→180接近中；prior P0未確認+Coors；2%零壓力（fa_scan）
-- 06-23：14d OPS .894+xwOBA P80 ✓;BBE 165接近180觸發線但未達;Savant Δ-0.036轉品質下滑;prior P0未確認+Coors;2%零壓力（fa_scan）
-- 06-24：14d OPS .894+xwOBA P80 ✓;BBE 166接近180觸發線未達;Savant Δ-0.045轉品質下滑+運氣+0.099膨脹;prior P0未確認+Coors;2%零壓力（fa_scan）
-- 06-25：14d OPS .929+xwOBA P80 ✓;BBE 166接近180觸發線未達;Savant Δ-0.032轉品質下滑+運氣+0.124膨脹;prior P0未確認+Coors;2%零壓力（fa_scan）
-- 06-26：14d OPS .929+xwOBA P80 ✓但BBE 169<180觸發線未達+Savant Δ-0.047品質下滑+運氣+0.185膨脹;prior P0+Coors;2%零壓力（fa_scan）
-- 06-27：14d OPS .936+xwOBA P70但BBE 169<180觸發線未達+Savant Δ-0.054品質下滑+運氣+0.194膨脹;prior P0+Coors;2%零壓力（fa_scan）
-- 06-28：14d OPS 1.086+xwOBA P70但BBE 169<180觸發線未達+Savant Δ-0.049品質下滑+運氣+0.201膨脹;prior P0+Coors;2%零壓力（fa_scan）
-- 06-29：14d OPS 1.115但BBE 169<180觸發未達+Savant Δ-0.056品質下滑+運氣+0.182膨脹+Coors+prior P0;2%零壓力（fa_scan）
-- 06-30：BBE 172<180觸發線未達+14d OPS 1.142但運氣+0.188膨脹+Savant Δ-0.050品質下滑+Coors+prior P0未確認;2%零壓力skeptical（fa_scan）
-- 07-01：BBE 176<180觸發線未達+14d OPS 1.158但運氣+0.188膨脹+Savant Δ-0.036下滑+Coors+prior P0;2%零壓力skeptical（fa_scan）
-- 07-02：BBE 177<180觸發線未達+14d OPS 1.148但運氣+0.176膨脹+Savant Δ-0.042下滑+Coors+prior P0;2%零壓力skeptical（fa_scan）
-- 07-03：BBE 177<180觸發線未達+14d OPS 1.145但運氣+0.186膨脹+Savant Δ-0.007持平+Coors+prior P0;2%零壓力skeptical（fa_scan）
-- 07-04：BBE 181≥180觸發線今達+xwOBA P80≥P75✓但運氣+0.179巨膨脹+Savant Δ+0.012持平+Coors+prior P0;14d OPS 1.241灌水;skeptical不升級（fa_scan）
-- 07-05：BBE 181≥180✓+xwOBA P80≥P75✓但運氣+0.199巨膨脹+Savant Δ+0.028弱+Coors+prior P0;14d OPS 1.114灌水;skeptical不升級（fa_scan）
-- 07-06：BBE 189≥180✓+xwOBA P80≥P75✓但運氣+0.169巨膨脹+Savant Δ+0.050+Coors+prior P0;14d OPS 1.212灌水;skeptical不升級（fa_scan）
-- 07-07：BBE 189≥180✓+xwOBA P80≥P75✓但運氣+0.166巨膨脹+Savant Δ+0.052+Coors+prior P0;14d OPS 1.178灌水;explosive+11但skeptical不升級（fa_scan）
-
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
 vs：Mauricio Dubón
@@ -278,6 +249,9 @@ vs：（無錨點 — 純 upside watch）
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Kyle Karros (COL, 3B) — 被搶（自動偵測）
+- 2026-07-08：Yahoo ownership_type=team，從觀察中移除。
 
 ### Josh Bell (MIN, 1B) — 被搶（自動偵測）
 - 2026-07-07：Yahoo ownership_type=team，從觀察中移除。
