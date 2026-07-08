@@ -27,7 +27,8 @@
 
 - **2026-06-10 創建**（issue 029 骨架）：解析 + episode + 六類別比數 + 週日 cron 端到端；outcome 全 pending-judge。
 - **2026-06-10 執行標註上線**（issue 031）：每筆帳補 executed 欄位（roster git 歷史機械判定）+ 週報 executed / not-executed 分組 hit-rate 行。真實歷史 spot-check 三例皆正確（Rafaela 06-07 add → executed / Pederson 被搶 → not-executed / Arraez 長期在籍 → already-rostered）。
-- **2026-06-10 裁判合議上線**（issue 030）：pending-judge → 2 位裁判合議 verdict（hit / miss / 難分）+ 週報命中率行（replace 量太衝動 / watch 鏡像量太保守）。第一批真 claude 抽查（真實 05-15→06-04 產出，Pederson vs Arraez + Clemens vs Arraez）：2 calls 零 retry 契約全合規、判定與機械比數方向一致無唱反調。**待辦：首個非空 production 週日段（預期 2026-07-05）出來後再做一次人工抽查**（demo 兩帳都偏明顯案例，勉強/難分路徑尚未被真裁判走過）。
+- **2026-06-10 裁判合議上線**（issue 030）：pending-judge → 2 位裁判合議 verdict（hit / miss / 難分）+ 週報命中率行（replace 量太衝動 / watch 鏡像量太保守）。第一批真 claude 抽查（真實 05-15→06-04 產出，Pederson vs Arraez + Clemens vs Arraez）：2 calls 零 retry 契約全合規、判定與機械比數方向一致無唱反調。首個非空 production 段人工抽查見下條（2026-07-08）。
+- **2026-07-08 首個非空 production 段人工抽查（issue 030 殘留觀察結案，PASS）**：對 2026-07-05 段 14 筆判帳（`backtest_batter.py --no-judge --dry-run` 重建六類別 scorecard 對照 doc 記錄的裁判判定，零 LLM / 零 Yahoo）。**無系統性唱反調；demo 未走過的四條路徑首次由真裁判正確走過**：① **magnitude override**（唯一二元-方向分歧 Basallo vs Albies：機械 FA 3W-2L 但 Basallo 三勝全毛邊 BB+1/AVG+.008/OPS+.027、R 卻 4-vs-11 慘輸 → 裁判 blind 判 B 正確，正是 panel 設計要抓的「二元感知不到量級」情境）② **雙勉強→難分**（Pederson vs Albies 06-13：兩裁判 A·勉強 → 合議降難分，OPS+.160 vs counting 領先真實拉鋸）③ **平局破切**（Cam Smith 3-3 → A，OPS+.115+power 勝小輸）④ **watch 鏡像看走眼**（Mead vs Duran 機械 6W-0L 橫掃 → A明顯 → miss，真訊號=系統對 Mead 過保守）。唯二偏 aggressive 的「明顯」（Caglianone/Arraez、Pederson/Arraez，皆判「4 counting 領先」勝「較高 OPS」）為 7×7 counting-heavy 格式的一致傾向、非隨機錯判。**結論：裁判 prompt 無需修**。
 - 後續：xwOBACON 門檻校準（Use Case B）等對帳資料累積 4-6 週後另案。
 
 ## Weekly Batter Backtest 2026-06-14 (no due episodes)

@@ -14,7 +14,7 @@
 | [`027-sp-backtest-repair-e2e`](027-sp-backtest-repair-e2e.md) | AFK | 無 | ✅ 2026-06-10（merge `4daefa7`） |
 | [`028-waiver-log-grammar-extension`](028-waiver-log-grammar-extension.md) | HITL | 無（**最優先部署**） | ✅ 2026-06-10（merge `c549fe0`，已部署） |
 | [`029-batter-backtest-skeleton`](029-batter-backtest-skeleton.md) | AFK | 027, 028 | ✅ 2026-06-10（merge `0e94cf7`） |
-| [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ✅ 2026-06-10（merge `b9a8e4d`；殘留觀察：07-05 首個非空段再抽查一次） |
+| [`030-judge-panel-verdicts`](030-judge-panel-verdicts.md) | HITL | 029 | ✅ 2026-06-10（merge `b9a8e4d`）；**殘留觀察結案 2026-07-08**：07-05 首個非空段 14 帳人工抽查 PASS（magnitude override / 雙勉強→難分 / 平局破切 / watch 看走眼四路徑正確，裁判 prompt 無需修） |
 | [`031-execution-annotation`](031-execution-annotation.md) | AFK | 029（可與 030 平行） | ✅ 2026-06-10（雲端 session 完工，merge `ae8cb46`） |
 | [`032-payload-history-truncation`](032-payload-history-truncation.md) | AFK | 無（軟排序在 028 後） | ✅ 2026-06-10（merge `d18207e`）；**隔日驗證 ✅ 2026-06-11**（issue #311：（中略 N 行）+ [機械計數] 行皆現） |
 | [`033-payload-hygiene-pack`](033-payload-hygiene-pack.md) | AFK | 無 | ✅ 2026-06-10（merge `fc55fae`）；**隔日驗證 ✅ 2026-06-11**（payload 五項逐項可見 + cost 下降） |
@@ -31,8 +31,9 @@
 4. **029 在 027+028 合併後開工**（fixture 先行開發，cron 上線後等資料熟，「0 筆可對帳」= 合格 demo）→ **030 / 031 接續**。
 5. **032 在 028 上線後重測省幅**（結案自動化會先縮小歷史段）、**037 殿後**（與 028 分批，A/B 歸因隔離）。
 
-### Handoff（最後更新：2026-06-11）
+### Handoff（最後更新：2026-07-08）
 
+- **C1 對帳回路 production 驗證完成（2026-07-08）— 全計畫實質收官**：11 片 027-037 全 ✅ merge。曆法長竿到期後兩份對帳都在 production 產出真帳：**SP**（`docs/sp-decisions-backtest.md`）自 2026-06-21 regular 段起有真 verdict（06-21 hit 0% → 06-28 40% → 07-05 100%），027 空殼三破洞修復確認生效、不再「no verdicts」；**batter**（`docs/batter-decisions-backtest.md`）2026-07-05 首個非空段 = 17 episode（replace 命中 71% 5/7、watch 57% 4/7）、裁判 2 calls 跑完零 fail-open、031 executed split + 051 Decision KPI（4★ 4/4、regret=Kody Clemens）全填真值。**030 殘留裁判抽查 PASS**（見狀態表 030 行 + batter doc 2026-07-08 條）。**尺已建好且驗證會量 → 解鎖 Out-of-Scope 的下游（model 降級 / 訊號擴充是否有效 / xwOBACON Use Case B），皆需此對帳基線再累積 2-4 週後另案 A/B。** 剩被動：037 一週 spot-check（06-13 部署起）。
 - **032-036 隔日 production 驗證全過（2026-06-11，對象 issue #311 + VPS transcript）**：① 032 — 觀察中段全部長歷史條目折疊為「（中略 N 行）」、Cam Smith 帶 `[機械計數] counter day 0/3（引自 06-10）`；② 033 — 視窗註記 + 運氣 legend 兩行、watch 球員真 %owned（Cam Smith 12% 等）、prior 行 PA+年齡、Heriberto 14d Savant「樣本不足 (BBE 13 <15)」；③ 034 — Teoscar/Basallo/Jeffers/Mead/Pederson/Meckler + watch 多人帶 ⚠️ 上場量落差 tag，且 LLM 確實用它擋了立即取代（Mead/Basallo 留觀察）；④ 035 — season「運氣 +0.040(顯著)」格式正確、14d 只列值，LLM 判斷大量引用（Arraez/Albies 泡沫、Steer buy-low）；⑤ 036 — FA 10 人 87/53/52/50/48/33/26/7/3/1% 嚴格降序。**Cost spot-check**：batter call cache 寫入 41.3K→21.4K（−48%）、output 13.1K→7.1K（−46%），無 thinking 誘發反噬。⑥ 028 CLOSE 鏈端到端首次在 production 走通：LLM 發 `CLOSE|Gavin Sheets` → 寫入端即時搬已結案（VPS log + waiver-log.md 皆證實）。**唯一未開工：037**。
 
 - **033 / 034 / 035 / 036 同日完工（2026-06-10）— payload 誠實度 + 去偏四片全上**。共同剩餘驗證：**6/11 12:30 cron 後看 production batter issue** ① payload 逐項可見（視窗註記 + 運氣 legend 兩行、watch 真 %owned 或 `?%`、prior 行 PA+年齡、BBE<15 樣本不足、符合條件 FA 的 ⚠️ 上場量落差、Season/14d 運氣欄、FA 順序 = %owned 降序）② cost spot-check（input/output tokens 與前日同量級 — 新增行均為靜態資料字典類，非判斷規則，lever 2 風險低但仍要看）。035 注意：我方 roster 的 14d 運氣欄要等 VPS savant_rolling cron（TW 12:00）以新 code 跑過一輪；FA 端即時計算當天即有。剩餘未開工：**037**（觸發 schema 約束，HITL，需與 028 分批 A/B — 至此 11 片唯一未完）。
