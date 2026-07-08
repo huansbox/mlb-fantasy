@@ -150,11 +150,32 @@ PR #351（318b-batter）merge（`9449fa2`）+ VPS deploy 後，VPS production co
 - 042 的「drop 面對原 add 理由」邏輯上 **blocked by backfill B7**（現 add_reason 是季線快照假理由，強制面對會誤導）。
 - 結論：**注入裸上保留（已 production），042 不上**。重評觸發 = backfill B7 跑完 + 出現真實翻供（verdict 改變）或 drop 回溯案例。
 
+## 段③ 實測結果（2026-07-08，VPS 配對 A/B）
+
+B6 merge（`7ecdfd1`）+ VPS deploy 後，取首批注入的 production capture fixture（`_tools/fixtures/b1_baseline/2026-07-08_sp_b2_{step_a,step_b}.json`）作 B（injected）；反注入剝掉 B6 欄位（`_inject_318b` + `_rolling_payload` 權威清單：ledger_note / next_week_starts / velo / kbb_small_sample / swap_vs_incumbent + rolling_21d.csw_pct/pitches + velo-prefix tags）得**同批候選**的 A（clean），零候選池 noise。VPS neutral cwd 各跑 unchanged Step A/B prompt × `claude -p --output-format json` × 2 reps（runner `_tools/_ab_318b_sp_runner.py`）。主 model = **claude-opus-4-8[1m]**（modelUsage 另有 ~$0.008 Haiku 輔助 call = claude -p harness 開銷，非主推理）。
+
+| variant | input（tot）| output_tokens（2 reps）| cost rep0 |
+|---|---|---|---|
+| step_a clean | 28,050 | [7574, 7322] avg **7448** | $0.317 |
+| step_a inj | 30,295（+8.0%）| [4547, 5066] avg **4806（−35.5%）** | $0.249 |
+| step_b clean | 28,211 | [1366, 2479] avg **1922** | $0.147 |
+| step_b inj | 30,456（+8.0%）| [3170, 5655] avg **4412（+129.5%）** | $0.216 |
+
+**通過判定 — 段③ 通過（成本淨中性）**：
+- ✅ **input 漲小**：+2,245 tok/step（+8.0%），A+B 共 **+4,490 tok**。注入 payload char +4,771/step（+25% payload body）看似大，但 token 只 +8%（JSON ~2 chars/tok + 28K base 含固定 Opus system prompt）；**char 量嚇人、token 量溫和**。最大宗 = 046 next_week_starts cadence dict（11 候選全帶，含 dates array）。
+- ✅ **output 淨持平、無 lever-2 誘發**：net A+B output avg **−152 tok**（噪音內）。注入把 output 在兩步間**重分配** — Step A **−35.5%**（richer data → 排序更果斷、Opus thinking 少）、Step B **+129.5%**（final verdict 多料可衡量 → thinking 多）；兩步方向各自 robust（2 reps 不重疊）、淨相抵。與 lever-2「prompt 改動致 output 單調 3× 暴增 + 可見文字持平」本質不同：B6 **未動 prompt**、淨 output 平、可見 verdict 文字穩定（~500-1500 chars）。
+- ✅ **成本中性**：每 scan（A+B）clean $0.463 → inj $0.466（**+0.5%、~$0.002**）。
+
+**特徵記錄（非 fail，供未來注入片參照）**：
+- SP 路徑 output_tokens 由 **Opus thinking 主導**（可見 result ~400-500 tok vs output_tokens 1366-7574）— 既有 production 特性、非注入造成；注入只在此基礎上重分配 thinking。
+- Opus thinking 單 call 變異大（Step B clean 1366-2479 / inj 3170-5655）；2 reps 足判每步方向與淨中性，絕對量勿過度解讀。
+- 若未來要壓 SP payload token，先精簡 next_week_starts 的 dates array（char/token 大宗）。
+
 ## 拆 slice 清單與順序
 
 1. **318b-batter 注入**（✅ merge PR #351 `9449fa2` + VPS deploy + 段① A/B 通過，2026-06-18）：batter pass2 注入 → 基礎 + swap 兩 pool register → 段① A/B。backfill（B7）改拆第二批，故段① 跑時 ledger add_reason 多為空/季線快照（見「段① 實測結果」）。
 2. **042 prompt 契約**（#321，HITL，**暫緩**）：段① 數據已出 — 注入裸上零誘發、事實型 tag LLM 自發使用，但 ledger 規則增益未證實 + drop 規則 blocked by backfill B7 → **042 不上**。重評觸發：B7 已跑完（2026-07-07 ✓），仍待真實翻供（verdict 改變）或 drop 回溯案例出現。
-3. **318b-sp 注入**（B6，✅ merge `7ecdfd1`，2026-07-07）：`slim_entry` dict 注入 — 046 `next_week_starts`（probable 錨定 cadence 投影，retro gate 85.3% production config / 85.0% 日曆協議，2354 cells；窗口 = 明天 ET 起算的當週剩餘，staleness 用球隊比賽日免疫 All-Star break，horizon-absence per-team）+ 050 micro（CSW 21d 騎 rolling dict 0 行 — season CSW 經驗證不可得；velo 21d/YoY delta + prefix 白名單 tag；K-BB ladder BBE<30 only）+ ledger 記憶 2 行 + 048 swap line（4★+ 獨立 pool）。SP 端 channel/stars wiring（318a SP mirror）同批 — SP 條目今後自動有 channel。prompt 未動。**段③ A/B 待首個注入 production payload（部署後首次 12:30 scan）**：取 capture fixture 反注入配對，比照段①。
+3. **318b-sp 注入**（B6，✅ merge `7ecdfd1`，2026-07-07）：`slim_entry` dict 注入 — 046 `next_week_starts`（probable 錨定 cadence 投影，retro gate 85.3% production config / 85.0% 日曆協議，2354 cells；窗口 = 明天 ET 起算的當週剩餘，staleness 用球隊比賽日免疫 All-Star break，horizon-absence per-team）+ 050 micro（CSW 21d 騎 rolling dict 0 行 — season CSW 經驗證不可得；velo 21d/YoY delta + prefix 白名單 tag；K-BB ladder BBE<30 only）+ ledger 記憶 2 行 + 048 swap line（4★+ 獨立 pool）。SP 端 channel/stars wiring（318a SP mirror）同批 — SP 條目今後自動有 channel。prompt 未動。**段③ A/B ✅ 通過（2026-07-08）**：input +8.0%/step（+4,490 tok/scan）、output 淨 −152 tok（Step A −35.5% / Step B +129.5% 重分配相抵）、成本 +0.5%（~$0.002/scan）、無 lever-2 誘發。詳見上方「段③ 實測結果」。
 4. **legacy backfill**（B7，✅ 已執行，2026-07-07）：`daily-advisor/backfill_ledger.py`（26 tests）實跑 22 筆 — roster 20 人 tagged 季線快照 add_reason（batter 3 核心 / SP 5-slot）+ SP watchlist 2 人 channel（Gasser heat / Holmes structure，文字回推 classifier：structure > heat > market > unknown，含 SP slot-name 規則）。驗收通過：roster 23/23 有 add_reason、watchlist 11/11 有 channel；再跑 plan 0 筆（冪等）。
 
 ## 尚待決定的實作細節（design doc 不卡、實作時定）
