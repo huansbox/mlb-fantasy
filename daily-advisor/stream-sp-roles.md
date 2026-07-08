@@ -13,3 +13,4 @@
 |---|---|---|---|---|
 | Miles Mikolas | WSH | bulk（piggyback 後段，swingman 無 QS）| 2026-07-06 | deep eval（初確認 2026-06-18 WebSearch）|
 | Andrew Alvarez | WSH | opener/piggyback，單場 cap ~4.2 IP / PC≤90，全季 0 QS | 2026-07-06 | deep eval（初確認 2026-06-20 WebSearch）|
+| Griffin Canning | SD | bulk（Wandy Peralta 開局 1 IP 後段接手，~4-5 IP，遮 LHB/首局；10.12 首局 ERA）| 2026-07-08 | WebSearch |
