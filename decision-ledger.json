@@ -260,6 +260,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "立即取代",
+   "ts": "2026-07-08",
+   "add_reason": "xwOBA .337 / BB% 9.15 / Barrel% 12.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -501,6 +510,15 @@
    "player": "J.P. Crawford",
    "verdict": "watch",
    "ts": "2026-07-07",
+   "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-07-08",
    "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
    "channel": "structure",
    "stars": 4,
@@ -1217,6 +1235,15 @@
    "player": "Heriberto Hernández",
    "verdict": "closed",
    "ts": "2026-06-30",
+   "add_reason": "xwOBA .350 / BB% 8.44 / Barrel% 8.9",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Heriberto Hernández",
+   "verdict": "watch",
+   "ts": "2026-07-08",
    "add_reason": "xwOBA .350 / BB% 8.44 / Barrel% 8.9",
    "channel": "structure",
    "stars": 3,
@@ -1992,6 +2019,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-07-08",
+   "add_reason": "xwOBA .313 / BB% 11.31 / Barrel% 13.8",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Gabriel Moreno": [
@@ -2350,6 +2386,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Royce Lewis",
+   "verdict": "watch",
+   "ts": "2026-07-08",
+   "add_reason": "xwOBA .298 / BB% 9.78 / Barrel% 12.7",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Teoscar Hernández": [
@@ -2596,6 +2641,15 @@
    "channel": "structure",
    "stars": 2,
    "executed_ts": null
+  },
+  {
+   "player": "A.J. Ewing",
+   "verdict": "watch",
+   "ts": "2026-07-08",
+   "add_reason": "xwOBA .352 / BB% 11.45 / Barrel% 5.9 / 14d xwOBA .413",
+   "channel": "structure",
+   "stars": 2,
+   "executed_ts": null
   }
  ],
  "Robert Gasser": [
@@ -2677,6 +2731,15 @@
    "player": "Kerry Carpenter",
    "verdict": "watch",
    "ts": "2026-07-07",
+   "add_reason": "xwOBA .317 / BB% 7.8 / Barrel% 11.6 / 14d xwOBA .378",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Kerry Carpenter",
+   "verdict": "watch",
+   "ts": "2026-07-08",
    "add_reason": "xwOBA .317 / BB% 7.8 / Barrel% 11.6 / 14d xwOBA .378",
    "channel": "structure",
    "stars": 3,
@@ -2804,6 +2867,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Tommy Edman",
+   "verdict": "watch",
+   "ts": "2026-07-08",
+   "add_reason": "xwOBA .375 / BB% 10.2 / Barrel% 9.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Josh Bell": [
@@ -2842,6 +2914,15 @@
    "player": "Victor Bericoto",
    "verdict": "watch",
    "ts": "2026-07-07",
+   "add_reason": "xwOBA .298 / BB% 1.92 / Barrel% 14.7 / 14d xwOBA .378",
+   "channel": "heat",
+   "stars": 1,
+   "executed_ts": null
+  },
+  {
+   "player": "Victor Bericoto",
+   "verdict": "watch",
+   "ts": "2026-07-08",
    "add_reason": "xwOBA .298 / BB% 1.92 / Barrel% 14.7 / 14d xwOBA .378",
    "channel": "heat",
    "stars": 1,
