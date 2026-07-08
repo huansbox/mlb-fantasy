@@ -190,6 +190,7 @@ vs：Christian Walker
 ### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
 觸發：B2 2-step watch
 - 07-02：Leahy's ugly season line (xwOBACON 0.415 pct0, xERA 5.74) is undercut by a strong 21d surge — 0.334 on 62 BBE (Δ -0.081), so the deterioration signal points away from dropping him. Gasser shows the cl（fa_scan）
+- 07-08：Gasser holds a real 3/5-slot edge over P1 Cantillo — IP/GS 5.42 (p45) vs 5.05 (p0), BB/9 2.91 vs 4.41, and xwOBACON .317 (p95) vs .362 (p60) — but he loses Whiff% (23.5 vs 27.7) and GB% (29.4 p0 vs 42（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：14d OPS ≥.850連5天 + PA-TG ≥3.0連5天
