@@ -3137,5 +3137,16 @@
    "stars": null,
    "executed_ts": null
   }
+ ],
+ "Brandon Woodruff": [
+  {
+   "player": "Brandon Woodruff",
+   "verdict": "watch",
+   "ts": "2026-07-09",
+   "add_reason": "IP/GS 5.04 / Whiff% 23.3 / BB/9 1.99 / GB% 27.6 / xwOBACON .332",
+   "channel": "unknown",
+   "stars": 3,
+   "executed_ts": null
+  }
  ]
 }

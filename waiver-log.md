@@ -199,6 +199,10 @@ vs：（無錨點 — 純 upside watch）
 觸發：B2 2-step add
 - 07-07：Holmes wins 4 of 5 slots over Cantillo on credible 150 BBE: IP/GS 5.85 vs 5.06, BB/9 3.08 vs Cantillo's 4.35 (pct0), GB 55.3 vs 42.3, xwOBACON 0.348 vs 0.362; Cantillo only holds Whiff% (27.7 vs 21.9)（fa_scan）
 
+### Brandon Woodruff (MIL, SP) [mlb_id:605540] — 觀察中
+觸發：B2 2-step watch
+- 07-09：Woodruff's season line clearly beats McDonald (xERA 2.85 vs 4.05, WHIP 0.84 vs 1.38, BB/9 1.99 vs 3.03), but Step A's 'start next wk' read conflicts with his IL15 status and cadence-only (not probable（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
