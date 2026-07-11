@@ -217,6 +217,7 @@ vs：（無錨點 — 純 upside watch）
 ### Brandon Woodruff (MIL, SP) [mlb_id:605540] — 觀察中
 觸發：B2 2-step watch
 - 07-09：Woodruff's season line clearly beats McDonald (xERA 2.85 vs 4.05, WHIP 0.84 vs 1.38, BB/9 1.99 vs 3.03), but Step A's 'start next wk' read conflicts with his IL15 status and cadence-only (not probable（fa_scan）
+- 07-11：No FA is classified worth, and both borderline FAs are currently unavailable (Woodruff IL15, Gasser NA-status), so no available arm clearly outproduces P1 Cantillo. Woodruff shows a genuine multi-slot（fa_scan）
 
 ## 隊上觀察
 
