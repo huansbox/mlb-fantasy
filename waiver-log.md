@@ -62,6 +62,7 @@
 - 07-08：[立即取代→Ozzie Albies] 14d OPS .807≥.700✓+K% 11.1<28✓+Savant Δ+0.031連3天正✓觸發全滿足;xwOBA P80/Barrel P70雙年上行;健康PA-TG 3.70;升級立即取代 vs Albies（fa_scan）
 - 07-09：14d OPS .686<.700觸發破線降溫+K% 13.5<28✓+Savant Δ+0.030上升;xwOBA P80/Barrel P70雙年上行buy-low但counting回落;⚠️連2天未執行;Ewing熱度超越;vs Albies（fa_scan）
 - 07-10：14d OPS .686<.700觸發破線降溫+K% 13.5<28✓+Savant Δ+0.010轉平;xwOBA P80結構穩但counting回落;Ewing熱度超越;vs Albies（fa_scan）
+- 07-11：14d OPS .658<.700降溫+K% 11.5<28✓+Savant Δ+0.027上升;xwOBA P80結構穩但counting回落;vs Albies（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -118,6 +119,7 @@
 - 07-08：14d OPS .498續崩+Savant Δ-0.117;xwOBA P70/BB% P95底穩但%owned 9%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-09：14d OPS .478續崩+Savant Δ-0.108;xwOBA P70/BB% P95底穩但%owned 9%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-10：14d OPS .431續崩+Savant Δ-0.087;xwOBA P70/BB% P95底穩且BB%未退破10%未達降級結案;%owned 9%未破30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
+- 07-11：14d OPS .482續崩+Savant Δ-0.077;xwOBA P70/BB% P95底穩未破10%未達降級;%owned 9%<30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -147,6 +149,7 @@ vs：Mauricio Dubón
 - 07-08：14d K% 33.3>28觸發破線(counter重置)+OPS .768≥.750✓+Savant Δ+0.092上升;43%owned;vs Dubón（fa_scan）
 - 07-09：14d K% 33.3>28觸發破線(counter重置)+OPS .768≥.750✓+Savant Δ+0.048上升;43%owned;vs Dubón（fa_scan）
 - 07-10：14d K% 33.3>28觸發破線(counter重置)+OPS .782≥.750✓+Savant Δ+0.048上升;43%owned;vs Dubón（fa_scan）
+- 07-11：14d K% 33.3>28觸發破線(counter重置)+OPS .796≥.750✓+Savant Δ+0.048上升;43%owned;vs Dubón（fa_scan）
 
 ### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
@@ -169,6 +172,7 @@ vs：Christian Walker
 - 07-08：PA-TG 2.57<3.0+14d OPS .698<.850兩項觸發皆未達+xwOBA P50中庸+K% 26.7;vs Christian Walker（fa_scan）
 - 07-09：PA-TG 2.57<3.0+14d OPS .652<.850兩項觸發皆未達+xwOBA P50中庸+K% 24.6;vs Christian Walker（fa_scan）
 - 07-10：PA-TG 2.57<3.0+14d OPS .740<.850兩項觸發皆未達+xwOBA P50中庸+K% 27.9;vs Christian Walker（fa_scan）
+- 07-11：PA-TG 2.57<3.0+14d OPS .740<.850兩項觸發皆未達+xwOBA P50中庸+K% 27.9;vs Christian Walker（fa_scan）
 
 ### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
 觸發：B2 2-step watch
@@ -188,6 +192,7 @@ vs：Ceddanne Rafaela
 - 07-08：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
 - 07-09：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
 - 07-10：14d OPS .763<.850+PA-TG 2.43 platoon<3.0兩項觸發未達+Savant Δ+0.054/xwOBA P60;vs Rafaela（fa_scan）
+- 07-11：14d OPS .746<.850+PA-TG 2.43<3.0兩項觸發未達+Savant Δ+0.044/xwOBA P60;vs Rafaela（fa_scan）
 
 ### Tommy Edman (LAD, 2B,3B,LF,CF) [mlb_id:669242] — 觀察中
 觸發：PA-TG≥3.0連5天+BBE達50
@@ -200,6 +205,7 @@ vs：Ozzie Albies
 - 07-08：xwOBA P95+14d OPS .926菁英但PA-TG 0.68<3.0/BBE 40<50量能未確認+3d-3 dropping;運氣+0.098;vs Albies（fa_scan）
 - 07-09：xwOBA P95+14d OPS .926菁英但PA-TG 0.68<3.0/BBE 40<50量能未確認+3d-3 dropping;運氣+0.098;vs Albies（fa_scan）
 - 07-10：xwOBA P95+14d OPS .926菁英但PA-TG 0.71<3.0/BBE 47<50量能未確認(逼近門檻);運氣+0.096;vs Albies（fa_scan）
+- 07-11：xwOBA P95+14d OPS .945菁英但PA-TG 0.74<3.0/BBE 47<50量能未確認(逼近門檻);運氣+0.111;vs Albies（fa_scan）
 
 ### Victor Bericoto (SF, LF,RF) [mlb_id:682674] — 觀察中
 觸發：Jung Hoo Lee 歸隊後仍每日先發 + season BBE ≥40 + BB% 回升 ≥5%
@@ -209,6 +215,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-08：Barrel P95/HH P95 power真但BBE 38低信心+BB% 1.8<P25+運氣+0.093灌水;繫於Lee歸隊;純upside watch（fa_scan）
 - 07-09：Barrel P95/HH P80 power真但BBE 42低信心+BB% 1.8<P25+運氣+0.084灌水;繫於Lee歸隊;純upside watch（fa_scan）
 - 07-10：Barrel P95/HH P80 power真但BBE 42低信心+BB% 1.69<P25+運氣+0.084灌水;繫於Lee歸隊;純upside watch（fa_scan）
+- 07-11：IL10+Barrel P95/HH P70 power真但BBE低信心+BB% 1.69<P25+運氣+0.088灌水;繫Lee歸隊;純upside watch（fa_scan）
 
 ### Clay Holmes (NYM, SP) [mlb_id:605280] — 觀察中
 觸發：B2 2-step add
@@ -382,6 +389,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-08：xwOBA P95/HH P95雙年power菁英+14d OPS 1.140/6HR/K% 13.7爆量+運氣-0.028 buy-low側;但PA-TG 2.27限局+chase崩壞;純power upside觀察（fa_scan）
 - 07-09：xwOBA P95/HH P95+14d OPS 1.081/5HR/Savant .457但選球崩壞+PA-TG 2.28上場有限+3%owned（fa_scan）
 - 07-10：xwOBA P95/14d OPS 1.118/5HR+Savant Δ+0.089衝.460 power真;PA-TG 2.30+chase崩壞+3%無人搶=upside watch;vs Albies（fa_scan）
+- 07-11：[取代→Ozzie Albies] xwOBA P95/P80雙年菁英+Barrel P70+14d 5HR OPS1.050+Savant Δ+0.081上升;無下週PA0標記會上場;唯PA-TG2.32platoon+選球崩壞故取代非立即;%owned 4%+2上榜（fa_scan）
 
 ### Kyle Manzardo (CLE, 1B) [mlb_id:700932] — 已結案（fa_scan CLOSE）
 觸發：立即行動
