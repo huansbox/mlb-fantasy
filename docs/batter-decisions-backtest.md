@@ -102,3 +102,27 @@ Episodes:
 - 2026-06-14 (1d) `replace/取代` add Kody Clemens ⇄ drop Ezequiel Duran → 機械比數 FA 5W-0L-1T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **hit** 〔executed 2026-06-15〕
 - 2026-06-14 (1d) `watch` watch Spencer Torkelson vs Mauricio Dubón → 機械比數 FA 1W-3L-2T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **hit** 〔not executed〕
 
+
+## Weekly Batter Backtest 2026-07-12 (2026-06-15 ~ 2026-06-20)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 8 (replace 4 / watch 4; episodes in lookback: 63)
+- Judge panel（issue 030）: 2 位裁判同指示合議，2 calls（強制二選一＋明顯/勉強；同人+至少一明顯=採用，餘=難分）；機械類別比數僅為稽核底稿，不參與判定
+- 命中率 — replace（量太衝動）: 0%（0/4），難分 0 / watch（鏡像，量太保守；難分=看對計 hit）: 50%（1/2）
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 2（hit-rate 0%（0/2））/ not-executed 6（hit-rate 25%（1/4））
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 0/1 (0%) / ≤3★ 1/5 (20%)
+- ⏱ 觸發→執行延遲中位: 1.5 天（n=2；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 0
+
+Episodes:
+- 2026-06-15 (3d) `replace/取代` add Andrew Benintendi ⇄ drop Mauricio Dubón → 機械比數 FA 0W-5L-1T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔not executed〕
+- 2026-06-16 (1d) `watch` watch Gabriel Moreno vs 通用升級候選 → 機械比數 no data → **no-data** 〔not executed〕（unresolved id: 通用升級候選）
+- 2026-06-16 (1d) `watch` watch Joc Pederson vs 通用升級候選 → 機械比數 no data → **no-data** 〔not executed〕（unresolved id: 通用升級候選）
+- 2026-06-17 (1d) `replace/取代` add Matt McLain ⇄ drop Christian Walker → 機械比數 FA 0W-6L-0T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔executed 2026-06-19〕
+- 2026-06-18 (3d) `replace/立即取代` add Andrew Benintendi ⇄ drop Ozzie Albies → 機械比數 FA 0W-6L-0T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔not executed〕
+- 2026-06-18 (1d) `replace/立即取代` add Matt McLain ⇄ drop Mauricio Dubón → 機械比數 FA 0W-6L-0T → 裁判 J1 B·明顯 / J2 B·明顯 ⇒ adopted B → **miss** 〔executed 2026-06-19〕
+- 2026-06-18 (1d) `watch` watch Curtis Mead vs Ozzie Albies → 機械比數 FA 3W-2L-1T → 裁判 J1 B·勉強 / J2 B·明顯 ⇒ adopted B → **hit** 〔not executed〕
+- 2026-06-20 (1d) `watch` watch Trevor Larnach vs Christian Walker → 機械比數 FA 5W-1L-0T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **miss** 〔not executed〕
+

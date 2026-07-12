@@ -355,3 +355,19 @@ Episodes:
 - 2026-06-11 (7d) `drop_X_add_Y` drop Walker Buehler → add Peter Lambert → **hit**, Δ +0.058
 - 2026-06-12 (1d) `watch` watch Peter Lambert → **hit**
 
+
+## Weekly Backtest 2026-07-12 (2026-06-17 ~ 2026-06-20)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 2 (actionable: 1; episodes in lookback: 22)
+- Hit rate: 0%
+
+By action:
+- `drop_X_add_Y` n=0 (actionable 0) hit_rate=—
+- `watch` n=1 (actionable 1) hit_rate=0%
+- `pass` n=1 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-06-17 (1d) `watch` watch Martín Pérez → **miss**
+- 2026-06-20 (1d) `pass` pass → **neutral**
+
