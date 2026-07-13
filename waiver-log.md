@@ -184,6 +184,7 @@ vs：Christian Walker
 - 07-08：Gasser holds a real 3/5-slot edge over P1 Cantillo — IP/GS 5.42 (p45) vs 5.05 (p0), BB/9 2.91 vs 4.41, and xwOBACON .317 (p95) vs .362 (p60) — but he loses Whiff% (23.5 vs 27.7) and GB% (29.4 p0 vs 42（fa_scan）
 - 07-10：Gasser's raw edge over P1 Cantillo is real and multi-slot — IP/GS 5.42 vs 5.05, BB/9 2.91 vs 4.41, xwOBACON .322 vs .355, WHIP 1.18 vs 1.39 — but status NA with 0 next-week starts and GB% 29.6 (p0) ca（fa_scan）
 - 07-12：Gasser shows the real multi-slot edge Step A flagged (IP/GS 5.42 vs McDonald 4.94, xwOBACON .322 vs .334, BB/9 2.91, WHIP 1.18 vs 1.38, xERA 3.44 vs 4.05), but next_week_starts=0 means an immediate ad（fa_scan）
+- 07-13：Gasser's season edge over Cantillo is only a split, not a multi-slot win: he beats BB/9 (2.72 vs 4.37) and xwOBACON (.322 vs .355), but Cantillo dominates Whiff% (28.0 pct80 vs 23.2) and GB% (43.7 vs（fa_scan）
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
 觸發：14d OPS ≥.850連5天 + PA-TG ≥3.0連5天
