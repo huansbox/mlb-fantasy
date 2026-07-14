@@ -242,6 +242,10 @@ vs：（無錨點 — 純 upside watch）
 - 07-09：Woodruff's season line clearly beats McDonald (xERA 2.85 vs 4.05, WHIP 0.84 vs 1.38, BB/9 1.99 vs 3.03), but Step A's 'start next wk' read conflicts with his IL15 status and cadence-only (not probable（fa_scan）
 - 07-11：No FA is classified worth, and both borderline FAs are currently unavailable (Woodruff IL15, Gasser NA-status), so no available arm clearly outproduces P1 Cantillo. Woodruff shows a genuine multi-slot（fa_scan）
 
+### Keider Montero (DET, SP,RP) [mlb_id:672456] — 觀察中
+觸發：B2 2-step add
+- 07-14：Montero wins 3 of 5 slots over P1 Ginn with visible margins — BB/9 2.03 (80th) vs 4.02 (0th), xwOBACON .327 (95th) vs .345, IP/GS 5.76 vs 5.33 — plus WHIP 1.01 vs 1.25 and a healthy 298 BBE, while Gin（fa_scan）
+
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
