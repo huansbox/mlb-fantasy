@@ -259,6 +259,7 @@ vs：（無錨點 — 純 upside watch）
 ### Keider Montero (DET, SP,RP) [mlb_id:672456] — 觀察中
 觸發：B2 2-step add
 - 07-14：Montero wins 3 of 5 slots over P1 Ginn with visible margins — BB/9 2.03 (80th) vs 4.02 (0th), xwOBACON .327 (95th) vs .345, IP/GS 5.76 vs 5.33 — plus WHIP 1.01 vs 1.25 and a healthy 298 BBE, while Gin（fa_scan）
+- 07-15：Montero shows a real 3/5-slot edge over Ginn — BB/9 2.03 vs 4.02, xwOBACON .327 (pct95) vs .345, IP/GS 5.76 vs 5.33, backed by 298 BBE and improving 21d (-0.057) — so Step A's 'worth' read holds direc（fa_scan）
 
 ### Brandon Nimmo (TEX, LF,CF,RF) [mlb_id:607043] — 觀察中
 觸發：立即行動
