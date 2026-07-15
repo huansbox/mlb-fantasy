@@ -261,12 +261,6 @@ vs：（無錨點 — 純 upside watch）
 - 07-14：Montero wins 3 of 5 slots over P1 Ginn with visible margins — BB/9 2.03 (80th) vs 4.02 (0th), xwOBACON .327 (95th) vs .345, IP/GS 5.76 vs 5.33 — plus WHIP 1.01 vs 1.25 and a healthy 298 BBE, while Gin（fa_scan）
 - 07-15：Montero shows a real 3/5-slot edge over Ginn — BB/9 2.03 vs 4.02, xwOBACON .327 (pct95) vs .345, IP/GS 5.76 vs 5.33, backed by 298 BBE and improving 21d (-0.057) — so Step A's 'worth' read holds direc（fa_scan）
 
-### Brandon Nimmo (TEX, LF,CF,RF) [mlb_id:607043] — 觀察中
-觸發：立即行動
-vs：Ozzie Albies
-- 07-14：[取代→Ozzie Albies] xwOBA P95/HH P95雙年菁英+運氣-0.049 buy-low+PA-TG 4.00全職;14d OPS .760 Δ-0.048品質短降=進場窗;swap Albies→Nimmo OPS+0.052;71%owned較貴為唯一保留（fa_scan）
-- 07-15：[取代→Ozzie Albies] xwOBA P95/HH P95雙年菁英+運氣-0.049 buy-low;14d OPS .760 Δ-0.048短降=進場窗;swap Albies→Nimmo OPS+0.052;71%owned較貴列Cam Smith後;維持取代vs Albies（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -317,6 +311,9 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Brandon Nimmo (TEX, LF,CF,RF) — 被搶（自動偵測）
+- 2026-07-15：Yahoo ownership_type=team，從觀察中移除。
 
 ### Kyle Karros (COL, 3B) — 被搶（自動偵測）
 - 2026-07-08：Yahoo ownership_type=team，從觀察中移除。
