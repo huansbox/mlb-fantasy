@@ -276,6 +276,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-15：Montero shows a real 3/5-slot edge over Ginn — BB/9 2.03 vs 4.02, xwOBACON .327 (pct95) vs .345, IP/GS 5.76 vs 5.33, backed by 298 BBE and improving 21d (-0.057) — so Step A's 'worth' read holds direc（fa_scan）
 - 07-16：Montero's edge over P1 Ginn is real and multi-slot — IP/GS 5.76 vs 5.33, BB/9 2.03 (pct80) vs 4.02 (pct0), xwOBACON .327 (pct95) vs .345, with strong BBE 298 and 21d improving to .270 — but Whiff 17.3（fa_scan）
 - 07-17：Montero only beats McDonald in 2 of 5 slots (IP/GS 5.76 vs 5.1, BB/9 2.03 vs 2.85) while losing Whiff badly (17.3/p0 vs 21.3/p25, k9 6.01 vs 7.33) and GB (40.9 vs 55.1/p95), with xwOBACON a virtual ti（fa_scan）
+- 07-18：Montero (worth, 298 BBE) beats P1 McDonald only 2 of 5 slots — IP/GS 5.76 p70 vs 5.10 p0 and BB/9 1.97 p80 vs 2.85 p50 — while McDonald wins Whiff% (21.3 p25 vs 17.3 p0) and GB% (55.1 p95 vs 40.9 p40)（fa_scan）
 
 ## 隊上觀察
 
