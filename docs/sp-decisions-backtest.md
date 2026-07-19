@@ -371,3 +371,22 @@ Episodes:
 - 2026-06-17 (1d) `watch` watch Martín Pérez → **miss**
 - 2026-06-20 (1d) `pass` pass → **neutral**
 
+
+## Weekly Backtest 2026-07-19 (2026-06-23 ~ 2026-06-28)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 4 (actionable: 4; episodes in lookback: 19)
+- Hit rate: 50%
+- Average marginal benefit (xwOBACON Δ favoring add): -0.0767
+
+By action:
+- `drop_X_add_Y` n=3 (actionable 3) hit_rate=33%
+- `watch` n=1 (actionable 1) hit_rate=100%
+- `pass` n=0 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-06-23 (1d) `drop_X_add_Y` drop Walker Buehler → add Shane Drohan → **hit**, Δ +0.015
+- 2026-06-25 (1d) `watch` watch Shane Drohan → **hit**
+- 2026-06-27 (1d) `drop_X_add_Y` drop Joey Cantillo → add Shane Drohan → **miss**, Δ -0.073
+- 2026-06-28 (4d) `drop_X_add_Y` drop Kyle Leahy → add Slade Cecconi → **miss**, Δ -0.172
+
