@@ -301,11 +301,6 @@ vs：（無錨點 — 純 upside watch）
 - 07-19：Montero (worth, 304 BBE high-confidence) beats P1 McDonald on IP/GS 5.76 vs 5.10, BB/9 1.97 vs 2.85, WHIP 0.98 vs 1.30, and xERA 3.46 vs 3.88, with xwOBACON essentially tied (.325 vs .326) — McDonald（fa_scan）
 - 07-20：Montero beats P1 Cantillo in 3 of 5 slots by visible margin — IP/GS 5.76 vs 5.05, BB/9 1.97(pct80) vs 4.42(pct0), xwOBACON .325(pct95) vs .351 — plus WHIP 0.98 vs 1.42 and a confirmed probable start;（fa_scan）
 
-### Michael Busch (CHC, 1B) [mlb_id:683737] — 觀察中
-觸發：立即行動
-vs：Ozzie Albies
-- 07-19：[取代→Ozzie Albies] xwOBA P80/BB% P95雙年菁英+14d OPS .831 HR3+Savant Δ+0.019上升;健康主力81%owned;結構完勝Albies P40/P0;唯下週預期PA 0賽程輕（fa_scan）
-
 ## 隊上觀察
 
 > 自家球員的非數據脈絡：傷勢追蹤、角色變化、限局跡象、borderline anchor 驗證等。已驗證 / 失守 2 週後移除（git log 留痕）。
@@ -356,6 +351,9 @@ vs：Ozzie Albies
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Michael Busch (CHC, 1B) — 被搶（自動偵測）
+- 2026-07-20：Yahoo ownership_type=team，從觀察中移除。
 
 ### Brandon Nimmo (TEX, LF,CF,RF) — 被搶（自動偵測）
 - 2026-07-15：Yahoo ownership_type=team，從觀察中移除。
