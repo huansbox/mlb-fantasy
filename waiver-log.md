@@ -72,6 +72,7 @@
 - 07-18：14d OPS .627<.700跌破取代觸發(前.744)+AVG .188本週冷;xwOBA P80/Barrel P80雙年buy-low運氣-0.045結構仍勝Albies;連4日取代未執行+轉冷降回觀察讓位Moreno;vs Albies（fa_scan）
 - 07-19：14d OPS .602<.700續冷+AVG .180;xwOBA P80/Barrel P80運氣-0.046 buy-low結構仍勝Albies;未達取代觸發(K%<28+OPS>.700);vs Albies（fa_scan）
 - 07-20：14d OPS .405續崩自.602+AVG .140;xwOBA P80/Barrel P70雙年+運氣-0.047顯著buy-low結構仍勝Albies;未達取代觸發(K%<28+OPS>.700);讓位Pederson;vs Albies（fa_scan）
+- 07-21：14d OPS .413續崩+AVG .130;xwOBA P80/Barrel P70雙年+運氣-0.048顯著buy-low結構仍勝Albies;未達取代觸發(K%<28+OPS>.700);讓位Pederson;vs Albies（fa_scan）
 
 ### J.P. Crawford (SEA, SS) [mlb_id:641487] — 觀察中（Swanson 替代候選）
 觸發：Swanson 14d xwOBA Δ ≥-0.080 連 5 天 OR Crawford %owned 突破 30% → 立即取代 Swanson；
@@ -138,6 +139,7 @@
 - 07-18：14d OPS .613<.700續冷+Savant Δ-0.005;xwOBA P70/BB% P95底穩未破10%未達降級;%owned 9%<30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-19：14d OPS .586<.700續冷+Savant Δ+0.009;xwOBA P70/BB% P95底穩未達降級;%owned 9%<30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 - 07-20：14d OPS .655<.700續冷+Savant Δ+0.010;xwOBA P80/BB% P95底穩未破10%未達降級;%owned 9%<30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
+- 07-21：DTD日傷不即add;14d OPS .655<.700續冷+Savant Δ+0.019;xwOBA P80/BB% P95底穩未破10%未達降級;%owned 9%<30%;Swanson錨未過brand bias;鎖窗口watch（fa_scan）
 
 ### Spencer Torkelson (DET, 1B) [mlb_id:679529] — 觀察中
 觸發：14d K% ≤28% 連 5 天 + OPS ≥.750
@@ -177,6 +179,7 @@ vs：Mauricio Dubón
 - 07-18：14d K% 33.9>28觸發破線(counter重置)+OPS .699<.750兩線皆失;HR4RBI11 power但Savant Δ-0.083下滑三振風險未消;42%owned;vs Dubón（fa_scan）
 - 07-19：14d K% 34.5>28觸發未達+OPS .730<.750;HR5RBI13 power但Savant Δ-0.110下滑三振風險未消;42%owned;vs Dubón（fa_scan）
 - 07-20：14d K% 34.5>28觸發破線(counter重置)+OPS .730<.750;HR5RBI12 power但Savant Δ-0.110大幅下滑三振風險未消;42%owned;vs Dubón（fa_scan）
+- 07-21：14d K% 34.5>28觸發破線(counter重置)+OPS .577<.750;HR4RBI12 power但Savant Δ-0.072下滑三振風險未消;42%owned;vs Dubón（fa_scan）
 
 ### Royce Lewis (MIN, 1B,3B) [mlb_id:668904] — 觀察中
 觸發：PA-TG ≥3.0 連5天 + 14d OPS ≥.850 連5天
@@ -209,6 +212,7 @@ vs：Christian Walker
 - 07-18：PA-TG 2.65<3.0+14d OPS .777<.850兩項觸發皆未達;xwOBA P55+Savant Δ+0.060上升;35%owned;vs Christian Walker（fa_scan）
 - 07-19：DTD日傷觀察不立即add;PA-TG 2.63<3.0+14d OPS .777<.850兩觸發未達;Savant Δ+0.049上升;34%owned;vs Walker（fa_scan）
 - 07-20：PA-TG 2.64<3.0+14d OPS .786<.850兩觸發未達;xwOBA P55+Savant Δ+0.032上升;33%owned;vs Walker（fa_scan）
+- 07-21：PA-TG 2.65<3.0+14d OPS .753<.850兩觸發未達;xwOBA P55+Savant Δ+0.044上升;32%owned;vs Walker（fa_scan）
 
 ### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
 觸發：B2 2-step watch
@@ -217,29 +221,6 @@ vs：Christian Walker
 - 07-10：Gasser's raw edge over P1 Cantillo is real and multi-slot — IP/GS 5.42 vs 5.05, BB/9 2.91 vs 4.41, xwOBACON .322 vs .355, WHIP 1.18 vs 1.39 — but status NA with 0 next-week starts and GB% 29.6 (p0) ca（fa_scan）
 - 07-12：Gasser shows the real multi-slot edge Step A flagged (IP/GS 5.42 vs McDonald 4.94, xwOBACON .322 vs .334, BB/9 2.91, WHIP 1.18 vs 1.38, xERA 3.44 vs 4.05), but next_week_starts=0 means an immediate ad（fa_scan）
 - 07-13：Gasser's season edge over Cantillo is only a split, not a multi-slot win: he beats BB/9 (2.72 vs 4.37) and xwOBACON (.322 vs .355), but Cantillo dominates Whiff% (28.0 pct80 vs 23.2) and GB% (43.7 vs（fa_scan）
-
-### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 觀察中
-觸發：14d OPS ≥.850連5天 + PA-TG ≥3.0連5天
-vs：Ceddanne Rafaela
-- 07-02：xwOBA P60/Barrel% P70+14d .891/4HR/Savant Δ+0.061但PA-TG 2.36 platoon限局（fa_scan）
-- 07-03：xwOBA P60/Barrel P70+14d OPS .771(從.891回落)/3HR9RBI但PA-TG 2.39 platoon限局+Savant Δ+0.054;vs Rafaela（fa_scan）
-- 07-04：14d OPS .771<.850(從.891回落)+PA-TG 2.39 platoon限局兩項觸發未達+Savant Δ+0.035;vs Rafaela（fa_scan）
-- 07-05：14d OPS .731<.850+PA-TG 2.40 platoon限局兩項觸發未達+Savant Δ+0.038;xwOBA P60;vs Rafaela（fa_scan）
-- 07-06：14d OPS .742<.850+PA-TG 2.42 platoon限局兩項觸發未達+Savant Δ+0.057/xwOBA P60;vs Rafaela（fa_scan）
-- 07-07：14d OPS .742<.850+PA-TG 2.42 platoon限局兩項觸發未達+Savant Δ+0.056/xwOBA P60;vs Rafaela（fa_scan）
-- 07-08：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
-- 07-09：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
-- 07-10：14d OPS .763<.850+PA-TG 2.43 platoon<3.0兩項觸發未達+Savant Δ+0.054/xwOBA P60;vs Rafaela（fa_scan）
-- 07-11：14d OPS .746<.850+PA-TG 2.43<3.0兩項觸發未達+Savant Δ+0.044/xwOBA P60;vs Rafaela（fa_scan）
-- 07-12：14d OPS .799<.850+PA-TG 2.41<3.0兩項觸發未達+Savant Δ+0.001/xwOBA P60;vs Rafaela（fa_scan）
-- 07-13：14d OPS .713<.850+PA-TG 2.41<3.0兩項觸發未達+Savant Δ-0.010/xwOBA P60;vs Rafaela（fa_scan）
-- 07-14：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Savant Δ-0.070下滑/xwOBA P55;vs Rafaela（fa_scan）
-- 07-15：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Savant樣本不足(BBE13)/xwOBA P55;vs Rafaela（fa_scan）
-- 07-16：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Barrel P70/xwOBA P55;vs Rafaela（fa_scan）
-- 07-17：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Barrel P70/xwOBA P55;樣本不足BBE8;vs Rafaela（fa_scan）
-- 07-18：14d OPS .566<.850(續崩自.713)+PA-TG 2.40<3.0兩項未達;Barrel P70/xwOBA P55;樣本不足BBE8;vs Rafaela（fa_scan）
-- 07-19：14d OPS .451<.850續崩自.566+AVG .132;PA-TG 2.44<3.0兩項未達;Barrel P70/xwOBA P55;樣本不足BBE6;vs Rafaela（fa_scan）
-- 07-20：14d OPS .346續崩自.451+AVG .103第4連掃冷;PA-TG 2.43<3.0兩項未達;xwOBA P50/Barrel P70(prior P80)結構marginal但slump非死;樣本不足BBE9;近結案邊緣;vs Rafaela（fa_scan）
 
 ### Tommy Edman (LAD, 2B,3B,LF,CF) [mlb_id:669242] — 觀察中
 觸發：PA-TG≥3.0連5天+BBE達50
@@ -262,6 +243,7 @@ vs：Ozzie Albies
 - 07-18：xwOBA P95+14d OPS .855+BBE達50但PA-TG 0.83<3.0量能未確認(傷癒未回全職);運氣+0.013;鎖窗口watch;vs Albies（fa_scan）
 - 07-19：xwOBA P95+14d OPS .855+BBE達50但PA-TG 0.83<3.0量能未確認(傷癒未回全職);運氣+0.035;鎖窗口watch;vs Albies（fa_scan）
 - 07-20：xwOBA P95+14d OPS .883菁英但PA-TG 0.88<3.0(傷癒未回全職)+BBE 28<50量能未確認;運氣+0.038;鎖窗口watch;vs Albies（fa_scan）
+- 07-21：xwOBA P95+14d OPS .944菁英但PA-TG 0.92<3.0(傷癒未回全職)+BBE 30<50量能未確認;運氣+0.044;鎖窗口watch;vs Albies（fa_scan）
 
 ### Victor Bericoto (SF, LF,RF) [mlb_id:682674] — 觀察中
 觸發：Jung Hoo Lee 歸隊後仍每日先發 + season BBE ≥40 + BB% 回升 ≥5%
@@ -281,6 +263,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-18：IL10+Barrel P95/HH P70 power真但BBE低信心+BB% 1.69<P0+運氣+0.076灌水;繫Lee歸隊;純upside watch（fa_scan）
 - 07-19：IL10+Barrel P95/HH P70 power真但BBE低信心+BB% 1.69<P0+運氣+0.076灌水;繫Lee歸隊;純upside watch（fa_scan）
 - 07-20：IL10+Barrel P95/HH P70 power真但BBE 43低信心+BB% 1.69<P0+運氣+0.076灌水;繫Lee歸隊;純upside watch（fa_scan）
+- 07-21：IL10+Barrel P95/HH P70 power真但BBE 43低信心+BB% 1.69<P0+運氣+0.076灌水;繫Lee歸隊;純upside watch（fa_scan）
 
 ### Clay Holmes (NYM, SP) [mlb_id:605280] — 觀察中
 觸發：B2 2-step add
@@ -353,6 +336,30 @@ vs：（無錨點 — 純 upside watch）
 
 ## 已結案
 
+### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 已結案（fa_scan CLOSE）
+觸發：14d OPS ≥.850連5天 + PA-TG ≥3.0連5天
+vs：Ceddanne Rafaela
+- 07-02：xwOBA P60/Barrel% P70+14d .891/4HR/Savant Δ+0.061但PA-TG 2.36 platoon限局（fa_scan）
+- 07-03：xwOBA P60/Barrel P70+14d OPS .771(從.891回落)/3HR9RBI但PA-TG 2.39 platoon限局+Savant Δ+0.054;vs Rafaela（fa_scan）
+- 07-04：14d OPS .771<.850(從.891回落)+PA-TG 2.39 platoon限局兩項觸發未達+Savant Δ+0.035;vs Rafaela（fa_scan）
+- 07-05：14d OPS .731<.850+PA-TG 2.40 platoon限局兩項觸發未達+Savant Δ+0.038;xwOBA P60;vs Rafaela（fa_scan）
+- 07-06：14d OPS .742<.850+PA-TG 2.42 platoon限局兩項觸發未達+Savant Δ+0.057/xwOBA P60;vs Rafaela（fa_scan）
+- 07-07：14d OPS .742<.850+PA-TG 2.42 platoon限局兩項觸發未達+Savant Δ+0.056/xwOBA P60;vs Rafaela（fa_scan）
+- 07-08：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
+- 07-09：14d OPS .790<.850+PA-TG 2.44 platoon限局兩項觸發未達+Savant Δ+0.045/xwOBA P60;vs Rafaela（fa_scan）
+- 07-10：14d OPS .763<.850+PA-TG 2.43 platoon<3.0兩項觸發未達+Savant Δ+0.054/xwOBA P60;vs Rafaela（fa_scan）
+- 07-11：14d OPS .746<.850+PA-TG 2.43<3.0兩項觸發未達+Savant Δ+0.044/xwOBA P60;vs Rafaela（fa_scan）
+- 07-12：14d OPS .799<.850+PA-TG 2.41<3.0兩項觸發未達+Savant Δ+0.001/xwOBA P60;vs Rafaela（fa_scan）
+- 07-13：14d OPS .713<.850+PA-TG 2.41<3.0兩項觸發未達+Savant Δ-0.010/xwOBA P60;vs Rafaela（fa_scan）
+- 07-14：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Savant Δ-0.070下滑/xwOBA P55;vs Rafaela（fa_scan）
+- 07-15：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Savant樣本不足(BBE13)/xwOBA P55;vs Rafaela（fa_scan）
+- 07-16：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Barrel P70/xwOBA P55;vs Rafaela（fa_scan）
+- 07-17：14d OPS .713<.850+PA-TG 2.41<3.0兩項未達+Barrel P70/xwOBA P55;樣本不足BBE8;vs Rafaela（fa_scan）
+- 07-18：14d OPS .566<.850(續崩自.713)+PA-TG 2.40<3.0兩項未達;Barrel P70/xwOBA P55;樣本不足BBE8;vs Rafaela（fa_scan）
+- 07-19：14d OPS .451<.850續崩自.566+AVG .132;PA-TG 2.44<3.0兩項未達;Barrel P70/xwOBA P55;樣本不足BBE6;vs Rafaela（fa_scan）
+- 07-20：14d OPS .346續崩自.451+AVG .103第4連掃冷;PA-TG 2.43<3.0兩項未達;xwOBA P50/Barrel P70(prior P80)結構marginal但slump非死;樣本不足BBE9;近結案邊緣;vs Rafaela（fa_scan）
+- 07-21：[結案] 14d OPS .220第5連掃冷續崩(自.346)+PA-TG 2.46<3.0上場受限;觸發(OPS≥.850+PA-TG≥3.0連5天)遠未達且14d無改善;錨點Rafaela受hold保護不可drop=已不具add價值（fa_scan）
+
 ### Michael Busch (CHC, 1B) — 被搶（自動偵測）
 - 2026-07-20：Yahoo ownership_type=team，從觀察中移除。
 
@@ -364,6 +371,7 @@ vs：（無錨點 — 純 upside watch）
 
 ### Josh Bell (MIN, 1B) — 被搶（自動偵測）
 - 2026-07-07：Yahoo ownership_type=team，從觀察中移除。
+- 07-21：14d OPS .922 HR3熱+prior xwOBA P95雙年結構;但預期下週PA 0替補少先發無即戰力+chase+3.9+Savant Δ-0.043;watch待先發回歸（fa_scan）
 
 ### Andrew Benintendi (CWS, LF) [mlb_id:643217] — 已結案（fa_scan CLOSE）
 觸發：14d OPS ≥.800 維持 7 天 + Savant Δ 連 5 天正值 → 升級取代 Albies
@@ -689,6 +697,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-18：xwOBA .352 P95/BB% P95/Barrel P70;14d 5HR/OPS .868純power;保留PA-TG 3.03 platoon+K% 30;HR/RBI/R差異化;vs Albies（fa_scan）
 - 07-19：xwOBA P95菁英+14d HR5 R8+BB% P80;健康3%owned免費power;K% 30+zone-contact -4.2+PA-TG 3.04量能待確認故觀察（fa_scan）
 - 07-20：[取代→Ozzie Albies] xwOBA P95/BB% P80/Barrel P70碾壓Albies P40/P0/P0;14d OPS .819/HR4/R7 vs Albies .606/HR1;健康PA-TG 3.05正常先發;K% 32.7唯一顧慮;3%owned便宜;取代vs Albies（fa_scan）
+- 07-21：[取代→Ozzie Albies] xwOBA P95/BB% P80/Barrel P70雙年菁英+14d OPS .970 HR5 R8+Savant Δ+0.020品質上升+運氣-0.003中性;PA-TG 3.05健康有上場;取代vs Albies(P40/P0/P0結構死+Δ-0.075);K% 31.9為唯一雜訊（fa_scan）
 
 ### Curtis Mead (WSH, 1B,2B,3B) — 被搶（自動偵測）
 - 2026-06-02：Yahoo ownership_type=team，從觀察中移除。
@@ -737,6 +746,7 @@ vs：（無錨點 — 純 upside watch）
 - 06-30：xwOBA P80/BB% P95+14d .916/3HR/11R+Savant Δ+0.076上升;但IL10 claim浪費名額不add;等脫IL再評（fa_scan）
 - 07-18：xwOBA .339 P80/BB% P95雙年菁英+14d OPS .916/3HR品質夠;但IL10佔slot不可即上場+Albies非slump-hold四條件不成立;純追蹤等歸隊;vs Albies（fa_scan）
 - 07-20：IL10無法立即上場;xwOBA P80/BB% P95+14d OPS .916結構+當週俱佳但HH% P0非雙年菁英+回歸時程不明→不IL stash等回歸（fa_scan）
+- 07-21：IL10短期不可即上場;14d OPS .916/BB% P95/xwOBA P80菁英+HR3 R11;claim佔IL格且四項IL-stash條件未全滿足,watch待歸隊（fa_scan）
 
 ### Carlos Cortes (ATH, LF,RF) — 被搶（自動偵測）
 - 2026-05-26：Yahoo ownership_type=team，從觀察中移除。
