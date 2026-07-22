@@ -386,6 +386,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Cam Smith",
+   "verdict": "watch",
+   "ts": "2026-07-22",
+   "add_reason": "xwOBA .337 / BB% 9.15 / Barrel% 12.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Isaac Paredes": [
@@ -753,6 +762,15 @@
    "player": "J.P. Crawford",
    "verdict": "watch",
    "ts": "2026-07-21",
+   "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "J.P. Crawford",
+   "verdict": "watch",
+   "ts": "2026-07-22",
    "add_reason": "xwOBA .357 / BB% 14.69 / Barrel% 9.1 / 14d xwOBA .415",
    "channel": "structure",
    "stars": 4,
@@ -2170,6 +2188,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Joc Pederson",
+   "verdict": "立即取代",
+   "ts": "2026-07-22",
+   "add_reason": "xwOBA .353 / BB% 12.67 / Barrel% 9.8",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Spencer Torkelson": [
@@ -2496,6 +2523,15 @@
    "channel": "structure",
    "stars": 4,
    "executed_ts": null
+  },
+  {
+   "player": "Spencer Torkelson",
+   "verdict": "watch",
+   "ts": "2026-07-22",
+   "add_reason": "xwOBA .313 / BB% 11.31 / Barrel% 13.8",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
   }
  ],
  "Gabriel Moreno": [
@@ -2646,6 +2682,15 @@
    "player": "Trevor Larnach",
    "verdict": "watch",
    "ts": "2026-06-24",
+   "add_reason": "xwOBA .335 / BB% 12.27 / Barrel% 6.9 / 14d xwOBA .441",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
+  },
+  {
+   "player": "Trevor Larnach",
+   "verdict": "取代",
+   "ts": "2026-07-22",
    "add_reason": "xwOBA .335 / BB% 12.27 / Barrel% 6.9 / 14d xwOBA .441",
    "channel": "structure",
    "stars": 3,
@@ -2998,6 +3043,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Royce Lewis",
+   "verdict": "watch",
+   "ts": "2026-07-22",
+   "add_reason": "xwOBA .298 / BB% 9.78 / Barrel% 12.7",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Teoscar Hernández": [
@@ -3209,6 +3263,15 @@
    "player": "Spencer Horwitz",
    "verdict": "watch",
    "ts": "2026-07-21",
+   "add_reason": "xwOBA .339 / BB% 13.56 / Barrel% 8.6 / 14d xwOBA .399",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "Spencer Horwitz",
+   "verdict": "watch",
+   "ts": "2026-07-22",
    "add_reason": "xwOBA .339 / BB% 13.56 / Barrel% 8.6 / 14d xwOBA .399",
    "channel": "structure",
    "stars": 4,
@@ -3830,6 +3893,15 @@
    "channel": "structure",
    "stars": 3,
    "executed_ts": null
+  },
+  {
+   "player": "Tommy Edman",
+   "verdict": "watch",
+   "ts": "2026-07-22",
+   "add_reason": "xwOBA .375 / BB% 10.2 / Barrel% 9.4",
+   "channel": "structure",
+   "stars": 3,
+   "executed_ts": null
   }
  ],
  "Josh Bell": [
@@ -4003,6 +4075,15 @@
    "player": "Victor Bericoto",
    "verdict": "watch",
    "ts": "2026-07-21",
+   "add_reason": "xwOBA .298 / BB% 1.92 / Barrel% 14.7 / 14d xwOBA .378",
+   "channel": "heat",
+   "stars": 1,
+   "executed_ts": null
+  },
+  {
+   "player": "Victor Bericoto",
+   "verdict": "watch",
+   "ts": "2026-07-22",
    "add_reason": "xwOBA .298 / BB% 1.92 / Barrel% 14.7 / 14d xwOBA .378",
    "channel": "heat",
    "stars": 1,
@@ -4375,6 +4456,15 @@
    "player": "Jac Caglianone",
    "verdict": "watch",
    "ts": "2026-07-15",
+   "add_reason": "xwOBA .357 / BB% 7.16 / Barrel% 14.7",
+   "channel": "structure",
+   "stars": 4,
+   "executed_ts": null
+  },
+  {
+   "player": "Jac Caglianone",
+   "verdict": "watch",
+   "ts": "2026-07-22",
    "add_reason": "xwOBA .357 / BB% 7.16 / Barrel% 14.7",
    "channel": "structure",
    "stars": 4,
