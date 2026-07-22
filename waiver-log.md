@@ -284,6 +284,7 @@ vs：（無錨點 — 純 upside watch）
 - 07-19：Montero (worth, 304 BBE high-confidence) beats P1 McDonald on IP/GS 5.76 vs 5.10, BB/9 1.97 vs 2.85, WHIP 0.98 vs 1.30, and xERA 3.46 vs 3.88, with xwOBACON essentially tied (.325 vs .326) — McDonald（fa_scan）
 - 07-20：Montero beats P1 Cantillo in 3 of 5 slots by visible margin — IP/GS 5.76 vs 5.05, BB/9 1.97(pct80) vs 4.42(pct0), xwOBACON .325(pct95) vs .351 — plus WHIP 0.98 vs 1.42 and a confirmed probable start;（fa_scan）
 - 07-21：Montero has a real but non-dominant edge over P1 McDonald — he wins IP/GS (5.76 pct70 vs 5.02 pct0) and BB/9 (1.97 pct80 vs 2.94 pct50) with matching elite xwOBACON (.325 vs .326), but McDonald wins W（fa_scan）
+- 07-22：Montero is the only `worth` FA and clears my P1 (McDonald, IL15/BN) on 3 of 5 slots — IP/GS 5.76 vs 5.02, BB/9 1.97 vs 2.94, xwOBACON .325 vs .328 — plus WHIP 0.98 vs 1.31 on a robust 304 BBE (32 in 2（fa_scan）
 
 ## 隊上觀察
 
