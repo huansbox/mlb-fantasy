@@ -218,14 +218,6 @@ vs：Christian Walker
 - 07-21：PA-TG 2.65<3.0+14d OPS .753<.850兩觸發未達;xwOBA P55+Savant Δ+0.044上升;32%owned;vs Walker（fa_scan）
 - 07-22：PA-TG 2.67<3.0+14d OPS .717<.850兩觸發未達;xwOBA P55+Savant Δ+0.064上升;32%owned;vs Christian Walker（fa_scan）
 
-### Robert Gasser (MIL, SP) [mlb_id:688107] — 觀察中
-觸發：B2 2-step watch
-- 07-02：Leahy's ugly season line (xwOBACON 0.415 pct0, xERA 5.74) is undercut by a strong 21d surge — 0.334 on 62 BBE (Δ -0.081), so the deterioration signal points away from dropping him. Gasser shows the cl（fa_scan）
-- 07-08：Gasser holds a real 3/5-slot edge over P1 Cantillo — IP/GS 5.42 (p45) vs 5.05 (p0), BB/9 2.91 vs 4.41, and xwOBACON .317 (p95) vs .362 (p60) — but he loses Whiff% (23.5 vs 27.7) and GB% (29.4 p0 vs 42（fa_scan）
-- 07-10：Gasser's raw edge over P1 Cantillo is real and multi-slot — IP/GS 5.42 vs 5.05, BB/9 2.91 vs 4.41, xwOBACON .322 vs .355, WHIP 1.18 vs 1.39 — but status NA with 0 next-week starts and GB% 29.6 (p0) ca（fa_scan）
-- 07-12：Gasser shows the real multi-slot edge Step A flagged (IP/GS 5.42 vs McDonald 4.94, xwOBACON .322 vs .334, BB/9 2.91, WHIP 1.18 vs 1.38, xERA 3.44 vs 4.05), but next_week_starts=0 means an immediate ad（fa_scan）
-- 07-13：Gasser's season edge over Cantillo is only a split, not a multi-slot win: he beats BB/9 (2.72 vs 4.37) and xwOBACON (.322 vs .355), but Cantillo dominates Whiff% (28.0 pct80 vs 23.2) and GB% (43.7 vs（fa_scan）
-
 ### Tommy Edman (LAD, 2B,3B,LF,CF) [mlb_id:669242] — 觀察中
 觸發：PA-TG≥3.0連5天+BBE達50
 vs：Ozzie Albies
@@ -342,6 +334,9 @@ vs：（無錨點 — 純 upside watch）
 - 結構弱點仍在：BB% P0 / HH% P25 + season 運氣 +0.051 顯著（賣高側）— 但選球進化軌道 + SB 差異化 + CF 深度 = hold 而非 drop
 
 ## 已結案
+
+### Robert Gasser (MIL, SP) — 被搶（自動偵測）
+- 2026-07-25：Yahoo ownership_type=team，從觀察中移除。
 
 ### Kerry Carpenter (DET, LF,RF) [mlb_id:681481] — 已結案（fa_scan CLOSE）
 觸發：14d OPS ≥.850連5天 + PA-TG ≥3.0連5天
