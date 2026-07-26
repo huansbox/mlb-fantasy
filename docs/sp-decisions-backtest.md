@@ -390,3 +390,21 @@ Episodes:
 - 2026-06-27 (1d) `drop_X_add_Y` drop Joey Cantillo → add Shane Drohan → **miss**, Δ -0.073
 - 2026-06-28 (4d) `drop_X_add_Y` drop Kyle Leahy → add Slade Cecconi → **miss**, Δ -0.172
 
+
+## Weekly Backtest 2026-07-26 (2026-07-02 ~ 2026-07-04)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 3 (actionable: 3; episodes in lookback: 19)
+- Hit rate: 67%
+- Average marginal benefit (xwOBACON Δ favoring add): +0.0640
+
+By action:
+- `drop_X_add_Y` n=1 (actionable 1) hit_rate=100%
+- `watch` n=2 (actionable 2) hit_rate=50%
+- `pass` n=0 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-07-02 (1d) `watch` watch Robert Gasser → **miss**
+- 2026-07-03 (1d) `watch` watch Trevor McDonald → **hit**
+- 2026-07-04 (2d) `drop_X_add_Y` drop Ryan Johnson → add Trevor McDonald → **hit**, Δ +0.064
+

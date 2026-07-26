@@ -153,3 +153,34 @@ Episodes:
 - 2026-06-26 (1d) `watch` watch Trent Grisham vs Ozzie Albies → 機械比數 FA 2W-3L-1T → 裁判 J1 B·勉強 / J2 B·勉強 ⇒ 難分 → **hit** 〔not executed〕
 - 2026-06-28 (1d) `watch` watch A.J. Ewing vs Ozzie Albies → 機械比數 FA 3W-2L-1T → 裁判 J1 A·明顯 / J2 A·明顯 ⇒ adopted A → **miss** 〔not executed〕
 
+
+## Weekly Batter Backtest 2026-07-26 (2026-06-29 ~ 2026-07-05)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 16 (replace 7 / watch 9; episodes in lookback: 63)
+- ⚠️ Judge panel FAILED（2 calls，輸出契約連續違反，failed_judge=judge_1）— outcomes 留 **pending-judge**；本批帳下週會老化出 [21, 28) 窗，需手動 `--age-min/--age-max` 重跑補判
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 0（hit-rate —）/ not-executed 16（hit-rate —）
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 0/0 (—) / ≤3★ 0/0 (—)
+- ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 0
+
+Episodes:
+- 2026-06-29 (2d) `replace/取代` add Joc Pederson ⇄ drop Christian Walker → 機械比數 FA 5W-0L-1T → **pending-judge** 〔not executed〕
+- 2026-06-29 (2d) `replace/取代` add Kody Clemens ⇄ drop Ozzie Albies → 機械比數 FA 5W-1L-0T → **pending-judge** 〔not executed〕
+- 2026-06-29 (1d) `watch` watch Curtis Mead vs Christian Walker → 機械比數 FA 6W-0L-0T → **pending-judge** 〔not executed〕
+- 2026-06-30 (1d) `watch` watch Dominic Canzone vs Christian Walker → 機械比數 FA 3W-2L-1T → **pending-judge** 〔not executed〕
+- 2026-07-01 (2d) `replace/取代` add Dominic Canzone ⇄ drop Ozzie Albies → 機械比數 FA 1W-5L-0T → **pending-judge** 〔not executed〕
+- 2026-07-01 (2d) `replace/立即取代` add Joc Pederson ⇄ drop Ozzie Albies → 機械比數 FA 2W-3L-1T → **pending-judge** 〔not executed〕
+- 2026-07-02 (1d) `replace/立即取代` add Joc Pederson ⇄ drop Ceddanne Rafaela → 機械比數 FA 4W-2L-0T → **pending-judge** 〔not executed〕
+- 2026-07-02 (1d) `watch` watch A.J. Ewing vs Ceddanne Rafaela → 機械比數 FA 4W-2L-0T → **pending-judge** 〔not executed〕
+- 2026-07-02 (1d) `watch` watch Kerry Carpenter vs Ceddanne Rafaela → 機械比數 FA 0W-5L-1T → **pending-judge** 〔not executed〕
+- 2026-07-03 (1d) `watch` watch A.J. Ewing vs Ozzie Albies → 機械比數 FA 2W-3L-1T → **pending-judge** 〔not executed〕
+- 2026-07-03 (5d) `watch` watch Gavin Sheets vs Ozzie Albies → 機械比數 FA 1W-5L-0T → **pending-judge** 〔not executed〕
+- 2026-07-03 (1d) `watch` watch Tommy Edman vs Ozzie Albies → 機械比數 FA 2W-2L-2T → **pending-judge** 〔not executed〕
+- 2026-07-04 (2d) `replace/取代` add Joc Pederson ⇄ drop Christian Walker → 機械比數 FA 4W-0L-2T → **pending-judge** 〔not executed〕
+- 2026-07-04 (3d) `replace/立即取代` add Trent Grisham ⇄ drop Ozzie Albies → 機械比數 FA 1W-4L-1T → **pending-judge** 〔not executed〕
+- 2026-07-04 (2d) `watch` watch Dominic Canzone vs Ozzie Albies → 機械比數 FA 1W-3L-2T → **pending-judge** 〔not executed〕
+- 2026-07-05 (1d) `watch` watch Josh Bell vs Christian Walker → 機械比數 FA 3W-3L-0T → **pending-judge** 〔not executed〕
+
