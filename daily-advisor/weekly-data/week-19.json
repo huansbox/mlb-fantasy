@@ -1,0 +1,1595 @@
+{
+  "week": 19,
+  "dates": [
+    "2026-07-27",
+    "2026-08-02"
+  ],
+  "generated": "2026-07-27T01:00:26.420527-04:00",
+  "review": {
+    "opponent_name": "Fantasy 9Tsai",
+    "categories": [
+      {
+        "name": "R",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "HR",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "RBI",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "SB",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "BB",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "AVG",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "OPS",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "IP",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "W",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "K",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "ERA",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "WHIP",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "QS",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      },
+      {
+        "name": "SV+H",
+        "mine": 0.0,
+        "opp": 0.0,
+        "result": "D"
+      }
+    ],
+    "final_record": {
+      "wins": 0,
+      "losses": 0,
+      "draws": 14
+    },
+    "league_category_ranks": {
+      "R": 10,
+      "HR": 10,
+      "RBI": 10,
+      "SB": 10,
+      "BB": 10,
+      "AVG": 10,
+      "OPS": 10,
+      "IP": 10,
+      "W": 10,
+      "K": 10,
+      "ERA": 10,
+      "WHIP": 10,
+      "QS": 10,
+      "SV+H": 10
+    },
+    "daily_reports": [],
+    "my_roster_performance": {
+      "batters": [
+        {
+          "name": "Shea Langeliers",
+          "team": "ATH",
+          "positions": [
+            "C"
+          ],
+          "selected_pos": "C",
+          "weekly": {
+            "games": 4,
+            "pa": 17,
+            "r": 2,
+            "hr": 1,
+            "rbi": 1,
+            "sb": 0,
+            "bb": 2,
+            "avg": 0.333,
+            "ops": 1.012
+          },
+          "season": {
+            "g": 93,
+            "pa": 416,
+            "ops": ".829",
+            "hr": 23,
+            "bb_pct": 8.2,
+            "xwoba": 0.363,
+            "hh_pct": 45.6,
+            "barrel_pct": 14.9,
+            "bbe": 281
+          },
+          "pctiles": {
+            "xwoba": "(>P90)",
+            "bb_pct": "(P55-60)",
+            "barrel_pct": "(>P90)",
+            "hh_pct": "(P70-80)"
+          }
+        },
+        {
+          "name": "Christian Walker",
+          "team": "HOU",
+          "positions": [
+            "1B"
+          ],
+          "selected_pos": "BN",
+          "weekly": {
+            "games": 5,
+            "pa": 17,
+            "r": 1,
+            "hr": 0,
+            "rbi": 3,
+            "sb": 0,
+            "bb": 1,
+            "avg": 0.188,
+            "ops": 0.485
+          },
+          "season": {
+            "g": 103,
+            "pa": 423,
+            "ops": ".754",
+            "hr": 20,
+            "bb_pct": 8.0,
+            "xwoba": 0.295,
+            "hh_pct": 42.1,
+            "barrel_pct": 9.6,
+            "bbe": 280
+          },
+          "pctiles": {
+            "xwoba": "(P45-50)",
+            "bb_pct": "(P50-55)",
+            "barrel_pct": "(P60-70)",
+            "hh_pct": "(P55-60)"
+          }
+        },
+        {
+          "name": "Jazz Chisholm Jr.",
+          "team": "NYY",
+          "positions": [
+            "2B",
+            "3B"
+          ],
+          "selected_pos": "Util",
+          "weekly": {
+            "games": 4,
+            "pa": 16,
+            "r": 2,
+            "hr": 2,
+            "rbi": 5,
+            "sb": 1,
+            "bb": 0,
+            "avg": 0.188,
+            "ops": 0.75
+          },
+          "season": {
+            "g": 98,
+            "pa": 387,
+            "ops": ".707",
+            "hr": 16,
+            "bb_pct": 9.6,
+            "xwoba": 0.291,
+            "hh_pct": 41.8,
+            "barrel_pct": 9.5,
+            "bbe": 232
+          },
+          "pctiles": {
+            "xwoba": "(P40-45)",
+            "bb_pct": "(P70-80)",
+            "barrel_pct": "(P60-70)",
+            "hh_pct": "(P55-60)"
+          }
+        },
+        {
+          "name": "Manny Machado",
+          "team": "SD",
+          "positions": [
+            "3B"
+          ],
+          "selected_pos": "3B",
+          "weekly": {
+            "games": 7,
+            "pa": 33,
+            "r": 7,
+            "hr": 4,
+            "rbi": 7,
+            "sb": 0,
+            "bb": 1,
+            "avg": 0.344,
+            "ops": 1.145
+          },
+          "season": {
+            "g": 103,
+            "pa": 437,
+            "ops": ".734",
+            "hr": 23,
+            "bb_pct": 11.2,
+            "xwoba": 0.327,
+            "hh_pct": 44.1,
+            "barrel_pct": 10.8,
+            "bbe": 288
+          },
+          "pctiles": {
+            "xwoba": "(P70-80)",
+            "bb_pct": "(P80-90)",
+            "barrel_pct": "(P70-80)",
+            "hh_pct": "(P60-70)"
+          }
+        },
+        {
+          "name": "Byron Buxton",
+          "team": "MIN",
+          "positions": [
+            "CF"
+          ],
+          "selected_pos": "CF",
+          "weekly": {
+            "games": 6,
+            "pa": 25,
+            "r": 0,
+            "hr": 0,
+            "rbi": 0,
+            "sb": 0,
+            "bb": 1,
+            "avg": 0.174,
+            "ops": 0.414
+          },
+          "season": {
+            "g": 81,
+            "pa": 360,
+            "ops": ".869",
+            "hr": 25,
+            "bb_pct": 6.7,
+            "xwoba": 0.351,
+            "hh_pct": 48.1,
+            "barrel_pct": 18.0,
+            "bbe": 239
+          },
+          "pctiles": {
+            "xwoba": "(>P90)",
+            "bb_pct": "(P25-40)",
+            "barrel_pct": "(>P90)",
+            "hh_pct": "(P80-90)"
+          }
+        },
+        {
+          "name": "Ozzie Albies",
+          "team": "ATL",
+          "positions": [
+            "2B"
+          ],
+          "selected_pos": "2B",
+          "weekly": {
+            "games": 7,
+            "pa": 33,
+            "r": 5,
+            "hr": 3,
+            "rbi": 4,
+            "sb": 0,
+            "bb": 1,
+            "avg": 0.219,
+            "ops": 0.742
+          },
+          "season": {
+            "g": 105,
+            "pa": 458,
+            "ops": ".744",
+            "hr": 17,
+            "bb_pct": 6.6,
+            "xwoba": 0.285,
+            "hh_pct": 27.4,
+            "barrel_pct": 4.3,
+            "bbe": 350
+          },
+          "pctiles": {
+            "xwoba": "(P25-40)",
+            "bb_pct": "(P25-40)",
+            "barrel_pct": "(<P25)",
+            "hh_pct": "(<P25)"
+          }
+        },
+        {
+          "name": "Jordan Walker",
+          "team": "STL",
+          "positions": [
+            "LF",
+            "RF"
+          ],
+          "selected_pos": "LF",
+          "weekly": {
+            "games": 7,
+            "pa": 29,
+            "r": 2,
+            "hr": 0,
+            "rbi": 1,
+            "sb": 1,
+            "bb": 1,
+            "avg": 0.214,
+            "ops": 0.563
+          },
+          "season": {
+            "g": 103,
+            "pa": 439,
+            "ops": ".856",
+            "hr": 22,
+            "bb_pct": 8.0,
+            "xwoba": 0.364,
+            "hh_pct": 49.8,
+            "barrel_pct": 13.8,
+            "bbe": 289
+          },
+          "pctiles": {
+            "xwoba": "(>P90)",
+            "bb_pct": "(P50-55)",
+            "barrel_pct": "(P80-90)",
+            "hh_pct": "(>P90)"
+          }
+        },
+        {
+          "name": "Luis Arraez",
+          "team": "SF",
+          "positions": [
+            "1B",
+            "2B"
+          ],
+          "selected_pos": "BN",
+          "weekly": {
+            "games": 5,
+            "pa": 22,
+            "r": 2,
+            "hr": 0,
+            "rbi": 4,
+            "sb": 0,
+            "bb": 0,
+            "avg": 0.333,
+            "ops": 0.714
+          },
+          "season": {
+            "g": 99,
+            "pa": 438,
+            "ops": ".814",
+            "hr": 4,
+            "bb_pct": 5.7,
+            "xwoba": 0.304,
+            "hh_pct": 21.0,
+            "barrel_pct": 0.5,
+            "bbe": 386
+          },
+          "pctiles": {
+            "xwoba": "(P55-60)",
+            "bb_pct": "(<P25)",
+            "barrel_pct": "(<P25)",
+            "hh_pct": "(<P25)"
+          }
+        },
+        {
+          "name": "Gleyber Torres",
+          "team": "DET",
+          "positions": [
+            "2B"
+          ],
+          "selected_pos": "BN",
+          "weekly": {
+            "games": 6,
+            "pa": 26,
+            "r": 2,
+            "hr": 0,
+            "rbi": 0,
+            "sb": 0,
+            "bb": 5,
+            "avg": 0.19,
+            "ops": 0.537
+          },
+          "season": {
+            "g": 49,
+            "pa": 216,
+            "ops": ".760",
+            "hr": 4,
+            "bb_pct": 15.7,
+            "xwoba": 0.343,
+            "hh_pct": 30.1,
+            "barrel_pct": 7.4,
+            "bbe": 136
+          },
+          "pctiles": {
+            "xwoba": "(P80-90)",
+            "bb_pct": "(>P90)",
+            "barrel_pct": "(P45-50)",
+            "hh_pct": "(<P25)"
+          }
+        },
+        {
+          "name": "Mauricio Dubón",
+          "team": "ATL",
+          "positions": [
+            "2B",
+            "3B",
+            "SS",
+            "LF",
+            "CF"
+          ],
+          "selected_pos": "SS",
+          "weekly": {
+            "games": 7,
+            "pa": 30,
+            "r": 4,
+            "hr": 0,
+            "rbi": 2,
+            "sb": 0,
+            "bb": 2,
+            "avg": 0.2,
+            "ops": 0.499
+          },
+          "season": {
+            "g": 101,
+            "pa": 416,
+            "ops": ".719",
+            "hr": 10,
+            "bb_pct": 6.5,
+            "xwoba": 0.312,
+            "hh_pct": 31.1,
+            "barrel_pct": 4.7,
+            "bbe": 322
+          },
+          "pctiles": {
+            "xwoba": "(P60-70)",
+            "bb_pct": "(P25-40)",
+            "barrel_pct": "(P25-40)",
+            "hh_pct": "(<P25)"
+          }
+        },
+        {
+          "name": "Victor Caratini",
+          "team": "MIN",
+          "positions": [
+            "C",
+            "1B"
+          ],
+          "selected_pos": "1B",
+          "weekly": {
+            "games": 5,
+            "pa": 17,
+            "r": 0,
+            "hr": 0,
+            "rbi": 1,
+            "sb": 0,
+            "bb": 0,
+            "avg": 0.176,
+            "ops": 0.412
+          },
+          "season": {
+            "g": 77,
+            "pa": 289,
+            "ops": ".680",
+            "hr": 7,
+            "bb_pct": 9.0,
+            "xwoba": 0.328,
+            "hh_pct": 38.9,
+            "barrel_pct": 7.1,
+            "bbe": 198
+          },
+          "pctiles": {
+            "xwoba": "(P70-80)",
+            "bb_pct": "(P60-70)",
+            "barrel_pct": "(P45-50)",
+            "hh_pct": "(P40-45)"
+          }
+        },
+        {
+          "name": "Curtis Mead",
+          "team": "WSH",
+          "positions": [
+            "1B",
+            "2B",
+            "3B"
+          ],
+          "selected_pos": "Util",
+          "weekly": {
+            "games": 4,
+            "pa": 18,
+            "r": 2,
+            "hr": 0,
+            "rbi": 0,
+            "sb": 0,
+            "bb": 4,
+            "avg": 0.214,
+            "ops": 0.675
+          },
+          "season": {
+            "g": 87,
+            "pa": 327,
+            "ops": ".852",
+            "hr": 17,
+            "bb_pct": 11.9,
+            "xwoba": 0.358,
+            "hh_pct": 42.3,
+            "barrel_pct": 10.8,
+            "bbe": 222
+          },
+          "pctiles": {
+            "xwoba": "(>P90)",
+            "bb_pct": "(P80-90)",
+            "barrel_pct": "(P70-80)",
+            "hh_pct": "(P55-60)"
+          }
+        }
+      ],
+      "pitchers": [
+        {
+          "name": "Tarik Skubal",
+          "team": "DET",
+          "type": "SP",
+          "selected_pos": "SP",
+          "weekly": {
+            "starts": 1,
+            "ip": 7.3,
+            "w": 1,
+            "k": 12,
+            "qs": 1,
+            "era": 1.23,
+            "whip": 0.82
+          },
+          "season": {
+            "gs": 15,
+            "ip": "90.0",
+            "era": 2.7,
+            "whip": "0.92",
+            "k": 110,
+            "w": 7,
+            "qs": 8,
+            "ip_gs": 6.0,
+            "whiff_pct": 32.27408513816281,
+            "bb9": 1.3,
+            "gb_pct": 48.19819819819818,
+            "xwobacon": 0.363,
+            "xera": 2.9,
+            "xwoba_allowed": null,
+            "bbe": 222
+          },
+          "pctiles": {
+            "ip_gs": "(P80-90)",
+            "whiff_pct": "(>P90)",
+            "bb9": "(>P90)",
+            "gb_pct": "(P70-80)",
+            "xwobacon": "(P60-70)",
+            "xera": "(>P90)"
+          }
+        },
+        {
+          "name": "Chris Sale",
+          "team": "ATL",
+          "type": "SP",
+          "selected_pos": "SP",
+          "weekly": {
+            "starts": 1,
+            "ip": 6.0,
+            "w": 1,
+            "k": 11,
+            "qs": 1,
+            "era": 4.5,
+            "whip": 1.0
+          },
+          "season": {
+            "gs": 19,
+            "ip": "111.0",
+            "era": 2.19,
+            "whip": "1.05",
+            "k": 134,
+            "w": 11,
+            "qs": 12,
+            "ip_gs": 5.84,
+            "whiff_pct": 30.69023702031603,
+            "bb9": 2.108108108108108,
+            "gb_pct": 44.839857651245545,
+            "xwobacon": 0.354,
+            "xera": 3.18,
+            "xwoba_allowed": null,
+            "bbe": 281
+          },
+          "pctiles": {
+            "ip_gs": "(P70-80)",
+            "whiff_pct": "(>P90)",
+            "bb9": "(P80-90)",
+            "gb_pct": "(P60-70)",
+            "xwobacon": "(P70-80)",
+            "xera": "(P80-90)"
+          }
+        },
+        {
+          "name": "Parker Messick",
+          "team": "CLE",
+          "type": "SP",
+          "selected_pos": "P",
+          "weekly": {
+            "starts": 2,
+            "ip": 13.3,
+            "w": 0,
+            "k": 12,
+            "qs": 1,
+            "era": 1.35,
+            "whip": 0.75
+          },
+          "season": {
+            "gs": 21,
+            "ip": "125.1",
+            "era": 2.59,
+            "whip": "1.04",
+            "k": 122,
+            "w": 8,
+            "qs": 8,
+            "ip_gs": 5.97,
+            "whiff_pct": 24.861711464618757,
+            "bb9": 2.585106382978724,
+            "gb_pct": 44.90445859872611,
+            "xwobacon": 0.337,
+            "xera": 3.25,
+            "xwoba_allowed": null,
+            "bbe": 314
+          },
+          "pctiles": {
+            "ip_gs": "(P80-90)",
+            "whiff_pct": "(P55-60)",
+            "bb9": "(P60-70)",
+            "gb_pct": "(P60-70)",
+            "xwobacon": "(>P90)",
+            "xera": "(P80-90)"
+          }
+        },
+        {
+          "name": "Reid Detmers",
+          "team": "LAA",
+          "type": "SP",
+          "selected_pos": "SP",
+          "weekly": {
+            "starts": 1,
+            "ip": 5.3,
+            "w": 0,
+            "k": 6,
+            "qs": 0,
+            "era": 1.69,
+            "whip": 0.75
+          },
+          "season": {
+            "gs": 21,
+            "ip": "120.0",
+            "era": 4.05,
+            "whip": "1.10",
+            "k": 136,
+            "w": 3,
+            "qs": 8,
+            "ip_gs": 5.71,
+            "whiff_pct": 28.95096741344196,
+            "bb9": 2.775,
+            "gb_pct": 36.50793650793651,
+            "xwobacon": 0.352,
+            "xera": 3.32,
+            "xwoba_allowed": null,
+            "bbe": 315
+          },
+          "pctiles": {
+            "ip_gs": "(P60-70)",
+            "whiff_pct": "(P80-90)",
+            "bb9": "(P55-60)",
+            "gb_pct": "(<P25)",
+            "xwobacon": "(P70-80)",
+            "xera": "(P80-90)"
+          }
+        },
+        {
+          "name": "J.T. Ginn",
+          "team": "ATH",
+          "type": "SP",
+          "selected_pos": "SP",
+          "weekly": null,
+          "season": {
+            "gs": 19,
+            "ip": "109.1",
+            "era": 3.46,
+            "whip": "1.22",
+            "k": 100,
+            "w": 8,
+            "qs": 9,
+            "ip_gs": 5.39,
+            "whiff_pct": 26.884780092592592,
+            "bb9": 4.033536585365854,
+            "gb_pct": 47.350993377483434,
+            "xwobacon": 0.341,
+            "xera": 3.98,
+            "xwoba_allowed": null,
+            "bbe": 302
+          },
+          "pctiles": {
+            "ip_gs": "(P40-45)",
+            "whiff_pct": "(P70-80)",
+            "bb9": "(<P25)",
+            "gb_pct": "(P70-80)",
+            "xwobacon": "(>P90)",
+            "xera": "(P60-70)"
+          }
+        },
+        {
+          "name": "Andre Pallante",
+          "team": "STL",
+          "type": "SP",
+          "selected_pos": "P",
+          "weekly": {
+            "starts": 1,
+            "ip": 7.0,
+            "w": 1,
+            "k": 8,
+            "qs": 1,
+            "era": 0.0,
+            "whip": 0.43
+          },
+          "season": {
+            "gs": 20,
+            "ip": "112.1",
+            "era": 3.77,
+            "whip": "1.21",
+            "k": 83,
+            "w": 11,
+            "qs": 7,
+            "ip_gs": 5.62,
+            "whiff_pct": 21.767342465753426,
+            "bb9": 2.5637982195845703,
+            "gb_pct": 55.45977011494251,
+            "xwobacon": 0.322,
+            "xera": 3.65,
+            "xwoba_allowed": null,
+            "bbe": 348
+          },
+          "pctiles": {
+            "ip_gs": "(P60-70)",
+            "whiff_pct": "(P25-40)",
+            "bb9": "(P60-70)",
+            "gb_pct": "(>P90)",
+            "xwobacon": "(>P90)",
+            "xera": "(P70-80)"
+          }
+        },
+        {
+          "name": "Joey Cantillo",
+          "team": "CLE",
+          "type": "SP",
+          "selected_pos": "P",
+          "weekly": {
+            "starts": 1,
+            "ip": 3.7,
+            "w": 0,
+            "k": 4,
+            "qs": 0,
+            "era": 12.27,
+            "whip": 2.45
+          },
+          "season": {
+            "gs": 22,
+            "ip": "109.2",
+            "era": 4.02,
+            "whip": "1.46",
+            "k": 116,
+            "w": 8,
+            "qs": 4,
+            "ip_gs": 4.98,
+            "whiff_pct": 29.305084745762716,
+            "bb9": 4.349544072948328,
+            "gb_pct": 45.72368421052632,
+            "xwobacon": 0.35,
+            "xera": 3.89,
+            "xwoba_allowed": null,
+            "bbe": 304
+          },
+          "pctiles": {
+            "ip_gs": "(<P25)",
+            "whiff_pct": "(P80-90)",
+            "bb9": "(<P25)",
+            "gb_pct": "(P60-70)",
+            "xwobacon": "(P80-90)",
+            "xera": "(P60-70)"
+          }
+        },
+        {
+          "name": "Aaron Ashby",
+          "team": "MIL",
+          "type": "RP",
+          "selected_pos": "RP",
+          "weekly": {
+            "starts": 2,
+            "ip": 2.3,
+            "w": 0,
+            "k": 4,
+            "qs": 0,
+            "era": 0.0,
+            "whip": 0.43
+          },
+          "season": {
+            "gs": 1,
+            "ip": "60.0",
+            "era": 3.3,
+            "whip": "1.40",
+            "k": 82,
+            "w": 12,
+            "qs": 0,
+            "ip_gs": 2.33,
+            "whiff_pct": 32.888952380952375,
+            "bb9": 4.5,
+            "gb_pct": 50.34013605442179,
+            "xwobacon": 0.332,
+            "xera": 3.03,
+            "xwoba_allowed": null,
+            "bbe": 147
+          },
+          "pctiles": {
+            "xera": "(P80-90)"
+          }
+        },
+        {
+          "name": "Hunter Gaddis",
+          "team": "CLE",
+          "type": "RP",
+          "selected_pos": "RP",
+          "weekly": {
+            "starts": 3,
+            "ip": 2.0,
+            "w": 0,
+            "k": 2,
+            "qs": 0,
+            "era": 9.0,
+            "whip": 1.5
+          },
+          "season": {
+            "gs": 0,
+            "ip": "33.2",
+            "era": 2.94,
+            "whip": "1.34",
+            "k": 32,
+            "w": 1,
+            "qs": 0,
+            "ip_gs": null,
+            "whiff_pct": 31.424693520140107,
+            "bb9": 3.2079207920792068,
+            "gb_pct": 32.35294117647059,
+            "xwobacon": 0.374,
+            "xera": 4.35,
+            "xwoba_allowed": null,
+            "bbe": 102
+          },
+          "pctiles": {
+            "xera": "(P45-50)"
+          }
+        },
+        {
+          "name": "Trevor McDonald",
+          "team": "SF",
+          "type": "SP",
+          "selected_pos": "BN",
+          "weekly": {
+            "starts": 1,
+            "ip": 4.0,
+            "w": 0,
+            "k": 3,
+            "qs": 0,
+            "era": 6.75,
+            "whip": 1.5
+          },
+          "season": {
+            "gs": 14,
+            "ip": "70.1",
+            "era": 5.12,
+            "whip": "1.31",
+            "k": 57,
+            "w": 3,
+            "qs": 5,
+            "ip_gs": 5.02,
+            "whiff_pct": 21.069217238346525,
+            "bb9": 2.943127962085309,
+            "gb_pct": 54.37788018433176,
+            "xwobacon": 0.33,
+            "xera": 4.09,
+            "xwoba_allowed": null,
+            "bbe": 217
+          },
+          "pctiles": {
+            "ip_gs": "(<P25)",
+            "whiff_pct": "(<P25)",
+            "bb9": "(P50-55)",
+            "gb_pct": "(P80-90)",
+            "xwobacon": "(>P90)",
+            "xera": "(P55-60)"
+          }
+        }
+      ]
+    },
+    "two_week_ranks": {
+      "weeks": [
+        17,
+        18
+      ],
+      "merged": {
+        "SauzMyJauz": {
+          "R": 56,
+          "HR": 24,
+          "RBI": 61,
+          "SB": 5,
+          "BB": 50,
+          "AVG": 0.275,
+          "OPS": 0.885,
+          "IP": 111.3,
+          "W": 6,
+          "K": 114,
+          "ERA": 3.4,
+          "WHIP": 1.07,
+          "QS": 11,
+          "SV+H": 5
+        },
+        "SUMMER": {
+          "R": 62,
+          "HR": 22,
+          "RBI": 61,
+          "SB": 8,
+          "BB": 29,
+          "AVG": 0.288,
+          "OPS": 0.884,
+          "IP": 102.3,
+          "W": 5,
+          "K": 87,
+          "ERA": 3.69,
+          "WHIP": 1.2,
+          "QS": 9,
+          "SV+H": 5
+        },
+        "99 APO": {
+          "R": 54,
+          "HR": 17,
+          "RBI": 44,
+          "SB": 7,
+          "BB": 46,
+          "AVG": 0.249,
+          "OPS": 0.813,
+          "IP": 64.0,
+          "W": 5,
+          "K": 75,
+          "ERA": 1.83,
+          "WHIP": 1.02,
+          "QS": 4,
+          "SV+H": 6
+        },
+        "Fantasy 9Tsai": {
+          "R": 34,
+          "HR": 8,
+          "RBI": 41,
+          "SB": 2,
+          "BB": 23,
+          "AVG": 0.251,
+          "OPS": 0.672,
+          "IP": 98.7,
+          "W": 2,
+          "K": 95,
+          "ERA": 4.65,
+          "WHIP": 1.25,
+          "QS": 7,
+          "SV+H": 6
+        },
+        "WorkWork": {
+          "R": 53,
+          "HR": 15,
+          "RBI": 54,
+          "SB": 6,
+          "BB": 53,
+          "AVG": 0.251,
+          "OPS": 0.796,
+          "IP": 112.7,
+          "W": 6,
+          "K": 103,
+          "ERA": 3.28,
+          "WHIP": 1.2,
+          "QS": 11,
+          "SV+H": 4
+        },
+        "Fantasy Chicken": {
+          "R": 51,
+          "HR": 15,
+          "RBI": 55,
+          "SB": 5,
+          "BB": 23,
+          "AVG": 0.278,
+          "OPS": 0.801,
+          "IP": 105.7,
+          "W": 10,
+          "K": 106,
+          "ERA": 4.0,
+          "WHIP": 1.33,
+          "QS": 8,
+          "SV+H": 3
+        },
+        "Annbii Studio": {
+          "R": 29,
+          "HR": 6,
+          "RBI": 28,
+          "SB": 5,
+          "BB": 35,
+          "AVG": 0.216,
+          "OPS": 0.665,
+          "IP": 104.0,
+          "W": 9,
+          "K": 113,
+          "ERA": 3.81,
+          "WHIP": 1.12,
+          "QS": 11,
+          "SV+H": 1
+        },
+        "YoBonBonLo": {
+          "R": 43,
+          "HR": 13,
+          "RBI": 41,
+          "SB": 6,
+          "BB": 27,
+          "AVG": 0.213,
+          "OPS": 0.636,
+          "IP": 117.3,
+          "W": 6,
+          "K": 113,
+          "ERA": 5.45,
+          "WHIP": 1.41,
+          "QS": 7,
+          "SV+H": 1
+        },
+        "RALLY MONKEY®": {
+          "R": 50,
+          "HR": 7,
+          "RBI": 32,
+          "SB": 6,
+          "BB": 27,
+          "AVG": 0.255,
+          "OPS": 0.693,
+          "IP": 94.7,
+          "W": 6,
+          "K": 106,
+          "ERA": 3.52,
+          "WHIP": 1.17,
+          "QS": 4,
+          "SV+H": 0
+        },
+        "99 940": {
+          "R": 34,
+          "HR": 12,
+          "RBI": 35,
+          "SB": 3,
+          "BB": 24,
+          "AVG": 0.221,
+          "OPS": 0.673,
+          "IP": 90.7,
+          "W": 6,
+          "K": 105,
+          "ERA": 2.38,
+          "WHIP": 0.93,
+          "QS": 8,
+          "SV+H": 4
+        },
+        "鍋's Neat Team": {
+          "R": 31,
+          "HR": 5,
+          "RBI": 24,
+          "SB": 14,
+          "BB": 23,
+          "AVG": 0.212,
+          "OPS": 0.579,
+          "IP": 37.7,
+          "W": 2,
+          "K": 37,
+          "ERA": 5.73,
+          "WHIP": 1.46,
+          "QS": 1,
+          "SV+H": 5
+        },
+        "BUMMER": {
+          "R": 40,
+          "HR": 11,
+          "RBI": 35,
+          "SB": 9,
+          "BB": 34,
+          "AVG": 0.211,
+          "OPS": 0.691,
+          "IP": 86.7,
+          "W": 9,
+          "K": 98,
+          "ERA": 2.7,
+          "WHIP": 0.98,
+          "QS": 9,
+          "SV+H": 4
+        }
+      },
+      "my_ranks": {
+        "R": 10,
+        "HR": 7,
+        "RBI": 8,
+        "SB": 11,
+        "BB": 9,
+        "AVG": 8,
+        "OPS": 8,
+        "IP": 9,
+        "W": 8,
+        "K": 6,
+        "ERA": 2,
+        "WHIP": 1,
+        "QS": 7,
+        "SV+H": 7
+      }
+    },
+    "scan_summary": {
+      "issue_number": 463,
+      "issue_url": "https://github.com/huansbox/mlb-fantasy/issues/463",
+      "issue_date": "2026-07-27",
+      "analysis": "[FA Scan SP-v4] Step A failed; defaulting to pass\n\nAnchor (eligible-pool P1): Joey Cantillo\nFA pool size: 11\n\n---"
+    }
+  },
+  "preview": {
+    "opponent_name": "WorkWork",
+    "opponent_key": "469.l.105457.t.12",
+    "opponent_roster": {
+      "batters": [
+        {
+          "name": "Gabriel Moreno",
+          "team": "AZ",
+          "positions": [
+            "C"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Willson Contreras",
+          "team": "BOS",
+          "positions": [
+            "1B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Luis García Jr.",
+          "team": "WSH",
+          "positions": [
+            "1B",
+            "2B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Isaac Paredes",
+          "team": "HOU",
+          "positions": [
+            "1B",
+            "3B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Dansby Swanson",
+          "team": "CHC",
+          "positions": [
+            "SS"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Randy Arozarena",
+          "team": "SEA",
+          "positions": [
+            "LF",
+            "CF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "JJ Bleday",
+          "team": "CIN",
+          "positions": [
+            "LF",
+            "CF",
+            "RF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Fernando Tatis Jr.",
+          "team": "SD",
+          "positions": [
+            "2B",
+            "RF"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Geraldo Perdomo",
+          "team": "AZ",
+          "positions": [
+            "SS"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Rafael Devers",
+          "team": "SF",
+          "positions": [
+            "1B"
+          ],
+          "role": "starter"
+        },
+        {
+          "name": "Juan Soto",
+          "team": "NYM",
+          "positions": [
+            "LF",
+            "RF"
+          ],
+          "role": "IL"
+        }
+      ],
+      "pitchers": [
+        {
+          "name": "Tanner Bibee",
+          "team": "CLE",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Jacob deGrom",
+          "team": "TEX",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Shane Baz",
+          "team": "BAL",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Kyle Bradish",
+          "team": "BAL",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Grant Taylor",
+          "team": "CWS",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Matthew Boyd",
+          "team": "CHC",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Jesús Luzardo",
+          "team": "PHI",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Hunter Brown",
+          "team": "HOU",
+          "type": "SP",
+          "role": "starter"
+        },
+        {
+          "name": "Eury Pérez",
+          "team": "MIA",
+          "type": "SP",
+          "role": "bench"
+        },
+        {
+          "name": "Bryce Elder",
+          "team": "ATL",
+          "type": "SP",
+          "role": "bench"
+        },
+        {
+          "name": "Spencer Arrighetti",
+          "team": "HOU",
+          "type": "SP",
+          "role": "IL"
+        }
+      ]
+    },
+    "my_sp_schedule": [
+      {
+        "date": "2026-07-28",
+        "pitcher": "Chris Sale",
+        "team": "ATL",
+        "vs": "New York Mets",
+        "confirmed": true
+      },
+      {
+        "date": "2026-07-28",
+        "pitcher": "Reid Detmers",
+        "team": "LAA",
+        "vs": "Houston Astros",
+        "confirmed": true
+      },
+      {
+        "date": "2026-07-29",
+        "pitcher": "Tarik Skubal",
+        "team": "DET",
+        "vs": "Baltimore Orioles",
+        "confirmed": true
+      },
+      {
+        "date": "2026-07-29",
+        "pitcher": "Joey Cantillo",
+        "team": "CLE",
+        "vs": "Cincinnati Reds",
+        "confirmed": true
+      }
+    ],
+    "opp_sp_schedule": [
+      {
+        "date": "2026-07-27",
+        "pitcher": "Kyle Bradish",
+        "team": "BAL",
+        "vs": "Detroit Tigers",
+        "confirmed": true
+      },
+      {
+        "date": "2026-07-29",
+        "pitcher": "Jesús Luzardo",
+        "team": "PHI",
+        "vs": "Miami Marlins",
+        "confirmed": true
+      },
+      {
+        "date": "2026-07-29",
+        "pitcher": "Matthew Boyd",
+        "team": "CHC",
+        "vs": "St. Louis Cardinals",
+        "confirmed": true
+      }
+    ],
+    "probable_as_of": "2026-07-27T01:00:26.420385-04:00",
+    "positional_coverage": {
+      "2026-07-27": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Ozzie Albies",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [
+          "Victor Caratini",
+          "Manny Machado",
+          "Byron Buxton"
+        ],
+        "dead_slots": []
+      },
+      "2026-07-28": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-07-29": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-07-30": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez"
+        ],
+        "players_no_game": [
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "dead_slots": []
+      },
+      "2026-07-31": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-08-01": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      },
+      "2026-08-02": {
+        "players_with_games": [
+          "Shea Langeliers",
+          "Victor Caratini",
+          "Ozzie Albies",
+          "Manny Machado",
+          "Mauricio Dubón",
+          "Jordan Walker",
+          "Byron Buxton",
+          "Jazz Chisholm Jr.",
+          "Curtis Mead",
+          "Luis Arraez",
+          "Christian Walker",
+          "Gleyber Torres"
+        ],
+        "players_no_game": [],
+        "dead_slots": []
+      }
+    },
+    "predicted_outcome": null
+  },
+  "unexecuted_recommendations": [
+    {
+      "player": "Trent Grisham",
+      "action": "act_now",
+      "recommend_days": 5,
+      "reason": "ACT NOW（慢軌，4★，已推薦 5 天未執行）"
+    },
+    {
+      "player": "Isaac Paredes",
+      "action": "act_now",
+      "recommend_days": 4,
+      "reason": "ACT NOW（慢軌，4★，已推薦 4 天未執行）"
+    },
+    {
+      "player": "Kody Clemens",
+      "action": "act_now",
+      "recommend_days": 3,
+      "reason": "ACT NOW（慢軌，4★，已推薦 3 天未執行）"
+    },
+    {
+      "player": "Joc Pederson",
+      "action": "act_now",
+      "recommend_days": 3,
+      "reason": "ACT NOW（慢軌，3★，已推薦 3 天未執行）"
+    },
+    {
+      "player": "Matt McLain",
+      "action": "act_now",
+      "recommend_days": 2,
+      "reason": "ACT NOW（慢軌，3★，已推薦 2 天未執行）"
+    },
+    {
+      "player": "A.J. Ewing",
+      "action": "act_now",
+      "recommend_days": 2,
+      "reason": "ACT NOW（慢軌，2★，已推薦 2 天未執行）"
+    },
+    {
+      "player": "Brandon Nimmo",
+      "action": "act_now",
+      "recommend_days": 2,
+      "reason": "ACT NOW（慢軌，4★，已推薦 2 天未執行）"
+    },
+    {
+      "player": "Heriberto Hernández",
+      "action": "pending",
+      "recommend_days": 1,
+      "reason": "慢軌待確認（第 1/2 天）"
+    },
+    {
+      "player": "Gabriel Moreno",
+      "action": "pending",
+      "recommend_days": 1,
+      "reason": "慢軌待確認（第 1/2 天）"
+    },
+    {
+      "player": "Trevor Larnach",
+      "action": "pending",
+      "recommend_days": 1,
+      "reason": "慢軌待確認（第 1/2 天）"
+    },
+    {
+      "player": "Michael Busch",
+      "action": "pending",
+      "recommend_days": 1,
+      "reason": "慢軌待確認（第 1/2 天）"
+    }
+  ]
+}
