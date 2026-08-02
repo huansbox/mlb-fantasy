@@ -1,0 +1,441 @@
+{
+  "candidates": [
+    {
+      "name": "Joey Cantillo",
+      "team": "CLE",
+      "position": "SP",
+      "selected_pos": "P",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 4.94,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 29.765705614567526,
+            "percentile": 80
+          },
+          "BB/9": {
+            "raw": 4.275659824046921,
+            "percentile": 0
+          },
+          "GB%": {
+            "raw": 45.512820512820504,
+            "percentile": 60
+          },
+          "xwOBACON": {
+            "raw": 0.353,
+            "percentile": 70
+          }
+        },
+        "context": {
+          "xera": 3.82,
+          "era": 3.88,
+          "bbe": 312,
+          "ip": 113.66666666666667,
+          "g": 23,
+          "gs": 23,
+          "k9": 9.818181818181818,
+          "whip": 1.45
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.331,
+        "season_xwobacon": 0.353,
+        "delta": -0.021999999999999964,
+        "bbe": 49,
+        "csw_pct": 37.2,
+        "pitches": 328
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": [],
+      "ledger_note": [
+        "[記事] 上次 hold（26 天前）",
+        "[原撿因] [backfill：上線日季線，非真實 add 理由] IP/GS 5.06 / Whiff% 27.7 / BB/9 4.35 / GB% 42.3 / xwOBACON .362 / IP 91.0"
+      ],
+      "next_week_starts": {
+        "starts": 2,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [
+          "2026-08-04",
+          "2026-08-09"
+        ],
+        "source": "probable"
+      }
+    },
+    {
+      "name": "Trevor McDonald",
+      "team": "SF",
+      "position": "SP",
+      "selected_pos": "BN",
+      "status": "IL15",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.02,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 21.069217238346525,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": 2.943127962085309,
+            "percentile": 50
+          },
+          "GB%": {
+            "raw": 54.377880184331794,
+            "percentile": 80
+          },
+          "xwOBACON": {
+            "raw": 0.33,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 4.07,
+          "era": 5.12,
+          "bbe": 217,
+          "ip": 70.33333333333331,
+          "g": 14,
+          "gs": 14,
+          "k9": 7.293838862559244,
+          "whip": 1.31
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.304,
+        "season_xwobacon": 0.33,
+        "delta": -0.026000000000000023,
+        "bbe": 31,
+        "csw_pct": 29.1,
+        "pitches": 141
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [
+        "⚠️ 球速下滑 (SI -1.2 vs season)"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "ledger_note": [
+        "[記事] 上次 hold（26 天前）",
+        "[原撿因] [backfill：上線日季線，非真實 add 理由] IP/GS 5.18 / Whiff% 22.4 / BB/9 3.00 / GB% 56.2 / xwOBACON .331 / IP 57.0"
+      ],
+      "next_week_starts": {
+        "starts": 0,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [],
+        "source": "stale"
+      }
+    },
+    {
+      "name": "Reid Detmers",
+      "team": "LAA",
+      "position": "SP",
+      "selected_pos": "SP",
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.68,
+            "percentile": 60
+          },
+          "Whiff%": {
+            "raw": 29.340234375,
+            "percentile": 80
+          },
+          "BB/9": {
+            "raw": 2.736,
+            "percentile": 55
+          },
+          "GB%": {
+            "raw": 35.99999999999998,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.361,
+            "percentile": 60
+          }
+        },
+        "context": {
+          "xera": 3.38,
+          "era": 4.03,
+          "bbe": 325,
+          "ip": 125.0,
+          "g": 22,
+          "gs": 22,
+          "k9": 10.44,
+          "whip": 1.1
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.424,
+        "season_xwobacon": 0.361,
+        "delta": 0.063,
+        "bbe": 36,
+        "csw_pct": 32.5,
+        "pitches": 255
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": [],
+      "ledger_note": [
+        "[記事] 上次 hold（26 天前）",
+        "[原撿因] [backfill：上線日季線，非真實 add 理由] IP/GS 5.81 / Whiff% 29.0 / BB/9 2.92 / GB% 37.0 / xwOBACON .339 / IP 104.7"
+      ],
+      "next_week_starts": {
+        "starts": 2,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [
+          "2026-08-04",
+          "2026-08-09"
+        ],
+        "source": "cadence"
+      }
+    }
+  ],
+  "fa_candidates": [
+    {
+      "name": "Clay Holmes",
+      "team": "NYM",
+      "position": "SP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.85,
+            "percentile": 70
+          },
+          "Whiff%": {
+            "raw": 21.88067632850242,
+            "percentile": 25
+          },
+          "BB/9": {
+            "raw": 3.075949367088607,
+            "percentile": 40
+          },
+          "GB%": {
+            "raw": 55.333333333333314,
+            "percentile": 95
+          },
+          "xwOBACON": {
+            "raw": 0.348,
+            "percentile": 80
+          }
+        },
+        "context": {
+          "xera": 3.91,
+          "era": 2.39,
+          "bbe": 150,
+          "ip": 52.66666666666668,
+          "g": 9,
+          "gs": 9,
+          "k9": 7.689873417721517,
+          "whip": 1.1
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.348,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [
+        "✅ 深投型",
+        "✅ GB 重型"
+      ],
+      "warn_tags": [
+        "⚠️ K 壓制不足",
+        "⚠️ 賣高運氣"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": "",
+      "ledger_note": [
+        "[記事] 上次 watch（26 天前）",
+        "[原撿因] IP/GS 5.85 / Whiff% 21.9 / BB/9 3.08 / GB% 55.3 / xwOBACON .348"
+      ],
+      "next_week_starts": {
+        "starts": 0,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [],
+        "source": "stale"
+      }
+    },
+    {
+      "name": "Brandon Woodruff",
+      "team": "MIL",
+      "position": "SP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.04,
+            "percentile": 0
+          },
+          "Whiff%": {
+            "raw": 23.310954616588422,
+            "percentile": 40
+          },
+          "BB/9": {
+            "raw": 1.9852941176470587,
+            "percentile": 80
+          },
+          "GB%": {
+            "raw": 27.586206896551737,
+            "percentile": 0
+          },
+          "xwOBACON": {
+            "raw": 0.332,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 2.84,
+          "era": 2.98,
+          "bbe": 116,
+          "ip": 45.333333333333336,
+          "g": 9,
+          "gs": 9,
+          "k9": 9.330882352941176,
+          "whip": 0.84
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": null,
+        "season_xwobacon": 0.332,
+        "delta": null,
+        "bbe": null
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [],
+      "low_confidence": false,
+      "notes": [],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": "",
+      "ledger_note": [
+        "[記事] 上次 watch（22 天前）",
+        "[原撿因] IP/GS 5.04 / Whiff% 23.3 / BB/9 1.99 / GB% 27.6 / xwOBACON .332"
+      ],
+      "next_week_starts": {
+        "starts": 0,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [],
+        "source": "stale"
+      }
+    },
+    {
+      "name": "Keider Montero",
+      "team": "DET",
+      "position": "SP,RP",
+      "selected_pos": null,
+      "status": "",
+      "season_v4": {
+        "slots": {
+          "IP/GS": {
+            "raw": 5.65,
+            "percentile": 60
+          },
+          "Whiff%": {
+            "raw": 18.662860727728983,
+            "percentile": 0
+          },
+          "BB/9": {
+            "raw": 1.8761329305135954,
+            "percentile": 95
+          },
+          "GB%": {
+            "raw": 42.43323442136499,
+            "percentile": 45
+          },
+          "xwOBACON": {
+            "raw": 0.328,
+            "percentile": 95
+          }
+        },
+        "context": {
+          "xera": 3.48,
+          "era": 3.34,
+          "bbe": 337,
+          "ip": 110.33333333333331,
+          "g": 23,
+          "gs": 17,
+          "k9": 6.444108761329306,
+          "whip": 1.02
+        }
+      },
+      "rolling_21d": {
+        "xwobacon": 0.34,
+        "season_xwobacon": 0.328,
+        "delta": 0.01200000000000001,
+        "bbe": 47,
+        "csw_pct": 35.7,
+        "pitches": 263
+      },
+      "pa_tags": [],
+      "sample_tags": [],
+      "add_tags": [],
+      "warn_tags": [
+        "⚠️ K 壓制不足"
+      ],
+      "low_confidence": false,
+      "notes": [],
+      "pct": null,
+      "d1": null,
+      "d3": null,
+      "waiver_date": "",
+      "ledger_note": [
+        "[記事] 上次 watch（11 天前）",
+        "[原撿因] IP/GS 5.76 / Whiff% 17.3 / BB/9 2.03 / GB% 40.9 / xwOBACON .327"
+      ],
+      "next_week_starts": {
+        "starts": 1,
+        "window": [
+          "2026-08-03",
+          "2026-08-09"
+        ],
+        "dates": [
+          "2026-08-08"
+        ],
+        "source": "cadence"
+      }
+    }
+  ],
+  "low_confidence_excluded": []
+}
