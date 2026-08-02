@@ -408,3 +408,20 @@ Episodes:
 - 2026-07-03 (1d) `watch` watch Trevor McDonald → **hit**
 - 2026-07-04 (2d) `drop_X_add_Y` drop Ryan Johnson → add Trevor McDonald → **hit**, Δ +0.064
 
+
+## Weekly Backtest 2026-08-02 (2026-07-07 ~ 2026-07-09)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 3 (actionable: 1; episodes in lookback: 16)
+- Hit rate: 0%
+
+By action:
+- `drop_X_add_Y` n=1 (actionable 0) hit_rate=—
+- `watch` n=2 (actionable 1) hit_rate=0%
+- `pass` n=0 (actionable 0) hit_rate=—
+
+Episodes:
+- 2026-07-07 (1d) `drop_X_add_Y` drop Joey Cantillo → add Clay Holmes → **neutral**
+- 2026-07-08 (4d) `watch` watch Robert Gasser → **miss**
+- 2026-07-09 (2d) `watch` watch Brandon Woodruff → **neutral**
+

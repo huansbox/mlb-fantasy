@@ -184,3 +184,29 @@ Episodes:
 - 2026-07-04 (2d) `watch` watch Dominic Canzone vs Ozzie Albies → 機械比數 FA 1W-3L-2T → **pending-judge** 〔not executed〕
 - 2026-07-05 (1d) `watch` watch Josh Bell vs Christian Walker → 機械比數 FA 3W-3L-0T → **pending-judge** 〔not executed〕
 
+
+## Weekly Batter Backtest 2026-08-02 (2026-07-06 ~ 2026-07-12)
+
+- Episode age window: [21, 28) days; post-verdict observation: 21 days; issue lookback: 42 days
+- Episodes due this run: 11 (replace 6 / watch 5; episodes in lookback: 54)
+- ⚠️ Judge panel FAILED（2 calls，輸出契約連續違反，failed_judge=judge_1）— outcomes 留 **pending-judge**；本批帳下週會老化出 [21, 28) 窗，需手動 `--age-min/--age-max` 重跑補判
+- Executed split（issue 031，roster git 歷史機械判定；執行窗 = episode 首日 → 末日 + 3d）: executed 0（hit-rate —）/ not-executed 11（hit-rate —）
+
+Decision KPIs (issue 051):
+- ⭐ star-bucket 命中率: 5★ 0/0 (—) / 4★ 0/0 (—) / ≤3★ 0/0 (—)
+- ⏱ 觸發→執行延遲中位: —（n=0；目標 ≤2 天）
+- 🔁 regret（撿入後 30 天內再推薦）: 0
+
+Episodes:
+- 2026-07-06 (2d) `replace/取代` add Joc Pederson ⇄ drop Ozzie Albies → 機械比數 FA 2W-3L-1T → **pending-judge** 〔not executed〕
+- 2026-07-06 (1d) `replace/取代` add Josh Bell ⇄ drop Christian Walker → 機械比數 FA 4W-1L-1T → **pending-judge** 〔not executed〕
+- 2026-07-07 (2d) `replace/取代` add Cam Smith ⇄ drop Ozzie Albies → 機械比數 FA 0W-5L-1T → **pending-judge** 〔not executed〕
+- 2026-07-08 (1d) `watch` watch A.J. Ewing vs Ozzie Albies → 機械比數 FA 2W-3L-1T → **pending-judge** 〔not executed〕
+- 2026-07-08 (1d) `watch` watch Heriberto Hernández vs Christian Walker → 機械比數 FA 5W-0L-1T → **pending-judge** 〔not executed〕
+- 2026-07-09 (2d) `replace/立即取代` add A.J. Ewing ⇄ drop Ozzie Albies → 機械比數 FA 1W-4L-1T → **pending-judge** 〔not executed〕
+- 2026-07-09 (1d) `watch` watch Heriberto Hernández vs Mauricio Dubón → 機械比數 FA 5W-1L-0T → **pending-judge** 〔not executed〕
+- 2026-07-09 (1d) `watch` watch Joc Pederson vs Mauricio Dubón → 機械比數 FA 5W-0L-1T → **pending-judge** 〔not executed〕
+- 2026-07-11 (1d) `replace/取代` add Heriberto Hernández ⇄ drop Ozzie Albies → 機械比數 FA 2W-4L-0T → **pending-judge** 〔not executed〕
+- 2026-07-12 (2d) `replace/立即取代` add Trent Grisham ⇄ drop Ozzie Albies → 機械比數 FA 1W-5L-0T → **pending-judge** 〔not executed〕
+- 2026-07-12 (2d) `watch` watch Joc Pederson vs Ozzie Albies → 機械比數 FA 4W-2L-0T → **pending-judge** 〔not executed〕
+
