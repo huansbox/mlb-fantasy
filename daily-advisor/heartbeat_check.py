@@ -76,18 +76,16 @@ def should_alert(last_success_epoch, now_epoch, threshold_hours=THRESHOLD_HOURS)
 
 
 def build_alert_message(age_hours, threshold_hours=THRESHOLD_HOURS):
+    """只講「出事了 + 多久」，刻意不附診斷指令或可能原因。
+
+    使用者一律透過 AI agent 排查，不會自己去下 shell 指令 — 指令對他是雜訊，
+    而 agent 自己查得到（也不該被預設的「常見原因」先入為主帶偏方向）。
+    """
     if age_hours is None:
-        head = "找不到日報成功紀錄（heartbeat 檔不存在或內容損毀）。"
+        detail = "找不到日報成功紀錄（heartbeat 檔不存在或內容損毀）。"
     else:
-        head = f"已 {age_hours:.1f} 小時沒有成功送出日報（門檻 {threshold_hours}h）。"
-    return (
-        "日報異常\n\n"
-        f"{head}\n\n"
-        "查法：\n"
-        "  tail -40 /var/log/daily-advisor.log\n"
-        "  cd /tmp && claude -p \"Reply with exactly: PONG\"\n\n"
-        "常見原因：Claude token 過期、cron 被停用、VPS 重開後服務沒起來。"
-    )
+        detail = f"已 {age_hours:.1f} 小時沒有成功送出日報（門檻 {threshold_hours}h）。"
+    return f"日報異常\n\n{detail}"
 
 
 def send_telegram(message, env):

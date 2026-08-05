@@ -94,11 +94,21 @@ def test_integer_epoch_reads_as_float(tmp_path):
 def test_message_without_age_says_record_missing():
     msg = build_alert_message(None)
     assert "找不到日報成功紀錄" in msg
-    assert "daily-advisor.log" in msg
 
 
 def test_message_with_age_reports_hours_and_threshold():
     msg = build_alert_message(49.5)
     assert "49.5 小時" in msg
     assert "48h" in msg
-    assert "claude -p" in msg
+
+
+@pytest.mark.parametrize("age", [None, 49.5])
+def test_message_carries_no_diagnostic_instructions(age):
+    """訊息刻意精簡：使用者透過 AI agent 排查，shell 指令與臆測原因都是雜訊。
+
+    這條擋的是「順手把查法加回去」— 那是設計決定，不是遺漏。
+    """
+    msg = build_alert_message(age)
+    for noise in ("tail", "claude -p", "ssh", "cron", "常見原因", "查法"):
+        assert noise not in msg
+    assert len(msg.splitlines()) <= 3
