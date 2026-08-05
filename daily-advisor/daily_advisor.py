@@ -1435,6 +1435,28 @@ def send_telegram(message, env):
         return False
 
 
+HEARTBEAT_FILE = os.environ.get(
+    "DAILY_ADVISOR_HEARTBEAT", "/var/lib/mlb-fantasy/last_report_success"
+)
+
+
+def record_heartbeat():
+    """記錄一次成功送報的時間，供 heartbeat_check.py 偵測日報是否默默停擺。
+
+    路徑常數與 heartbeat_check.py 各自定義而非共用：那支刻意不 import 本檔
+    （見其 docstring — 本檔壞掉時它仍須能發警告），反向 import 也一樣危險，
+    會讓監控腳本的問題拖垮日報。重複一個常數換兩支腳本完全獨立。
+
+    寫檔失敗不影響日報：報告已經送出去了，heartbeat 純粹是監控用。
+    """
+    try:
+        os.makedirs(os.path.dirname(HEARTBEAT_FILE), exist_ok=True)
+        with open(HEARTBEAT_FILE, "w", encoding="utf-8") as f:
+            f.write(str(datetime.now().timestamp()))
+    except OSError as e:
+        print(f"heartbeat write failed (non-fatal): {e}", file=sys.stderr)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fantasy Baseball Daily Advisor")
     parser.add_argument("--dry-run", action="store_true", help="Only fetch data and print summary, skip claude and telegram")
@@ -1480,6 +1502,7 @@ def main():
     ok = send_telegram(advice, env)
     if ok:
         print("Sent.", file=sys.stderr)
+        record_heartbeat()
     else:
         print("Failed to send.", file=sys.stderr)
 
