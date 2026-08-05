@@ -2,6 +2,8 @@
 
 2026 Yahoo Fantasy Baseball 聯賽（12 隊、H2H One Win、7×7 類別）的**賽季管理自動化 + 決策支援系統**。選秀已完成，目前為 in-season 管理階段。
 
+> ⚠️ **當前狀態（2026-08-05）**：Yahoo 於 2026-07-28 對本專案的 app 全面撤銷 Fantasy API 存取（app-level 403，非 token 問題，重新授權無效）。系統多數自動化已停用，目前以**日報單線**降級運作。範圍見 [Maintenance](Maintenance)「當前運作範圍」，平台風險見 [Tech-Debt](Tech-Debt)。
+
 ## 這個專案在做什麼
 
 一句話：**VPS cron 跑 Python 機械層組資料 → `claude -p` 做 LLM 定性判斷 → Telegram 推送 + GitHub Issue 存檔；本機 Claude Code skills 負責手動決策場景。**
@@ -12,12 +14,12 @@
 
 ## 系統組成
 
-| 層 | 內容 |
-|---|---|
-| 機械層（Python） | `fa_scan.py` / `fa_compute.py` / `stream_sp_scan.py` / `rp_svh_scan.py` / `roster_sync.py` 等 — 資料抓取、hard rule 過濾、排序，**不做定性判斷** |
-| LLM 層（claude -p / skills） | 自由 reasoning 排 drop 優先序、FA classify、verdict — 機械層只餵 raw + percentile |
-| 存放層 | `roster_config.json`（陣容唯一來源）、`waiver-log.md`（球員追蹤）、GitHub Issues（報告存檔） |
-| 排程層 | VPS cron（每日 FA scan / 日報 / roster sync 每 15 分 / 週日 backtest） |
+| 層 | 內容 | 現況 |
+|---|---|---|
+| 機械層（Python） | `fa_scan.py` / `fa_compute.py` / `stream_sp_scan.py` / `rp_svh_scan.py` / `roster_sync.py` 等 — 資料抓取、hard rule 過濾、排序，**不做定性判斷** | 依賴 Yahoo 的部分停擺；`daily_advisor` / `savant_rolling` 只吃 MLB Stats API + Savant，照常運作 |
+| LLM 層（claude -p / skills） | 自由 reasoning 排 drop 優先序、FA classify、verdict — 機械層只餵 raw + percentile | 日報線正常；FA 掃描線因無候選資料而停 |
+| 存放層 | `roster_config.json`（陣容唯一來源）、`waiver-log.md`（球員追蹤）、GitHub Issues（報告存檔） | `roster_config.json` 凍結於 2026-07-22，改人工維護 |
+| 排程層 | VPS cron | 9 個排程縮到 4 個，見 [Maintenance](Maintenance) |
 
 評估框架的唯一定義在 repo 的 [`CLAUDE.md`](https://github.com/huansbox/mlb-fantasy/blob/master/CLAUDE.md)；資料流圖在 [`docs/architecture.md`](https://github.com/huansbox/mlb-fantasy/blob/master/docs/architecture.md)。
 
@@ -25,12 +27,13 @@
 
 - **Phase 1 — 選秀準備（已完成）**：7×7 格式分析 → VOR 排名 → Monte Carlo 模擬 → Draft Helper 工具
 - **Phase 2 — 賽季管理（進行中）**：每日戰報、FA 市場掃描、waiver 操作、每週覆盤、串流 SP / RP-SV+H 專用流程
+- **Phase 2.5 — 降級運作（2026-08-05 起）**：Yahoo API 中斷後保留不依賴 Yahoo 的日報單線；工程投資暫停，等平台狀態明朗
 
 ## Wiki 頁面導覽
 
 | 頁面 | 內容 |
 |---|---|
-| [Maintenance](Maintenance) | 維運手冊 — 執行環境、cron 排程、同步 pipeline、部署與故障排查 |
+| [Maintenance](Maintenance) | 維運手冊 — 執行環境、當前運作範圍、cron 排程、部署與故障排查 |
 | [Roadmap](Roadmap) | 路線圖 — 已完成里程碑時間線 + 未來方向 |
 | [Plan](Plan) | 執行中計畫 — 當前開發主軸與待辦快照 |
 | [Tech Debt](Tech-Debt) | 技術債清單 — 已知欠帳與風險 |
