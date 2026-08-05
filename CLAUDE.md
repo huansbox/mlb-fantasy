@@ -1,5 +1,25 @@
 # MLB Fantasy Baseball 2026 賽季管理
 
+> ## ⚠️ 當前狀態（2026-08-05）— Yahoo API 已中斷，多數自動化停用
+>
+> Yahoo 於 **2026-07-28** 對本專案的 app 全面撤銷 Fantasy API 存取，所有端點回 app-level 403
+> `"This application is not authorized to perform this action."`（連公開的 `/game/mlb` 都擋）。
+> **不是 token 問題，重新授權無效**；write scope 更早在 2025-10 就被官方移除。全業界事件，
+> 非個案。完整時間線、證據與判斷見 memory `project_yahoo_api_revoked`。
+>
+> - **還在跑**：日報（平日 TW 05:30 / 假日 TW 22:30，行動清單格式）、`savant_rolling`（TW 12:00）
+>   — 兩者只吃 MLB Stats API + Savant，不碰 Yahoo
+> - **已停用**：`fa_scan`、`fa_scan --snapshot-only`、`weekly_review --prepare`、
+>   `roster_sync`（每 15 分 + reconcile）、B2 backtest
+> - **不能用的 skill**：`/waiver-scan`、`/rp-svh`、`/stream-sp`、`/stream-sp-deep`、
+>   `/weekly-review`、`/sync-roster`、`/xingxiu`（全需 Yahoo）；`/player-eval` 打者流程可用，
+>   SP 流程部分步驟需 Yahoo
+> - `roster_config.json` **凍結在 2026-07-22**，不再自動同步 — 名單有異動需手動編輯
+> - **恢復方式**：VPS 上 `mv /etc/cron.d/daily-advisor.disabled-20260805 /etc/cron.d/daily-advisor`
+>   即還原完整排程（該檔是斷線前的原始版本，未經修改）
+>
+> **以下各段描述的是 Yahoo 正常時的完整流程 — 在 Yahoo 恢復前多數不適用。**
+
 ## 專案概述
 
 2026 Yahoo Fantasy Baseball 聯賽 — 選秀已完成，目前為 in-season 管理階段。
