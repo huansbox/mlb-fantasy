@@ -472,6 +472,8 @@ RP（品質指標同 SP 方向；K/9 和 IP/Team_G 越高越好）：
 | `bin/vps-run.sh` | SSH 到 VPS 的 timeout + retry wrapper（本機↔VPS 路徑間歇丟包，見 `issues/vps-ssh-handshake-hang.md`）。`bash bin/vps-run.sh [--no-retry] '<remote cmd>'`，純讀指令會 retry、寫檔/git 走 `--no-retry`。skill 的 SSH step 與本機手動 VPS 指令都走它 |
 | `hooks/sync-mirror.mjs` | SessionStart hook（roster 新鮮度 pipeline 第 1 層）— 開場 `git fetch origin master`，master+乾淨+可 ff 時自動 `pull --ff-only` 拉進 VPS cron 已同步的最新 roster_config.json，否則只警告。純 git 走 GitHub、不碰 VPS SSH / Yahoo。註冊於 `.claude/settings.json`。詳見「執行環境」段 |
 | `daily-advisor/daily_advisor.py` | 每日戰報（單一 adaptive 報；平日 TW 05:30 報 ET 夜場 / 假日 TW 22:30 報 ET 日場） |
+| `daily-advisor/heartbeat_check.py` | 日報健康檢查（cron TW 07:00 = UTC 23:00）— `daily_advisor` 送報成功時寫 `/var/lib/mlb-fantasy/last_report_success`，本腳本檢查其年齡 >48h 就推 Telegram 警告（只錯一天不吵，連錯兩天才報）。**刻意獨立成腳本且雙向不 import `daily_advisor`** — 那支若整個沒跑或壞掉，它無法回報自己的缺席。背景：2026-07 日報默默死了兩週沒人發現 |
+| `daily-advisor/tests/test_heartbeat_check.py` | heartbeat_check 單元測試（20 cases — should_alert 門檻邊界含正常最長間隔 32.5h 不誤報 / 連錯兩天 49.5h 觸發 / 剛好 48h 不觸發 / 時鐘回撥負年齡 / read_heartbeat 檔案遺失+內容損毀+空檔 / 警告訊息內容）|
 | `daily-advisor/fa_scan.py` | FA 市場分析唯一入口（每日 Batter+SP 並行 / 週一 RP / snapshot-only） |
 | `daily-advisor/fa_compute.py` | Python 機械計算層（B2 thin SP：anchor_filter + 5-slot Sum 排序 + 2026-only ✅⚠️ tags / Batter v4 thin：Sum ≥25 filter） |
 | `daily-advisor/anchor_filter.py` | SP B2 thin pure function（cant_cut + weekly_anchor_sp 名單，accent/apostrophe/case-insensitive 名稱比對）— `pick_weakest_v4_sp` 入口單一 call site |
