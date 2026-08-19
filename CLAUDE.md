@@ -1,24 +1,26 @@
 # MLB Fantasy Baseball 2026 賽季管理
 
-> ## ⚠️ 當前狀態（2026-08-05）— Yahoo API 已中斷，多數自動化停用
+> ## 📦 專案已封存（2026-08-19）— 等 2027 賽季重啟
 >
-> Yahoo 於 **2026-07-28** 對本專案的 app 全面撤銷 Fantasy API 存取，所有端點回 app-level 403
-> `"This application is not authorized to perform this action."`（連公開的 `/game/mlb` 都擋）。
-> **不是 token 問題，重新授權無效**；write scope 更早在 2025-10 就被官方移除。全業界事件，
-> 非個案。完整時間線、證據與判斷見 memory `project_yahoo_api_revoked`。
+> 2026 賽季戰績確定無望，專案已整體封存：不修改、不維護、不運作。預計 2027 賽季開打前重啟。
 >
-> - **還在跑**：日報（平日 TW 05:30 / 假日 TW 22:30，行動清單格式）、`savant_rolling`（TW 12:00）
->   — 兩者只吃 MLB Stats API + Savant，不碰 Yahoo
-> - **已停用**：`fa_scan`、`fa_scan --snapshot-only`、`weekly_review --prepare`、
->   `roster_sync`（每 15 分 + reconcile）、B2 backtest
-> - **不能用的 skill**：`/waiver-scan`、`/rp-svh`、`/stream-sp`、`/stream-sp-deep`、
->   `/weekly-review`、`/sync-roster`、`/xingxiu`（全需 Yahoo）；`/player-eval` 打者流程可用，
->   SP 流程部分步驟需 Yahoo
-> - `roster_config.json` **凍結在 2026-07-22**，不再自動同步 — 名單有異動需手動編輯
-> - **恢復方式**：VPS 上 `mv /etc/cron.d/daily-advisor.disabled-20260805 /etc/cron.d/daily-advisor`
->   即還原完整排程（該檔是斷線前的原始版本，未經修改）
+> - **VPS**：`/etc/cron.d/` 下已無任何 active 排程（全部是 `.bak*` / `.disabled*`）。日報、
+>   `savant_rolling`、`heartbeat_check` 於 2026-08-19 停用；`fa_scan`、`weekly_review --prepare`、
+>   `roster_sync`、B2 backtest 更早（2026-07-28 Yahoo API 撤銷後）就已停用
+> - **GitHub**：repo 已 archive（唯讀，擋 push / PR / 新 issue；既有 issue / wiki 仍可瀏覽）
+> - **本機**：兩台開發機（Windows / Mac）均未跑本機排程（架構本就是「本機只做開發與 git push」），
+>   無需額外處理；`.claude/settings.json` 的 hooks（`sync-mirror` / `block-local-yahoo`）維持原樣，
+>   不花費、不主動做事
+> - `roster_config.json` **凍結在 2026-07-22**，不再自動同步
+> - **重啟方式**（2027 賽季前）：
+>   1. GitHub repo 網頁 Settings → Danger Zone → Unarchive（或 `gh api -X PATCH repos/huansbox/mlb-fantasy -f archived=false`）
+>   2. VPS：`mv /etc/cron.d/daily-advisor.disabled-20260819 /etc/cron.d/daily-advisor` 還原最小排程
+>      （本身已是 Yahoo 中斷後的縮減版；若 Yahoo API 已恢復，改還原 `daily-advisor.disabled-20260805` 完整版，
+>      並先查 memory `project_yahoo_api_revoked` 確認最新狀況）
+>   3. `roster_config.json` 手動比對 Yahoo 現況更新（凍結期間的異動不會自動補）
+>   4. 重新走過本檔「賽季運營 SOP」段，確認新賽季的聯賽設定（賽制/名單配置/計分類別）未變
 >
-> **以下各段描述的是 Yahoo 正常時的完整流程 — 在 Yahoo 恢復前多數不適用。**
+> **以下各段描述的是完整運作時的流程 — 封存期間不適用，供重啟時參考。**
 
 ## 專案概述
 
